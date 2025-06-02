@@ -1,1 +1,63 @@
 
+
+dictée-audio-assistant/
+│
+├── main.py
+├── requirements.txt
+└── README.md
+import speech_recognition as sr
+
+def transcribe_audio(file_path):
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(file_path) as source:
+        print("⏳ Analyse de l'audio...")
+        audio = recognizer.record(source)
+
+    try:
+        print("📝 Transcription en cours...")
+        text = recognizer.recognize_google(audio, language="fr-FR")
+        print("✅ Transcription terminée !\n")
+        return text
+    except sr.UnknownValueError:
+        return "❌ L'audio n'a pas pu être compris."
+    except sr.RequestError as e:
+        return f"Erreur lors de la requête : {e}"
+
+if __name__ == "__main__":
+    audio_file = "conseils_dictée.wav"  # Remplace par ton fichier audio
+    texte_transcrit = transcribe_audio(audio_file)
+    print(texte_transcrit)
+SpeechRecognition==3.10.0
+# 🎙️ Dictée Audio Assistant
+
+Ce projet écoute un fichier audio contenant des conseils de dictée et affiche le texte transcrit automatiquement.
+
+## ✅ Prérequis
+
+- Python 3.8+
+- pip
+
+## 📦 Installation
+
+```bash
+pip install -r requirements.txt
+python main.py
+1. Pratiquer régulièrement - Conseil : La pratique fait le maître ! ...
+
+---
+
+### 🎤 Audio d’entrée
+
+Pour tester, tu dois créer un fichier `.wav` contenant la lecture du texte (par exemple avec [Audacity](https://www.audacityteam.org/) ou ton téléphone).
+
+---
+
+### ➕ Améliorations possibles
+
+- Utiliser `whisper` pour meilleure précision offline.
+- Découper et analyser les phrases pour détecter les conseils individuellement.
+- Ajouter une interface web avec Flask.
+
+Souhaites-tu que je t’aide à générer un exemple de fichier audio ou à héberger le projet sur GitHub ?
+
+
