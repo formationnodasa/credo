@@ -1,182 +1,215 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clan Nodasa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f5f5f5;
-            --text-color: #111;
-            --primary-color: #e53935;
-            --secondary-color: #000;
-        }
-        body.dark-mode {
-            --bg-color: #121212;
-            --text-color: #ffffff;
-            --secondary-color: #fff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clan Nodasa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-color: #e53935;
+      --bg-light: #fefefe;
+      --bg-dark: #121212;
+      --text-light: #ffffff;
+      --text-dark: #222;
+      --accent: #ff6b6b;
+    }
 
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background 0.4s, color 0.4s;
-        }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      transition: 0.3s ease;
+    }
 
-        .toggle-btn {
-            position: fixed;
-            top: 10px;
-            right: 20px;
-            background: none;
-            border: 2px solid var(--text-color);
-            color: var(--text-color);
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.3s, color 0.3s;
-        }
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+    }
 
-        .toggle-btn:hover {
-            background: var(--text-color);
-            color: var(--bg-color);
-        }
+    header {
+      background: linear-gradient(120deg, #e53935, #d32f2f);
+      padding: 20px 0;
+      text-align: center;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
 
-        header {
-            background: linear-gradient(90deg, #d32f2f, #f44336);
-            padding: 20px;
-            color: white;
-            text-align: center;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
 
-        nav.navbar {
-            background-color: #333;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #222;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
 
-        nav.navbar a {
-            color: white;
-            padding: 14px 20px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
+    nav a {
+      color: white;
+      padding: 15px 25px;
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: bold;
+    }
 
-        nav.navbar a:hover {
-            background-color: #e53935;
-        }
+    nav a:hover {
+      background-color: var(--main-color);
+      color: white;
+    }
 
-        .welcome-banner {
-            background-color: #ffdede;
-            color: #d32f2f;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            animation: slideIn 5s linear infinite;
-        }
+    .toggle-btn {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background-color: transparent;
+      border: 2px solid white;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      z-index: 999;
+    }
 
-        @keyframes slideIn {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+    .content {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+    }
 
-        .content {
-            padding: 30px;
-            text-align: center;
-        }
+    .content img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
 
-        .content img {
-            width: 400px;
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+    .content h3 {
+      font-weight: normal;
+      line-height: 1.6;
+    }
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #eee;
-            margin-top: 40px;
-            color: var(--secondary-color);
-        }
+    .highlight {
+      color: var(--main-color);
+      font-weight: bold;
+    }
 
-        .logo-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
+    .scroll-banner {
+      background-color: #ffe6e6;
+      padding: 15px;
+      font-size: 1.2rem;
+      color: var(--main-color);
+      text-align: center;
+      animation: slide 15s linear infinite;
+      overflow: hidden;
+    }
 
-        .logo-container img {
-            width: 60px;
-        }
+    @keyframes slide {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
 
-        .contact {
-            margin-top: 40px;
-        }
+    footer {
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 60px;
+    }
 
-        .defile-image img {
-            width: 60px;
-            animation: defilement 5s linear infinite;
-        }
+    .defile-image img {
+      width: 60px;
+      animation: defilement 6s linear infinite;
+      margin: 20px 0;
+    }
 
-        @keyframes defilement {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+    @keyframes defilement {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
 
-    </style>
+    .logo-container {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+    }
+
+    .logo-container img {
+      width: 60px;
+      height: auto;
+    }
+
+    @media (max-width: 600px) {
+      nav a {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="logo-container">
-        <img src="logo.jpg" alt="Logo du site">
+  <div class="logo-container">
+    <img src="logo.jpg" alt="Logo Nodasa">
+  </div>
+
+  <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">
+    Mode sombre
+  </button>
+
+  <header>
+    <h1>Bienvenue sur le site du Clan Nodasa</h1>
+  </header>
+
+  <div class="scroll-banner">📚 Plusieurs leçons vous sont proposées 📚</div>
+
+  <nav>
+    <a href="choixdedictée.html">Dictée</a>
+    <a href="Anagramme.html">Anagramme</a>
+    <a href="champ.html">Champ lexical</a>
+    <a href="Choix.html">Mathématique</a>
+    <a href="choix eppelation.html">Epellation</a>
+  </nav>
+
+  <div class="content">
+    <img src="images (3).jpeg" alt="Illustration">
+    <h3>
+      Ce site a été créé par <span class="highlight">Ya Lwanga Credo Musao</span>, coach de dictée et épellation.
+      <br><br>
+      Il est destiné exclusivement aux membres du <span class="highlight">Clan Nodasa</span> pour améliorer leurs performances à travers un programme de formation unique.
+      <br><br>
+      Objectif : <strong>vous faire progresser</strong> avec des outils adaptés et une vraie méthodologie !
+      <br><br>
+      Merci à tous pour votre participation et votre engagement 💪
+    </h3>
+
+    <div class="defile-image">
+      <a href="https://mccommunication9.my.canva.site/dict-e-et-pellation">
+        <img src="Creed01.jpg" alt="Logo défilant">
+      </a>
     </div>
 
-    <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">Changer le mode</button>
-
-    <header>
-        <h1>Bienvenue à tous</h1>
-    </header>
-
-    <div class="welcome-banner">Plusieurs leçons vous sont proposées</div>
-
-    <nav class="navbar">
-        <a href="choixdedictée.html">Dictée</a>
-        <a href="Anagramme.html">Anagramme</a>
-        <a href="champ.html">Champ lexical</a>
-        <a href="Choix.html">Mathématique</a>
-        <a href="choix eppelation.html">Epellation</a>
-    </nav>
-
-    <div class="content">
-        <img src="images (3).jpeg" alt="Illustration">
-        <h3>
-            Ce site a été créé par <strong style="color:#e53935;">Ya Lwanga Credo Musao</strong>, coach de dictée et épellation.
-            <br><br>
-            Il est destiné aux joueurs du clan Nodasa avec pour objectif d'améliorer leurs performances à travers un programme de formation structuré.
-            <br><br>
-            Merci pour votre participation et bonne formation à tous !
-        </h3>
-
-        <div class="defile-image">
-            <a href="https://mccommunication9.my.canva.site/dict-e-et-pellation">
-                <img src="Creed01.jpg" alt="Logo défilant">
-            </a>
-        </div>
-
-        <div class="contact">
-            <img src="icon mail.jpg" width="30" alt="mail icon"> <br>
-            <a href="mailto:Dicteeetepellation@gmail.com">Dicteeetepellation@gmail.com</a>
-        </div>
+    <div class="contact">
+      <img src="icon mail.jpg" width="30" alt="Email"> <br>
+      <a href="mailto:Dicteeetepellation@gmail.com">Dicteeetepellation@gmail.com</a>
     </div>
+  </div>
 
-    <footer>
-        &copy;2025 Tous droits réservés
-    </footer>
+  <footer>
+    &copy; 2025 Clan Nodasa - Tous droits réservés
+  </footer>
 
 </body>
 </html>
