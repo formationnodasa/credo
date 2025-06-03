@@ -1,163 +1,138 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Champ lexical</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #000000;
-      --accent-color: #1b263b;
-      --highlight-color: #415a77;
-      --card-bg: #f0f4f8;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mathématiques - Priorités des Opérations</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #d32f2f;
+        }
 
-    body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #ffffff;
-      --accent-color: #778da9;
-      --highlight-color: #8ab4f8;
-      --card-bg: #1e1e1e;
-    }
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
-      padding: 20px;
-    }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "Segoe UI", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    .toggle-btn {
-      position: fixed;
-      top: 15px;
-      right: 20px;
-      background-color: var(--highlight-color);
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      z-index: 1000;
-    }
+        .toggle-btn {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: none;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s, color 0.3s, border 0.3s;
+        }
 
-    .toggle-btn:hover {
-      background-color: var(--accent-color);
-    }
+        .toggle-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
 
-    .back-btn {
-      position: fixed;
-      top: 15px;
-      left: 20px;
-      background-color: var(--highlight-color);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      z-index: 1000;
-    }
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+        }
 
-    .back-btn:hover {
-      background-color: var(--accent-color);
-    }
+        h2, h3 {
+            color: var(--accent-color);
+        }
 
-    h1 {
-      text-align: center;
-      color: var(--accent-color);
-      font-size: 38px;
-      margin-top: 100px;
-      font-family: 'Playfair Display', serif;
-    }
+        .content {
+            max-width: 900px;
+            margin: auto;
+            line-height: 1.6;
+        }
 
-    .content-card {
-      background-color: var(--card-bg);
-      border-radius: 20px;
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 40px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      transform: translateY(-10px);
-    }
+        .example {
+            background: rgba(200, 200, 200, 0.1);
+            padding: 10px 20px;
+            border-left: 4px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
 
-    .content-card h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      line-height: 1.7;
-      margin-bottom: 30px;
-    }
-
-    .content-card a {
-      text-decoration: none;
-      color: var(--highlight-color);
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .content-card a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .content-card {
-        margin: 20px;
-        padding: 25px;
-      }
-
-      h1 {
-        font-size: 28px;
-      }
-
-      .toggle-btn,
-      .back-btn {
-        padding: 8px 15px;
-        font-size: 14px;
-      }
-    }
-  </style>
+        a button {
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button>
+    <a href="Choix.html"><button>Retour</button></a>
 
-  <a href="https://formationnodasa.github.io/credo/accueil.html">
-    <button class="back-btn">⬅ Retour</button>
-  </a>
+    <div class="content">
+        <h1><strong>Mathématiques : Priorité des Opérations</strong></h1>
 
-  <button class="toggle-btn" onclick="toggleMode()" id="modeToggle">🌙 Mode sombre</button>
+        <h3>1. Addition et Soustraction</h3>
+        <p>Lorsqu'une équation comporte uniquement l'addition et la soustraction, on effectue les opérations de gauche à droite.</p>
+        <div class="example">
+            <strong>Exemples :</strong><br>
+            A. 45 + 6 - 2 = 51 - 2 = <strong>49</strong><br>
+            B. 25 + 6 - 5 = 31 - 5 = <strong>26</strong><br>
+            C. 45 - 5 + 2 = 40 + 2 = <strong>42</strong><br>
+            D. 36 - 5 + 8 = 31 + 8 = <strong>39</strong><br>
+            E. 75 - 45 - 30 = 30 - 30 = <strong>0</strong>
+        </div>
 
-  <h1>Champ lexical</h1>
+        <h3>2. Multiplication en priorité</h3>
+        <p>Quand une équation contient de l'addition, soustraction et multiplication, la multiplication est prioritaire.</p>
+        <div class="example">
+            A. 16 + 4 × 3 = 16 + 12 = <strong>28</strong><br>
+            B. 3 × 7 - 2 × 5 = 21 - 10 = <strong>11</strong><br>
+            C. 3 + 4 × 6 = 3 + 24 = <strong>27</strong><br>
+            D. 4 × 7 - 3 × 2 = 28 - 6 = <strong>22</strong><br>
+            E. 25 - 5 × 5 = 25 - 25 = <strong>0</strong>
+        </div>
 
-  <div class="content-card">
-    <h2>
-      Chers KA du Clan Nodasa,<br><br>
-      Si vous voulez devenir forts et efficaces au champ lexical, vous devez développer trois qualités essentielles :
-      <strong>la compréhension</strong>, <strong>l’anticipation</strong> et <strong>la rapidité</strong>.
-      Il faut savoir capter rapidement les questions, anticiper la bonne réponse avant même qu'elle ne sorte,
-      et la donner avant que l’équipe adverse ne réagisse.
-      <br><br>
-      Je vous encourage donc à vous exercer sérieusement, car c’est dans l'entraînement que naît la performance.
-      Je vous préviens également que j’avais commis certaines erreurs dans le passé lors des compositions des questions
-      de champ lexical, car je ne maîtrisais pas encore totalement les notions. Mais je me suis perfectionné par la suite.
-    </h2>
+        <h3>3. Division en priorité</h3>
+        <p>Dans une équation contenant la division, celle-ci est prioritaire.</p>
+        <div class="example">
+            A. 52 - 8 ÷ 2 = 52 - 4 = <strong>48</strong><br>
+            B. 35 + 6 + 5 + 4 ÷ 2 = 35 + 6 + 5 + 2 = <strong>48</strong>
+        </div>
 
-    <center>
-      <a href="ChamplexicalCredo .pdf" download>📄 <strong>Consultez le PDF</strong></a>
-    </center>
-  </div>
+        <h3>4. Toutes opérations combinées</h3>
+        <p>On commence par la multiplication et la division, puis on continue avec l'addition et la soustraction, de gauche à droite.</p>
+        <div class="example">
+            A. 45 × 2 ÷ 3 + 20 = 90 ÷ 3 + 20 = 30 + 20 = <strong>50</strong><br>
+            B. 3 ÷ 3 × 6 + 13 - 7 = 1 × 6 + 13 - 7 = 6 + 13 - 7 = 19 - 7 = <strong>12</strong><br>
+            C. 48 - 12 ÷ 4 + 3 × 2 = 48 - 3 + 6 = 45 + 6 = <strong>51</strong><br>
+            ...
+        </div>
 
-  <script>
-    function toggleMode() {
-      document.body.classList.toggle("dark-mode");
-      const btn = document.getElementById("modeToggle");
-      btn.textContent = document.body.classList.contains("dark-mode") ? "☀️ Mode clair" : "🌙 Mode sombre";
-    }
-  </script>
+        <h3><strong>Note Importante :</strong></h3>
+        <p>La multiplication et la division sont toujours prioritaires sur l'addition et la soustraction. En cas de présence de plusieurs opérations de même priorité, on suit l’ordre de gauche à droite.</p>
+        <div class="example">
+            Exemple :<br>
+            45 × 2 + 5 + 2 = 90 + 5 + 2 = <strong>97</strong><br>
+            180 ÷ 2 + 5 - 2 = 90 + 5 - 2 = <strong>93</strong>
+        </div>
 
+        <h2><strong>Encouragement</strong></h2>
+        <p><strong>NB :</strong> Je vous encourage vivement à vous orienter vers l'option mathématique dans les catégories d'exercices. Cela vous permettra de devenir plus performant en calcul mental et écrit. En vous exerçant régulièrement, vous améliorerez votre rapidité et votre précision.</p>
+    </div>
+
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
 </body>
 </html>
