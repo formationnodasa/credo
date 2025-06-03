@@ -2,179 +2,169 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clan Nodasa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dictée - Mode Clair/Sombre</title>
   <style>
     :root {
       --bg-color: #ffffff;
       --text-color: #000000;
-      --accent-color: #003366; /* Bleu foncé */
+      --btn-bg-color: #ff0000;
+      --btn-hover-bg-color: #990000;
+      --link-color: rgb(235, 37, 37);
+      --link-hover-bg-color: blue;
+      --link-hover-color: black;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --btn-bg-color: #cc3333;
+      --btn-hover-bg-color: #660000;
+      --link-color: #ff9999;
+      --link-hover-bg-color: #0044cc;
+      --link-hover-color: #eee;
     }
 
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: var(--bg-color);
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-      background-repeat: repeat;
-      background-size: auto;
       color: var(--text-color);
-      overflow-x: hidden;
-      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 2rem 1rem;
+    /* Bouton de bascule mode clair/sombre */
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s, border 0.3s;
+      z-index: 1000;
+    }
+    .toggle-btn:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    /* Boutons classiques */
+    button {
+      background-color: var(--btn-bg-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: var(--btn-hover-bg-color);
+    }
+
+    /* Navbar */
+    .navbar {
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+    .navbar a {
+      float: left;
+      display: block;
+      color: var(--link-color);
       text-align: center;
+      padding: 14px 20px;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .navbar a:hover {
+      background-color: var(--link-hover-bg-color);
+      color: var(--link-hover-color);
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    header img {
-      height: 50px;
+    /* Titres */
+    h1, h3 {
+      text-align: center;
+      margin: 20px 10px;
     }
 
     h1 {
-      font-size: 2rem;
-      color: var(--accent-color);
-      margin: 0 auto;
-    }
-
-    .toggle-btn {
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .navbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-
-    .navbar a {
-      text-decoration: none;
-      background: var(--accent-color);
-      color: white;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 0.95rem;
-      transition: 0.3s;
-    }
-
-    .navbar a:hover {
-      background-color: #001f4d;
-    }
-
-    .content {
-      font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
-    }
-
-    .content img {
-      max-width: 250px;
-      border-radius: 12px;
-      margin: 1rem 0;
-    }
-
-    .logo-defile {
-      overflow: hidden;
-      height: 50px;
-      margin: 1.5rem 0;
-    }
-
-    .logo-defile img {
-      height: 40px;
-      animation: scrollLogo 8s linear infinite;
-    }
-
-    @keyframes scrollLogo {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    footer {
-      font-size: 0.8rem;
-      color: #555;
-      margin-top: 3rem;
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .navbar a {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-      }
-
-      .content img {
-        max-width: 150px;
-      }
+      color: var(--btn-bg-color);
+      margin-top: 100px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <img src="logo.jpg" alt="Logo">
-      <h1>Bienvenue à tous</h1>
-      <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">Mode</button>
-    </header>
+  <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button>
 
-    <div class="navbar">
-      <a href="choixdedictée.html">📜 Dictée</a>
-      <a href="Anagramme.html">🔤 Anagramme</a>
-      <a href="champ.html">🌱 Lexique</a>
-      <a href="Choix.html">➗ Maths</a>
-      <a href="choix eppelation.html">📣 Épellation</a>
-    </div>
+  <a href="https://formationnodasa.github.io/credo/accueil.html">
+    <button>Back</button>
+  </a>
 
-    <div class="content">
-      <img src="images (3).jpeg" alt="Formation">
-      <p>
-        Ce site a été créé par <strong style="color:var(--accent-color);">Ya Lwanga Credo Musao</strong>,
-        coach de dictée et épellation du Clan Nodasa.<br><br>
-        Ce programme vise à renforcer vos compétences à travers des exercices ciblés et pratiques.
-        Votre engagement est la clé de votre progression.
-      </p>
+  <h1>Dictée</h1>
 
-      <div class="logo-defile">
-        <a href="https://mccommunication9.my.canva.site/dict-e-et-pellation">
-          <img src="Creed01.jpg" alt="Défilement logo">
-        </a>
-      </div>
-
-      <p><img src="icon mail.jpg" width="20" alt="email icon"> Dicteeetepellation@gmail.com</p>
-    </div>
-
-    <footer>
-      &copy; 2025 Clan Nodasa – Tous droits réservés
-    </footer>
+  <div class="navbar">
+    <a href="Dictée.html">COURS & EXERCICES</a>
+    <a href="dictéeinitiatique.html">Dictée initiatique</a>
+    <a href="exercices.html">Dictée française</a>
   </div>
+
+  <h1 style="color: var(--btn-bg-color);">CONSIGNES</h1>
+
+  <h3>
+    1. Pratiquer régulièrement - Conseil : La pratique fait le maître ! Il est important de faire des dictées régulièrement, même courtes, pour améliorer ta mémorisation et ta maîtrise de l'orthographe. Ne t'inquiète pas si au début, tu fais des erreurs, chaque erreur est une occasion d'apprendre et de t'améliorer.
+    <br><br>
+    2. Lire beaucoup - Conseil : La lecture est un excellent moyen de renforcer ton orthographe. Plus tu lis, plus tu verras comment les mots sont écrits, ce qui te permettra de mieux les retenir. Lis des livres, des histoires, ou même des articles intéressants pour toi.
+    <br><br>
+    3. Écouter attentivement - Conseil : Lorsque tu fais une dictée, écoute attentivement chaque mot. Fais attention aux sons, aux syllabes et aux lettres. Si tu entends bien, tu pourras mieux écrire.
+    <br><br>
+    4. Diviser les mots en syllabes - Conseil : Quand tu rencontres un mot difficile, essaie de le diviser en syllabes. Cela te permettra de mieux le comprendre et de ne pas oublier des lettres.
+    <br><br>
+    5. Utiliser un dictionnaire - Conseil : N’hésite pas à utiliser un dictionnaire pour vérifier les mots dont tu as un doute. Cela t’aidera à mieux retenir leur orthographe et à les utiliser correctement.
+    <br><br>
+    6. Apprendre les règles d’orthographe - Conseil : L’orthographe peut sembler difficile parfois, mais il existe des règles qui te permettront de ne plus faire certaines erreurs. Par exemple, connaître la règle des « é » et des « er », ou des doubles consonnes. Ces petites astuces peuvent t'aider beaucoup.
+    <br><br>
+    7. Faire des listes de mots - Conseil : Fais des listes de mots que tu trouves difficiles et révise-les régulièrement. La répétition aide à les fixer dans ta mémoire.
+    <br><br>
+    8. Réécrire les dictées - Conseil : Après avoir fait une dictée, prends le temps de la réécrire. Cela t’aidera à bien fixer les mots et à éviter de refaire les mêmes erreurs.
+    <br><br>
+    9. Ne pas se décourager - Conseil : Ne sois pas trop dur avec toi-même si tu fais des erreurs. Tout le monde fait des fautes, c’est normal. L’important est de comprendre tes erreurs pour ne pas les refaire. Avec de la persévérance, tu verras que tu t’amélioreras de jour en jour.
+    <br><br>
+    10. Prendre son temps - Conseil : Ne te précipite pas. Prends ton temps pour écouter, réfléchir et écrire. Il vaut mieux faire une dictée avec soin que de finir rapidement mais avec beaucoup d’erreurs.
+    <br><br>
+    11. Se corriger soi-même - Conseil : Quand tu fais une dictée, prends le temps de la relire et de te corriger avant de rendre ta copie pendant le challenge. Cela te permettra de repérer les fautes et de les corriger tout seul.
+    <br><br>
+    12. Demander de l’aide - Conseil : Si un mot ou une règle te pose problème, demande de l'aide à un encadreur, à un parent ou à un ami KA. Ils peuvent t'expliquer de manière simple et claire.
+    <br><br>
+    13. Faire des dictées à haute voix - Conseil : Essaie de faire des dictées à haute voix. Cela te permet d'entendre mieux les mots et de mieux les écrire.
+    <br><br>
+    14. Apprendre par cœur des mots fréquents - Conseil : Certains mots reviennent tout le temps. Apprends-les par cœur pour ne plus faire d’erreurs avec eux. Par exemple, "beaucoup", "toujours", "demain"...
+    <br><br>
+    15. Utiliser des supports visuels - Conseil : Si tu as du mal avec certains mots, écris-les sur des cartes ou utilise des images associées à des mots pour mieux les mémoriser.
+    <br><br>
+    16. Prendre soin de son écriture - Conseil : Une écriture soignée permet de mieux comprendre ce que tu écris et d’éviter les erreurs liées à une mauvaise lecture de ton propre travail. Prends ton temps pour écrire lisiblement.
+    <br><br>
+    17. Savoir que tout s'apprend - Conseil : Souviens-toi que tu n'es pas obligé d'être parfait tout de suite. Chaque jour est une opportunité pour apprendre et progresser. Même les personnes les plus expertes en orthographe ont dû apprendre et pratiquer à un moment donné.
+    <br><br>
+    18. Répéter les dictées - Conseil : Ne sois pas frustré si tu n'arrives pas à tout retenir après une première dictée. Répète plusieurs fois les dictées, cela te permettra de mieux les mémoriser et de ne pas refaire les mêmes fautes.
+    <br><br>
+    19. Utiliser des applications, des jeux éducatifs ou des livres - Conseil : Il existe des applications, des jeux éducatifs et des livres qui peuvent rendre la dictée plus ludique. Tu peux t'exercer en t’amusant, ce qui te motivera à t'améliorer.
+    <br><br>
+    20. Croire en vous - Conseil : Enfin, crois en toi ! Les erreurs font partie de l'apprentissage. Chaque jour, tu deviens un peu plus compétent. Avec de la persévérance, tu arriveras à atteindre tes objectifs.
+  </h3>
+
+  <script>
+    function toggleMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+  </script>
 
 </body>
 </html>
