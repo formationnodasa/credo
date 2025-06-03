@@ -2,161 +2,147 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Épellation des mots de la Bible</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catégories - Calcul Mental</title>
   <style>
     :root {
-      --bg-color: #f9f9f9;
-      --text-color: #1a1a1a;
-      --accent-color: #2a3d66;
-      --highlight-color: #3f5e8c;
-      --box-bg: #ffffff;
-      --pdf-bg: #eef2f7;
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --primary-color: #e74c3c;
+      --card-bg: #f8f8f8;
     }
 
     body.dark-mode {
-      --bg-color: #1a1a1a;
-      --text-color: #f0f0f0;
-      --accent-color: #a9c2ff;
-      --highlight-color: #7999c3;
-      --box-bg: #2a2a2a;
-      --pdf-bg: #333a45;
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --card-bg: #1e1e1e;
     }
 
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      transition: background-color 0.3s ease, color 0.3s ease;
-      padding: 20px;
-    }
-
-    .toggle-btn,
-    .back-btn {
-      position: fixed;
-      padding: 10px 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 25px;
-      color: #fff;
-      background-color: var(--highlight-color);
-      cursor: pointer;
-      z-index: 1000;
-      transition: background-color 0.3s ease;
-    }
-
-    .toggle-btn:hover,
-    .back-btn:hover {
-      background-color: var(--accent-color);
+      transition: background-color 0.4s, color 0.4s;
+      line-height: 1.6;
     }
 
     .toggle-btn {
-      top: 15px;
+      position: fixed;
+      top: 10px;
       right: 20px;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s, color 0.3s, border 0.3s;
     }
 
-    .back-btn {
-      top: 15px;
-      left: 20px;
+    .toggle-btn:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 80px auto 30px;
+      padding: 20px;
     }
 
     h1 {
       text-align: center;
-      margin-top: 100px;
-      font-size: 40px;
-      font-family: 'Playfair Display', serif;
-      color: var(--accent-color);
+      color: var(--primary-color);
+      margin-bottom: 40px;
     }
 
-    .pdf-card {
-      background-color: var(--pdf-bg);
-      border-radius: 20px;
-      max-width: 850px;
-      margin: 60px auto;
-      padding: 40px;
-      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+    h2 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 5px;
     }
 
-    .pdf-card h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      margin-bottom: 20px;
-      color: var(--accent-color);
-    }
-
-    .pdf-card p {
-      font-size: 18px;
-      line-height: 1.7;
-    }
-
-    .pdf-card a {
+    .back-btn {
       display: inline-block;
-      margin-top: 25px;
-      text-decoration: none;
+      margin: 15px 0;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
       color: white;
-      background-color: var(--highlight-color);
-      padding: 12px 25px;
-      border-radius: 8px;
+      text-decoration: none;
+      border-radius: 30px;
       font-weight: bold;
-      font-size: 18px;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s;
     }
 
-    .pdf-card a:hover {
-      background-color: var(--accent-color);
+    .back-btn:hover {
+      background-color: #c0392b;
     }
 
-    @media (max-width: 600px) {
-      .pdf-card {
-        padding: 25px;
-        margin: 40px 10px;
-      }
+    .quiz-section {
+      margin-bottom: 50px;
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+    }
 
-      h1 {
-        font-size: 30px;
-        margin-top: 80px;
-      }
+    .quiz-section p {
+      margin: 10px 0;
+    }
 
-      .toggle-btn,
-      .back-btn {
-        padding: 8px 15px;
-        font-size: 14px;
-      }
+    .answer-section {
+      margin-top: 20px;
+    }
 
-      .pdf-card a {
-        font-size: 16px;
-        padding: 10px 18px;
-      }
+    .question {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <a href="https://formationnodasa.github.io/credo/accueil.html">
-    <button class="back-btn">⬅ Retour</button>
-  </a>
+  <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button>
 
-  <button class="toggle-btn" onclick="toggleMode()" id="modeToggle">🌙 Mode sombre</button>
+  <div class="container">
+    <a class="back-btn" href="Choix.html">⬅ Retour</a>
+    <h1>Catégories - Calcul Mental</h1>
 
-  <h1>Anagramme</h1>
+    <section class="quiz-section">
+      <h2>Catégorie A</h2>
+      <p class="question">1. 15 + 25 - 10 = ?</p>
+      <p class="question">2. 50 ÷ 5 + 12 = ?</p>
+      <p class="question">3. 30 - 8 + 14 = ?</p>
+      <p class="question">4. 100 ÷ 4 - 15 = ?</p>
+      <p class="question">5. 75 + 25 ÷ 5 = ?</p>
+      <p class="question">6. 60 - 12 + 18 = ?</p>
+      <p class="question">7. 48 ÷ 6 + 10 = ?</p>
+      <p class="question">8. 120 - 40 ÷ 8 = ?</p>
+      <p class="question">9. 15 + 45 ÷ 9 = ?</p>
+      <p class="question">10. 72 - 24 + 8 = ?</p>
 
-  <div class="pdf-card">
-    <h2><strong>Chers KA du Clan Nodasa,</strong></h2>
-    <p>
-      Veuillez consulter le document PDF de <strong>Ya Lwanga Credo Musao</strong> pour approfondir vos recherches sur les anagrammes bibliques.
-      Ce recueil est un véritable trésor pour tous ceux qui veulent exceller dans les épreuves de Dictée et Épellation.
-      Prenez le temps de l’explorer : il contient des anagrammes utiles qui amélioreront vos performances. 💪📚
-    </p>
-    <a href="Anagrammecreed 2 .pdf" download>📄 Consultez le PDF</a>
+      <div class="answer-section">
+        <h3>Réponses</h3>
+        <p>1. 30</p>
+        <p>2. 22</p>
+        <p>3. 36</p>
+        <p>4. 10</p>
+        <p>5. 80</p>
+        <p>6. 66</p>
+        <p>7. 18</p>
+        <p>8. 115</p>
+        <p>9. 20</p>
+        <p>10. 56</p>
+      </div>
+    </section>
+
+    <!-- Tu peux continuer à copier-coller la même structure pour les autres séries : 11-20, 21-30 etc. -->
+
   </div>
 
   <script>
     function toggleMode() {
       document.body.classList.toggle("dark-mode");
-      const btn = document.getElementById("modeToggle");
-      btn.textContent = document.body.classList.contains("dark-mode") ? "☀️ Mode clair" : "🌙 Mode sombre";
     }
   </script>
 </body>
