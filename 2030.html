@@ -1,237 +1,156 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clan Nodasa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #000000;
-      --accent-color: #004080; /* Bleu foncé */
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mathématiques - Priorités des Opérations</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #d32f2f;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--bg-color);
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
-      overflow-x: hidden;
-    }
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+        }
 
-    body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #ffffff;
-    }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "Segoe UI", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      background-color: var(--bg-color);
-    }
+        .toggle-btn {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: none;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s, color 0.3s, border 0.3s;
+        }
 
-    header img {
-      height: 40px;
-    }
+        .toggle-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
 
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      color: var(--accent-color);
-      margin: 0 auto;
-    }
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+        }
 
-    .marquee {
-      background-color: #f2f2f2;
-      color: #333;
-      font-weight: bold;
-      padding: 10px;
-      margin: 20px auto;
-      width: 90%;
-      text-align: center;
-      animation: marquee 10s linear infinite;
-    }
+        h2, h3 {
+            color: var(--accent-color);
+        }
 
-    @keyframes marquee {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
+        .content {
+            max-width: 900px;
+            margin: auto;
+            line-height: 1.6;
+        }
 
-    .navbar {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 2rem auto;
-      max-width: 90%;
-    }
+        .example {
+            background: rgba(200, 200, 200, 0.1);
+            padding: 10px 20px;
+            border-left: 4px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
 
-    .navbar a {
-      background-color: var(--accent-color);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: background 0.3s;
-    }
-
-    .navbar a:hover {
-      background-color: #002244;
-    }
-
-    .content {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .content img {
-      width: 100%;
-      max-width: 360px;
-      margin: 20px auto;
-      display: block;
-      border-radius: 10px;
-    }
-
-    .content h3 {
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-
-    .defile-image {
-      width: 100%;
-      overflow: hidden;
-      margin: 30px 0;
-    }
-
-    .defile-image img {
-      width: 60px;
-      animation: scrollLogo 10s linear infinite;
-    }
-
-    @keyframes scrollLogo {
-      from { transform: translateX(100%); }
-      to { transform: translateX(-100%); }
-    }
-
-    .toggle-btn {
-      position: fixed;
-      top: 10px;
-      right: 20px;
-      background: var(--accent-color);
-      border: none;
-      color: white;
-      padding: 10px 15px;
-      font-weight: bold;
-      border-radius: 30px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      cursor: pointer;
-      transition: background 0.3s;
-      z-index: 999;
-    }
-
-    .toggle-btn:hover {
-      background: #002244;
-    }
-
-    .floating-logo {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 100;
-    }
-
-    .floating-logo img {
-      width: 60px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    p img {
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .navbar a {
-        padding: 10px 15px;
-        font-size: 0.9rem;
-      }
-
-      .content h3 {
-        font-size: 0.95rem;
-      }
-
-      .toggle-btn {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-      }
-    }
-  </style>
+        a button {
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="star-bg">
+<body>
+    <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button>
+    <a href="Choix.html"><button>Retour</button></a>
 
-  <div class="floating-logo">
-    <img src="logo.jpg" alt="Logo">
-  </div>
+    <div class="content">
+        <h1><strong>Mathématiques : Priorité des Opérations</strong></h1>
 
-  <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">Changer le mode</button>
+        <h3>1. Addition et Soustraction</h3>
+        <p>Lorsqu'une équation comporte uniquement l'addition et la soustraction, on effectue les opérations de gauche à droite.</p>
+        <div class="example">
+            <strong>Exemples :</strong><br>
+            A. 45 + 6 - 2 = 51 - 2 = <strong>49</strong><br>
+            B. 25 + 6 - 5 = 31 - 5 = <strong>26</strong><br>
+            C. 45 - 5 + 2 = 40 + 2 = <strong>42</strong><br>
+            D. 36 - 5 + 8 = 31 + 8 = <strong>39</strong><br>
+            E. 75 - 45 - 30 = 30 - 30 = <strong>0</strong>
+        </div>
 
-  <header>
-    <a href="info.html"><img src="icon personne.jpg" alt="profil"></a>
-    <h1>Bienvenue à tous</h1>
-  </header>
+        <h3>2. Multiplication en priorité</h3>
+        <p>Quand une équation contient de l'addition, soustraction et multiplication, la multiplication est prioritaire donc nous allons d’abord calculer l’équation ayant la multiplication.</p>
+        <div class="example">
+            A. 16 + 4 × 3 = 16 + 12 = <strong>28</strong><br>
+            B. 3 × 7 - 2 × 5 = 21 - 10 = <strong>11</strong><br>
+            C. 3 + 4 × 6 = 3 + 24 = <strong>27</strong><br>
+            D. 4 × 7 - 3 × 2 = 28 - 6 = <strong>22</strong><br>
+            E. 25 - 5 × 5 = 25 - 25 = <strong>0</strong>
+        </div>
 
-  <div class="marquee">Plusieurs leçons vous sont proposées</div>
+        <h3>3. Division en priorité</h3>
+        <p>Dans une équation contenant la division, celle-ci est prioritaire.</p>
+        <div class="example">
+            A. 52 - 8 ÷ 2 = 52 - 4 = <strong>48</strong><br>
+            B. 35 + 6 + 5 + 4 ÷ 2 = 35 + 6 + 5 + 2 = <strong>48</strong>
+        </div>
 
-  <div class="navbar">
-    <a href="choixdedictée.html">📜 Dictée</a>
-    <a href="Anagramme.html">🔤 Anagramme</a>
-    <a href="champ.html">🌱 Champ lexical</a>
-    <a href="Choix.html">➗ Mathématique</a>
-    <a href="choix eppelation.html">📣 Épellation</a>
-  </div>
+        <h3>4. Toutes opérations combinées</h3>
+        <p>On commence par la multiplication et la division, puis on continue avec l'addition et la soustraction, de gauche à droite.</p>
+        <div class="example">
+            A. 45 × 2 ÷ 3 + 20 = 90 ÷ 3 + 20 = 30 + 20 = <strong>50</strong><br>
+            B. 3 ÷ 3 × 6 + 13 - 7 = 1 × 6 + 13 - 7 = 6 + 13 - 7 = 19 - 7 = <strong>12</strong><br>
+            C. 48 - 12 ÷ 4 + 3 × 2 = 48 - 3 + 6 = 45 + 6 = <strong>51</strong><br>
+            D. 25 x 3 - 5 + 18 ÷ 2 = = 75 - 5 + 18 : 2 = 70 + 18 : 2 = 70 + 9 = <strong>79</strong><br>   E. 72 ÷ 9 x 6 - 2 + 5 = = 8 x 6 - 2 + 5 = 48 - 2 + 5 = 46 + 5 = <strong>51</strong><br>  F. 35 - 7 x 4 + 12 ÷ 3 = = 35 - 28 + 12 : 3 = 35- 28 + 12 : 3 = 35 - 28 + 4 = 7 + 4 = <strong>11</strong><br>   G. 50 ÷ 5 x 4 + 6 - 2 = = 10 x 4 + 6 - 2 = 40 + 6 - 2 = 46 - 2 = <strong>44</strong><br>   H. 24 + 16 - 8 ÷ 2 x 3 = = 24 + 16 - 4 x 3 = 24 + 16 - 12 = 40 - 12 = <strong>28</strong><br>   I. 80 ÷ 10 x 5 - 7 + 3 = = 8 x 5 - 7 + 3 = 40 - 7 + 3 = 33 + 3 = <strong>36</strong><br>   J. 45 - 9 x 3 + 6 ÷ 2 = = 45 - 27 + 6 : 2 = 45 -27 + 3 = 18 + 3 = <strong>21</strong><br>
 
-  <div class="content">
-    <img src="images (3).jpeg" alt="Formation">
+        </div>
 
-    <h3>
-      Ce site a été créé par <strong style="color:var(--accent-color);">Ya Lwanga Credo Musao</strong>, coach de dictée et épellation.<br><br>
-      Il est destiné aux joueurs du clan Nodasa.<br>
-      Ce programme vise à renforcer vos compétences à travers des exercices ciblés.<br>
-      Votre engagement est la clé de votre progression !<br><br>
-      Merci à tous pour votre participation et bonne formation.
-    </h3>
+        <h3><strong>Note Importante :</strong></h3>
+        <p>La multiplication et la division sont toujours prioritaires sur l'addition et la soustraction. Donc quand dans une équation nous avons la multiplication ou la division ( les priorités) nous commencerons d’abord par calculer le terme ayant la multiplication ou la division ( les priorités) puis ensuite calculer les autres termes en allant de la gauche vers la droite ➡➡➡ .</p>
+        <div class="example">
+            Exemple :<br>
+            45 × 2 + 5 + 2 = 90 + 5 + 2 = <strong>97</strong><br>
+            180 ÷ 2 + 5 - 2 = 90 + 5 - 2 = <strong>93</strong>
+        </div>
 
-    <div class="defile-image">
-      <a href="https://mccommunication9.my.canva.site/dict-e-et-pellation">
-        <img src="Creed01.jpg" alt="Logo Nodasa">
-      </a>
+
+
+        <h3><strong>Note Importante :</strong></h3>
+        <p> Et quand nous avons une équation dans laquelle nous avons la multiplication et la division vu que tous les deux sont des priorités nous commencerons par la priorité ( multiplication ou division ) qui vient avant l’autre en regardant de la gauche vers la droite..</p>
+        <div class="example">
+            Exemple :<br>
+            15+ 20 - 30 x 2 : 4 = = 15 + 20 - 60 : 4 = 15 + 20 - 15 = 35 - 15 =  <strong>20</strong><br>
+            20 x 4 - 25 + 18 : 2 = = 80 - 25 + 18 : 2 = 80 - 25 + 9 = 55 + 9 =  <strong>64</strong> <br>
+
+12 ÷ 3 + 6 x 4 - 2= = 4 + 6 x 4 - 2 = 4 + 24 - 2 = 28 - 2 =  <strong>26</strong> <br>
+
+
+        </div>
+
+
+        <h2><strong>Encouragement</strong></h2>
+        <p><strong>NB :</strong> Je vous encourage vivement à vous orienter vers l'option mathématique dans les catégories d'exercices. Cela vous permettra de devenir plus performant en calcul mental et écrit. En vous exerçant régulièrement, vous améliorerez votre rapidité et votre précision.</p>
     </div>
 
-    <p><img src="icon mail.jpg" width="20"> Dicteeetepellation@gmail.com</p>
-  </div>
-
-  <footer>
-    &copy; 2025 Tous droits réservés – Clan Nodasa
-  </footer>
-
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
 </body>
 </html>
