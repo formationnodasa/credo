@@ -1,90 +1,241 @@
 
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Feux d'artifice</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clan Nodasa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      background-color: black;
-      overflow: hidden;
+    :root {
+      --primary: #0044cc;
+      --accent: #0066ff;
+      --text: #222;
+      --bg: #ffffff;
     }
 
-    canvas {
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      color: var(--text);
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .logo-container {
+      position: absolute;
+      left: 20px;
+    }
+
+    .logo-container img {
+      width: 50px;
+    }
+
+    .profile-icon {
+      position: absolute;
+      right: 20px;
+    }
+
+    .profile-icon img {
+      width: 40px;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 90px;
+      background: linear-gradient(135deg, #007bff, #003366);
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: background 0.3s;
+      z-index: 999;
+    }
+
+    .toggle-btn:hover {
+      background: linear-gradient(135deg, #003366, #007bff);
+    }
+
+    .marquee {
+      background-color: #f0f0f0;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 20px;
+      background-color: #e6f0ff;
+    }
+
+    nav a {
+      background-color: var(--accent);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background-color: var(--primary);
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .content img.main {
+      width: 100%;
+      max-width: 350px;
+      margin: 20px auto;
+      border-radius: 12px;
       display: block;
+    }
+
+    .content h3 {
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .content strong {
+      color: var(--primary);
+    }
+
+    .defile-image {
+      overflow: hidden;
+      margin: 30px 0;
+    }
+
+    .defile-image img {
+      width: 60px;
+      animation: defilement 12s linear infinite;
+    }
+
+    @keyframes defilement {
+      from { transform: translateX(100%); }
+      to { transform: translateX(-100%); }
+    }
+
+    .mail {
+      margin: 20px 0;
+      font-size: 1rem;
+    }
+
+    .mail img {
+      width: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    footer {
+      background-color: #f5f5f5;
+      color: #555;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 600px) {
+      .toggle-btn {
+        right: 20px;
+        top: 80px;
+      }
+
+      nav {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .content img.main {
+        width: 90%;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
 
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  <div class="logo-container">
+    <img src="logo.jpg" alt="Logo du site">
+  </div>
 
-    const particles = [];
+  <div class="profile-icon">
+    <a href="info.html"><img src="icon personne.jpg" alt="Profil"></a>
+  </div>
 
-    function random(min, max) {
-      return Math.random() * (max - min) + min;
-    }
+  <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">🌙 Mode nuit</button>
 
-    class Particle {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = 2;
-        this.color = color;
-        this.speed = random(2, 10);
-        this.angle = random(0, 2 * Math.PI);
-        this.alpha = 1;
-        this.gravity = 0.05;
-      }
+  <header>
+    <h1>Bienvenue à tous</h1>
+  </header>
 
-      update() {
-        this.speed *= 0.98;
-        this.x += Math.cos(this.angle) * this.speed;
-        this.y += Math.sin(this.angle) * this.speed + this.gravity;
-        this.alpha -= 0.01;
-      }
+  <div class="marquee">Plusieurs leçons vous sont proposées</div>
 
-      draw() {
-        ctx.globalAlpha = this.alpha;
-        ctx.beginPath();
+  <nav>
+    <a href="choixdedictée.html">📜 Dictée</a>
+    <a href="Anagramme.html">🔤 Anagramme</a>
+    <a href="champ.html">🌱 Champ lexical</a>
+    <a href="Choix.html">➗ Mathématique</a>
+    <a href="choix eppelation.html">📣 Épellation</a>
+  </nav>
 
-ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
-    }
+  <div class="content">
+    <img src="images (3).jpeg" alt="Formation" class="main">
 
-    function createFirework() {
-      const x = random(100, canvas.width - 100);
-      const y = random(100, canvas.height / 2);
-      const color = `hsl(${random(0, 360)}, 100%, 50%)`;
-      for (let i = 0; i < 100; i++) {
-        particles.push(new Particle(x, y, color));
-      }
-    }
+    <h3>
+      Ce site a été créé par <strong>Ya Lwanga Credo Musao</strong>, coach de dictée et épellation.
+      <br><br>
+      Il est destiné exclusivement aux joueurs du clan Nodasa. Ce site contient le programme de formation
+      élaboré pour rendre chaque joueur plus efficace.
+      <br><br>
+      L'objectif est d'offrir des outils adaptés pour exceller lors des défis. Merci pour votre engagement.
+    </h3>
 
-    function animate() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p, i) => {
-        p.update();
-        p.draw();
-        if (p.alpha <= 0) particles.splice(i, 1);
-      });
-      requestAnimationFrame(animate);
-    }
+    <div class="defile-image">
+      <a href="https://mccommunication9.my.canva.site/dict-e-et-pellation">
+        <img src="Creed01.jpg" alt="Défilement Logo">
+      </a>
+    </div>
 
-    setInterval(createFirework, 1000);
-    animate();
-  </script>
+    <div class="mail">
+      <img src="icon mail.jpg" alt="Mail"> Dicteeetepellation@gmail.com
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Tous droits réservés – Clan Nodasa
+  </footer>
+
 </body>
 </html>
