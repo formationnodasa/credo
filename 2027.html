@@ -1,7 +1,3 @@
-Code c 
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,1102 +5,172 @@ Code c
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculs Catégorie C</title>
   <style>
-    /* Ton CSS existant ... */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --accent-color: #c70000;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --accent-color: #ff4d4d;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-color);
+      margin-bottom: 30px;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .toggle-btn:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    .calculs {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .calcul {
+      margin-bottom: 20px;
+      font-size: 18px;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
     .result {
       font-weight: bold;
       display: none;
       margin-left: 10px;
-      /* Retiré color ici pour changer dynamiquement */
+    }
+
+    .btn-verifier {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .btn-verifier:hover {
+      background-color: #a50000;
+    }
+
+    .back-button {
+      background-color: var(--accent-color);
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <!-- Bouton mode sombre, retour, etc. -->
+
+  <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button>
+  <a href="Cate.html" class="back-button">Retour</a>
+
+  <h1>Catégorie C</h1>
 
   <div class="calculs">
-    <div class="calcul">1. 20 + 10 × 2 − 5 ÷ 5 = ?
-      <br><button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-      <span class="result">Réponse : 39</span>
-    </div>
-    <!-- autres calculs -->
+    <!-- CALCULS 1 à 40 -->
+    <!-- Tu peux générer ça automatiquement, mais voici en brut -->
+    <script>
+      const calculs = [
+        ["20 + 10 × 2 − 5 ÷ 5", 39],
+        ["100 ÷ 4 + 6 × 2 − 5", 32],
+        ["15 × 2 + 8 − 9 ÷ 3", 35],
+        ["80 − 20 + 12 ÷ 3 × 2", 68],
+        ["25 + 15 × 2 − 40 ÷ 4", 45],
+        ["50 ÷ 2 + 8 × 3 − 4", 45],
+        ["60 − 30 + 6 ÷ 3 × 2", 34],
+        ["18 + 6 × 3 − 12 ÷ 4", 33],
+        ["40 ÷ 5 + 3 × 2 − 6", 8],
+        ["36 − 12 ÷ 4 + 7 × 2", 47],
+        ["100 − 40 ÷ 10 + 6 × 3", 114],
+        ["24 + 16 ÷ 4 × 3 − 6", 30],
+        ["50 + 10 − 5 × 2 ÷ 5", 58],
+        ["72 ÷ 9 − 3 + 10 × 2", 25],
+        ["60 + 15 − 5 ÷ 5 × 2", 73],
+        ["48 − 12 ÷ 4 + 6 × 2", 57],
+        ["30 + 6 ÷ 3 × 4 − 5", 33],
+        ["100 − 50 ÷ 10 + 8 × 2", 111],
+        ["10 × 5 + 20 − 30 ÷ 3", 60],
+        ["84 ÷ 6 + 9 × 2 − 7", 25],
+        ["50 + 10 × 2 − 8 ÷ 4", 68],
+        ["90 − 45 ÷ 5 + 6 × 2", 93],
+        ["36 ÷ 6 + 14 − 3 × 2", 14],
+        ["100 ÷ 2 − 20 + 5 × 3", 45],
+        ["60 + 18 ÷ 3 − 4 × 2", 58],
+        ["44 − 12 ÷ 4 + 7 × 3", 62],
+        ["81 ÷ 9 + 5 × 2 − 6", 13],
+        ["30 + 20 × 2 − 16 ÷ 4", 66],
+        ["96 ÷ 8 − 6 + 10 × 2", 26],
+        ["55 − 25 ÷ 5 + 12 × 2", 74],
+        ["70 ÷ 10 + 4 × 5 − 3", 24],
+        ["20 + 60 ÷ 6 − 5 × 2", 20],
+        ["64 − 32 ÷ 4 + 6 × 2", 68],
+        ["18 + 36 ÷ 6 − 4 × 2", 16],
+        ["48 ÷ 6 − 3 + 5 × 4", 25],
+        ["27 + 9 × 2 − 8 ÷ 4", 43],
+        ["100 − 50 ÷ 5 + 6 × 2", 102],
+        ["42 ÷ 6 + 10 − 3 × 2", 11],
+        ["60 + 15 × 2 − 18 ÷ 3", 84],
+        ["72 − 48 ÷ 6 + 5 × 3", 79],
+      ];
+
+      calculs.forEach((item, index) => {
+        document.write(`
+          <div class="calcul">${index + 1}. ${item[0]} = ?
+            <br><button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
+            <span class="result">Réponse : ${item[1]}</span>
+          </div>
+        `);
+      });
+    </script>
   </div>
 
   <script>
-    function afficherReponse(button) {
-      const resultSpan = button.nextElementSibling;
-      resultSpan.style.display = 'inline';
-      resultSpan.style.color = 'yellow';
-      button.style.display = 'none';
+    function afficherReponse(btn) {
+      const resultSpan = btn.nextElementSibling;
+      resultSpan.style.display = "inline";
+      resultSpan.style.color = "yellow";
+      btn.style.display = "none";
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle('dark-mode');
     }
   </script>
-</body>
-</html>
-
-
-<div class="calcul">
-  41. 40 + 12 × 3 − 18 ÷ 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 73</span>
-</div>
-
-<div class="calcul">
-  42. 90 ÷ 3 − 15 + 4 × 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 35</span>
-</div>
-
-<div class="calcul">
-  43. 100 − 60 ÷ 6 + 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 106</span>
-</div>
-
-<div class="calcul">
-  44. 50 ÷ 5 + 7 × 2 − 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 20</span>
-</div>
-
-<div class="calcul">
-  45. 72 − 24 ÷ 6 + 9 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 86</span>
-</div>
-
-<div class="calcul">
-  46. 36 + 20 ÷ 4 − 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 29</span>
-</div>
-
-<div class="calcul">
-  47. 80 − 10 × 2 + 36 ÷ 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 66</span>
-</div>
-
-<div class="calcul">
-  48. 64 ÷ 8 + 10 × 2 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  49. 18 × 2 − 4 + 32 ÷ 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 36</span>
-</div>
-
-<div class="calcul">
-  50. 100 + 60 ÷ 10 − 8 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 82</span>
-</div>
-
-<div class="calcul">
-  51. 90 − 6 × 4 + 40 ÷ 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 74</span>
-</div>
-
-<div class="calcul">
-  52. 25 + 45 ÷ 5 × 2 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 37</span>
-</div>
-
-<div class="calcul">
-  53. 36 ÷ 6 + 24 − 10 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 10</span>
-</div>
-
-<div class="calcul">
-  54. 60 + 30 ÷ 6 × 2 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 65</span>
-</div>
-
-<div class="calcul">
-  55. 80 ÷ 10 + 12 × 2 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 25</span>
-</div>
-
-<div class="calcul">
-  56. 44 − 16 ÷ 4 + 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 55</span>
-</div>
-
-<div class="calcul">
-  57. 100 − 10 × 3 + 9 ÷ 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 73</span>
-</div>
-
-<div class="calcul">
-  58. 72 ÷ 6 + 20 − 4 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 24</span>
-</div>
-
-<div class="calcul">
-  59. 96 − 24 ÷ 4 + 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 102</span>
-</div>
-
-<div class="calcul">
-  60. 60 ÷ 5 + 30 − 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 30</span>
-</div>
-
-<div class="calcul">
-  61. 40 ÷ 4 + 12 × 2 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 29</span>
-</div>
-
-<div class="calcul">
-  62. 90 + 20 ÷ 5 × 3 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 96</span>
-</div>
-
-<div class="calcul">
-  63. 100 − 8 × 3 + 24 ÷ 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 80</span>
-</div>
-
-<div class="calcul">
-  64. 36 + 10 × 2 − 16 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 52</span>
-</div>
-
-<div class="calcul">
-  65. 60 ÷ 6 + 9 × 2 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 21</span>
-</div>
-
-<div class="calcul">
-  66. 50 − 12 ÷ 4 + 6 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 65</span>
-</div>
-
-<div class="calcul">
-  67. 72 ÷ 8 + 14 × 2 − 10 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<div class="calcul">
-  68. 90 − 30 ÷ 5 + 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 98</span>
-</div>
-
-<div class="calcul">
-  69. 25 × 2 − 10 + 36 ÷ 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 46</span>
-</div>
-
-<div class="calcul">
-  70. 64 + 16 ÷ 4 − 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 58</span>
-</div>
-
-<div class="calcul">
-  71. 84 − 24 ÷ 6 + 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 95</span>
-</div>
-
-<div class="calcul">
-  72. 60 ÷ 10 + 6 × 3 − 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 20</span>
-</div>
-
-<div class="calcul">
-  73. 100 − 40 ÷ 4 + 9 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 108</span>
-</div>
-
-<div class="calcul">
-  74. 18 × 2 − 6 + 30 ÷ 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 36</span>
-</div>
-
-<div class="calcul">
-  75. 70 ÷ 10 + 20 − 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 15</span>
-</div>
-
-<div class="calcul">
-  76. 96 − 48 ÷ 6 + 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 104</span>
-</div>
-
-<div class="calcul">
-  77. 40 + 10 ÷ 5 × 6 − 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 50</span>
-</div>
-
-<div class="calcul">
-  78. 60 − 8 × 2 + 16 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 48</span>
-</div>
-
-<div class="calcul">
-  79. 32 ÷ 4 + 9 × 2 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 19</span>
-</div>
-
-<div class="calcul">
-  80. 100 ÷ 10 + 5 × 4 − 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<script>
-  function afficherReponse(button) {
-    const resultElement = button.nextElementSibling;
-
-    // Afficher la réponse
-    if (resultElement && resultElement.classList.contains('result')) {
-      resultElement.style.display = 'inline';
-    }
-
-    // Masquer le bouton
-    button.style.display = 'none';
-  }
-</script>
-
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Calcul</title>
-  <style>
-    .result {
-      display: none;
-      font-weight: bold;
-      color: Yellow; /* Réponse en jaune */
-    }
-  </style>
-</head>
-<body>
-
-<div class="calcul">
-  81. 64 ÷ 8 + 12 × 2 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 26</span>
-</div>
-
-<div class="calcul">
-  82. 45 + 30 ÷ 5 − 4 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 39</span>
-</div>
-
-<div class="calcul">
-  83. 90 − 10 × 2 + 24 ÷ 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 74</span>
-</div>
-
-<div class="calcul">
-  84. 56 + 20 ÷ 4 − 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 51</span>
-</div>
-
-<div class="calcul">
-  85. 100 ÷ 5 − 12 + 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 24</span>
-</div>
-
-<div class="calcul">
-  86. 72 − 36 ÷ 6 + 10 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 86</span>
-</div>
-
-<div class="calcul">
-  87. 60 + 18 ÷ 3 × 2 − 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 64</span>
-</div>
-
-<div class="calcul">
-  88. 48 ÷ 6 + 9 × 3 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 28</span>
-</div>
-
-<div class="calcul">
-  89. 100 − 30 ÷ 5 + 4 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 110</span>
-</div>
-
-<div class="calcul">
-  90. 36 × 2 − 12 + 20 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 65</span>
-</div>
-
-<div class="calcul">
-  91. 80 ÷ 10 + 6 × 5 − 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 35</span>
-</div>
-
-<div class="calcul">
-  92. 50 − 16 ÷ 4 + 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 60</span>
-</div>
-
-<div class="calcul">
-  93. 30 + 15 ÷ 5 − 2 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 25</span>
-</div>
-
-<div class="calcul">
-  94. 60 ÷ 6 + 20 − 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 15</span>
-</div>
-
-<div class="calcul">
-  95. 84 − 42 ÷ 6 + 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 89</span>
-</div>
-
-<div class="calcul">
-  96. 40 + 12 ÷ 3 − 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 30</span>
-</div>
-
-<div class="calcul">
-  97. 100 ÷ 4 − 10 + 6 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 33</span>
-</div>
-
-<div class="calcul">
-  98. 72 − 18 ÷ 6 + 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 85</span>
-</div>
-
-<div class="calcul">
-  99. 60 + 9 × 2 − 12 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 75</span>
-</div>
-
-<div class="calcul">
-  100. 96 ÷ 8 + 7 × 3 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<!-- Suite de 101 à 120 -->
-
-<div class="calcul">
-  101. 48 + 16 ÷ 4 − 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 37</span>
-</div>
-
-<div class="calcul">
-  102. 90 ÷ 6 + 14 × 2 − 10 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 33</span>
-</div>
-
-<div class="calcul">
-  103. 60 − 36 ÷ 6 + 8 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 78</span>
-</div>
-
-<div class="calcul">
-  104. 100 + 12 ÷ 4 − 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 89</span>
-</div>
-
-<div class="calcul">
-  105. 84 − 24 ÷ 6 + 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 95</span>
-</div>
-
-<div class="calcul">
-  106. 72 ÷ 8 + 20 × 2 − 15 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 34</span>
-</div>
-
-<div class="calcul">
-  107. 30 + 40 ÷ 5 − 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 26</span>
-</div>
-
-<div class="calcul">
-  108. 96 − 48 ÷ 6 + 7 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 109</span>
-</div>
-
-<div class="calcul">
-  109. 36 + 18 ÷ 3 − 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 32</span>
-</div>
-
-<div class="calcul">
-  110. 50 ÷ 5 + 9 × 2 − 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 24</span>
-</div>
-
-<div class="calcul">
-  111. 100 − 60 ÷ 6 + 11 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 112</span>
-</div>
-
-<div class="calcul">
-  112. 44 + 12 ÷ 3 − 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 36</span>
-</div>
-
-<div class="calcul">
-  113. 80 ÷ 10 + 10 × 3 − 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 30</span>
-</div>
-
-<div class="calcul">
-  114. 60 − 16 ÷ 4 + 9 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 74</span>
-</div>
-
-<div class="calcul">
-  115. 72 + 18 ÷ 6 − 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 61</span>
-</div>
-
-<div class="calcul">
-  116. 36 ÷ 6 + 8 × 2 − 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 19</span>
-</div>
-
-<div class="calcul">
-  117. 90 + 30 ÷ 5 − 6 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 78</span>
-</div>
-
-<div class="calcul">
-  118. 64 − 24 ÷ 6 + 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 75</span>
-</div>
-
-<div class="calcul">
-  119. 40 + 20 ÷ 4 − 4 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 33</span>
-</div>
-
-<div class="calcul">
-  120. 100 ÷ 10 + 12 × 2 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 29</span>
-</div>
-
-<script>
-  function afficherReponse(button) {
-    const resultElement = button.nextElementSibling;
-
-    if (resultElement && resultElement.classList.contains('result')) {
-      resultElement.style.display = 'inline';
-    }
-    button.style.display = 'none';
-  }
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Calcul</title>
-  <style>
-    .result {
-      display: none;
-      font-weight: bold;
-      color: Yellow; /* Réponse en jaune */
-    }
-    .calcul {
-      margin-bottom: 1em;
-    }
-  </style>
-</head>
-<body>
-
-<div class="calcul">
-  121. 48 ÷ 6 + 14 × 2 − 9 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<div class="calcul">
-  122. 100 − 20 ÷ 5 + 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 108</span>
-</div>
-
-<div class="calcul">
-  123. 36 + 18 ÷ 3 − 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 32</span>
-</div>
-
-<div class="calcul">
-  124. 90 ÷ 10 + 5 × 6 − 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 31</span>
-</div>
-
-<div class="calcul">
-  125. 80 − 40 ÷ 4 + 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 82</span>
-</div>
-
-<div class="calcul">
-  126. 60 + 30 ÷ 6 − 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 51</span>
-</div>
-
-<div class="calcul">
-  127. 96 ÷ 8 + 12 × 2 − 10 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 26</span>
-</div>
-
-<div class="calcul">
-  128. 50 − 10 ÷ 5 + 8 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 72</span>
-</div>
-
-<div class="calcul">
-  129. 70 ÷ 7 + 6 × 4 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 29</span>
-</div>
-
-<div class="calcul">
-  130. 64 − 16 ÷ 4 + 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 74</span>
-</div>
-
-<div class="calcul">
-  131. 40 + 36 ÷ 6 − 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 31</span>
-</div>
-
-<div class="calcul">
-  132. 72 ÷ 9 + 8 × 2 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 18</span>
-</div>
-
-<div class="calcul">
-  133. 100 − 48 ÷ 6 + 10 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 112</span>
-</div>
-
-<div class="calcul">
-  134. 60 + 24 ÷ 4 − 3 × 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 51</span>
-</div>
-
-<div class="calcul">
-  135. 84 − 18 ÷ 3 + 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 90</span>
-</div>
-
-<div class="calcul">
-  136. 90 ÷ 10 + 11 × 2 − 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<div class="calcul">
-  137. 36 + 16 ÷ 4 − 6 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 22</span>
-</div>
-
-<div class="calcul">
-  138. 80 − 12 ÷ 3 + 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 86</span>
-</div>
-
-<div class="calcul">
-  139. 100 ÷ 10 + 9 × 2 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 21</span>
-</div>
-
-<div class="calcul">
-  140. 72 + 18 ÷ 3 − 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 62</span>
-</div>
-
-<!-- Suite des calculs -->
-
-<div class="calcul">
-  141. 60 ÷ 6 + 15 × 2 − 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 32</span>
-</div>
-
-<div class="calcul">
-  142. 90 − 30 ÷ 5 + 4 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 96</span>
-</div>
-
-<div class="calcul">
-  143. 36 + 10 ÷ 2 − 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 29</span>
-</div>
-
-<div class="calcul">
-  144. 100 ÷ 10 + 7 × 3 − 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 25</span>
-</div>
-
-<div class="calcul">
-  145. 84 − 18 ÷ 6 + 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 93</span>
-</div>
-
-<div class="calcul">
-  146. 72 ÷ 9 + 10 × 2 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  147. 40 + 20 ÷ 5 − 4 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 36</span>
-</div>
-
-<div class="calcul">
-  148. 96 − 48 ÷ 6 + 8 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 104</span>
-</div>
-
-<div class="calcul">
-  149. 50 + 25 ÷ 5 − 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 43</span>
-</div>
-
-<div class="calcul">
-  150. 64 ÷ 8 + 12 × 2 − 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 25</span>
-</div>
-
-<div class="calcul">
-  151. 80 − 20 ÷ 4 + 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 90</span>
-</div>
-
-<div class="calcul">
-  152. 60 ÷ 6 + 18 − 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 18</span>
-</div>
-
-<div class="calcul">
-  153. 100 − 40 ÷ 8 + 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 107</span>
-</div>
-
-<div class="calcul">
-  154. 36 + 12 ÷ 3 − 2 × 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 30</span>
-</div>
-
-<div class="calcul">
-  155. 72 − 24 ÷ 6 + 7 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 82</span>
-</div>
-
-<div class="calcul">
-  156. 90 ÷ 10 + 6 × 4 − 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 28</span>
-</div>
-
-<div class="calcul">
-  157. 40 + 16 ÷ 4 − 3 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 35</span>
-</div>
-
-<div class="calcul">
-  158. 60 − 30 ÷ 6 + 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 65</span>
-</div>
-
-<div class="calcul">
-  159. 100 ÷ 5 + 8 × 2 − 10 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 26</span>
-</div>
-
-<div class="calcul">
-  160. 84 − 36 ÷ 6 + 9 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 96</span>
-</div>
-
-<script>
-  function afficherReponse(button) {
-    const resultElement = button.nextElementSibling;
-    if (resultElement && resultElement.classList.contains('result')) {
-      resultElement.style.display = 'inline';
-    }
-    button.style.display = 'none';
-  }
-</script>
-
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Calculs</title>
-  <style>
-    .result {
-      display: none;
-      font-weight: bold;
-      color: yellow; /* Réponse en jaune */
-    }
-  </style>
-</head>
-<body>
-
-<div class="calcul">
-  161. 60 + 12 ÷ 4 × 3 - 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 64</span>
-</div>
-
-<div class="calcul">
-  162. 80 - 16 × 2 ÷ 4 + 9 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 81</span>
-</div>
-
-<div class="calcul">
-  163. 90 ÷ 5 + 7 × 2 - 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 26</span>
-</div>
-
-<div class="calcul">
-  164. 100 - 20 + 30 ÷ 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 92</span>
-</div>
-
-<div class="calcul">
-  165. 72 ÷ 6 × 4 - 3 + 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 47</span>
-</div>
-
-<div class="calcul">
-  166. 64 + 12 - 8 ÷ 4 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 72</span>
-</div>
-
-<div class="calcul">
-  167. 50 × 2 ÷ 5 + 6 - 1 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 25</span>
-</div>
-
-<div class="calcul">
-  168. 48 - 6 + 18 ÷ 3 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 54</span>
-</div>
-
-<div class="calcul">
-  169. 36 ÷ 6 × 3 + 10 - 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 24</span>
-</div>
-
-<div class="calcul">
-  170. 28 + 16 ÷ 4 × 3 - 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 38</span>
-</div>
-
-<div class="calcul">
-  171. 40 + 12 × 2 - 6 ÷ 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 62</span>
-</div>
-
-<div class="calcul">
-  172. 35 - 5 + 10 × 2 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 35</span>
-</div>
-
-<div class="calcul">
-  173. 24 ÷ 6 + 8 × 3 - 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  174. 63 ÷ 7 + 4 × 5 - 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 27</span>
-</div>
-
-<div class="calcul">
-  175. 27 + 9 - 6 × 2 ÷ 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 32</span>
-</div>
-
-<div class="calcul">
-  176. 18 × 2 ÷ 6 + 4 - 1 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 9</span>
-</div>
-
-<div class="calcul">
-  177. 90 - 30 ÷ 5 + 3 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 90</span>
-</div>
-
-<div class="calcul">
-  178. 45 ÷ 9 + 8 × 2 - 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 17</span>
-</div>
-
-<div class="calcul">
-  179. 50 - 10 + 6 × 3 ÷ 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 49</span>
-</div>
-
-<div class="calcul">
-  180. 60 ÷ 4 + 7 - 2 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 16</span>
-</div>
-
-<div class="calcul">
-  181. 36 + 18 ÷ 6 × 2 - 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 38</span>
-</div>
-
-<div class="calcul">
-  182. 48 ÷ 8 + 5 × 4 - 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 20</span>
-</div>
-
-<div class="calcul">
-  183. 90 - 15 ÷ 5 + 6 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 105</span>
-</div>
-
-<div class="calcul">
-  184. 100 ÷ 10 + 8 × 2 - 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  185. 72 + 24 ÷ 6 - 5 × 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 61</span>
-</div>
-
-<div class="calcul">
-  186. 60 - 12 + 6 × 4 ÷ 3 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 56</span>
-</div>
-
-<div class="calcul">
-  187. 84 ÷ 7 + 5 - 3 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 11</span>
-</div>
-
-<div class="calcul">
-  188. 56 + 8 × 2 - 12 ÷ 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 69</span>
-</div>
-
-<div class="calcul">
-  189. 66 ÷ 6 + 9 × 2 - 10 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 19</span>
-</div>
-
-<div class="calcul">
-  190. 30 + 18 ÷ 3 - 4 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 28</span>
-</div>
-
-<div class="calcul">
-  191. 44 ÷ 11 + 12 × 2 - 5 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  192. 21 + 7 × 3 - 8 ÷ 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 38</span>
-</div>
-
-<div class="calcul">
-  193. 64 - 16 ÷ 4 × 2 + 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 62</span>
-</div>
-
-<div class="calcul">
-  194. 36 ÷ 6 + 18 - 3 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 18</span>
-</div>
-
-<div class="calcul">
-  195. 40 + 12 ÷ 4 × 2 - 6 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 40</span>
-</div>
-
-<div class="calcul">
-  196. 90 ÷ 9 + 10 × 2 - 7 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 23</span>
-</div>
-
-<div class="calcul">
-  197. 50 + 25 ÷ 5 × 2 - 8 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 52</span>
-</div>
-
-<div class="calcul">
-  198. 72 - 18 ÷ 3 + 6 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 78</span>
-</div>
-
-<div class="calcul">
-  199. 60 ÷ 5 + 14 - 3 × 4 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 14</span>
-</div>
-
-<div class="calcul">
-  200. 100 - 40 ÷ 4 + 5 × 2 = ?<br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-  <span class="result">Réponse : 100</span>
-</div>
-
-<script>
-  function afficherReponse(button) {
-    const resultElement = button.nextElementSibling;
-    if (resultElement && resultElement.classList.contains('result')) {
-      resultElement.style.display = 'inline';
-    }
-    button.style.display = 'none';
-  }
-</script>
-
 </body>
 </html>
