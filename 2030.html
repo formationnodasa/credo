@@ -1,87 +1,133 @@
 
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz Vocal Math</title>
+  <title>Concours Épelle-moi</title>
   <style>
-    body { font-family: Arial; text-align: center; background: #f4f4f4; }
-    button { margin: 10px; padding: 10px 20px; }
-    .question { font-size: 20px; margin: 20px; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+      background: #f4f4f4;
+    }
+    input {
+      font-size: 1.5em;
+      padding: 0.5em;
+      width: 300px;
+      text-align: center;
+    }
+    button {
+      font-size: 1em;
+      margin: 0.5em;
+      padding: 0.5em 1em;
+    }
+    #feedback {
+      font-weight: bold;
+      margin-top: 1em;
+    }
   </style>
 </head>
 <body>
-  <h1>🎙️ Quiz Vocal de Mathématiques</h1>
-  <div class="question" id="question"></div>
+  <h1>Concours Épelle-moi</h1>
+  <p>Un mot va être lu à haute voix. Écris ce que tu entends.</p>
+  <input id="userInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <br>
+  <button onclick="speakWord()">▶️ Lire</button>
+  <button onclick="pauseSpeech()">⏸️ Pause</button>
+  <button onclick="resumeSpeech()">▶️ Reprendre</button>
+  <button onclick="repeatWord()">🔁 Répéter</button>
+  <button onclick="nextWord()">⏭️ Mot suivant</button>
+  <button onclick="slowDown()">⏪ Ralentir</button>
+  <button onclick="speedUp()">⏩ Accélérer</button>
   <div id="feedback"></div>
 
-  <button onclick="lireQuestion()">🔁 Répéter</button>
-  <button onclick="pauseSpeech()">⏸️ Pause</button>
-  <button onclick="changerVitesse(0.5)">🐢 Ralentir</button>
-  <button onclick="changerVitesse(1)">⚖️ Normal</button>
-  <button onclick="changerVitesse(1.5)">🐇 Accélérer</button>
-  <button onclick="suivant()">➡️ Suivant</button>
-  <button onclick="demarrerReconnaissance()">🎤 Répondre</button>
+  <!-- 🔁 Charger d'abord le fichier contenant les mots -->
+  <script src="mots.js"></script>
 
-<script>
-    const questions = [
-      "20 + 10 fois 2 moins 5 divisé par 5",
-      "100 divisé par 4 plus 6 fois 2 moins 5",
-      "15 fois 2 plus 8 moins 9 divisé par 3",
-      "80 moins 20 plus 12 divisé par 3 fois 2",
-      "25 plus 15 fois 2 moins 40 divisé par 4",
-      "50 divisé par 2 plus 8 fois 3 moins 4",
-      "60 moins 30 plus 6 divisé par 3 fois 2",
-      "18 plus 6 fois 3 moins 12 divisé par 4",
-      "40 divisé par 5 plus 3 fois 2 moins 6",
-      "36 moins 12 divisé par 4 plus 7 fois 2"
-    ];
-    const reponses = [39, 32, 35, 68, 45, 45, 34, 33, 8, 47];
-
-    let index = 0;
+  <!-- 🔁 Puis le script principal -->
+  <script>
+    let currentIndex = 0;
+    let currentRate = 1;
     let synth = window.speechSynthesis;
-    let vitesse = 1;
+    let currentUtterance;
 
-    function lireQuestion() {
-      let utter = new SpeechSynthesisUtterance(questions[index]);
-      utter.rate = vitesse;
-      synth.cancel(); synth.speak(utter);
-      document.getElementById("question").innerText = questions[index] + " = ?";
+    const input = document.getElementById("userInput");
+    const feedback = document.getElementById("feedback");
+
+    function speak(text) {
+      if (synth.speaking) synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "fr-FR";
+      utterance.rate = currentRate;
+      synth.speak(utterance);
+      currentUtterance = utterance;
+    }
+
+    function speakWord() {
+      input.value = "";
+      feedback.textContent = "";
+      speak(mots[currentIndex]);
+    }
+
+    function repeatWord() {
+      speak(mots[currentIndex]);
     }
 
     function pauseSpeech() {
-      if (synth.speaking) synth.pause();
+      if (synth.speaking && !synth.paused) synth.pause();
     }
 
-    function changerVitesse(val) {
-      vitesse = val;
-      lireQuestion();
+    function resumeSpeech() {
+      if (synth.paused) synth.resume();
     }
 
-    function suivant() {
-      index = (index + 1) % questions.length;
-      lireQuestion();
-      document.getElementById("feedback").innerText = "";
+    function slowDown() {
+      currentRate = Math.max(0.5, currentRate - 0.1);
+      speak("Vitesse ralentie");
     }
 
-    function demarrerReconnaissance() {
-
-const recognition = new webkitSpeechRecognition();
-      recognition.lang = "fr-FR";
-      recognition.onresult = function(event) {
-        const reponseUtilisateur = parseInt(event.results[0][0].transcript);
-        if (reponseUtilisateur === reponses[index]) {
-          document.getElementById("feedback").innerText = "✅ Bonne réponse !";
-        } else {
-          document.getElementById("feedback").innerText = "❌ Mauvaise réponse. Réponse correcte : " + reponses[index];
-          let utter = new SpeechSynthesisUtterance("La bonne réponse est " + reponses[index]);
-          synth.speak(utter);
-        }
-      };
-      recognition.start();
+    function speedUp() {
+      currentRate = Math.min(2, currentRate + 0.1);
+      speak("Vitesse accélérée");
     }
 
-    window.onload = lireQuestion;
+    function nextWord() {
+      currentIndex = (currentIndex + 1) % mots.length;
+      speakWord();
+    }
+
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    function checkAnswer() {
+      const answer = input.value.trim().toLowerCase();
+      const correct = mots[currentIndex].toLowerCase();
+      if (answer === correct) {
+        feedback.textContent = "✅ Bravo !";
+        speak("Bonne réponse !");
+        setTimeout(nextWord, 1500);
+      } else {
+        feedback.textContent = `❌ Mauvaise réponse. C'était : ${mots[currentIndex]}`;
+        speak(`Mauvaise réponse. Le mot correct est : ${mots[currentIndex]}`);
+        setTimeout(nextWord, 4000);
+      }
+    }
   </script>
 </body>
 </html>
+
+
+const mots = [
+  "autel", "bataille", "chômage", "documentaire", "étang", "force", "gazouiller", "hache",
+  "atome", "bibliographie", "crustacé", "documentaliste", "érosion", "fantastique", "gamète", "hormone",
+  "altercation", "bipède", "conductible", "dictionnaire", "étiquette", "fantôme", "gynécologue", "herbivore",
+  "acide", "bourgeon", "croquis", "délimitation", "écart", "format", "gentiment", "harmonieux",
+  // ... (colle ici les 500 mots que tu m'as déjà envoyés)
+];
+
