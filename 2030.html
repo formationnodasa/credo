@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,125 +7,118 @@
   <style>
     body {
       font-family: sans-serif;
+      background: #f9f9f9;
+      color: #333;
       text-align: center;
       padding: 2em;
-      background: #f4f4f4;
     }
-    input {
-      font-size: 1.5em;
-      padding: 0.5em;
-      width: 300px;
-      text-align: center;
-    }
-    button {
-      font-size: 1em;
+    input, button, select {
+      font-size: 1.2em;
       margin: 0.5em;
-      padding: 0.5em 1em;
+      padding: 0.5em;
     }
-    #feedback {
-      font-weight: bold;
-      margin-top: 1em;
+    #motActuel {
+      font-size: 1.5em;
+      margin: 1em;
     }
   </style>
 </head>
 <body>
-  <h1>Concours Épelle-moi</h1>
-  <p>Un mot va être lu à haute voix. Écris ce que tu entends.</p>
-  <input id="userInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-  <br>
-  <button onclick="speakWord()">▶️ Lire</button>
-  <button onclick="pauseSpeech()">⏸️ Pause</button>
-  <button onclick="resumeSpeech()">▶️ Reprendre</button>
-  <button onclick="repeatWord()">🔁 Répéter</button>
-  <button onclick="nextWord()">⏭️ Mot suivant</button>
-  <button onclick="slowDown()">⏪ Ralentir</button>
-  <button onclick="speedUp()">⏩ Accélérer</button>
-  <div id="feedback"></div>
 
-  <!-- 🔁 Charger d'abord le fichier contenant les mots -->
-  <script src="mots.js"></script>
+<h1>Concours Épelle-moi</h1>
+<p>Écris le mot que tu entends :</p>
 
-  <!-- 🔁 Puis le script principal -->
-  <script>
-    let currentIndex = 0;
-    let currentRate = 1;
-    let synth = window.speechSynthesis;
-    let currentUtterance;
+<input type="text" id="reponse" autocomplete="off" />
+<br>
+<button onclick="verifier()">Vérifier</button>
+<button onclick="repeter()">🔁 Répéter</button>
+<button onclick="suivant()">➡️ Passer</button>
+<br>
+<label>Vitesse :
+  <select id="vitesse" onchange="changerVitesse()">
+    <option value="0.7">Lente</option>
+    <option value="1" selected>Normale</option>
+    <option value="1.3">Rapide</option>
+  </select>
+</label>
+<button onclick="pause()">⏸️ Pause</button>
 
-    const input = document.getElementById("userInput");
-    const feedback = document.getElementById("feedback");
+<p id="motActuel"></p>
+<p id="feedback"></p>
 
-    function speak(text) {
-      if (synth.speaking) synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = currentRate;
-      synth.speak(utterance);
-      currentUtterance = utterance;
+<script>
+  const mots = [
+    "autel", "bataille", "chômage", "documentaire", "étang", "force", "gazouiller", "hache",
+    "atome", "bibliographie", "crustacé", "documentaliste", "érosion", "fantastique", "gamète", "hormone",
+    "altercation", "bipède", "conductible", "dictionnaire", "étiquette", "fantôme", "gynécologue", "herbivore",
+    "acide", "bourgeon", "croquis", "délimitation", "écart", "format", "gentiment", "harmonieux",
+    "amplitude", "bidonville", "cylindre", "descendre", "épaisseur", "fonctionnement", "gabarit", "hypothèse",
+    "analogie", "bissectrice", "contrebasse", "dent", "égoïste", "frétiller", "galanterie", "hypermarché",
+    "antécédent", "bissextile", "cyclope", "désoler", "équilatéral", "faillite", "gâchis", "humanité",
+    "anaphore", "bouillir", "cellule", "disparaître", "expression", "facturation", "gangrène", "hippopotame",
+    "antipathie", "botanique", "cancer", "dollar", "esquisse", "fluidifier", "galipette", "hirondelle",
+    "archéologie", "bonheur", "câble", "doigt", "emprunt", "fœtus", "gargouiller", "heurter",
+    "anticorps", "banquette", "chronologie", "déesse", "enceinte", "fanfare", "garde-robe", "honnêteté",
+    "anatomie", "bientôt", "compas", "devis", "électron", "fertilité", "gencive",
+    "aquatique", "bicyclette", "calomnie", "déduction", "éclipse", "furieux", "généralement", "illustrateur",
+    "anecdote", "baptême", "chorale", "développement", "euphorie", "frayeur", "gentillesse", "inflation",
+    "abonnement", "bégayer", "corail", "différemment", "euphémisme", "fugitif", "ghetto", "impersonnel",
+    "absence", "barbecue", "concentration", "dégradation", "extinction", "fraiseuse", "glaciaire", "isoloir",
+    "abréger", "bactérie", "carambolage", "discriminatoire", "équerre", "fabuleux", "index",
+    "abyme", "bracelet", "concubin", "différencier", "ébauche", "fainéant", "harceler", "intérieur",
+    "accueil", "boulangère", "conteneur", "délocalisation", "ébène", "faisable", "happer", "industrie",
+    "actuellement", "brûler", "cadenasser", "démangeaison", "épithète", "falsifier", "handicap", "impression"
+    // Tu peux continuer les 500 mots ici si tu veux ajouter plus
+  ];
+
+  let index = 0;
+  let vitesse = 1;
+  let synth = window.speechSynthesis;
+
+  function parler(texte) {
+    if (synth.speaking) synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(texte);
+    utterance.lang = "fr-FR";
+    utterance.rate = vitesse;
+    synth.speak(utterance);
+  }
+
+  function pause() {
+    if (synth.speaking) synth.pause();
+  }
+
+  function repeter() {
+    parler(mots[index]);
+  }
+
+  function suivant() {
+    index = (index + 1) % mots.length;
+    document.getElementById("reponse").value = "";
+    document.getElementById("feedback").textContent = "";
+    parler(mots[index]);
+  }
+
+  function verifier() {
+    const saisie = document.getElementById("reponse").value.trim().toLowerCase();
+    const attendu = mots[index].toLowerCase();
+    if (saisie === attendu) {
+      document.getElementById("feedback").textContent = "✅ Bravo !";
+      setTimeout(suivant, 1000);
+    } else {
+      document.getElementById("feedback").textContent = "❌ Mauvais. Répète après moi.";
+      parler("Le mot était " + mots[index]);
     }
+  }
 
-    function speakWord() {
-      input.value = "";
-      feedback.textContent = "";
-      speak(mots[currentIndex]);
-    }
+  function changerVitesse() {
+    vitesse = parseFloat(document.getElementById("vitesse").value);
+  }
 
-    function repeatWord() {
-      speak(mots[currentIndex]);
-    }
+  // Démarrer automatiquement au chargement
+  window.onload = () => {
+    parler(mots[index]);
+  };
+</script>
 
-    function pauseSpeech() {
-      if (synth.speaking && !synth.paused) synth.pause();
-    }
-
-    function resumeSpeech() {
-      if (synth.paused) synth.resume();
-    }
-
-    function slowDown() {
-      currentRate = Math.max(0.5, currentRate - 0.1);
-      speak("Vitesse ralentie");
-    }
-
-    function speedUp() {
-      currentRate = Math.min(2, currentRate + 0.1);
-      speak("Vitesse accélérée");
-    }
-
-    function nextWord() {
-      currentIndex = (currentIndex + 1) % mots.length;
-      speakWord();
-    }
-
-    input.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        checkAnswer();
-      }
-    });
-
-    function checkAnswer() {
-      const answer = input.value.trim().toLowerCase();
-      const correct = mots[currentIndex].toLowerCase();
-      if (answer === correct) {
-        feedback.textContent = "✅ Bravo !";
-        speak("Bonne réponse !");
-        setTimeout(nextWord, 1500);
-      } else {
-        feedback.textContent = `❌ Mauvaise réponse. C'était : ${mots[currentIndex]}`;
-        speak(`Mauvaise réponse. Le mot correct est : ${mots[currentIndex]}`);
-        setTimeout(nextWord, 4000);
-      }
-    }
-  </script>
 </body>
 </html>
-
-
-const mots = [
-  "autel", "bataille", "chômage", "documentaire", "étang", "force", "gazouiller", "hache",
-  "atome", "bibliographie", "crustacé", "documentaliste", "érosion", "fantastique", "gamète", "hormone",
-  "altercation", "bipède", "conductible", "dictionnaire", "étiquette", "fantôme", "gynécologue", "herbivore",
-  "acide", "bourgeon", "croquis", "délimitation", "écart", "format", "gentiment", "harmonieux",
-  // ... (colle ici les 500 mots que tu m'as déjà envoyés)
-];
-
