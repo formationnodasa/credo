@@ -122,3 +122,124 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Concours Épelle-moi – Partie 2</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f2f2f2;
+      color: #222;
+      text-align: center;
+      padding: 2em;
+    }
+    input, button, select {
+      font-size: 1.2em;
+      margin: 0.5em;
+      padding: 0.5em;
+    }
+    #motActuel {
+      font-size: 1.5em;
+      margin: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Concours Épelle-moi – Partie 2</h1>
+<p>Écris le mot que tu entends :</p>
+
+<input type="text" id="reponse" autocomplete="off" />
+<br>
+<button onclick="verifier()">Vérifier</button>
+<button onclick="repeter()">🔁 Répéter</button>
+<button onclick="suivant()">➡️ Passer</button>
+<br>
+<label>Vitesse :
+  <select id="vitesse" onchange="changerVitesse()">
+    <option value="0.7">Lente</option>
+    <option value="1" selected>Normale</option>
+    <option value="1.3">Rapide</option>
+  </select>
+</label>
+<button onclick="pause()">⏸️ Pause</button>
+
+<p id="motActuel"></p>
+<p id="feedback"></p>
+
+<script>
+  const mots = [
+    "adhésion", "baroque", "chromosome", "dilemme", "estomac", "favoritisme", "homogène", "insecte",
+    "agenda", "boulevard", "compas", "désarroi", "épilogue", "humain", "information",
+    "affliger", "banquise", "circonflexe", "dinosaure", "épicentre", "géologue", "harpie", "indigo",
+    "allégorie", "bourgeonner", "contraception", "dissolution", "effigie", "gestionnaire", "hamster", "intolérance",
+    "anesthésie", "bain-marie", "contemporain", "démagogie", "emboîter", "gouache", "humain", "infinitif",
+    "antiquaire", "bafouer", "commettre", "douillet", "écarquiller", "gravitation", "hectare", "inondation",
+    "apostrophe", "barrette", "coefficient", "droiture", "graffiti", "hypoténuse", "induction",
+    "apparaître", "boycotter", "confidentialité", "dubitatif", "fécondation", "géant", "hauteur", "impulsion",
+    "agglomération", "bouilloire", "caoutchouc", "durablement", "fréquence", "gestion", "horticulture", "intéressant",
+    "amertume", "bizutage", "chronomètre", "dyslexie", "fossile", "génocide", "hiérarchie", "isocèle",
+    "assiduité", "balbutier", "cynique", "dorénavant", "fusain", "grammaire", "hypocrisie", "internet",
+    "allégresse", "bouddhisme", "claustrophobe", "faille", "genre", "hydratant", "illusion",
+    "appendice", "biodiversité", "crainte", "écho", "fasciste", "gradation", "homicide", "invention",
+    "adjacent", "bioclimatique", "couveuse", "échapper", "fascination", "gouvernement", "hasard", "impair",
+    "antisémitisme", "banlieue", "couvre-feu", "échéance", "fresque", "grenade", "hibiscus", "interrogation",
+    "asphyxie", "biennale", "craquement", "emphatique", "faisceau", "graphisme", "hostile", "inoubliable",
+    "anonyme", "bienfait", "entreprise", "fédération", "grenouillère", "harmonie", "incorrigible",
+    "anaconda", "bifteck", "débris", "esclavage", "famine", "griffon", "hospitalier", "importer"
+  ];
+
+  let index = 0;
+  let vitesse = 1;
+  let synth = window.speechSynthesis;
+
+  function parler(texte) {
+    if (synth.speaking) synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(texte);
+    utterance.lang = "fr-FR";
+    utterance.rate = vitesse;
+    synth.speak(utterance);
+  }
+
+  function pause() {
+    if (synth.speaking) synth.pause();
+  }
+
+  function repeter() {
+    parler(mots[index]);
+  }
+
+  function suivant() {
+    index = (index + 1) % mots.length;
+    document.getElementById("reponse").value = "";
+    document.getElementById("feedback").textContent = "";
+    parler(mots[index]);
+  }
+
+  function verifier() {
+    const saisie = document.getElementById("reponse").value.trim().toLowerCase();
+    const attendu = mots[index].toLowerCase();
+    if (saisie === attendu) {
+      document.getElementById("feedback").textContent = "✅ Bravo !";
+      setTimeout(suivant, 1000);
+    } else {
+      document.getElementById("feedback").textContent = "❌ Mauvais. Répète après moi.";
+      parler("Le mot était " + mots[index]);
+    }
+  }
+
+  function changerVitesse() {
+    vitesse = parseFloat(document.getElementById("vitesse").value);
+  }
+
+  window.onload = () => {
+    parler(mots[index]);
+  };
+</script>
+
+</body>
+</html>
+
