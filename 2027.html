@@ -1,0 +1,60 @@
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Épellation vocale</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f0f0f0; }
+    button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+    input { padding: 10px; font-size: 16px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>🔊 Épellation Vocale</h1>
+  <p id="mot">Clique sur "Lire" pour commencer</p>
+  <button onclick="lireMotActuel()">Lire</button><br>
+  <input type="text" id="reponse" placeholder="Écris le mot ici">
+  <button onclick="verifier()">Vérifier</button>
+
+  <script>
+    const mots = ["science", "mathématique", "épellation", "grammaire", "orthographe"];
+    let index = 0;
+
+    function lireMot(mot) {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(mot);
+      utter.lang = "fr-FR";
+      synth.speak(utter);
+    }
+
+    function epelerMot(mot) {
+      const synth = window.speechSynthesis;
+      const lettres = mot.split('').join(', ');
+      const utter = new SpeechSynthesisUtterance(lettres);
+      utter.lang = "fr-FR";
+      synth.speak(utter);
+    }
+
+    function lireMotActuel() {
+    
+    document.getElementById("mot").textContent = "Écoute et écris le mot";
+      lireMot(mots[index]);
+    }
+
+    function verifier() {
+      const rep = document.getElementById("reponse").value.trim().toLowerCase();
+      if (rep === mots[index]) {
+        alert("✅ Correct !");
+        index = (index + 1) % mots.length;
+      } else {
+        alert("❌ Mauvaise réponse. On épelle le mot.");
+        epelerMot(mots[index]);
+      }
+      document.getElementById("reponse").value = "";
+    }
+  </script>
+</body>
+</html>
