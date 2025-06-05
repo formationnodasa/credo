@@ -1,0 +1,35 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Lecture PDF vocale</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body>
+
+<h2>Lecture vocale du PDF</h2>
+<button onclick="lirePDF()">Lire le PDF</button>
+
+<script>
+  function lirePDF() {
+    const url = 'Anagramme.pdf'; // Ton fichier PDF
+    pdfjsLib.getDocument(url).promise.then(pdf => {
+      pdf.getPage(1).then(page => {
+        page.getTextContent().then(content => {
+          const texte = content.items.map(item => item.str).join(' ');
+          const voix = new SpeechSynthesisUtterance(texte);
+          speechSynthesis.speak(voix); // Le navigateur lit le texte
+        });
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
