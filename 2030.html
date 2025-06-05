@@ -243,3 +243,195 @@
 </body>
 </html>
 
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concours Épelle-moi - Module 3</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+  .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+  h1 { text-align: center; }
+  .word-box { font-size: 1.5em; margin-bottom: 15px; text-align: center; }
+  input[type="text"] { width: 100%; padding: 10px; font-size: 1.2em; border: 2px solid #ccc; border-radius: 5px; }
+  button { margin-top: 10px; padding: 10px 20px; font-size: 1.1em; border:none; border-radius: 5px; cursor: pointer; }
+  .btn-check { background-color: #4CAF50; color: white; }
+  .btn-skip { background-color: #f44336; color: white; margin-left: 10px; }
+  .controls { margin-top: 15px; text-align: center; }
+  .controls button { margin: 0 5px; padding: 8px 12px; font-size: 1em; }
+  .result { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Concours Épelle-moi - Module 3</h1>
+  <div class="word-box" id="wordToSpell">Prêt ?</div>
+
+  <input type="text" id="answerInput" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Écris le mot ici" />
+
+  <div>
+    <button class="btn-check" id="checkBtn">Vérifier</button>
+    <button class="btn-skip" id="skipBtn">Passer</button>
+  </div>
+
+  <div class="controls">
+    <button id="playBtn">▶️ Jouer</button>
+    <button id="pauseBtn">⏸ Pause</button>
+    <button id="slowBtn">🐢 Lent</button>
+    <button id="fastBtn">🐇 Rapide</button>
+    <button id="repeatBtn">🔁 Répéter</button>
+  </div>
+
+  <div class="result" id="resultText"></div>
+</div>
+
+<script>
+  // Liste des mots fournis
+  const words = [
+    "auparavant", "bimestriel", "décontracté", "endurance", "friable", "gesticuler", "herse", "innocent",
+    "accumulation", "bistouri", "décennie", "emploi", "fréquence", "guitariste", "humanisme", "ingrédient",
+    "accouplement", "biochimie", "décès", "explicatif", "formule", "grappe", "hiéroglyphe", "infraction",
+    "acrobatie", "démographie", "enthousiasme", "fiche", "gratte-ciel", "hectare", "icône",
+    "affranchir", "climat", "devise", "énonciation", "fraction", "gladiateur", "hypoténuse", "inversion",
+    "abstention", "compassion", "discrimination", "élection", "facteur", "gaspillage", "hyperbole", "instaurer",
+    "abstinence", "comparaison", "dioxyde", "essor", "figure", "gentilhomme", "hommage", "immortaliser",
+    "arbrisseau", "calendrier", "diminution", "engagement", "flûte", "griffer", "haut-parleur", "intègre",
+    "calculatrice", "dénouement", "émeraude", "fragile", "guillemet", "hérédité", "intention",
+    "bâiller", "crayon", "démocratie", "enzyme", "fond", "ginseng", "homophone", "iceberg",
+    "budget", "contour", "désodorisant", "entrepôt", "falloir", "gymnase", "héros", "interrupteur",
+    "beaucoup", "collectivité", "dissoudre", "expérience", "front", "grossesse", "habitat", "insolent",
+    "ballade", "charte", "distillation", "espace", "frapper", "goût", "hymne", "intellectuel",
+    "bâtiment", "cercueil", "dérivation", "étendue", "fenêtre", "goéland", "hystérie", "infaisable",
+    "intervalle", "loi", "marionnette", "nausée", "pathétique", "quadruple", "suffixe", "travailler",
+    "illégalité", "laudatif", "maïpouri", "navette", "papyrus", "quereller", "(se)", "syntaxe", "toucher",
+    "identification", "littoral", "magistrat", "négligence", "plasticien", "qualité", "syndicat", "toile",
+    "igloo", "lyrique", "mascotte", "névrose", "perspective", "quartier", "seigneur", "trompette",
+    "idiotie", "logique", "meilleur", "nœud", "percussion", "quitter", "scène", "tambourin",
+    "idolâtrer", "largeur", "monastère", "noisette", "précipiter", "quadrilatère", "sympathique", "thérapeutique",
+    "liquide", "médiatrice", "nonchalance", "perpendiculaire", "scrutin", "toupie",
+    "juxtaposition", "local", "millionnaire", "nombril", "pollution", "reconnaissance", "strophe", "thermomètre",
+    "juge", "logiciels", "métamorphose", "notamment", "polythéiste", "résistant", "somme", "taureau",
+    "journal", "lunette", "mâcher", "nucléaire", "poème", "rayon", "semaine", "tyrannie",
+    "journaliste", "lumière", "monstrueux", "nourrisson", "problème", "république", "symphonie", "terroriste",
+    "jadis", "lentille", "misogyne", "personne", "renaissance", "suggestion", "trapèze",
+    "jamais", "liberté", "migrant", "orchidée", "pathétique", "règlement", "sérieux", "tressaillir",
+    "jeunesse", "lieutenant", "mutation", "orchestration", "préfixe", "racisme", "silencieux", "trahison",
+    "justice", "louveteau", "mâchoire", "opticien", "psychologique", "résultat", "science", "transsexuel",
+    "joyeux", "ludothèque", "maigreur", "oxygène", "président", "rivière", "seconde", "tremplin",
+    "joie", "lusophone", "magnésium", "orientation", "prix", "record", "souffrir", "trachée",
+    "jambe", "lacérer", "maillon", "œil", "pétrole", "rectangle", "sembler", "transmutation",
+    "journaux(les)", "leucémie", "maintien", "oreille", "pape", "rassasier", "serrer", "tromper"
+  ];
+
+  let currentIndex = 0;
+  const wordToSpell = document.getElementById('wordToSpell');
+  const answerInput = document.getElementById('answerInput');
+  const checkBtn = document.getElementById('checkBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const resultText = document.getElementById('resultText');
+
+  // Speech synthesis setup
+  const synth = window.speechSynthesis;
+  let utterance = null;
+  let speechRate = 1;
+
+  function speak(text) {
+    if (synth.speaking) {
+      synth.cancel();
+    }
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.rate = speechRate;
+    synth.speak(utterance);
+  }
+
+  function playWord() {
+    speak(words[currentIndex]);
+  }
+
+  function checkAnswer() {
+    const userAnswer = answerInput.value.trim().toLowerCase();
+    const correctWord = words[currentIndex].toLowerCase();
+
+    if (!userAnswer) {
+      resultText.textContent = "Veuillez écrire un mot.";
+      return;
+    }
+
+    if (userAnswer === correctWord) {
+      resultText.style.color = 'green';
+      resultText.textContent = "Correct ! 🎉";
+      // Automatique : passe au mot suivant après 1.5s
+      setTimeout(() => {
+        nextWord();
+      }, 1500);
+    } else {
+      resultText.style.color = 'red';
+      resultText.textContent = `Incorrect. La bonne réponse est : ${words[currentIndex]}`;
+      speak(`Incorrect. La bonne réponse est : ${words[currentIndex]}`);
+    }
+  }
+
+  function nextWord() {
+    if (synth.speaking) synth.cancel();
+    currentIndex++;
+    if (currentIndex >= words.length) {
+      wordToSpell.textContent = "Félicitations, vous avez terminé la liste ! 🎉";
+      answerInput.disabled = true;
+      checkBtn.disabled = true;
+      skipBtn.disabled = true;
+      return;
+    }
+    wordToSpell.textContent = "Épelle ce mot :";
+    answerInput.value = '';
+    resultText.textContent = '';
+    playWord();
+  }
+
+  // Event Listeners
+  checkBtn.addEventListener('click', checkAnswer);
+  skipBtn.addEventListener('click', () => {
+    resultText.textContent = `Mot sauté. La bonne réponse était : ${words[currentIndex]}`;
+    speak(`Mot sauté. La bonne réponse était : ${words[currentIndex]}`);
+    nextWord();
+  });
+
+  document.getElementById('playBtn').addEventListener('click', () => {
+    playWord();
+  });
+
+  document.getElementById('pauseBtn').addEventListener('click', () => {
+    if (synth.speaking) {
+      synth.pause();
+    }
+  });
+
+  document.getElementById('slowBtn').addEventListener('click', () => {
+    speechRate = Math.max(0.5, speechRate - 0.25);
+    speak(words[currentIndex]);
+  });
+
+  document.getElementById('fastBtn').addEventListener('click', () => {
+    speechRate = Math.min(2, speechRate + 0.25);
+    speak(words[currentIndex]);
+  });
+
+  document.getElementById('repeatBtn').addEventListener('click', () => {
+    speak(words[currentIndex]);
+  });
+
+  // Lance le premier mot à l'ouverture
+  window.onload = () => {
+    wordToSpell.textContent = "Épelle ce mot :";
+    playWord();
+    answerInput.focus();
+  };
+</script>
+
+</body>
+</html>
+
+
