@@ -634,4 +634,270 @@
 </body>
 </html>
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concours Épelle-moi - Module Unifié</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+  .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 0 15px #ccc; }
+  h1 { text-align: center; margin-bottom: 20px; }
+  .word-box { font-size: 2em; margin-bottom: 20px; text-align: center; font-weight: bold; }
+  input[type="text"] {
+    width: 100%; padding: 12px; font-size: 1.3em;
+    border: 2px solid #ccc; border-radius: 6px; margin-bottom: 15px;
+  }
+  button {
+    padding: 10px 18px; font-size: 1.1em;
+    border: none; border-radius: 6px;
+    cursor: pointer;
+    margin: 5px 6px 10px 0;
+  }
+  button:focus { outline:none; }
+  .btn-check { background-color: #007bff; color: white; }
+  .btn-skip { background-color: #dc3545; color: white; }
+  .controls {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .controls button {
+    background-color: #28a745;
+    color: white;
+  }
+  .controls button.speed { background-color: #17a2b8; }
+  .result {
+    min-height: 28px;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .correct { color: green; }
+  .incorrect { color: red; }
+  .info { color: #555; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Concours Épelle-moi - Module Unifié</h1>
+
+  <div class="word-box" id="instruction">Écoutez et écrivez le mot :</div>
+
+  <input type="text" id="answerInput" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Écris le mot ici..." />
+
+  <div style="text-align:center;">
+    <button class="btn-check" id="checkBtn">Vérifier</button>
+    <button class="btn-skip" id="skipBtn">Passer</button>
+  </div>
+
+  <div class="controls">
+    <button id="playBtn">▶️ Jouer</button>
+    <button id="pauseBtn">⏸ Pause</button>
+    <button id="resumeBtn" disabled>▶️ Reprendre</button>
+    <button id="repeatBtn">🔁 Répéter</button>
+    <button class="speed" id="slowBtn">🐢 Lent</button>
+    <button class="speed" id="normalBtn" disabled>⚡ Normal</button>
+    <button class="speed" id="fastBtn">🐇 Rapide</button>
+  </div>
+
+  <div class="result" id="resultText"></div>
+</div>
+
+<script>
+  // LISTE DES MOTS — tu peux changer/étendre ici
+  const words = [
+    // Exemples, remplace ou complète avec toutes tes listes
+    "jaunisse", "littéral", "majestueux", "ombre", "pharaon", "reste", "sculpture", "tronçonneuse",
+    "joncher", "loyer", "orthographe", "patin", "rapporteur", "souffle",
+    "jouissance", "lucidité", "naturel", "occasionnellement", "processus", "relatif", "sceptre", "veillée",
+    // ... tu peux ajouter toutes tes listes ici ...
+  ];
+
+  let currentIndex = 0;
+  const wordToSpell = document.getElementById('instruction');
+  const answerInput = document.getElementById('answerInput');
+  const checkBtn = document.getElementById('checkBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const resultText = document.getElementById('resultText');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const repeatBtn = document.getElementById('repeatBtn');
+  const slowBtn = document.getElementById('slowBtn');
+  const normalBtn = document.getElementById('normalBtn');
+  const fastBtn = document.getElementById('fastBtn');
+
+  const synth = window.speechSynthesis;
+  let utterance = null;
+  let speechRate = 1;  // 0.5 lent, 1 normal, 1.5 rapide
+  let isPaused = false;
+
+  function speak(text, onEnd=null) {
+    if (synth.speaking) synth.cancel();
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.rate = speechRate;
+    utterance.onend = () => {
+      if(onEnd) onEnd();
+    };
+    synth.speak(utterance);
+    isPaused = false;
+    resumeBtn.disabled = true;
+  }
+
+  function speakWord() {
+    speak(words[currentIndex]);
+  }
+
+  function speakSpell(word, letterIndex = 0) {
+    if(letterIndex >= word.length) {
+      // Fin de l'épellation
+      return;
+    }
+    // Pour épeler, on prononce lettre par lettre, ici on énonce la lettre
+    const letter = word[letterIndex];
+    // On prononce la lettre (en français) avec une pause courte entre les lettres
+    const toSpeak = letter.toUpperCase();
+    utterance = new SpeechSynthesisUtterance(toSpeak);
+    utterance.lang = 'fr-FR';
+    utterance.rate = speechRate;
+    utterance.onend = () => {
+      // On enchaîne sur la lettre suivante avec un petit délai
+      setTimeout(() => speakSpell(word, letterIndex + 1), 300);
+    };
+    synth.speak(utterance);
+  }
+
+  function checkAnswer() {
+    const userAnswer = answerInput.value.trim().toLowerCase();
+    const correctWord = words[currentIndex].toLowerCase();
+
+    if (!userAnswer) {
+      resultText.textContent = "Veuillez écrire un mot.";
+      resultText.className = "result info";
+      return;
+    }
+
+    if (userAnswer === correctWord) {
+      resultText.textContent = "Correct ! 🎉";
+      resultText.className = "result correct";
+      setTimeout(() => {
+        nextWord();
+      }, 1500);
+    } else {
+      resultText.textContent = `Incorrect. Voici l'épellation du mot :`;
+      resultText.className = "result incorrect";
+      speakSpell(words[currentIndex]);
+    }
+  }
+
+  function nextWord() {
+    if (synth.speaking) synth.cancel();
+    currentIndex++;
+    if (currentIndex >= words.length) {
+      wordToSpell.textContent = "Bravo, vous avez terminé la liste ! 🎉";
+      answerInput.disabled = true;
+      checkBtn.disabled = true;
+      skipBtn.disabled = true;
+      playBtn.disabled = true;
+      pauseBtn.disabled = true;
+      resumeBtn.disabled = true;
+      repeatBtn.disabled = true;
+      slowBtn.disabled = true;
+      normalBtn.disabled = true;
+      fastBtn.disabled = true;
+      resultText.textContent = "";
+      return;
+    }
+    wordToSpell.textContent = "Écoutez et écrivez le mot :";
+    answerInput.value = '';
+    resultText.textContent = '';
+    answerInput.disabled = false;
+    checkBtn.disabled = false;
+    skipBtn.disabled = false;
+    playBtn.disabled = false;
+    pauseBtn.disabled = false;
+    normalBtn.disabled = false;
+    slowBtn.disabled = false;
+    fastBtn.disabled = false;
+    repeatBtn.disabled = false;
+    answerInput.focus();
+    speakWord();
+  }
+
+  checkBtn.addEventListener('click', checkAnswer);
+
+  skipBtn.addEventListener('click', () => {
+    resultText.textContent = `Mot sauté. La bonne réponse était : ${words[currentIndex]}`;
+    resultText.className = "result info";
+    speakSpell(words[currentIndex]);
+    setTimeout(() => nextWord(), 2500);
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (synth.speaking) synth.cancel();
+    speakWord();
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if (synth.speaking && !isPaused) {
+      synth.pause();
+      isPaused = true;
+      resumeBtn.disabled = false;
+    }
+  });
+
+  resumeBtn.addEventListener('click', () => {
+    if (isPaused) {
+      synth.resume();
+      isPaused = false;
+      resumeBtn.disabled = true;
+    }
+  });
+
+  repeatBtn.addEventListener('click', () => {
+    if (synth.speaking) synth.cancel();
+    speakWord();
+  });
+
+  slowBtn.addEventListener('click', () => {
+    speechRate = 0.7;
+    setSpeedButtons();
+    if (synth.speaking) synth.cancel();
+    speakWord();
+  });
+
+  normalBtn.addEventListener('click', () => {
+    speechRate = 1;
+    setSpeedButtons();
+    if (synth.speaking) synth.cancel();
+    speakWord();
+  });
+
+  fastBtn.addEventListener('click', () => {
+    speechRate = 1.5;
+    setSpeedButtons();
+    if (synth.speaking) synth.cancel();
+    speakWord();
+  });
+
+  function setSpeedButtons() {
+    slowBtn.disabled = speechRate === 0.7;
+    normalBtn.disabled = speechRate === 1;
+    fastBtn.disabled = speechRate === 1.5;
+  }
+
+  // Initial setup
+  window.onload = () => {
+    setSpeedButtons();
+    nextWord();
+  };
+</script>
+
+</body>
+</html>
+
 
