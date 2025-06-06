@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Module Épellation Vocale - Liste Complète</title>
+<title>Épellation vocale - Voix masculine + Bouton Retour</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,7 +21,7 @@
     border-radius: 15px;
     box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
     width: 90%;
-    max-width: 480px;
+    max-width: 520px;
     text-align: center;
     backdrop-filter: blur(8px);
   }
@@ -63,10 +63,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
   }
   button {
-    flex: 1 1 40%;
+    flex: 1 1 30%;
     padding: 12px 10px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -77,6 +77,7 @@
     background-color: #fff;
     transition: background-color 0.3s, color 0.3s;
     user-select: none;
+    min-width: 100px;
   }
   button:hover:not(:disabled) {
     background-color: #2575fc;
@@ -97,7 +98,7 @@
 </style>
 </head>
 <body>
-  <div class="container" role="main" aria-label="Module d'épellation vocale">
+  <div class="container" role="main" aria-label="Module d'épellation vocale avec voix masculine">
     <h1>Épellation vocale</h1>
     <div id="wordDisplay" aria-live="polite" aria-atomic="true">Mot à écouter</div>
     <input
@@ -111,6 +112,7 @@
       autofocus
     />
     <div class="buttons">
+      <button id="btnBack" aria-label="Mot précédent">⏮ Retour</button>
       <button id="btnPlay" aria-label="Jouer le mot">▶️ Jouer</button>
       <button id="btnSlow" aria-label="Ralentir la lecture">🐢 Ralentir</button>
       <button id="btnFast" aria-label="Accélérer la lecture">🐇 Accélérer</button>
@@ -165,23 +167,47 @@
   const btnFast = document.getElementById("btnFast");
   const btnRepeat = document.getElementById("btnRepeat");
   const btnSkip = document.getElementById("btnSkip");
+  const btnBack = document.getElementById("btnBack");
 
-  // Prépare la voix française la plus adaptée
-  let frenchVoice = null;
-  function selectFrenchVoice() {
+  // Sélectionner la voix masculine française la plus appropriée
+  let frenchMaleVoice = null;
+  function selectFrenchMaleVoice() {
     const voices = synth.getVoices();
-    frenchVoice = voices.find(v => v.lang.startsWith('fr')) || voices[0];
+    // Priorité : voix FR masculine
+    // On cherche une voix qui contient "male" ou "homme" dans le nom (si dispo), sinon la plus grave
+    const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+    if (frVoices.length === 0) {
+      frenchMaleVoice = voices[0] || null;
+      return;
+    }
+
+    // Chercher voix avec "male" dans le nom (case insensitive)
+    let maleVoice = frVoices.find(v => /male|homme|garçon/i.test(v.name));
+    if (maleVoice) {
+      frenchMaleVoice = maleVoice;
+      return;
+    }
+
+    // Sinon, choisir la voix FR avec la fréquence la plus basse (indirectement souvent voix masculine)
+    // (Comme on n'a pas fréquence, on prend la première voix FR trouvée)
+    frenchMaleVoice = frVoices[0];
   }
   if (synth.onvoiceschanged !== undefined) {
-    synth.onvoiceschanged = selectFrenchVoice;
+    synth.onvoiceschanged = () => {
+      selectFrenchMaleVoice();
+    };
   }
-  selectFrenchVoice();
+  selectFrenchMaleVoice();
 
   function speak(text, rate = playingRate, callback) {
     if (synth.speaking) synth.cancel();
     utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = frenchVoice.lang || "fr-FR";
-    utterance.voice = frenchVoice;
+    if(frenchMaleVoice){
+      utterance.lang = frenchMaleVoice.lang;
+      utterance.voice = frenchMaleVoice;
+    } else {
+      utterance.lang = "fr-FR";
+    }
     utterance.rate = rate;
     utterance.onend = () => {
       if (callback) callback();
@@ -197,6 +223,7 @@
     wordDisplay.textContent = "";
     message.textContent = "Écoutez attentivement...";
     answerInput.value = "";
+    answerInput.disabled = false;
     answerInput.focus();
     speak(words[currentIndex]);
   }
@@ -256,11 +283,20 @@
   }
 
   function nextWord() {
-    currentIndex++;
-    if (currentIndex >= words.length) {
-      finishSession();
-    } else {
+    if(currentIndex < words.length - 1){
+      currentIndex++;
       playCurrentWord();
+    } else {
+      finishSession();
+    }
+  }
+
+  function prevWord() {
+    if(currentIndex > 0){
+      currentIndex--;
+      playCurrentWord();
+    } else {
+      message.textContent = "Déjà au premier mot.";
     }
   }
 
@@ -273,6 +309,7 @@
     btnFast.disabled = true;
     btnRepeat.disabled = true;
     btnSkip.disabled = true;
+    btnBack.disabled = true;
   }
 
   // Événements des boutons
@@ -286,6 +323,9 @@
   btnSkip.addEventListener("click", () => {
     message.textContent = "Mot passé, écoutez le suivant.";
     nextWord();
+  });
+  btnBack.addEventListener("click", () => {
+    prevWord();
   });
 
   answerInput.addEventListener("keydown", (e) => {
