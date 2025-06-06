@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Module Épellation Vocal - Liste Complète</title>
+<title>Module Épellation Vocale - Liste Complète</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -49,7 +49,6 @@
     color: #333;
     background-color: #fff;
     caret-color: #2575fc;
-    /* Empêche la correction automatique */
     autocorrect: off;
     autocomplete: off;
     spellcheck: false;
@@ -79,9 +78,13 @@
     transition: background-color 0.3s, color 0.3s;
     user-select: none;
   }
-  button:hover {
+  button:hover:not(:disabled) {
     background-color: #2575fc;
     color: #fff;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
   #message {
     margin-top: 20px;
@@ -89,23 +92,32 @@
     font-size: 1.3rem;
     font-weight: 600;
     text-shadow: 0 0 8px rgba(0,0,0,0.15);
+    min-height: 32px;
   }
 </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" role="main" aria-label="Module d'épellation vocale">
     <h1>Épellation vocale</h1>
-    <div id="wordDisplay">Mot à écouter</div>
-    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <div id="wordDisplay" aria-live="polite" aria-atomic="true">Mot à écouter</div>
+    <input
+      type="text"
+      id="answer"
+      placeholder="Écris le mot ici..."
+      autocorrect="off"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Saisie du mot"
+      autofocus
+    />
     <div class="buttons">
-      <button id="btnPlay">▶️ Jouer</button>
-      <button id="btnSlow">🐢 Ralentir</button>
-      <button id="btnFast">🐇 Accélérer</button>
-      <button id="btnRepeat">🔁 Répéter</button>
-      <button id="btnCheck">✔️ Vérifier</button>
-      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnPlay" aria-label="Jouer le mot">▶️ Jouer</button>
+      <button id="btnSlow" aria-label="Ralentir la lecture">🐢 Ralentir</button>
+      <button id="btnFast" aria-label="Accélérer la lecture">🐇 Accélérer</button>
+      <button id="btnRepeat" aria-label="Répéter le mot">🔁 Répéter</button>
+      <button id="btnSkip" aria-label="Passer le mot">⏭ Passer</button>
     </div>
-    <div id="message"></div>
+    <div id="message" aria-live="assertive" aria-atomic="true"></div>
   </div>
 
 <script>
@@ -138,162 +150,155 @@
     "antiquaire","bafouer","commettre","douillet","écarquiller","gravitation","hectare","inondation",
     "apostrophe","barrette","coefficient","droiture","graffiti","hypoténuse","induction",
     "apparaître","boycotter","confidentialité","dubitatif","fécondation","géant","hauteur","impulsion",
-    "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant",
-    "amertume","bizutage","chronomètre","dyslexie","fossile","génocide","hiérarchie","isocèle",
-    "assiduité","balbutier","cynique","dorénavant","fusain","grammaire","hypocrisie","internet",
-    "allégresse","bouddhisme","claustrophobe","faille","genre","hydratant","illusion",
-    "appendice","biodiversité","crainte","écho","fasciste","gradation","homicide","invention",
-    "adjacent","bioclimatique","couveuse","échapper","fascination","gouvernement","hasard","impair",
-    "antisémitisme","biscuit","crépuscule","écharpe","félicitations","grève","hippocampe","italique",
-    "ambulance","béatitude","carré","déguisement","embryon","fard","gauche","hypnose",
-    "archipel","bénéfique","clavier","désormais","élan","faramineux","goutte","infraction",
-    "acrobate","bavarder","cirque","duperie","élastique","faramineux","génération","individuel",
-    "aéroport","bibliothèque","champignon","déménagement","équipement","fascicule","gêne","humanitaire",
-    "anxiété","bénévole","chaîne","diction","éducation","fission","goutte","impératif"
+    "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant"
   ];
 
   let currentIndex = 0;
+  let synth = window.speechSynthesis;
+  let utterance;
+  let playingRate = 1;
   const wordDisplay = document.getElementById("wordDisplay");
-  const input = document.getElementById("answer");
+  const answerInput = document.getElementById("answer");
   const message = document.getElementById("message");
   const btnPlay = document.getElementById("btnPlay");
   const btnSlow = document.getElementById("btnSlow");
   const btnFast = document.getElementById("btnFast");
   const btnRepeat = document.getElementById("btnRepeat");
-  const btnCheck = document.getElementById("btnCheck");
   const btnSkip = document.getElementById("btnSkip");
 
-  let speechRate = 1.0;
-  let isPlaying = false;
-  let synth = window.speechSynthesis;
-
-  function cleanWord(w) {
-    // en minuscules, sans espaces en début/fin
-    return w.trim().toLowerCase();
+  // Prépare la voix française la plus adaptée
+  let frenchVoice = null;
+  function selectFrenchVoice() {
+    const voices = synth.getVoices();
+    frenchVoice = voices.find(v => v.lang.startsWith('fr')) || voices[0];
   }
-
-  function speakWord(word, rate = 1.0) {
-    if (!synth) {
-      alert("Synthèse vocale non disponible dans ce navigateur.");
-      return;
-    }
-    if (synth.speaking) {
-      synth.cancel();
-    }
-    let utter = new SpeechSynthesisUtterance(word);
-    utter.lang = 'fr-FR';
-    utter.rate = rate;
-    synth.speak(utter);
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = selectFrenchVoice;
   }
+  selectFrenchVoice();
 
-  function speakLetterByLetter(word, rate = 0.8) {
-    if (!synth) return;
+  function speak(text, rate = playingRate, callback) {
     if (synth.speaking) synth.cancel();
-
-    // Parler chaque lettre séparément avec une pause
-    const letters = word.split('');
-    let i = 0;
-
-    function speakNext() {
-      if (i >= letters.length) return;
-      let u = new SpeechSynthesisUtterance(letters[i]);
-      u.lang = 'fr-FR';
-      u.rate = rate;
-      u.onend = () => {
-        i++;
-        setTimeout(speakNext, 150);
-      };
-      synth.speak(u);
-    }
-    speakNext();
-  }
-
-  function displayCurrentWord() {
-    wordDisplay.textContent = "Mot à écouter";
-    input.value = "";
-    message.textContent = "";
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = frenchVoice.lang || "fr-FR";
+    utterance.voice = frenchVoice;
+    utterance.rate = rate;
+    utterance.onend = () => {
+      if (callback) callback();
+    };
+    synth.speak(utterance);
   }
 
   function playCurrentWord() {
-    let w = words[currentIndex];
-    speakWord(w, speechRate);
+    if (currentIndex >= words.length) {
+      finishSession();
+      return;
+    }
+    wordDisplay.textContent = "";
+    message.textContent = "Écoutez attentivement...";
+    answerInput.value = "";
+    answerInput.focus();
+    speak(words[currentIndex]);
+  }
+
+  function playCurrentWordSlow() {
+    playingRate = 0.6;
+    playCurrentWord();
+  }
+  function playCurrentWordFast() {
+    playingRate = 1.6;
+    playCurrentWord();
+  }
+  function repeatWord() {
+    if (currentIndex >= words.length) return;
+    speak(words[currentIndex]);
   }
 
   function checkAnswer() {
-    let userAnswer = cleanWord(input.value);
-    let correct = cleanWord(words[currentIndex]);
+    if (currentIndex >= words.length) return;
+    const userInput = answerInput.value.trim().toLowerCase();
+    const correctWord = words[currentIndex].toLowerCase();
 
-    if (userAnswer === "") {
-      message.textContent = "Merci d'écrire un mot.";
-      return false;
+    if (!userInput) {
+      message.textContent = "Veuillez écrire le mot.";
+      return;
     }
 
-    if (userAnswer === correct) {
-      message.style.color = "limegreen";
-      message.textContent = "✅ Correct !";
-      return true;
+    if (userInput === correctWord) {
+      message.textContent = "✅ Correct ! Mot suivant...";
+      currentIndex++;
+      setTimeout(() => {
+        if (currentIndex < words.length) {
+          playCurrentWord();
+        } else {
+          finishSession();
+        }
+      }, 1200);
     } else {
-      message.style.color = "#FF5555";
-      message.textContent = `❌ Incorrect. Voici l'orthographe lettre par lettre :`;
-      speakLetterByLetter(correct, 0.8);
-      return false;
+      message.textContent = "❌ Incorrect, écoutez l'épellation...";
+
+      // Épellation lettre par lettre à vitesse lente
+      const letters = correctWord.split("");
+      let i = 0;
+
+      function spellLetter() {
+        if (i < letters.length) {
+          speak(letters[i], 0.8, () => {
+            i++;
+            setTimeout(spellLetter, 350);
+          });
+        } else {
+          message.textContent = "Essayez encore, ou passez le mot.";
+        }
+      }
+      spellLetter();
     }
   }
 
   function nextWord() {
     currentIndex++;
     if (currentIndex >= words.length) {
-      currentIndex = 0;
-      alert("Bravo, tu as parcouru toute la liste ! On recommence.");
+      finishSession();
+    } else {
+      playCurrentWord();
     }
-    displayCurrentWord();
-    input.focus();
   }
 
+  function finishSession() {
+    wordDisplay.textContent = "👍 Fin de la liste.";
+    message.textContent = "Bravo, vous avez terminé la liste complète.";
+    answerInput.disabled = true;
+    btnPlay.disabled = true;
+    btnSlow.disabled = true;
+    btnFast.disabled = true;
+    btnRepeat.disabled = true;
+    btnSkip.disabled = true;
+  }
+
+  // Événements des boutons
   btnPlay.addEventListener("click", () => {
+    playingRate = 1;
     playCurrentWord();
-    input.focus();
   });
-
-  btnSlow.addEventListener("click", () => {
-    speechRate = Math.max(0.5, speechRate - 0.25);
-    message.textContent = `Vitesse ralentie à ${speechRate.toFixed(2)}`;
-  });
-
-  btnFast.addEventListener("click", () => {
-    speechRate = Math.min(2.0, speechRate + 0.25);
-    message.textContent = `Vitesse accélérée à ${speechRate.toFixed(2)}`;
-  });
-
-  btnRepeat.addEventListener("click", () => {
-    playCurrentWord();
-    input.focus();
-  });
-
-  btnCheck.addEventListener("click", () => {
-    let correct = checkAnswer();
-    if (correct) {
-      setTimeout(() => {
-        nextWord();
-      }, 1800);
-    }
-  });
-
+  btnSlow.addEventListener("click", playCurrentWordSlow);
+  btnFast.addEventListener("click", playCurrentWordFast);
+  btnRepeat.addEventListener("click", repeatWord);
   btnSkip.addEventListener("click", () => {
-    message.textContent = `Le mot était : "${words[currentIndex]}"`;
+    message.textContent = "Mot passé, écoutez le suivant.";
     nextWord();
   });
 
-  input.addEventListener("keydown", (e) => {
+  answerInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-      btnCheck.click();
+      e.preventDefault();
+      checkAnswer();
     }
   });
 
-  // Initialisation
-  displayCurrentWord();
-  input.focus();
-
+  // Lancer le premier mot au chargement
+  window.onload = () => {
+    playCurrentWord();
+  };
 </script>
 </body>
 </html>
