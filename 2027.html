@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -52,17 +51,15 @@
     color: #333;
     background-color: #fff;
     caret-color: #2575fc;
-
-
-
-
+    autocorrect: off;
+    autocomplete: off;
+    spellcheck: false;
   }
- input[type="text"]::-webkit-autofill,
+  input[type="text"]::-webkit-autofill,
   input[type="text"]::-webkit-autofill:hover,
   input[type="text"]::-webkit-autofill:focus {
     box-shadow: 0 0 0px 1000px white inset !important;
     -webkit-text-fill-color: #333 !important;
-
   }
   .buttons {
     display: flex;
@@ -96,19 +93,12 @@
   }
 </style>
 </head>
-
 <body>
   <div class="container">
     <h1>Épellation vocale</h1>
-    <div id="wordDisplay">Mot à écouter</div> <input
-  type="text"
-  id="answer"
-  placeholder="Écris le mot ici..."
-  autocomplete="off"
-  autocorrect="off"
-
-/>
-
+    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocorrect="off" autocomplete="off" spellcheck="false" />
+    <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
@@ -119,8 +109,134 @@
   </div>
 
 <script>
+  const words = [ /* ... tous vos mots ici (inchangés) ... */ ];
+
+  let currentWordIndex = parseInt(localStorage.getItem('currentWordIndex')) || 0;
+  const wordDisplay = document.getElementById("wordDisplay");
+  const answerInput = document.getElementById("answer");
+  const message = document.getElementById("message");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnSlow = document.getElementById("btnSlow");
+  const btnFast = document.getElementById("btnFast");
+  const btnRepeat = document.getElementById("btnRepeat");
+  const btnSkip = document.getElementById("btnSkip");
+
+  let speechRate = 1;
+
+  function speakWord(word, rate = speechRate) {
+    if (!('speechSynthesis' in window)) {
+      message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+      return;
+    }
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = "fr-FR";
+    utterance.rate = rate;
+    speechSynthesis.speak(utterance);
+  }
+
+  function playWord() {
+    const word = words[currentWordIndex];
+    wordDisplay.textContent = "";
+    speakWord(word);
+    message.textContent = "Écoutez attentivement et écrivez le mot.";
+    answerInput.value = "";
+    answerInput.focus();
+    localStorage.setItem('currentWordIndex', currentWordIndex); // mode réto
+  }
+
+  function playWordSlow() {
+    speechRate = Math.max(0.5, speechRate - 0.25);
+    playWord();
+  }
+
+  function playWordFast() {
+    speechRate = Math.min(2, speechRate + 0.25);
+    playWord();
+  }
+
+  function repeatWord() {
+    playWord();
+  }
+
+  function checkAnswer() {
+    const userAnswer = answerInput.value.trim().toLowerCase();
+    const correctAnswer = words[currentWordIndex].toLowerCase();
+    if (userAnswer === correctAnswer) {
+      message.textContent = "✅ Correct !";
+      wordDisplay.textContent = correctAnswer;
+      setTimeout(() => {
+        nextWord();
+      }, 1500);
+    } else {
+      message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+      spellWord(correctAnswer);
+    }
+  }
+
+  function spellWord(word) {
+    speechSynthesis.cancel();
+    let letters = [...word.replace(/[-\s]/g, "")];
+    let i = 0;
+    function spellNext() {
+      if (i < letters.length) {
+        const utterance = new SpeechSynthesisUtterance(letters[i]);
+        utterance.lang = "fr-FR";
+        utterance.rate = 0.6;
+        utterance.onend = () => {
+          i++;
+          setTimeout(spellNext, 350);
+        };
+        speechSynthesis.speak(utterance);
+      } else {
+        message.textContent = "Réessayez d'écrire le mot.";
+        answerInput.value = "";
+        answerInput.focus();
+      }
+    }
+    spellNext();
+  }
+
+  function nextWord() {
+    currentWordIndex++;
+    if (currentWordIndex >= words.length) {
+      message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
+      wordDisplay.textContent = "";
+      answerInput.value = "";
+      answerInput.disabled = true;
+      btnPlay.disabled = true;
+      btnSlow.disabled = true;
+      btnFast.disabled = true;
+      btnRepeat.disabled = true;
+      btnSkip.disabled = true;
+      localStorage.removeItem('currentWordIndex');
+    } else {
+      localStorage.setItem('currentWordIndex', currentWordIndex); // mode réto
+      playWord();
+    }
+  }
+
+  btnPlay.addEventListener("click", playWord);
+  btnSlow.addEventListener("click", playWordSlow);
+  btnFast.addEventListener("click", playWordFast);
+  btnRepeat.addEventListener("click", repeatWord);
+  btnSkip.addEventListener("click", () => {
+    message.textContent = `Mot sauté : ${words[currentWordIndex]}`;
+    wordDisplay.textContent = words[currentWordIndex];
+    nextWord();
+  });
+
+  answerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      checkAnswer();
+    }
+  });
+
+    
+
   const words = [
-    "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
+
+"autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
     "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
     "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
     "acide","bourgeon","croquis","délimitation","écart","format","gentiment","harmonieux",
@@ -226,130 +342,7 @@
     "lutte","méchanceté","nuageux","parenthèse","quelconque","stylistique","temps"
   ];
 
-  let currentWordIndex = 0;
-  const wordDisplay = document.getElementById("wordDisplay");
-  const answerInput = document.getElementById("answer");
-  const message = document.getElementById("message");
-  const btnPlay = document.getElementById("btnPlay");
-  const btnSlow = document.getElementById("btnSlow");
-  const btnFast = document.getElementById("btnFast");
-  const btnRepeat = document.getElementById("btnRepeat");
-  const btnSkip = document.getElementById("btnSkip");
-
-  let speechRate = 1;
-
-  function speakWord(word, rate = speechRate) {
-    if (!('speechSynthesis' in window)) {
-      message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
-      return;
-    }
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
-    speechSynthesis.speak(utterance);
-  }
-
-  function playWord() {
-    const word = words[currentWordIndex];
-    wordDisplay.textContent = ""; // cache le mot écrit
-    speakWord(word);
-    message.textContent = "Écoutez attentivement et écrivez le mot.";
-    answerInput.value = "";
-    answerInput.focus();
-  }
-
-  function playWordSlow() {
-    speechRate = Math.max(0.5, speechRate - 0.25);
-    playWord();
-  }
-
-  function playWordFast() {
-    speechRate = Math.min(2, speechRate + 0.25);
-    playWord();
-  }
-
-  function repeatWord() {
-    playWord();
-  }
-
-  function checkAnswer() {
-    const userAnswer = answerInput.value.trim().toLowerCase();
-    const correctAnswer = words[currentWordIndex].toLowerCase();
-    if (userAnswer === correctAnswer) {
-      message.textContent = "✅ Correct !";
-      wordDisplay.textContent = correctAnswer;
-      setTimeout(() => {
-        nextWord();
-      }, 1500);
-    } else {
-      message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
-      spellWord(correctAnswer);
-    }
-  }
-
-  function spellWord(word) {
-    speechSynthesis.cancel();
-    let letters = [...word.replace(/[-\s]/g, "")]; // enlève espaces et tirets
-    let i = 0;
-    function spellNext() {
-      if (i < letters.length) {
-        const utterance = new SpeechSynthesisUtterance(letters[i]);
-        utterance.lang = "fr-FR";
-        utterance.rate = 0.6;
-        utterance.onend = () => {
-          i++;
-          setTimeout(spellNext, 350);
-        };
-        speechSynthesis.speak(utterance);
-      } else {
-        message.textContent = "Réessayez d'écrire le mot.";
-        answerInput.value = "";
-        answerInput.focus();
-      }
-    }
-    spellNext();
-  }
-
-  function nextWord() {
-    currentWordIndex++;
-    if (currentWordIndex >= words.length) {
-      message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
-      wordDisplay.textContent = "";
-      answerInput.value = "";
-      answerInput.disabled = true;
-      btnPlay.disabled = true;
-      btnSlow.disabled = true;
-      btnFast.disabled = true;
-      btnRepeat.disabled = true;
-      btnSkip.disabled = true;
-    } else {
-      playWord();
-    }
-  }
-
-  btnPlay.addEventListener("click", playWord);
-  btnSlow.addEventListener("click", playWordSlow);
-  btnFast.addEventListener("click", playWordFast);
-  btnRepeat.addEventListener("click", repeatWord);
-  btnSkip.addEventListener("click", () => {
-    message.textContent = `Mot sauté : ${words[currentWordIndex]}`;
-    wordDisplay.textContent = words[currentWordIndex];
-    nextWord();
-  });
-
-  // Vérification automatique à la saisie (si tu préfères, sinon supprime cet event)
-  answerInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      checkAnswer();
-    }
-  });
-
-  // Au chargement, jouer premier mot
-  window.onload = () => {
-    playWord();
-  };
+  window.addEventListener("load", playWord);
 </script>
 </body>
 </html>
