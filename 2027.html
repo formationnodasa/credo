@@ -1,539 +1,157 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Module Épellation Vocal des mots de l’initiation- Liste Complète</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .container {
-    background: rgba(255,255,255,0.1);
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
-    width: 90%;
-    max-width: 480px;
-    text-align: center;
-    backdrop-filter: blur(8px);
-  }
-  h1 {
-    margin-bottom: 20px;
-    font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  }
-  #wordDisplay {
-    font-size: 2.3rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-    letter-spacing: 0.12em;
-    min-height: 48px;
-  }
-  input[type="text"] {
-    font-size: 1.5rem;
-    padding: 12px 15px;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-    margin-bottom: 20px;
-    color: #333;
-    background-color: #fff;
-    caret-color: #2575fc;
-    /* Empêche la correction automatique */
-    autocorrect: off;
-    autocomplete: off;
-    spellcheck: false;
-  }
-  input[type="text"]::-webkit-autofill,
-  input[type="text"]::-webkit-autofill:hover,
-  input[type="text"]::-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px white inset !important;
-    -webkit-text-fill-color: #333 !important;
-  }
-  .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-  }
-  button {
-    flex: 1 1 40%;
-    padding: 12px 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    color: #2575fc;
-    background-color: #fff;
-    transition: background-color 0.3s, color 0.3s;
-    user-select: none;
-  }
-  button:hover {
-    background-color: #2575fc;
-    color: #fff;
-  }
-  #message {
-    margin-top: 20px;
-    min-height: 28px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-shadow: 0 0 8px rgba(0,0,0,0.15);
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Calcul Mental Vocal</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    button { margin: 5px; padding: 10px 15px; }
+    #micro {
+      width: 60px;
+      height: 60px;
+      margin: 10px auto;
+      background: red;
+      border-radius: 50%;
+      animation: none;
+    }
+    .listening {
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Épellation vocale</h1>
-    <div id="wordDisplay">Mot à écouter</div>
 
-<input type="text" id="answer" placeholder="Écris le mot ici..." 
-       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-
-
-    <div class="buttons">
-      <button id="btnPlay">▶️ Jouer</button>
-      <button id="btnSlow">🐢 Ralentir</button>
-      <button id="btnFast">🐇 Accélérer</button>
-      <button id="btnRepeat">🔁 Répéter</button>
-      <button id="btnSkip">⏭ Passer</button>
-    </div>
-    <div id="message"></div>
+  <h1>🧠 Calcul Mental Vocal</h1>
+  <p id="question">Clique sur Lire pour commencer !</p>
+  
+  <div>
+    <button onclick="prevQuestion()">⬅️ Retour</button>
+    <button onclick="repeatQuestion()">🔁 Répéter</button>
+    <button onclick="nextQuestion()">➡️ Passer</button>
   </div>
 
-<script>
-  const words = [
+  <div>
+    <button onclick="readQuestion()">🔊 Lire</button>
+    <button onclick="changeSpeed(-0.1)">🐢 Ralentir</button>
+    <button onclick="changeSpeed(0.1)">🐇 Accélérer</button>
+  </div>
 
-  "Secourisme", "Alcool", "Vermifuge", "Ouate", "Phaspholgel", "Plaie", "Morsure", "Médecin", "Venin", "Asphyxier",
-  "Paracetamol", "Aiguillon", "Thermomètre", "Sparadrap", "Analgésique", "Antipyrétique", "Antihistaminique", "Pansement",
-  "Technologie", "Léonard Santedi (Co-fondateur du groupe K.A)", "Paroissien", "Paroissial", "Botomolo", "Cabane", "Engagement",
-  "Cérémonie", "Pierre Bosangia (Mapera Boss)", "Boboto / Bondeko", "Shaloom", "Bienheureuse", "Mnémotechnique", "Clanique",
-  "Ouganda", "Diocésain", "Encadreur", "Aumônier", "Aumônerie", "Hiérarchie", "Jamaa Takatifu", "Batelier", "Cravate", "Voyage",
-  "Noeud", "Décoration", "La jachère", "Tabora", "Païen", "Kigowa", "Kiwatule", "Matthieu Kisule", "Catéchisme", "Évêque Anglican",
-  "Muwafu", "Moïse Mukasa", "Kirugi", "Béatifier", "Canoniser", "Hannington", "Kirimânyi", "Père Giraud", "Père Amans", "Sebo Kabaka",
-  "Dr Lambert Swert", "Ngalo (Histoire d’Anuarité)", "Olombe", "Yuma Deo", "Simba", "Baganda", "Écrevisse", "Araignée", "Hygiène",
-  "Chapelle", "Trinité", "Angélus", "Vieille (Vieille et le méchant voisin)", "Naba", "Baobab : (conte 1)", "Louange",
-  "Pentateuque (5 livres de Moïse)", "Signalisation routière", "J.P Knight", "Léon Foenquinos", "Thérèse IZAY Kirongozi (Robot roulage en 2013)",
-  "Piéton", "Carrefour", "Samuel FINDLEY Breese Morse (Inventeur du code morse)", "Code Morse", "SOS", "Triduum", "Octave",
-  "Pâques : célèbre la résurrection du Christ.", "pâque : sans majuscule désigne par extension l'agneau pascal", "Panser", "Redemption",
-  "Horloge", "Kyrie", "Homélie", "Credo", "Quête ou offertoire", "Sanctus", "Agnus Dei", "Ave Maria", "Chapelet",
-  "Transfiguration (Marc 9 , 1-10)", "Gethsémani", "Flagellation", "Couronnement", "Résurrection", "Ascension", "Assomption",
-  "Pentecôte", "pentecôtisme", "Bricolage", "Orner", "Embellir", "Eucharistique", "Liturgique", "Gloria", "Calomnier", "Idolâtrie",
-  "Crucifix", "Chérubin", "Sémaphore", "Claude Chappe (inventeur du sémaphore)", "Louis Jacob (Créateur du sémaphore maritime en 1806)",
-  "Fanion", "Saint Paul", "Saint Luc", "Tradition", "Magistère", "World wide web (signification de WWW)", "épilepsie", "Hyperdulie",
-  "Butaka", "Nika", "Conscience", "Préséance", "Mabota", "Katonda", "Seggulu", "Kirimânyi", "Catéchuménat", "Nauséabonde", "Kiwatule",
-  "Majordome", "Espièglerie", "Seigneurie", "Mukama", "Nnyondo", "Mwango", "Mackay", "Matthieu Kisule", "Musulman", "Aime et fais plaisir",
-  "Mukajanga", "Bulange", "Chapelet", "Pape Benoît XV (Béatifié les martyrs de l’Ouganda)", "Pape Paul VI (Canonisé les martyrs de l’Ouganda)",
-  "Pape Pie VI (Proclamé Charles Lwamga comme étant le patron de la jeunesse chrétienne africaine)", "Congrégation", "Servir et faire plaisir",
-  "Légionnaire", "Xavérienne", "Orphelinat", "Kisangani", "Archevêque", "Simba", "Olombe", "Balonnette", "Soeur Bokuma", "Soeur Nabeane",
-  "Pape Jean Paul II (béatifié la bienheureuse Anuarite)", "Colonel Dep", "Signe Conventionnel", "Tour cheminée", "Chapelle",
-  "Moulin à vent", "Moulin à eau", "Ruine", "Hangar", "Gloire au père (Gloria Patri)", "Notre père (Pater Noster)", "Je vous salue Marie (Ave Maria)",
-  "Ngonga Malu", "Pentateuque", "Livres Poétiques et sapientiaux", "Livres prophétiques", "Corpus Paulinnien", "Limitrophe", "Croquis",
-  "Position Ready", "Hanse", "Ka-Botomolo", "Righini-Gombele", "José Moko Ekanga", "Binza", "Abbé Claude Lufungula", "Matonge",
-  "Éléphant", "La devise des Anuarite", "La devise des Kizito", "Prenons courage (Kizito)", "Aime et fais plaisir (Anuarite)", "Bon tour",
-  "Vaisselle", "Lessive", "Les principes des KA", "Popvap", "Amexcor", "Organigramme"
-  "Secourisme",
-  "Alcool",
-  "Vermifuge",
-  "Ouatte",
-  "Phaspholgel",
-  "Plaie",
-  "Morsure",
-  "Médecin",
-  "Venin",
-  "Asphyxier",
-  "Paracetamol",
-  "Aiguillon",
-  "Thermomètre",
-  "Sparadrap",
-  "Analgésique",
-  "Antipyrétique",
-  "Antihistaminique",
-  "Pansement",
-  "Technologie",
-  "Léonard Santedi (Co-fondateur du groupe K.A)",
-  "Paroissien",
-  "Paroissial",
-  "Botomolo",
-  "Cabane",
-  "Engagement",
-  "Cérémonie",
-  "Pierre Bosangia (Mapera Boss)",
-  "Boboto / Bondeko",
-  "Shaloom",
-  "Bienheureuse",
-  "Mnémotechnique",
-  "Clanique",
-  "Ouganda",
-  "Diocésain",
-  "Encadreur",
-  "Aumônier",
-  "Aumônerie",
-  "Hiérarchie",
-  "Jamaa Takatifu",
-  "Batelier",
-  "Cravate",
-  "Voyage",
-  "Noeud",
-  "Décoration",
-  "La jachère",
-  "Tabora",
-  "Païen",
-  "Kigowa",
-  "Kiwatule",
-  "Matthieu Kisule",
-  "Catéchisme",
-  "Évêque Anglican",
-  "Muwafu",
-  "Moïse Mukasa",
-  "Kirugi",
-  "Béatifier",
-  "Canoniser",
-  "Hannington",
-  "Kirimânyi",
-  "Père Giraud",
-  "Père Amans",
-  "Sebo Kabaka",
-  "Dr Lambert Swert",
-  "Ngalo (Histoire d’Anuarité)",
-  "Olombe",
-  "Yuma Deo",
-  "Simba",
-  "Baganda",
-  "Écrevisse",
-  "Araignée",
-  "Hygiène",
-  "Chapelle",
-  "Trinité",
-  "Angélus",
-  "Vieille (Vieille et le méchant voisin)",
-  "Naba",
-  "Baobab (conte 1)",
-  "Louange",
-  "Pentateuque (5 livres de Moïse)",
-  "Signalisation routière",
-  "J.P Knight",
-  "Léon Foenquinos",
-  "Thérèse IZAY Kirongozi (Robot roulage en 2013)",
-  "Piéton",
-  "Carrefour",
-  "Samuel FINDLEY Breese Morse",
-  "Code Morse",
-  "SOS",
-  "Triduum",
-  "Octave",
-  "Pâques : Résurrection du Christ",
-  "pâque : Agneau Pascal",
-  "Panser",
-  "Redemption",
-  "Horloge",
-  "Kyrie",
-  "Homélie",
-  "Credo",
-  "Offertoire",
-  "Sanctus",
-  "Agnus Dei",
-  "Ave Maria",
-  "Chapelet",
-  "Transfiguration (Marc 9,1-10)",
-  "Gethsémani",
-  "Flagellation",
-  "Couronnement",
-  "Résurrection",
-  "Ascension",
-  "Assomption",
-  "Pentecôte",
-  "Pentecôtisme",
-  "Bricolage",
-  "Orner",
-  "Embellir",
-  "Eucharistique",
-  "Liturgique",
-  "Gloria",
-  "Calomnier",
-  "Idolâtrie",
-  "Crucifix",
-  "Chérubin",
-  "Sémaphore",
-  "Claude Chappe",
-  "Louis Jacob",
-  "Fanion",
-  "Saint Paul",
-  "Saint Luc",
-  "Tradition",
-  "Magistère",
-  "World wide web (WWW)",
-  "Épilepsie",
-  "Hyperdulie",
-  "Butaka",
-  "Nika",
-  "Conscience",
-  "Préséance",
-  "Mabota",
-  "Katonda",
-  "Seggulu",
-  "Kirimânyi",
-  "Catéchuménat",
-  "Nauséabonde",
-  "Kiwatule",
-  "Majordome",
-  "Espièglerie",
-  "Seigneurie",
-  "Mukama",
-  "Nnyondo",
-  "Mwango",
-  "Mackay",
-  "Matthieu Kisule",
-  "Musulman",
-  "Aime et fais plaisir",
-  "Mukajanga",
-  "Bulange",
-  "Chapelet",
-  "Pape Benoît XV",
-  "Pape Paul VI",
-  "Pape Pie VI",
-  "Congrégation",
-  "Servir et faire plaisir",
-  "Légionnaire",
-  "Xavérienne",
-  "Orphelinat",
-  "Kisangani",
-  "Archevêque",
-  "Simba",
-  "Olombe",
-  "Balonnette",
-  "Soeur Bokuma",
-  "Soeur Nabeane",
-  "Pape Jean Paul II",
-  "Colonel Dep",
-  "Signe Conventionnel",
-  "Tour cheminée",
-  "Chapelle",
-  "Moulin à vent",
-  "Moulin à eau",
-  "Ruine",
-  "Hangar",
-  "Gloire au père (Gloria Patri)",
-  "Notre père (Pater Noster)",
-  "Je vous salue Marie (Ave Maria)",
-  "Ngonga Malu",
-  "Pentateuque",
-  "Livres Poétiques et sapientiaux",
-  "Livres prophétiques",
-  "Corpus Paulinien",
-  "Limitrophe",
-  "Croquis",
-  "Position Ready",
-  "Hanse",
-  "Ka-Botomolo",
-  "Righini-Gombele",
-  "José Moko Ekanga",
-  "Binza",
-  "Abbé Claude Lufungula",
-  "Matonge",
-  "Éléphant",
-  "La devise des Anuarite",
-  "La devise des Kizito",
-  "Prenons courage (Kizito)",
-  "Aime et fais plaisir (Anuarite)",
-  "Bon tour",
-  "Vaisselle",
-  "Lessive",
-  "Les principes des KA",
-  "Popvap",
-  "Amexcor",
-  "Organigramme"
-["Mapéra", "Initiatique", "Idéal", "Spiritualité", "Martyr", "Yahvé ( YHWH )", "Slogan",
-      "Joseph Mukasa Balikuddembe", "Athanase Bazzekuketta", "Matthias Mulumba", "Charles Lwanga", "Kizito",
-      "MUGAGGA LUBOWA", "Gyavira Musoke", "Mukasa Kiriwawanvu", "Ambroise Kibuka", "Achille Kiwanuka", 
-      "Luc Banabakintu", "Adolphe Mukasa Ludigo", "Anatole KIRIGGWAJJO", "Jacques Buzabaliawo", 
-      "Bruno Serunkuma", "Mbaga Tuzinde", "André Kaggwa", "Denis ssebuggwawo", "Pontien Ngondwe",
-      "Jean-Marie Muzeyi", "Noé Mawaggali", "Gonzague GONZA", "Tibère : Empereur romain", 
-      "Buganda : Royaume de l’Ouganda", "Bunyoro : Royaume de l’Ouganda", "Toro : Royaume de l’Ouganda",
-      "Ankolé : Royaume de l’Ouganda", "Karagwe : Royaume de l’Ouganda", "Kabaka", "Mutesa", 
-      "Mukasa - Kasima", "Lwanga - Kahenga", "Kaggwa - Meka", "Mulumba - Bakoma", "Nyondo", "Mwanga",
-      "Lubiri", "Bel’ange", "Rubaga - Maïka", "Mityana - Ibambi", "Mengo - Pawa-Vube", "Namugongo - Isiro",
-      "Bûcher", "Bourreau", "Senkole", "Katikkiro", "Munyonyo", "Mugatto", "Singo", "Simon Lourdel",
-      "Siméon Sebutta", "Denis Kamyaka", "Charles Werabé", "Béatitude", "Béatification", "Canonisation",
-      "Marie-Clémentine Anuarité Nengapeta", "Wamba", "Amisi Batshuru Batobobo", "ISUDE Julienne", 
-      "Leontine", "Pauline", "Bafwabaka", "Justin Segbande", "Noviciat", "Paquet d’eau", "Mangandja",
-      "Inguéré", "Tamari", "Dogme", "Maternité divine", "Virginité perpétuelle", "Immaculée Conception",
-      "Assomption", "Kim ( jeu de Kim )", "Rudyard Kipling", "Lurgan ( personnage du jeu de Kim )", 
-      "Scoutisme", "Robert Baden Powell", "Joseph Mobutu", "Laurent-Désiré Kabila", "Flambeau",
-      "Boka et Lutumba", "Assistant Spirituel", "Colonie de vacances", "LIKONZI", "Libanga", "Efelo",
-      "Libota", "Excursion", "Anselme Masua", "Sainte Marie - Goretti", "Zaïrois", "Foulard", 
-      "Sacerdotal", "Pastoral", "Apostolat", "Décanal", "Sacerdoce", "Mijerca", "Diocèse", "Doyenné",
-      "Stagiaire", "Metanoïa", "Maranatha", "Mission", "Libala ya Mwinda", "Secourisme", "Alcool",
-      "Vermifuge", "Ouate", "Phaspholgel", "Plaie", "Morsure", "Médecin", "Venin", "Asphyxier",
-      "Paracetamol", "Aiguillon", "Thermomètre", "Sparadrap", "Analgésique", "Antipyrétique", 
-      "Antihistaminique", "Pansement", "Technologie", "Léonard Santedi", "Paroissien", "Paroissial",
-      "Botomolo", "Cabane", "Engagement", "Cérémonie", "Pierre Bosangia", "Boboto / Bondeko", "Shaloom",
-      "Bienheureuse", "Mnémontechnique", "Clanique", "Ouganda", "Diocésain", "Encadreur", "Aumônier",
-      "Aumônerie", "Hiérarchie", "Jamaa Takatifu", "Batelier", "Cravate", "Voyage", "Noeud", 
-      "Décoration", "La jachère", "Tabora", "païen", "Kigowa", "Kiwatule", "Matthieu Kisule", 
-      "catéchisme", "Évêque Anglican", "Muwafu", "Moïse Mukasa", "Kirugi", "Béatifier", "Canoniser",
-      "Hannington", "Kirimânyi", "Père Giraud", "Père Amans", "Sebo Kabaka", "Dr Lambert Swert",
-      "Ngalo", "Olombe", "Yuma Deo", "Simba", "Baganda", "Écrevisse", "Araignée", "Hygiène", 
-      "Chapelle", "Trinité", "Angélus", "Vieille", "Naba", "Baobab", "Louange", "Pentateuque",
-      "Signalisation routière", "J.P Knight", "Léon Foenquinos", "Thérèse IZAY Kirongozi", "Piéton",
-      "Carrefour", "Samuel Morse", "Code Morse", "SOS", "Triduum", "Octave", "Pâques", "pâque",
-      "Panser", "Redemption", "Horloge", "Kyrie", "Homélie", "Credo", "Quête", "Sanctus", "Agnus Dei",
-      "Ave Maria", "Chapelet", "Transfiguration", "Gethsémani", "Flagellation", "Couronnement",
-      "Résurrection", "Ascension", "Assomption", "Pentecôte", "pentecôtisme", "Bricolage", "Orner",
-      "Embellir", "Eucharistique", "Liturgique", "Gloria", "Calomnier", "Idolâtrie", "Crucifix",
-      "Chérubin", "Sémaphore", "Claude Chappe", "Louis Jacob", "Fanion", "Saint Paul", "Saint Luc",
-      "Tradition", "Magistère", "World wide web", "épilepsie", "Hyperdulie", "Butaka", "Nika",
-      "Conscience", "Préséance", "Mabota", "Katonda", "Seggulu", "Kirimânyi", "Catéchuménat",
-      "Nauséabonde", "Kiwatule", "Majordome", "Espièglerie", "Seigneurie", "Mukama", "Nnyondo",
-      "Mwango", "Mackay", "Matthieu Kisule", "Musulman", "Aime et fais plaisir", "Mukajanga",
-      "Bulange", "Chapelet", "Pape Benoît XV", "Pape Paul VI", "Pape Pie VI", "Congrégation",
-      "Servir et faire plaisir", "Légionnaire", "Xavérienne", "Orphelinat", "Kisangani",
-      "Archevêque", "Simba", "Olombe", "Balonnette", "Soeur Bokuma", "Soeur Nabeane",
-      "Pape Jean Paul II", "Colonel Dep", "Signe Conventionnel", "Tour cheminée", "Chapelle",
-      "Moulin à vent", "Moulin à eau", "Ruine", "Hangar", "Gloire au père", "Notre père",
-      "Je vous salue Marie", "Ngonga Malu", "Pentateuque", "Livres Poétiques et sapientiaux",
-      "Livres prophétiques", "Corpus Paulinnien", "Limitrophe", "Croquis", "Position Ready", "Hanse",
-      "Ka-Botomolo", "Righini-Gombele", "José Moko Ekanga", "Binza", "Abbé Claude Lufungula",
-      "Matonge", "Éléphant", "La devise des Anuarite", "La devise des Kizito", "Prenons courage",
-      "Aime et fais plaisir", "Bon tour", "Vaisselle", "Lessive", "Les principes des KA", "Popvap",
-      "Amexcor", "Organigramme", "Erreur Patrick Monga Mpyana", "ssebugwawo", "Raphaël" ];
+  <div>
+    <button 
+      onmousedown="startRecognition()" 
+      onmouseup="stopRecognition()" 
+      ontouchstart="startRecognition()" 
+      ontouchend="stopRecognition()">
+      🎙️ Répondre
+    </button>
+    <div id="micro"></div>
+  </div>
 
-  let currentWordIndex = 0;
-  const wordDisplay = document.getElementById("wordDisplay");
-  const answerInput = document.getElementById("answer");
-  const message = document.getElementById("message");
-  const btnPlay = document.getElementById("btnPlay");
-  const btnSlow = document.getElementById("btnSlow");
-  const btnFast = document.getElementById("btnFast");
-  const btnRepeat = document.getElementById("btnRepeat");
-  const btnSkip = document.getElementById("btnSkip");
+  <script>
+    const questions = [
+      { q: "6 fois 2 plus 4 divisé par 2", a: 14 },
+      { q: "10 divisé par 2 plus 3 fois 4", a: 17 },
+      { q: "5 fois 3 plus 6 divisé par 2", a: 18 },
+      { q: "12 divisé par 3 plus 4 fois 2", a: 12 },
+      // Ajoutez ici les autres questions dans le même format
+    ];
 
-  let speechRate = 1;
+    let current = 0;
+    let speed = 1;
+    let synth = window.speechSynthesis;
+    let recognition;
+    let listening = false;
 
-  function speakWord(word, rate = speechRate) {
-    if (!('speechSynthesis' in window)) {
-      message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
-      return;
+    const questionEl = document.getElementById("question");
+    const micro = document.getElementById("micro");
+
+    function updateQuestion() {
+      questionEl.textContent = `Question : ${questions[current].q}`;
     }
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
-    speechSynthesis.speak(utterance);
-  }
 
-  function playWord() {
-    const word = words[currentWordIndex];
-    wordDisplay.textContent = ""; // cache le mot écrit
-    speakWord(word);
-    message.textContent = "Écoutez attentivement et écrivez le mot.";
-    answerInput.value = "";
-    answerInput.focus();
-  }
-
-  function playWordSlow() {
-    speechRate = Math.max(0.5, speechRate - 0.25);
-    playWord();
-  }
-
-  function playWordFast() {
-    speechRate = Math.min(2, speechRate + 0.25);
-    playWord();
-  }
-
-  function repeatWord() {
-    playWord();
-  }
-
-  function checkAnswer() {
-    const userAnswer = answerInput.value.trim().toLowerCase();
-    const correctAnswer = words[currentWordIndex].toLowerCase();
-    if (userAnswer === correctAnswer) {
-      message.textContent = "✅ Correct !";
-      wordDisplay.textContent = correctAnswer;
-      setTimeout(() => {
-        nextWord();
-      }, 1500);
-    } else {
-      message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
-      spellWord(correctAnswer);
+    function readQuestion() {
+      const utterance = new SpeechSynthesisUtterance(questions[current].q);
+      utterance.lang = 'fr-FR';
+      utterance.rate = speed;
+      synth.speak(utterance);
     }
-  }
 
-  function spellWord(word) {
-    speechSynthesis.cancel();
-    let letters = [...word.replace(/[-\s]/g, "")]; // enlève espaces et tirets
-    let i = 0;
-    function spellNext() {
-      if (i < letters.length) {
-        const utterance = new SpeechSynthesisUtterance(letters[i]);
-        utterance.lang = "fr-FR";
-        utterance.rate = 0.6;
-        utterance.onend = () => {
-          i++;
-          setTimeout(spellNext, 350);
-        };
-        speechSynthesis.speak(utterance);
-      } else {
-        message.textContent = "Réessayez d'écrire le mot.";
-        answerInput.value = "";
-        answerInput.focus();
+    function changeSpeed(delta) {
+      speed = Math.max(0.5, Math.min(2, speed + delta));
+      alert(`Vitesse : ${speed.toFixed(1)}x`);
+    }
+
+    function nextQuestion() {
+      if (current < questions.length - 1) current++;
+      updateQuestion();
+      readQuestion();
+    }
+
+    function prevQuestion() {
+      if (current > 0) current--;
+      updateQuestion();
+      readQuestion();
+    }
+
+    function repeatQuestion() {
+      readQuestion();
+    }
+
+    function startRecognition() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Reconnaissance vocale non supportée.");
+        return;
+      }
+
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        micro.classList.add('listening');
+        listening = true;
+      };
+
+      recognition.onend = () => {
+        micro.classList.remove('listening');
+        listening = false;
+      };
+
+      recognition.onresult = event => {
+        const result = event.results[0][0].transcript;
+        const num = parseInt(result.match(/\d+/)); // extrait le premier nombre
+        const correct = questions[current].a;
+
+        if (num === correct) {
+          speak("Bravo, c'est correct !");
+        } else {
+          speak(`Non, la bonne réponse est ${correct}`);
+        }
+      };
+
+      recognition.start();
+    }
+
+    function stopRecognition() {
+      if (recognition && listening) {
+        recognition.stop();
       }
     }
-    spellNext();
-  }
 
-  function nextWord() {
-    currentWordIndex++;
-    if (currentWordIndex >= words.length) {
-      message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
-      wordDisplay.textContent = "";
-      answerInput.value = "";
-      answerInput.disabled = true;
-      btnPlay.disabled = true;
-      btnSlow.disabled = true;
-      btnFast.disabled = true;
-      btnRepeat.disabled = true;
-      btnSkip.disabled = true;
-    } else {
-      playWord();
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      synth.speak(utterance);
     }
-  }
 
-  btnPlay.addEventListener("click", playWord);
-  btnSlow.addEventListener("click", playWordSlow);
-  btnFast.addEventListener("click", playWordFast);
-  btnRepeat.addEventListener("click", repeatWord);
-  btnSkip.addEventListener("click", () => {
-    message.textContent = `Mot sauté : ${words[currentWordIndex]}`;
-    wordDisplay.textContent = words[currentWordIndex];
-    nextWord();
-  });
-
-  // Vérification automatique à la saisie (si tu préfères, sinon supprime cet event)
-  answerInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      checkAnswer();
-    }
-  });
-
-  // Au chargement, jouer premier mot
-  window.onload = () => {
-    playWord();
-  };
-</script>
+    // Init
+    updateQuestion();
+  </script>
 </body>
 </html>
