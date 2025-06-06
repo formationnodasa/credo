@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Module Épellation Vocal - Liste Complète</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: rgba(255,255,255,0.1);
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+    width: 90%;
+    max-width: 480px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+  h1 {
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  #wordDisplay {
+    font-size: 2.3rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    letter-spacing: 0.12em;
+    min-height: 48px;
+  }
+  input[type="text"] {
+    font-size: 1.5rem;
+    padding: 12px 15px;
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+    color: #333;
+    background-color: #fff;
+    caret-color: #2575fc;
+    /* Empêche la correction automatique */
+    autocorrect: off;
+    autocomplete: off;
+    spellcheck: false;
+  }
+  input[type="text"]::-webkit-autofill,
+  input[type="text"]::-webkit-autofill:hover,
+  input[type="text"]::-webkit-autofill:focus {
+    box-shadow: 0 0 0px 1000px white inset !important;
+    -webkit-text-fill-color: #333 !important;
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  button {
+    flex: 1 1 40%;
+    padding: 12px 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    color: #2575fc;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #2575fc;
+    color: #fff;
+  }
+  #message {
+    margin-top: 20px;
+    min-height: 28px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(0,0,0,0.15);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Épellation vocale</h1>
+    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnCheck">✔️ Vérifier</button>
+      <button id="btnSkip">⏭ Passer</button>
+    </div>
+    <div id="message"></div>
+  </div>
+
+<script>
+  const words = [
+    "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
+    "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
+    "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
+    "acide","bourgeon","croquis","délimitation","écart","format","gentiment","harmonieux",
+    "amplitude","bidonville","cylindre","descendre","épaisseur","fonctionnement","gabarit","hypothèse",
+    "analogie","bissectrice","contrebasse","dent","égoïste","frétiller","galanterie","hypermarché",
+    "antécédent","bissextile","cyclope","désoler","équilatéral","faillite","gâchis","humanité",
+    "anaphore","bouillir","cellule","disparaître","expression","facturation","gangrène","hippopotame",
+    "antipathie","botanique","cancer","dollar","esquisse","fluidifier","galipette","hirondelle",
+    "archéologie","bonheur","câble","doigt","emprunt","fœtus","gargouiller","heurter",
+    "anticorps","banquette","chronologie","déesse","enceinte","fanfare","garde-robe","honnêteté",
+    "anatomie","bientôt","compas","devis","électron","fertilité","gencive",
+    "aquatique","bicyclette","calomnie","déduction","éclipse","furieux","généralement","illustrateur",
+    "anecdote","baptême","chorale","développement","euphorie","frayeur","gentillesse","inflation",
+    "abonnement","bégayer","corail","différemment","euphémisme","fugitif","ghetto","impersonnel",
+    "absence","barbecue","concentration","dégradation","extinction","fraiseuse","glaciaire","isoloir",
+    "abréger","bactérie","carambolage","discriminatoire","équerre","fabuleux","index",
+    "abyme","bracelet","concubin","différencier","ébauche","fainéant","harceler","intérieur",
+    "accueil","boulangère","conteneur","délocalisation","ébène","faisable","happer","industrie",
+    "actuellement","brûler","cadenasser","démangeaison","épithète","falsifier","handicap","impression",
+    "adhésion","baroque","chromosome","dilemme","estomac","favoritisme","homogène","insecte",
+    "agenda","boulevard","compas","désarroi","épilogue","humain","information",
+    "affliger","banquise","circonflexe","dinosaure","épicentre","géologue","harpie","indigo",
+    "allégorie","bourgeonner","contraception","dissolution","effigie","gestionnaire","hamster","intolérance",
+    "anesthésie","bain-marie","contemporain","démagogie","emboîter","gouache","humain","infinitif",
+    "antiquaire","bafouer","commettre","douillet","écarquiller","gravitation","hectare","inondation",
+    "apostrophe","barrette","coefficient","droiture","graffiti","hypoténuse","induction",
+    "apparaître","boycotter","confidentialité","dubitatif","fécondation","géant","hauteur","impulsion",
+    "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant",
+    "amertume","bizutage","chronomètre","dyslexie","fossile","génocide","hiérarchie","isocèle",
+    "assiduité","balbutier","cynique","dorénavant","fusain","grammaire","hypocrisie","internet",
+    "allégresse","bouddhisme","claustrophobe","faille","genre","hydratant","illusion",
+    "appendice","biodiversité","crainte","écho","fasciste","gradation","homicide","invention",
+    "adjacent","bioclimatique","couveuse","échapper","fascination","gouvernement","hasard","impair",
+    "antisémitisme","biscuit","crépuscule","écharpe","félicitations","grève","hippocampe","italique",
+    "ambulance","béatitude","carré","déguisement","embryon","fard","gauche","hypnose",
+    "archipel","bénéfique","clavier","désormais","élan","faramineux","goutte","infraction",
+    "acrobate","bavarder","cirque","duperie","élastique","faramineux","génération","individuel",
+    "aéroport","bibliothèque","champignon","déménagement","équipement","fascicule","gêne","humanitaire",
+    "anxiété","bénévole","chaîne","diction","éducation","fission","goutte","impératif"
+  ];
+
+  let currentIndex = 0;
+  const wordDisplay = document.getElementById("wordDisplay");
+  const input = document.getElementById("answer");
+  const message = document.getElementById("message");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnSlow = document.getElementById("btnSlow");
+  const btnFast = document.getElementById("btnFast");
+  const btnRepeat = document.getElementById("btnRepeat");
+  const btnCheck = document.getElementById("btnCheck");
+  const btnSkip = document.getElementById("btnSkip");
+
+  let speechRate = 1.0;
+  let isPlaying = false;
+  let synth = window.speechSynthesis;
+
+  function cleanWord(w) {
+    // en minuscules, sans espaces en début/fin
+    return w.trim().toLowerCase();
+  }
+
+  function speakWord(word, rate = 1.0) {
+    if (!synth) {
+      alert("Synthèse vocale non disponible dans ce navigateur.");
+      return;
+    }
+    if (synth.speaking) {
+      synth.cancel();
+    }
+    let utter = new SpeechSynthesisUtterance(word);
+    utter.lang = 'fr-FR';
+    utter.rate = rate;
+    synth.speak(utter);
+  }
+
+  function speakLetterByLetter(word, rate = 0.8) {
+    if (!synth) return;
+    if (synth.speaking) synth.cancel();
+
+    // Parler chaque lettre séparément avec une pause
+    const letters = word.split('');
+    let i = 0;
+
+    function speakNext() {
+      if (i >= letters.length) return;
+      let u = new SpeechSynthesisUtterance(letters[i]);
+      u.lang = 'fr-FR';
+      u.rate = rate;
+      u.onend = () => {
+        i++;
+        setTimeout(speakNext, 150);
+      };
+      synth.speak(u);
+    }
+    speakNext();
+  }
+
+  function displayCurrentWord() {
+    wordDisplay.textContent = "Mot à écouter";
+    input.value = "";
+    message.textContent = "";
+  }
+
+  function playCurrentWord() {
+    let w = words[currentIndex];
+    speakWord(w, speechRate);
+  }
+
+  function checkAnswer() {
+    let userAnswer = cleanWord(input.value);
+    let correct = cleanWord(words[currentIndex]);
+
+    if (userAnswer === "") {
+      message.textContent = "Merci d'écrire un mot.";
+      return false;
+    }
+
+    if (userAnswer === correct) {
+      message.style.color = "limegreen";
+      message.textContent = "✅ Correct !";
+      return true;
+    } else {
+      message.style.color = "#FF5555";
+      message.textContent = `❌ Incorrect. Voici l'orthographe lettre par lettre :`;
+      speakLetterByLetter(correct, 0.8);
+      return false;
+    }
+  }
+
+  function nextWord() {
+    currentIndex++;
+    if (currentIndex >= words.length) {
+      currentIndex = 0;
+      alert("Bravo, tu as parcouru toute la liste ! On recommence.");
+    }
+    displayCurrentWord();
+    input.focus();
+  }
+
+  btnPlay.addEventListener("click", () => {
+    playCurrentWord();
+    input.focus();
+  });
+
+  btnSlow.addEventListener("click", () => {
+    speechRate = Math.max(0.5, speechRate - 0.25);
+    message.textContent = `Vitesse ralentie à ${speechRate.toFixed(2)}`;
+  });
+
+  btnFast.addEventListener("click", () => {
+    speechRate = Math.min(2.0, speechRate + 0.25);
+    message.textContent = `Vitesse accélérée à ${speechRate.toFixed(2)}`;
+  });
+
+  btnRepeat.addEventListener("click", () => {
+    playCurrentWord();
+    input.focus();
+  });
+
+  btnCheck.addEventListener("click", () => {
+    let correct = checkAnswer();
+    if (correct) {
+      setTimeout(() => {
+        nextWord();
+      }, 1800);
+    }
+  });
+
+  btnSkip.addEventListener("click", () => {
+    message.textContent = `Le mot était : "${words[currentIndex]}"`;
+    nextWord();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      btnCheck.click();
+    }
+  });
+
+  // Initialisation
+  displayCurrentWord();
+  input.focus();
+
+</script>
+</body>
+</html>
