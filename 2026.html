@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -49,6 +52,10 @@
     color: #333;
     background-color: #fff;
     caret-color: #2575fc;
+    /* Empêche la correction automatique */
+    autocorrect: off;
+    autocomplete: off;
+    spellcheck: false;
   }
   input[type="text"]::-webkit-autofill,
   input[type="text"]::-webkit-autofill:hover,
@@ -91,9 +98,16 @@
 <body>
   <div class="container">
     <h1>Épellation vocale</h1>
-    <div id="wordDisplay">Mot à écouter</div>
-    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-    <div class="buttons">
+    <div id="wordDisplay">Mot à écouter</div> <input
+  type="text"
+  id="answer"
+  placeholder="Écris le mot ici..."
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  spellcheck="false"
+/>
+
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
@@ -104,14 +118,116 @@
   </div>
 
 <script>
-  const words = [
-    "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
-    // ... (tous les mots sont bien présents comme dans ton code original)
-    "tonalité","localisation","messager","nuque","obèse","quatuor","scénario","toile",
-    "lexical","méthode","nuisance","quotidien","salaire","thème",
-    "législatif","merveille","numérique","pyramide","qualificatif","syndrome","tourment",
-    "lutte","méchanceté","nuageux","parenthèse","quelconque","stylistique","temps"
-  ];
+
+const words = [
+  "autel", "bataille", "chômage", "documentaire", "étang", "force", "gazouiller", "hache",
+  "atome", "bibliographie", "crustacé", "documentaliste", "érosion", "fantastique", "gamète", "hormone",
+  "altercation", "bipède", "conductible", "dictionnaire", "étiquette", "fantôme", "gynécologue", "herbivore",
+  "acide", "bourgeon", "croquis", "délimitation", "écart", "format", "gentiment", "harmonieux",
+  "amplitude", "bidonville", "cylindre", "descendre", "épaisseur", "fonctionnement", "gabarit", "hypothèse",
+  "analogie", "bissectrice", "contrebasse", "dent", "égoïste", "frétiller", "galanterie", "hypermarché",
+  "antécédent", "bissextile", "cyclope", "désoler", "équilatéral", "faillite", "gâchis", "humanité",
+  "anaphore", "bouillir", "cellule", "disparaître", "expression", "facturation", "gangrène", "hippopotame",
+  "antipathie", "botanique", "cancer", "dollar", "esquisse", "fluidifier", "galipette", "hirondelle",
+  "archéologie", "bonheur", "câble", "doigt", "emprunt", "fœtus", "gargouiller", "heurter",
+  "anticorps", "banquette", "chronologie", "déesse", "enceinte", "fanfare", "garde-robe", "honnêteté",
+  "anatomie", "bientôt", "compas", "devis", "électron", "fertilité", "gencive",
+  "aquatique", "bicyclette", "calomnie", "déduction", "éclipse", "furieux", "généralement", "illustrateur",
+  "anecdote", "baptême", "chorale", "développement", "euphorie", "frayeur", "gentillesse", "inflation",
+  "abonnement", "bégayer", "corail", "différemment", "euphémisme", "fugitif", "ghetto", "impersonnel",
+  "absence", "barbecue", "concentration", "dégradation", "extinction", "fraiseuse", "glaciaire", "isoloir",
+  "abréger", "bactérie", "carambolage", "discriminatoire", "équerre", "fabuleux", "index",
+  "abyme", "bracelet", "concubin", "différencier", "ébauche", "fainéant", "harceler", "intérieur",
+  "accueil", "boulangère", "conteneur", "délocalisation", "ébène", "faisable", "happer", "industrie",
+  "actuellement", "brûler", "cadenasser", "démangeaison", "épithète", "falsifier", "handicap", "impression",
+  "adhésion", "baroque", "chromosome", "dilemme", "estomac", "favoritisme", "homogène", "insecte",
+  "agenda", "boulevard", "compas", "désarroi", "épilogue", "humain", "information",
+  "affliger", "banquise", "circonflexe", "dinosaure", "épicentre", "géologue", "harpie", "indigo",
+  "allégorie", "bourgeonner", "contraception", "dissolution", "effigie", "gestionnaire", "hamster", "intolérance",
+  "anesthésie", "bain-marie", "contemporain", "démagogie", "emboîter", "gouache", "humain", "infinitif",
+  "antiquaire", "bafouer", "commettre", "douillet", "écarquiller", "gravitation", "hectare", "inondation",
+  "apostrophe", "barrette", "coefficient", "droiture", "graffiti", "hypoténuse", "induction",
+  "apparaître", "boycotter", "confidentialité", "dubitatif", "fécondation", "géant", "hauteur", "impulsion",
+  "agglomération", "bouilloire", "caoutchouc", "durablement", "fréquence", "gestion", "horticulture", "intéressant",
+  "amertume", "bizutage", "chronomètre", "dyslexie", "fossile", "génocide", "hiérarchie", "isocèle",
+  "assiduité", "balbutier", "cynique", "dorénavant", "fusain", "grammaire", "hypocrisie", "internet",
+  "allégresse", "bouddhisme", "claustrophobe", "faille", "genre", "hydratant", "illusion",
+  "appendice", "biodiversité", "crainte", "écho", "fasciste", "gradation", "homicide", "invention",
+  "adjacent", "bioclimatique", "couveuse", "échapper", "fascination", "gouvernement", "hasard", "impair",
+  "antisémitisme", "banlieue", "couvre-feu", "échéance", "fresque", "grenade", "hibiscus", "interrogation",
+  "asphyxie", "biennale", "craquement", "emphatique", "faisceau", "graphisme", "hostile", "inoubliable",
+  "anonyme", "bienfait", "entreprise", "fédération", "grenouillère", "harmonie", "incorrigible",
+  "anaconda", "bifteck", "débris", "esclavage", "famine", "griffon", "hospitalier", "importer",
+  "auparavant", "bimestriel", "décontracté", "endurance", "friable", "gesticuler", "herse", "innocent",
+  "accumulation", "bistouri", "décennie", "emploi", "fréquence", "guitariste", "humanisme", "ingrédient",
+  "accouplement", "biochimie", "décès", "explicatif", "formule", "grappe", "hiéroglyphe", "infraction",
+  "acrobatie", "démographie", "enthousiasme", "fiche", "gratte-ciel", "hectare", "icône",
+  "affranchir", "climat", "devise", "énonciation", "fraction", "gladiateur", "hypoténuse", "inversion",
+  "abstention", "compassion", "discrimination", "élection", "facteur", "gaspillage", "hyperbole", "instaurer",
+  "abstinence", "comparaison", "dioxyde", "essor", "figure", "gentilhomme", "hommage", "immortaliser",
+  "arbrisseau", "calendrier", "diminution", "engagement", "flûte", "griffer", "haut-parleur", "intègre",
+  "calculatrice", "dénouement", "émeraude", "fragile", "guillemet", "hérédité", "intention",
+  "bâiller", "crayon", "démocratie", "enzyme", "fond", "ginseng", "homophone", "iceberg",
+  "budget", "contour", "désodorisant", "entrepôt", "falloir", "gymnase", "héros", "interrupteur",
+  "beaucoup", "collectivité", "dissoudre", "expérience", "front", "grossesse", "habitat", "insolent",
+  "ballade", "charte", "distillation", "espace", "frapper", "goût", "hymne", "intellectuel",
+  "bâtiment", "cercueil", "dérivation", "étendue", "fenêtre", "goéland", "hystérie", "infaisable",
+  // Derniers mots de la liste :
+  "intervalle", "loi", "marionnette", "nausée", "pathétique", "quadruple", "suffixe", "travailler",
+  "illégalité", "laudatif", "maïpouri", "navette", "papyrus", "quereller", "syntaxe", "toucher",
+  "identification", "littoral", "magistrat", "négligence", "plasticien", "qualité", "syndicat", "toile",
+  "igloo", "lyrique", "mascotte", "névrose", "perspective", "quartier", "seigneur", "trompette",
+  "idiotie", "logique", "meilleur", "nœud", "percussion", "quitter", "scène", "tambourin",
+  "idolâtrer", "largeur", "monastère", "noisette", "précipiter", "quadrilatère", "sympathique", "thérapeutique",
+  "liquide", "médiatrice", "nonchalance", "perpendiculaire", "scrutin", "toupie",
+  "juxtaposition", "local", "millionnaire", "nombril", "pollution", "reconnaissance", "strophe", "thermomètre",
+  "juge", "logiciels", "métamorphose", "notamment", "polythéiste", "résistant", "somme", "taureau",
+  "journal", "lunette", "mâcher", "nucléaire", "poème", "rayon", "semaine", "tyrannie",
+  "journaliste", "lumière", "monstrueux", "nourrisson", "problème", "république", "symphonie", "terroriste",
+  "jadis", "lentille", "misogyne", "personne", "renaissance", "suggestion", "trapèze",
+  "jamais", "liberté", "migrant", "orchidée", "pathétique", "règlement", "sérieux", "tressaillir",
+  "jeunesse", "lieutenant", "mutation", "orchestration", "préfixe", "racisme", "silencieux", "trahison",
+  "justice", "louveteau", "mâchoire", "opticien", "psychologique", "résultat", "science", "transsexuel",
+  "joyeux", "ludothèque", "maigreur", "oxygène", "président", "rivière", "seconde", "tremplin",
+  "joie", "lusophone", "magnésium", "orientation", "prix", "record", "souffrir", "trachée",
+  "jambe", "lacérer", "maillon", "œil", "pétrole", "rectangle", "sembler", "transmutation",
+  "journaux(les)", "leucémie", "maintien", "oreille", "pape", "rassasier", "serrer", "tromper",
+  "jaunisse", "littéral", "majestueux", "ombre", "pharaon", "reste", "sculpture", "tronçonneuse",
+  "joncher", "loyer", "orthographe", "patin", "rapporteur", "souffle",
+  "jouissance", "lucidité", "naturel", "occasionnellement", "processus", "relatif", "sceptre", "veillée",
+  "jonquille", "loquace", "narrateur", "oser", "proportion", "règle", "sédiment", "vermeille",
+  "juvénile", "labyrinthe", "nouveauté", "onde", "peut-être", "ramifier", "synchroniser", "vieillesse",
+  "justifier", "lâcher", "nouvelle", "orchestre", "plutôt", "résolution", "sceau", "vidéoprojecteur",
+  "jubiler", "navigateur", "ordonnance", "purée", "ronronner", "sédentaire", "vainqueur",
+  "joyau", "monarchie", "nettoyage", "opinion", "plongée", "rituel", "sagittaire", "vestiaire",
+  "joaillerie", "maritime", "nécessaire", "obésité", "polyglotte", "rhétorique", "sceptique", "variable",
+  "jogging", "monothéiste", "naître", "organe", "péripétie", "restreint", "systématique", "ventilation",
+  "mourir", "nutrition", "océan", "pourcentage", "rhinocéros", "souverain", "vociférer",
+  "kiwi", "médaille", "noyau", "ouragan", "psychopathe", "récepteur", "synonyme", "velours",
+  "kilomètre", "mondialisation", "nourrir", "octet", "patrimoine", "rayonnement", "scintiller", "vieillard",
+  "ketchup", "musée", "nénuphar", "organisation", "polyphonie", "répertoire", "subjuguer", "vingtaine",
+  "klaxonner", "moine", "néanmoins", "outil", "paratexte", "rancoeur", "sanctuaire", "verglas",
+  "kidnapper", "ministre", "néant", "odorat", "patiemment", "rejoindre", "sarcophage", "vendange",
+  "kilowatt", "mortalité", "nuance", "ouïe", "propagande", "réflexion", "sonnet",
+  "kiosque", "mythe", "nymphe", "orpaillage", "pression", "raquette", "segment",
+  "kung-fu", "médiane", "noyau", "œuvre", "printemps", "rabbin", "silhouette",
+  "kermesse", "mammifère", "négatif", "oxygène", "périphérie", "rétroprojecteur", "statistique",
+  "métaphore", "noblesse", "opération", "pâtisserie", "relique",
+  "landau", "mosaïque", "natation", "orchestre", "pitoyable", "recueil", "technique",
+  "lauréat", "mégalopole", "naturalisation", "oxymore", "périlleux", "renouement", "tiède",
+  "licenciement", "métropole", "neutre", "oreillette", "périodique", "radioactif", "théâtre",
+  "littérature", "messagerie", "nostalgie", "opaque", "péremption", "référendum", "tangente",
+  "lutter", "motion", "natalité", "omniscient", "royaume", "tolérance",
+  "lettre", "molécules", "nature", "occurrence", "quiproquo", "renouvelable", "thèse",
+  "liberté", "mouvement", "nombre", "œsophage", "quotient", "théorème",
+  "laïque", "mangrove", "navire", "orthodoxe", "quart", "sceau", "tonalité",
+  "localisation", "messager", "nuque", "obèse", "quatuor", "scénario", "toile",
+  "lexical", "méthode", "nuisance", "quotidien", "salaire", "thème",
+  "législatif", "merveille", "numérique", "pyramide", "qualificatif", "syndrome", "tourment",
+  "lutte", "méchanceté", "nuageux", "parenthèse", "quelconque", "stylistique", "temps"
+];
+
+ 
 
   let currentWordIndex = 0;
   const wordDisplay = document.getElementById("wordDisplay");
@@ -139,7 +255,7 @@
 
   function playWord() {
     const word = words[currentWordIndex];
-    wordDisplay.textContent = "";
+    wordDisplay.textContent = ""; // cache le mot écrit
     speakWord(word);
     message.textContent = "Écoutez attentivement et écrivez le mot.";
     answerInput.value = "";
@@ -177,7 +293,7 @@
 
   function spellWord(word) {
     speechSynthesis.cancel();
-    let letters = [...word.replace(/[-\s]/g, "")];
+    let letters = [...word.replace(/[-\s]/g, "")]; // enlève espaces et tirets
     let i = 0;
     function spellNext() {
       if (i < letters.length) {
@@ -225,6 +341,7 @@
     nextWord();
   });
 
+  // Vérification automatique à la saisie (si tu préfères, sinon supprime cet event)
   answerInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -232,9 +349,11 @@
     }
   });
 
+  // Au chargement, jouer premier mot
   window.onload = () => {
     playWord();
   };
 </script>
 </body>
 </html>
+
