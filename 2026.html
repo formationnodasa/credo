@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Épellation vocale - Voix masculine + Bouton Retour</title>
+<title>Épellation vocale - Voix masculine aiguë + Bouton Retour</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -98,7 +98,7 @@
 </style>
 </head>
 <body>
-  <div class="container" role="main" aria-label="Module d'épellation vocale avec voix masculine">
+  <div class="container" role="main" aria-label="Module d'épellation vocale avec voix masculine aiguë">
     <h1>Épellation vocale</h1>
     <div id="wordDisplay" aria-live="polite" aria-atomic="true">Mot à écouter</div>
     <input
@@ -173,23 +173,18 @@
   let frenchMaleVoice = null;
   function selectFrenchMaleVoice() {
     const voices = synth.getVoices();
-    // Priorité : voix FR masculine
-    // On cherche une voix qui contient "male" ou "homme" dans le nom (si dispo), sinon la plus grave
     const frVoices = voices.filter(v => v.lang.startsWith('fr'));
     if (frVoices.length === 0) {
       frenchMaleVoice = voices[0] || null;
       return;
     }
-
-    // Chercher voix avec "male" dans le nom (case insensitive)
+    // Chercher voix masculine dans le nom
     let maleVoice = frVoices.find(v => /male|homme|garçon/i.test(v.name));
     if (maleVoice) {
       frenchMaleVoice = maleVoice;
       return;
     }
-
-    // Sinon, choisir la voix FR avec la fréquence la plus basse (indirectement souvent voix masculine)
-    // (Comme on n'a pas fréquence, on prend la première voix FR trouvée)
+    // Sinon choisir la première voix FR
     frenchMaleVoice = frVoices[0];
   }
   if (synth.onvoiceschanged !== undefined) {
@@ -209,6 +204,7 @@
       utterance.lang = "fr-FR";
     }
     utterance.rate = rate;
+    utterance.pitch = 2.0; // Pitch aigu forcé
     utterance.onend = () => {
       if (callback) callback();
     };
@@ -264,7 +260,6 @@
     } else {
       message.textContent = "❌ Incorrect, écoutez l'épellation...";
 
-      // Épellation lettre par lettre à vitesse lente
       const letters = correctWord.split("");
       let i = 0;
 
@@ -312,30 +307,37 @@
     btnBack.disabled = true;
   }
 
-  // Événements des boutons
   btnPlay.addEventListener("click", () => {
-    playingRate = 1;
     playCurrentWord();
   });
-  btnSlow.addEventListener("click", playCurrentWordSlow);
-  btnFast.addEventListener("click", playCurrentWordFast);
-  btnRepeat.addEventListener("click", repeatWord);
+
+  btnSlow.addEventListener("click", () => {
+    playCurrentWordSlow();
+  });
+
+  btnFast.addEventListener("click", () => {
+    playCurrentWordFast();
+  });
+
+  btnRepeat.addEventListener("click", () => {
+    repeatWord();
+  });
+
   btnSkip.addEventListener("click", () => {
-    message.textContent = "Mot passé, écoutez le suivant.";
     nextWord();
   });
+
   btnBack.addEventListener("click", () => {
     prevWord();
   });
 
-  answerInput.addEventListener("keydown", (e) => {
+  answerInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
-      e.preventDefault();
       checkAnswer();
     }
   });
 
-  // Lancer le premier mot au chargement
+  // Démarrage automatique à l'ouverture
   window.onload = () => {
     playCurrentWord();
   };
