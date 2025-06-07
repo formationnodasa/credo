@@ -165,15 +165,35 @@
     let speechRate = 1;
 
     function speakWord(text, rate = speechRate) {
-      if (!('speechSynthesis' in window)) {
-        message.textContent = "Synthèse vocale non disponible.";
-        return;
-      }
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = rate;
-      speechSynthesis.speak(utterance);
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "Synthèse vocale non disponible.";
+    return;
+  }
+
+  const speak = () => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR";
+    utterance.rate = rate;
+
+    const voices = speechSynthesis.getVoices();
+    const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+
+    speechSynthesis.cancel(); // Stop any current speech
+    speechSynthesis.speak(utterance);
+  };
+
+  if (speechSynthesis.getVoices().length === 0) {
+    speechSynthesis.onvoiceschanged = speak;
+  } else {
+    speak();
+  }
+}
+
+    
+    
     }
 
     function playWord() {
@@ -273,4 +293,18 @@
     speak();
   }
 }
+
+btnSlow.addEventListener("click", playWordSlow);
+btnFast.addEventListener("click", playWordFast);
+btnRepeat.addEventListener("click", repeatWord);
+btnSkip.addEventListener("click", nextWord);
+
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    checkAnswer();
+  }
+});
+
+playWord();
+
 
