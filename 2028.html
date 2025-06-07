@@ -163,45 +163,23 @@
     let speechRate = 1;
 
 
-function speakWord(text, rate = speechRate) {
-  if (!('speechSynthesis' in window)) {
-    message.textContent = "Synthèse vocale non disponible.";
-    return;
-  }
-
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
-
-    const voices = speechSynthesis.getVoices();
-
-    // Essayer de forcer une voix française spécifique (Google ou autre)
-    const frenchVoice =
-      voices.find(v => v.name.includes("Google Français")) ||
-      voices.find(v => v.lang === "fr-FR") ||
-      voices.find(v => v.lang.startsWith("fr"));
-
-    if (frenchVoice) {
-      utterance.voice = frenchVoice;
+fonction speakWord(word, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
     }
 
-    speechSynthesis.cancel(); // Stoppe toute parole en cours
-    speechSynthesis.speak(utterance);
-  };
-
-  if (speechSynthesis.getVoices().length === 0) {
-    speechSynthesis.onvoiceschanged = speak;
-  } else {
-    speak();
-  }
-}
-
     function playWord() {
-      const current = words[currentWordIndex];
-      wordDisplay.textContent = current.mot;
-      speakWord(`Trouve une anagramme du mot ${current.mot}`);
-      message.textContent = "Écris une anagramme correcte.";
+      const word = words[currentWordIndex];
+      wordDisplay.textContent = "";
+      speakWord(word);
+      message.textContent = "Écoutez attentivement et écrivez le mot.";
       message.style.color = "#fff";
       answerInput.value = "";
       answerInput.focus();
@@ -223,20 +201,21 @@ function speakWord(text, rate = speechRate) {
 
     function checkAnswer() {
       const userAnswer = answerInput.value.trim().toLowerCase();
-      const anagramList = words[currentWordIndex].anagrammes.map(a => a.toLowerCase());
-
-      if (anagramList.includes(userAnswer)) {
-        message.textContent = "✅ Correct ! Bien joué.";
-        message.style.color = "#00e676";
+      const correctAnswer = words[currentWordIndex].toLowerCase();
+      if (userAnswer === correctAnswer) {
+        message.textContent = "✅ Correct !";
+        message.style.color = "#00e676"; // Vert
+        wordDisplay.textContent = correctAnswer;
         setTimeout(() => {
           nextWord();
         }, 1500);
       } else {
-        message.textContent = "❌ Incorrect. Écoute les bonnes réponses.";
-        message.style.color = "#ff5252";
-        speakWord(`Il fallait penser à : ${anagramList.join(", ")}`);
+        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252"; // Rouge
+        spellWord(correctAnswer);
       }
     }
+
 
     function nextWord() {
       currentWordIndex++;
