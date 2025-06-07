@@ -1,157 +1,115 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Calcul Mental Vocal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dictée Interactive</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    button { margin: 5px; padding: 10px 15px; }
-    #micro {
-      width: 60px;
-      height: 60px;
-      margin: 10px auto;
-      background: red;
-      border-radius: 50%;
-      animation: none;
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #000;
+      transition: background 0.3s, color 0.3s;
     }
-    .listening {
-      animation: pulse 1s infinite;
+    body.dark {
+      background-color: #111;
+      color: #fff;
     }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 1; }
+    .dictée {
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #999;
+      border-radius: 8px;
+    }
+    button {
+      margin: 5px;
+    }
+    #controls {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🧠 Calcul Mental Vocal</h1>
-  <p id="question">Clique sur Lire pour commencer !</p>
-  
-  <div>
-    <button onclick="prevQuestion()">⬅️ Retour</button>
-    <button onclick="repeatQuestion()">🔁 Répéter</button>
-    <button onclick="nextQuestion()">➡️ Passer</button>
-  </div>
+<h1>Module de Dictée Interactive</h1>
+<label><input type="checkbox" id="darkModeToggle"> Mode sombre</label>
 
-  <div>
-    <button onclick="readQuestion()">🔊 Lire</button>
-    <button onclick="changeSpeed(-0.1)">🐢 Ralentir</button>
-    <button onclick="changeSpeed(0.1)">🐇 Accélérer</button>
-  </div>
+<div class="dictée" id="dictée-container">
+  <h2 id="titre-dictée">T1</h2>
+  <p id="phrase">Phrase en attente...</p>
+</div>
 
-  <div>
-    <button 
-      onmousedown="startRecognition()" 
-      onmouseup="stopRecognition()" 
-      ontouchstart="startRecognition()" 
-      ontouchend="stopRecognition()">
-      🎙️ Répondre
-    </button>
-    <div id="micro"></div>
-  </div>
+<div id="controls">
+  <button onclick="lirePhrase()">▶️ Lire</button>
+  <button onclick="pause()">⏸️ Pause</button>
+  <button onclick="ralentir()">🐢 Ralentir</button>
+  <button onclick="accelerer()">🐇 Accélérer</button>
+  <button onclick="reculer()">⏪ Retour</button>
+  <button onclick="passer()">⏭️ Passer</button>
+</div>
 
-  <script>
-    const questions = [
-      { q: "6 fois 2 plus 4 divisé par 2", a: 14 },
-      { q: "10 divisé par 2 plus 3 fois 4", a: 17 },
-      { q: "5 fois 3 plus 6 divisé par 2", a: 18 },
-      { q: "12 divisé par 3 plus 4 fois 2", a: 12 },
-      // Ajoutez ici les autres questions dans le même format
-    ];
+<script>
+  const phrases = [
+    "Le soleil se lève à l'est.",
+    "Les enfants jouent dans le jardin.",
+    "La maîtresse corrige les devoirs.",
+    "Le chat dort sur le canapé."
+  ];
+  let index = 0;
+  let synth = window.speechSynthesis;
+  let utterance = null;
+  let vitesse = 1;
 
-    let current = 0;
-    let speed = 1;
-    let synth = window.speechSynthesis;
-    let recognition;
-    let listening = false;
+  function lirePhrase() {
+    if (utterance) synth.cancel(); // Annule lecture en cours
+    utterance = new SpeechSynthesisUtterance(phrases[index]);
+    utterance.lang = 'fr-FR';
+    utterance.rate = vitesse;
+    utterance.voice = synth.getVoices().find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes("homme")) || synth.getVoices()[0];
+    document.getElementById("phrase").textContent = phrases[index];
+    document.getElementById("titre-dictée").textContent = "T" + (index + 1);
+    synth.speak(utterance);
+  }
 
-    const questionEl = document.getElementById("question");
-    const micro = document.getElementById("micro");
-
-    function updateQuestion() {
-      questionEl.textContent = `Question : ${questions[current].q}`;
+  function pause() {
+    if (synth.speaking && !synth.paused) {
+      synth.pause();
+    } else if (synth.paused) {
+      synth.resume();
     }
+  }
 
-    function readQuestion() {
-      const utterance = new SpeechSynthesisUtterance(questions[current].q);
-      utterance.lang = 'fr-FR';
-      utterance.rate = speed;
-      synth.speak(utterance);
-    }
+  function accelerer() {
+    vitesse = Math.min(vitesse + 0.2, 2);
+    lirePhrase();
+  }
 
-    function changeSpeed(delta) {
-      speed = Math.max(0.5, Math.min(2, speed + delta));
-      alert(`Vitesse : ${speed.toFixed(1)}x`);
-    }
+  function ralentir() {
+    vitesse = Math.max(vitesse - 0.2, 0.4);
+    lirePhrase();
+  }
 
-    function nextQuestion() {
-      if (current < questions.length - 1) current++;
-      updateQuestion();
-      readQuestion();
-    }
+  function reculer() {
+    index = Math.max(0, index - 1);
+    lirePhrase();
+  }
 
-    function prevQuestion() {
-      if (current > 0) current--;
-      updateQuestion();
-      readQuestion();
-    }
+  function passer() {
+    index = Math.min(phrases.length - 1, index + 1);
+    lirePhrase();
+  }
 
-    function repeatQuestion() {
-      readQuestion();
-    }
+  // Mode sombre
+  document.getElementById("darkModeToggle").addEventListener("change", function () {
+    document.body.classList.toggle("dark", this.checked);
+  });
 
-    function startRecognition() {
-      if (!('webkitSpeechRecognition' in window)) {
-        alert("Reconnaissance vocale non supportée.");
-        return;
-      }
+  // Bloque le clavier
+  window.addEventListener("keydown", function (e) {
+    e.preventDefault();
+  }, true);
 
-      recognition = new webkitSpeechRecognition();
-      recognition.lang = 'fr-FR';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+</script>
 
-      recognition.onstart = () => {
-        micro.classList.add('listening');
-        listening = true;
-      };
-
-      recognition.onend = () => {
-        micro.classList.remove('listening');
-        listening = false;
-      };
-
-      recognition.onresult = event => {
-        const result = event.results[0][0].transcript;
-        const num = parseInt(result.match(/\d+/)); // extrait le premier nombre
-        const correct = questions[current].a;
-
-        if (num === correct) {
-          speak("Bravo, c'est correct !");
-        } else {
-          speak(`Non, la bonne réponse est ${correct}`);
-        }
-      };
-
-      recognition.start();
-    }
-
-    function stopRecognition() {
-      if (recognition && listening) {
-        recognition.stop();
-      }
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'fr-FR';
-      synth.speak(utterance);
-    }
-
-    // Init
-    updateQuestion();
-  </script>
 </body>
 </html>
