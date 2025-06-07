@@ -1,7 +1,4 @@
 
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -174,6 +171,10 @@ function speakQuestion(text, rate = speechRate) {
   speechSynthesis.speak(utterance);
 }
 
+function speakMessage(text) {
+  speakQuestion(text, speechRate);
+}
+
 function playQuestion() {
   const current = questions[currentQuestionIndex];
   questionDisplay.textContent = current.question;
@@ -182,6 +183,7 @@ function playQuestion() {
   message.style.color = "#fff";
   answerInput.value = "";
   answerInput.focus();
+  speakMessage("Entrez la réponse correcte.");
 }
 
 function playQuestionSlow() {
@@ -205,12 +207,14 @@ function checkAnswer() {
   if (userAnswer === correctAnswer) {
     message.textContent = "✅ Correct ! Bien joué.";
     message.style.color = "#00e676";
+    speakMessage("Correct. Bien joué !");
     setTimeout(() => {
       nextQuestion();
     }, 1500);
   } else {
     message.textContent = `❌ Incorrect. La bonne réponse était : ${correctAnswer}`;
     message.style.color = "#ff5252";
+    speakMessage(`Faut réfléchir à la réponse. La bonne réponse était : ${correctAnswer}`);
   }
 }
 
@@ -227,6 +231,7 @@ function nextQuestion() {
     btnRepeat.disabled = true;
     btnSkip.disabled = true;
     btnBack.disabled = true;
+    speakMessage("Bravo, vous avez complété la liste !");
   } else {
     playQuestion();
   }
