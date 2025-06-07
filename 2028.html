@@ -1,148 +1,265 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ascenseur Immersif</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Module Épellation Vocal - Liste Complète</title>
   <style>
     body {
-      margin: 0;
-      background: #000;
-      height: 100vh;
-      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      perspective: 1500px;
-      font-family: Arial, sans-serif;
+      height: 100vh;
+      margin: 0;
     }
 
-    .ascenseur {
-      position: relative;
-      width: 300px;
-      height: 500px;
-      background: #333;
-      border: 4px solid #999;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 4s ease-in-out;
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
 
-    .porte {
-      position: absolute;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(to right, #666, #aaa);
-      top: 0;
-      transition: transform 2.5s ease-in-out;
-      z-index: 3;
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
     }
 
-    .gauche {
-      left: 0;
-      border-right: 2px solid #ccc;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .droite {
-      right: 0;
-      border-left: 2px solid #ccc;
+    h1 {
+      font-weight: 800;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
 
-    .interieur {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, #555, #222);
-      animation: pulseLight 3s infinite alternate;
-      z-index: 1;
-    }
-
-    @keyframes pulseLight {
-      from { background: radial-gradient(circle at center, #666, #222); }
-      to   { background: radial-gradient(circle at center, #444, #111); }
-    }
-
-    .texte {
-      position: absolute;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      color: #fff;
-      font-size: 2.5em;
-      opacity: 0;
-      z-index: 2;
-      transition: opacity 2s ease-in-out 1s, transform 2s ease-in-out;
-    }
-
-    .boutons {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 2;
-    }
-
-    .boutons button {
-      width: 30px;
-      height: 30px;
-      border: none;
-      background: #666;
-      color: white;
+    #wordDisplay {
+      font-size: 2.4rem;
       font-weight: bold;
-      border-radius: 4px;
-      cursor: default;
+      letter-spacing: 0.15em;
+      margin-bottom: 30px;
+      min-height: 50px;
     }
 
-    .ascenseur.ouvert .gauche {
-      transform: translateX(-100%);
+    input[type="text"] {
+      font-size: 1.4rem;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      margin-bottom: 25px;
+      background-color: #fff;
+      color: #333;
+      outline: none;
+      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #2575fc;
+      caret-color: #2575fc;
     }
 
-    .ascenseur.ouvert .droite {
-      transform: translateX(100%);
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
     }
 
-    .ascenseur.ouvert .texte {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .ascenseur.zoom {
-      transform: scale(2.5) translateZ(200px);
+    button:hover {
+      background: #2575fc;
+      color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    }
+
+    #message {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 32px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.1);
+      transition: color 0.3s ease;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Épellation vocale</h1>
+    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+    <div id="message"></div>
+  </div>
 
-<div class="ascenseur" id="ascenseur">
-  <div class="porte gauche"></div>
-  <div class="porte droite"></div>
-  <div class="interieur"></div>
-  <div class="texte">Bienvenue</div>
-</div>
+  <script>
+    const words = ["autel", "bataille", "chômage", "documentaire", "étang", "force", "gazouiller", "hache"]; // ← pour simplifier la démo, raccourci
 
-<audio id="son" src="ding.mp3" preload="auto"></audio>
+    let currentWordIndex = 0;
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
 
-<script>
-  const ascenseur = document.getElementById('ascenseur');
-  const audio = document.getElementById('son');
+    let speechRate = 1;
 
-  // Ouvre les portes
-  setTimeout(() => {
-    ascenseur.classList.add('ouvert');
-    audio.play();
-  }, 1000);
+    function speakWord(word, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
+    }
 
-  // Lance le zoom vers l’intérieur après ouverture
-  setTimeout(() => {
-    ascenseur.classList.add('zoom');
-  }, 3000); // délai pour laisser les portes s’ouvrir
+    function playWord() {
+      const word = words[currentWordIndex];
+      wordDisplay.textContent = "";
+      speakWord(word);
+      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.focus();
+    }
 
-  // Redirection après le zoom
-  setTimeout(() => {
-    window.location.href = 'Domi.html';
-  }, 6000); // total ≈ 6s
-</script>
+    function playWordSlow() {
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      playWord();
+    }
 
+    function playWordFast() {
+      speechRate = Math.min(2, speechRate + 0.25);
+      playWord();
+    }
+
+    function repeatWord() {
+      playWord();
+    }
+
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const correctAnswer = words[currentWordIndex].toLowerCase();
+      if (userAnswer === correctAnswer) {
+        message.textContent = "✅ Correct !";
+        message.style.color = "#00e676"; // Vert
+        wordDisplay.textContent = correctAnswer;
+        setTimeout(() => {
+          nextWord();
+        }, 1500);
+      } else {
+        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252"; // Rouge
+        spellWord(correctAnswer);
+      }
+    }
+
+    function spellWord(word) {
+      speechSynthesis.cancel();
+      let letters = [...word.replace(/[-\s]/g, "")];
+      let i = 0;
+      function spellNext() {
+        if (i < letters.length) {
+          const utterance = new SpeechSynthesisUtterance(letters[i]);
+          utterance.lang = "fr-FR";
+          utterance.rate = 0.6;
+          utterance.onend = () => {
+            i++;
+            setTimeout(spellNext, 350);
+          };
+          speechSynthesis.speak(utterance);
+        } else {
+          message.textContent = "Réessayez d'écrire le mot.";
+          message.style.color = "#fff";
+          answerInput.value = "";
+          answerInput.focus();
+        }
+      }
+      spellNext();
+    }
+
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
+        wordDisplay.textContent = "";
+        answerInput.value = "";
+        answerInput.disabled = true;
+        btnPlay.disabled = true;
+        btnSlow.disabled = true;
+        btnFast.disabled = true;
+        btnRepeat.disabled = true;
+        btnSkip.disabled = true;
+        btnBack.disabled = true;
+      } else {
+        playWord();
+      }
+    }
+
+    btnBack.addEventListener("click", () => {
+      if (currentWordIndex > 0) {
+        currentWordIndex--;
+        message.textContent = "";
+        playWord();
+      }
+    });
+
+    btnPlay.addEventListener("click", playWord);
+    btnSlow.addEventListener("click", playWordSlow);
+    btnFast.addEventListener("click", playWordFast);
+    btnRepeat.addEventListener("click", repeatWord);
+    btnSkip.addEventListener("click", nextWord);
+
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    playWord(); // lancer au chargement
+  </script>
 </body>
 </html>
