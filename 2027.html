@@ -1,190 +1,311 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dictée Interactive Enfant</title>
+  <meta charset="UTF-8">
+  <title>Dictée Vocale Complète</title>
   <style>
     body {
-      font-family: 'Comic Sans MS', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom right, #f2f9ff, #d0e6ff);
-      color: #333;
-      transition: background 0.3s, color 0.3s;
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-
-    body.dark {
-      background: #1e1e1e;
-      color: #eee;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: auto;
-      padding: 30px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #2a6f97;
-    }
-
-    .dictée {
-      background-color: #ffffffbb;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-top: 20px;
-    }
-
-    .dictée.dark {
-      background-color: #2c2c2c;
-    }
-
-    #controls, #options {
-      text-align: center;
-      margin-top: 15px;
-    }
-
     button {
-      margin: 6px;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      background-color: #2a6f97;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
+      margin: 5px;
+      padding: 10px 15px;
     }
-
-    button:hover {
-      background-color: #1b4f6b;
+    select {
+      margin-top: 10px;
+      padding: 5px;
     }
-
-    label {
-      display: block;
-      text-align: center;
+    #fullText {
       margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      white-space: pre-wrap;
+      display: none;
     }
-
-    #phrase {
-      font-size: 1.3em;
-      margin-bottom: 10px;
-      visibility: hidden;
-    }
-
   </style>
 </head>
 <body>
+  <h1>Dictée Vocale Interactive</h1>
 
-<div class="container">
-  <h1>Dictée Interactive</h1>
-  <label><input type="checkbox" id="darkModeToggle"> 🌙 Activer le mode sombre</label>
+  <label for="dictationSelect">Choisissez une dictée :</label>
+  <select id="dictationSelect">
+    <option value="1">Dictée 1 - Le Laboureur et ses enfants</option>
+    <option value="2">Dictée 2 - La Cigale et la Fourmi</option>
+    <option value="3">Dictée 3 - Le Lièvre et la Tortue</option>
+    <option value="4">Dictée 4 - Le Corbeau et le Renard</option>
+    <option value="5">Dictée 5 - La Grenouille et le Bœuf</option>
+    <option value="6">Dictée 6 - La Fourmi et la Sauterelle</option>
+    <option value="7">Dictée 7 - Rien ne sert de courir</option>
+    <option value="9">Dictée 9 - Le Loup et l’Agneau</option>
+    <option value="10">Dictée 10 - Le Héron</option>
+    <option value="11">Dictée 11 - Le Lion et le Rat</option>
+  </select>
 
-  <div class="dictée" id="dictée-container">
-    <h2 id="titre-dictée">T1</h2>
-    <p id="phrase">Phrase masquée</p>
-
-    <div id="controls">
-      <button onclick="jouer()">▶️ Jouer</button>
-      <button onclick="pause()">⏸️ Pause</button>
-      <button onclick="ralentir()">🐢 Ralentir</button>
-      <button onclick="accelerer()">🐇 Accélérer</button>
-      <button onclick="reculer()">⏪ Retour</button>
-      <button onclick="passer()">⏭️ Suivant</button>
-      <button onclick="verifier()">✅ Vérifier</button>
-    </div>
+  <div>
+    <button onclick="speak()">Lire</button>
+    <button onclick="pauseSpeech()">Pause</button>
+    <button onclick="resumeSpeech()">Reprendre</button>
+    <button onclick="stopSpeech()">Arrêter</button>
+    <button onclick="repeatSpeech()">Répéter</button>
+    <button onclick="showFullText()">Vérifier la dictée</button>
   </div>
-</div>
 
-<script>
-  const phrases = [
-    "Le soleil brille sur les collines.",
-    "Un oiseau chante dans le grand arbre vert.",
-    "Les enfants jouent dans la cour de l'école.",
-    "Le chat saute sur la table de la cuisine."
-  ];
+  <div id="fullText"></div>
 
-  let index = 0;
-  let synth = window.speechSynthesis;
-  let utterance = null;
-  let vitesse = 1;
+  <script>
+    const dictations = {
+      1: `Dictée 1 – Le laboureur et ses enfants :
+Travaillez, prenez de la peine :
+C'est le fonds qui manque le moins.
+Un riche Laboureur, sentant sa mort prochaine,
+Fit venir ses enfants, leur parla sans témoins.
+Gardez-vous, leur dit-il, de vendre l'héritage
+Que nous ont laissé nos parents.
+Un trésor est caché dedans.
+Je ne sais pas l'endroit ; mais un peu de courage
+Vous le fera trouver, vous en viendrez à bout.
+Remuez votre champ dès qu'on aura fait l'Oût.
+Creusez, fouillez, bêchez ; ne laissez nulle place
+Où la main ne passe et repasse.
+Le père mort, les fils vous retournent le champ
+Deçà, delà, partout ; si bien qu'au bout de l'an
+Il en rapporta davantage.
+D'argent, point de caché. Mais le père fut sage
+De leur montrer avant sa mort
+Que le travail est un trésor.`,
 
-  function speak(texte) {
-    synth.cancel();
-    utterance = new SpeechSynthesisUtterance(texte);
-    utterance.lang = 'fr-FR';
-    utterance.rate = vitesse;
+      2: `Dictée 2 – La Cigale et la Fourmi :
+La Cigale, ayant chanté tout l'été,
+Se trouva fort dépourvue quand la bise fut venue :
+Pas un seul petit morceau de mouche ou de vermisseau.
+Elle alla crier famine chez la Fourmi sa voisine,
+La priant de lui prêter quelque grain pour subsister
+Jusqu'à la saison nouvelle.
+« Je vous paierai, lui dit-elle,
+Avant l'août, foi d'animal, intérêt et principal. »
+La Fourmi n'est pas prêteuse : c'est là son moindre défaut.
+« Que faisiez-vous au temps chaud ? » dit-elle à cette emprunteuse.
+— Nuit et jour à tout venant
+Je chantais, ne vous déplaise.
+— Vous chantiez ? j'en suis fort aise.
+Eh bien ! dansez maintenant.`,
 
-    // Recherche voix d’homme si possible
-    const voices = synth.getVoices();
-    const maleVoice = voices.find(v => v.lang === 'fr-FR' && /homme|male|paul|thomas/i.test(v.name));
-    utterance.voice = maleVoice || voices.find(v => v.lang === 'fr-FR') || voices[0];
+      3: `Dictée 3 – Le Lièvre et la Tortue :
+Tout le monde savait que le Lièvre était l'animal le plus rapide, et le Lièvre adorait s'en vanter.
+« Jamais un animal n'a été, n'est ou ne sera aussi rapide que moi », clamait-il. « Personne ne peut me battre ! »
+Un jour de grande chaleur, le Lièvre cherchait quelqu'un pour faire la course, tout en fanfaronnant comme à son habitude.
+Il rencontra la Tortue qui passait par là de son pas lent. Elle accepta le défi que lui proposa le Lièvre.
+Ils demandèrent à la Chouette de donner le signal : il fallait faire le tour du parc et revenir au point de départ.
+La Chouette hulula, signifiant ainsi le début de la course. Le Lièvre fut bientôt arrivé à mi-parcours.
+Alors, il s'arrêta pour déjeuner. La Tortue, loin derrière, continuait de son pas lent.
+Comme il ne voyait pas venir la Tortue, le Lièvre fit une petite sieste. La Tortue poursuivit son chemin pesamment.
+Le Lièvre dormit tout l'après-midi. Quand il s'éveilla, il aperçut la Tortue au loin, qui s'approchait lentement de la ligne d'arrivée.
+Pour essayer de rattraper la Tortue, le Lièvre détala si bien qu'on distinguait à peine ses pattes,
+et que ses longues oreilles étaient rabattues en arrière. Mais il arriva trop tard.
+C'est la Tortue qui remporta la course... d'une encolure, en gardant une allure constante.`,
 
-    synth.speak(utterance);
-  }
+      4: `Dictée 4 – Le Corbeau et le Renard :
+Maître Corbeau, sur un arbre perché,
+Tenait en son bec un fromage.
+Maître Renard, par l'odeur alléché,
+Lui tint à peu près ce langage :
+« Eh bonjour, Monsieur du Corbeau.
+Que vous êtes joli ! que vous me semblez beau !
+Sans mentir, si votre ramage
+Se rapporte à votre plumage,
+Vous êtes le Phénix des hôtes de ces bois. »
+À ces mots le Corbeau ne se sent pas de joie ;
+Et pour montrer sa belle voix,
+Il ouvre un large bec, laisse tomber sa proie.
+Le Renard s'en saisit, et dit : « Mon bon Monsieur,
+Apprenez que tout flatteur
+Vit aux dépens de celui qui l'écoute.
+Cette leçon vaut bien un fromage, sans doute. »
+Le Corbeau, honteux et confus,
+Jura, mais un peu tard, qu'on ne l'y prendrait plus.`,
 
-  function jouer() {
-    // Joue uniquement, ne montre pas la phrase
-    const phrase = phrases[index];
-    document.getElementById("phrase").style.visibility = "hidden";
-    document.getElementById("titre-dictée").textContent = "T" + (index + 1);
-    speak(phrase);
-  }
+      5: `Dictée 5 – La Grenouille et le Bœuf :
+Une Grenouille vit un Bœuf qui lui sembla de belle taille.
+Elle qui n'était pas grosse en tout comme un œuf,
+Envieuse s'étend, et s'enfle, et se travaille
+Pour égaler l'animal en grosseur.
+Disant : « Regardez bien, ma sœur ;
+Est-ce assez ? dites-moi ; n'y suis-je point encore ? »
+— Nenni. — M'y voici donc ? — Point du tout. — M'y voilà ?
+— Vous n'en approchez point.
+La chétive pécore s'enfla si bien qu'elle creva.
+Le monde est plein de gens qui ne sont pas plus sages :
+Tout Bourgeois veut bâtir comme les grands Seigneurs,
+Tout petit Prince a des Ambassadeurs,
+Tout Marquis veut avoir des Pages.`,
 
-  function verifier() {
-    // Montre la phrase sans parler
-    const phrase = phrases[index];
-    document.getElementById("phrase").textContent = phrase;
-    document.getElementById("phrase").style.visibility = "visible";
-  }
+      6: `Dictée 6 – La Fourmi et la Sauterelle :
+Nous étions au milieu de l'hiver, un jour clair et glacial.
+Malgré le froid, la Fourmi se chauffait au soleil.
+Elle mâchonnait quelques graines provenant d'un gros tas qu'elle avait péniblement amoncelé tout au long de l'été.
+Tandis que la Fourmi mangeait, la Sauterelle arriva, son estomac criant famine.
+S'adressant à la Fourmi, elle quémanda une ou deux graines.
+« Eh bien, demanda la Fourmi, que faisiez-vous durant l'été ? »
+« Je sautais de feuille en feuille, je les mordillais, je chantais », répliqua la Sauterelle.
+« Vous n'avez rien mis de côté en prévision de l'hiver ? » interrogea la Fourmi.
+La Sauterelle secoua la tête tristement.
+« Toutes les mêmes, ces sauterelles », dit la Fourmi.
+Puis elle donna quelques graines à la Sauterelle, et la renvoya avec ces mots :
+« Ceux qui ne travaillent pas en été auront faim en hiver. »`,
 
-  function pause() {
-    if (synth.speaking && !synth.paused) {
-      synth.pause();
-    } else if (synth.paused) {
-      synth.resume();
+      7: `Dictée 7 – Rien ne sert de courir :
+Rien ne sert de courir ; il faut partir à point.
+Le Lièvre et la Tortue en sont un témoignage.
+Gageons, dit celle-ci, que vous n'atteindrez point
+Sitôt que moi ce but. — Sitôt ? Êtes-vous sage ?
+Repartit l'animal léger.
+Ma commère, il vous faut purger
+Avec quatre grains d’ellébore.
+— Sage ou non, je parie encore.
+Ainsi fut fait : et de tous deux
+On mit près du but les enjeux :
+Savoir quoi, ce n’est pas l’affaire,
+Ni de quel juge l’on convint.
+Notre Lièvre n’avait que quatre pas à faire ;
+J’entends de ceux qu’il fait lorsque, prêt d’être atteint,
+Il s’éloigne des chiens, les renvoie aux Calendes,
+Et leur fait arpenter les landes.
+Ayant, dis-je, du temps de reste pour brouter,
+Pour dormir, et pour écouter
+D’où vient le vent, il laisse la Tortue
+Aller son train de Sénateur.
+Elle part, elle s’évertue ;
+Elle se hâte avec lenteur.
+Lui cependant méprise une telle victoire,
+Tient la gageure à peu de gloire,
+Croit qu’il y va de son honneur
+De partir tard. Il broute, il se repose,
+Il s’amuse à toute autre chose
+Qu’à la gageure. À la fin, quand il vit
+Que l’autre touchait presque au bout de la carrière,
+Il partit comme un trait ; mais les élans qu’il fit
+Furent vains : la Tortue arriva la première.
+« Eh bien ! » lui cria-t-elle, « avais-je pas raison ?
+De quoi vous sert votre vitesse ?
+Moi, l’emporter ! et que serait-ce
+Si vous portiez une maison ? »`,
+
+      9: `Dictée 9 – Le Loup et l’Agneau :
+La raison du plus fort est toujours la meilleure :
+Nous l’allons montrer tout à l’heure.
+Un Agneau se désaltérait dans le courant d’une onde pure.
+Un Loup survient à jeun qui cherchait aventure,
+Et que la faim en ces lieux attirait.
+« Qui te rend si hardi de troubler mon breuvage ? »
+Dit cet animal plein de rage.
+« Tu seras châtié de ta témérité. »
+— Sire, répond l’Agneau, que votre Majesté
+Ne se mette pas en colère ;
+Mais plutôt qu’elle considère
+Que je me vas désaltérant
+Dans le courant,
+Plus de vingt pas au-dessous d’Elle,
+Et que par conséquent, en aucune façon,
+Je ne puis troubler sa boisson.
+— Tu la troubles, reprit cette bête cruelle,
+Et je sais que de moi tu médis l’an passé.
+— Comment l’aurais-je fait si je n’étais pas né ?
+Reprit l’Agneau, je tette encore ma mère.
+— Si ce n’est toi, c’est donc ton frère.
+— Je n’en ai point.
+— C’est donc quelqu’un des tiens :
+Car vous ne m’épargnez guère,
+Vous, vos bergers, et vos chiens.
+On me l’a dit : il faut que je me venge.
+Là-dessus, au fond des forêts,
+Le Loup l’emporte, et puis le mange.`,
+
+      10: `Dictée 10 – Le Héron :
+Un jour, sur ses longs pieds, allait je ne sais où,
+Le Héron au long bec emmanché d’un long cou.
+Il côtoyait une rivière.
+L’onde était transparente ainsi qu’aux plus beaux jours ;
+Ma commère la carpe y faisait mille tours
+Avec le brochet son compère.
+Le Héron en eût fait aisément son profit :
+Tous approchaient du bord, l’oiseau n’avait qu’à prendre ;
+Mais il crut mieux faire d’attendre
+Qu’il eût un peu plus d’appétit.
+Il vivait de régime, et mangeait à ses heures.
+Après quelques moments l’appétit vint : l’oiseau
+S’approchant du bord vit sur l’eau
+Des Tanches qui sortaient du fond de ces demeures.
+Le mets ne lui plut pas ; il s’attendait à mieux
+Et montrait un goût dédaigneux
+Comme le rat du bon Horace.
+« Moi des Tanches ? » dit-il, « moi Héron ? Que je fasse
+Une si pauvre chère ? Et pour qui me prend-on ? »
+La Tanche rebutée, il trouva du goujon.
+« Du goujon ? C’est bien là le dîner d’un Héron ! »
+J’ouvrirais pour si peu le bec ? Aux Dieux ne plaise !
+Il l’ouvrit pour bien moins : tout alla de façon
+Qu’il ne vit plus aucun poisson.
+La faim le prit, il fut tout heureux et tout aise
+De rencontrer un limaçon.`,
+
+      11: `Dictée 11 – Le Lion et le Rat :
+Il faut, autant qu’on peut, obliger tout le monde :
+On a souvent besoin d’un plus petit que soi.
+De cette vérité deux Fables feront foi,
+Tant la chose en preuves abonde.
+Entre les pattes d’un Lion
+Un Rat sortit de terre assez à l’étourdie.
+Le Roi des animaux, en cette occasion,
+Montra ce qu’il était, et lui donna la vie.
+Ce bienfait ne fut pas perdu.
+Quelqu’un aurait-il jamais cru
+Qu’un Lion d’un Rat eût affaire ?
+Cependant il avint qu’au sortir des forêts
+Ce Lion fut pris dans des rets
+Dont ses rugissements ne le purent défaire.
+Sire Rat accourut, et fit tant par ses dents
+Qu’une maille rongée emporta tout l’ouvrage.
+Patience et longueur de temps
+Font plus que force ni que rage.`
+    };
+
+    let currentUtterance;
+    const synth = window.speechSynthesis;
+
+    function speak() {
+      stopSpeech();
+      const selectedId = document.getElementById("dictationSelect").value;
+      const text = dictations[selectedId];
+      currentUtterance = new SpeechSynthesisUtterance(text);
+      currentUtterance.lang = 'fr-FR';
+      currentUtterance.rate = 1;
+      synth.speak(currentUtterance);
     }
-  }
 
-  function accelerer() {
-    vitesse = Math.min(vitesse + 0.2, 2);
-    jouer();
-  }
+    function pauseSpeech() {
+      if (synth.speaking && !synth.paused) synth.pause();
+    }
 
-  function ralentir() {
-    vitesse = Math.max(vitesse - 0.2, 0.4);
-    jouer();
-  }
+    function resumeSpeech() {
+      if (synth.paused) synth.resume();
+    }
 
-  function reculer() {
-    index = Math.max(0, index - 1);
-    jouer();
-  }
+    function stopSpeech() {
+      if (synth.speaking) synth.cancel();
+    }
 
-  function passer() {
-    index = Math.min(phrases.length - 1, index + 1);
-    jouer();
-  }
+    function repeatSpeech() {
+      speak();
+    }
 
-  // Mode sombre
-  document.getElementById("darkModeToggle").addEventListener("change", function () {
-    document.body.classList.toggle("dark", this.checked);
-    document.getElementById("dictée-container").classList.toggle("dark", this.checked);
-  });
-
-  // Bloque clavier
-  window.addEventListener("keydown", function (e) {
-    e.preventDefault();
-  }, true);
-
-  // Précharger les voix
-  if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = () => {};
-  }
-
-</script>
-
+    function showFullText() {
+      const selectedId = document.getElementById("dictationSelect").value;
+      const fullTextDiv = document.getElementById("fullText");
+      fullTextDiv.textContent = dictations[selectedId];
+      fullTextDiv.style.display = 'block';
+    }
+  </script>
 </body>
 </html>
