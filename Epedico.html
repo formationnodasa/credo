@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,7 +7,9 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -18,73 +17,98 @@
       height: 100vh;
       margin: 0;
     }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
     .container {
-      background: rgba(255,255,255,0.1);
-      padding: 30px 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 500px;
       width: 90%;
-      max-width: 480px;
       text-align: center;
-      backdrop-filter: blur(8px);
+      animation: fadeIn 1.2s ease;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     h1 {
-      margin-bottom: 20px;
-      font-weight: 700;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
-    #wordDisplay {
-      font-size: 2.3rem;
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 25px;
-      letter-spacing: 0.12em;
-      min-height: 48px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
+
+    #wordDisplay {
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      margin-bottom: 30px;
+      min-height: 50px;
+    }
+
     input[type="text"] {
-      font-size: 1.5rem;
-      padding: 12px 15px;
-      width: 100%;
+      font-size: 1.4rem;
+      padding: 15px;
       border-radius: 10px;
       border: none;
-      outline: none;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-      margin-bottom: 20px;
-      color: #333;
+      width: 100%;
+      margin-bottom: 25px;
       background-color: #fff;
-      caret-color: #2575fc;
-      autocorrect: off;
-      autocomplete: off;
-      spellcheck: false;
+      color: #333;
+      outline: none;
+      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
+      transition: all 0.3s ease;
     }
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #2575fc;
+      caret-color: #2575fc;
+    }
+
     .buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
+      margin-top: 10px;
     }
+
     button {
       flex: 1 1 40%;
-      padding: 12px 10px;
+      padding: 12px;
       font-size: 1.1rem;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 10px;
       border: none;
       cursor: pointer;
+      background: #fff;
       color: #2575fc;
-      background-color: #fff;
-      transition: background-color 0.3s, color 0.3s;
-      user-select: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
     button:hover {
-      background-color: #2575fc;
+      background: #2575fc;
       color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
     }
+
     #message {
-      margin-top: 20px;
-      min-height: 28px;
-      font-size: 1.3rem;
+      margin-top: 25px;
+      font-size: 1.2rem;
       font-weight: 600;
-      text-shadow: 0 0 8px rgba(0,0,0,0.15);
+      min-height: 32px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.1);
+      transition: color 0.3s ease;
     }
   </style>
 </head>
@@ -92,21 +116,20 @@
   <div class="container">
     <h1>Épellation vocale</h1>
     <div id="wordDisplay">Mot à écouter</div>
-    <input type="text" id="answer" placeholder="Écris le mot ici..." 
-           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
     <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
       <button id="btnRepeat">🔁 Répéter</button>
       <button id="btnSkip">⏭ Passer</button>
-      <button id="btnBack">⬅️ Retour</button> <!-- ✅ Nouveau bouton ajouté -->
+      <button id="btnBack">⬅️ Retour</button>
     </div>
     <div id="message"></div>
   </div>
 
   <script>
-      const words = [
+          const words = [
     "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
     "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
     "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
@@ -214,6 +237,8 @@
   ];
 
 
+
+
     let currentWordIndex = 0;
     const wordDisplay = document.getElementById("wordDisplay");
     const answerInput = document.getElementById("answer");
@@ -241,9 +266,10 @@
 
     function playWord() {
       const word = words[currentWordIndex];
-      wordDisplay.textContent = ""; // Ne pas afficher le mot
+      wordDisplay.textContent = "";
       speakWord(word);
       message.textContent = "Écoutez attentivement et écrivez le mot.";
+      message.style.color = "#fff";
       answerInput.value = "";
       answerInput.focus();
     }
@@ -267,12 +293,14 @@
       const correctAnswer = words[currentWordIndex].toLowerCase();
       if (userAnswer === correctAnswer) {
         message.textContent = "✅ Correct !";
+        message.style.color = "#00e676"; // Vert
         wordDisplay.textContent = correctAnswer;
         setTimeout(() => {
           nextWord();
         }, 1500);
       } else {
         message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252"; // Rouge
         spellWord(correctAnswer);
       }
     }
@@ -293,6 +321,7 @@
           speechSynthesis.speak(utterance);
         } else {
           message.textContent = "Réessayez d'écrire le mot.";
+          message.style.color = "#fff";
           answerInput.value = "";
           answerInput.focus();
         }
@@ -318,14 +347,11 @@
       }
     }
 
-    // 🔁 Fonction de retour au mot précédent
     btnBack.addEventListener("click", () => {
       if (currentWordIndex > 0) {
         currentWordIndex--;
-        message.textContent = `⬅️ Retour au mot précédent.`;
+        message.textContent = "";
         playWord();
-      } else {
-        message.textContent = "⛔ Aucun mot précédent.";
       }
     });
 
@@ -333,22 +359,15 @@
     btnSlow.addEventListener("click", playWordSlow);
     btnFast.addEventListener("click", playWordFast);
     btnRepeat.addEventListener("click", repeatWord);
-    btnSkip.addEventListener("click", () => {
-      message.textContent = `Mot sauté : ${words[currentWordIndex]}`;
-      wordDisplay.textContent = words[currentWordIndex];
-      nextWord();
-    });
+    btnSkip.addEventListener("click", nextWord);
 
     answerInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
-        e.preventDefault();
         checkAnswer();
       }
     });
 
-    window.onload = () => {
-      playWord();
-    };
+    playWord(); // lancer au chargement
   </script>
 </body>
 </html>
