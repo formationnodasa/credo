@@ -71,6 +71,7 @@
     #phrase {
       font-size: 1.3em;
       margin-bottom: 10px;
+      visibility: hidden;
     }
 
   </style>
@@ -83,14 +84,16 @@
 
   <div class="dictée" id="dictée-container">
     <h2 id="titre-dictée">T1</h2>
-    <p id="phrase">Clique sur "Vérifier" pour écouter la dictée</p>
+    <p id="phrase">Phrase masquée</p>
+
     <div id="controls">
-      <button onclick="verifier()">✅ Vérifier</button>
+      <button onclick="jouer()">▶️ Jouer</button>
       <button onclick="pause()">⏸️ Pause</button>
       <button onclick="ralentir()">🐢 Ralentir</button>
       <button onclick="accelerer()">🐇 Accélérer</button>
       <button onclick="reculer()">⏪ Retour</button>
       <button onclick="passer()">⏭️ Suivant</button>
+      <button onclick="verifier()">✅ Vérifier</button>
     </div>
   </div>
 </div>
@@ -114,7 +117,7 @@
     utterance.lang = 'fr-FR';
     utterance.rate = vitesse;
 
-    // Recherche d'une voix d’homme puissante
+    // Recherche voix d’homme si possible
     const voices = synth.getVoices();
     const maleVoice = voices.find(v => v.lang === 'fr-FR' && /homme|male|paul|thomas/i.test(v.name));
     utterance.voice = maleVoice || voices.find(v => v.lang === 'fr-FR') || voices[0];
@@ -122,11 +125,19 @@
     synth.speak(utterance);
   }
 
-  function verifier() {
+  function jouer() {
+    // Joue uniquement, ne montre pas la phrase
     const phrase = phrases[index];
-    document.getElementById("phrase").textContent = phrase;
+    document.getElementById("phrase").style.visibility = "hidden";
     document.getElementById("titre-dictée").textContent = "T" + (index + 1);
     speak(phrase);
+  }
+
+  function verifier() {
+    // Montre la phrase sans parler
+    const phrase = phrases[index];
+    document.getElementById("phrase").textContent = phrase;
+    document.getElementById("phrase").style.visibility = "visible";
   }
 
   function pause() {
@@ -139,22 +150,22 @@
 
   function accelerer() {
     vitesse = Math.min(vitesse + 0.2, 2);
-    verifier();
+    jouer();
   }
 
   function ralentir() {
     vitesse = Math.max(vitesse - 0.2, 0.4);
-    verifier();
+    jouer();
   }
 
   function reculer() {
     index = Math.max(0, index - 1);
-    verifier();
+    jouer();
   }
 
   function passer() {
     index = Math.min(phrases.length - 1, index + 1);
-    verifier();
+    jouer();
   }
 
   // Mode sombre
@@ -163,7 +174,7 @@
     document.getElementById("dictée-container").classList.toggle("dark", this.checked);
   });
 
-  // Bloquer clavier
+  // Bloque clavier
   window.addEventListener("keydown", function (e) {
     e.preventDefault();
   }, true);
