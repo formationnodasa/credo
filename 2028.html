@@ -174,19 +174,33 @@ function speakMessage(text) {
   speakQuestion(text, speechRate);
 }
 
+function explainMathCalculation(question) {
+  let explanation = '';
+
+  if (question === "6 × 2 + 4 ÷ 2") {
+    explanation = "D'abord, on effectue la multiplication : 6 × 2 = 12. Ensuite, on fait la division : 4 ÷ 2 = 2. Puis, on additionne : 12 + 2 = 14.";
+  }
+  // Ajoute d'autres explications pour chaque question ici.
+  
+  return explanation;
+}
+
 function playQuestion() {
   const current = questions[currentQuestionIndex];
   questionDisplay.textContent = current.question;
 
-  // Lire la question à haute voix avant de demander une réponse
+  // Lire la question à haute voix
   speakQuestion(`Résolvez cette question : ${current.question}`);
   message.textContent = "Entrez la réponse correcte.";
   message.style.color = "#fff";
   answerInput.value = "";
   answerInput.focus();
 
-  // Annoncer l'instruction à l'utilisateur
-  speakMessage("Entrez la réponse correcte.");
+  // Annonce de l'explication de la correction
+  const explanation = explainMathCalculation(current.question);
+  if (explanation) {
+    speakMessage(explanation);
+  }
 }
 
 function playQuestionSlow() {
@@ -210,14 +224,14 @@ function checkAnswer() {
   if (userAnswer === correctAnswer) {
     message.textContent = "✅ Correct ! Bien joué.";
     message.style.color = "#00e676";
-    speakMessage("Correct. Bien joué !");
+    speakMessage("Bravo, vous avez trouvé la bonne réponse !");
     setTimeout(() => {
       nextQuestion();
     }, 1500);
   } else {
     message.textContent = `❌ Incorrect. La bonne réponse était : ${correctAnswer}`;
     message.style.color = "#ff5252";
-    speakMessage(`Faut réfléchir à la réponse. La bonne réponse était : ${correctAnswer}`);
+    speakMessage(`Désolé, la réponse correcte était ${correctAnswer}.`);
   }
 }
 
