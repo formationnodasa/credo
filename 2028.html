@@ -245,3 +245,32 @@
 
     btnPlay.addEventListener("click", playWord);
    
+  function speakWord(text, rate = speechRate) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "Synthèse vocale non disponible.";
+    return;
+  }
+
+  const speak = () => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR";
+    utterance.rate = rate;
+
+    const voices = speechSynthesis.getVoices();
+    const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+
+    speechSynthesis.cancel(); // Stop any current speech
+    speechSynthesis.speak(utterance);
+  };
+
+  if (speechSynthesis.getVoices().length === 0) {
+    // Voix pas encore chargées, on attend
+    speechSynthesis.onvoiceschanged = speak;
+  } else {
+    speak();
+  }
+}
+
