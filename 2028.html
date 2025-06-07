@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -162,24 +166,25 @@
 
     let speechRate = 1;
 
+function speakWord(text, rate = speechRate) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "La synthèse vocale n'est pas disponible.";
+    return;
+  }
 
-fonction speakWord(word, rate = speechRate) {
-      if (!('speechSynthesis' in window)) {
-        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
-        return;
-      }
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = "fr-FR";
-      utterance.rate = rate;
-      speechSynthesis.speak(utterance);
-    }
+  speechSynthesis.cancel(); // Annule toute lecture en cours
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.rate = rate;
+
+  speechSynthesis.speak(utterance);
+}
 
     function playWord() {
-      const word = words[currentWordIndex];
-      wordDisplay.textContent = "";
-      speakWord(word);
-      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      const current = words[currentWordIndex];
+      wordDisplay.textContent = current.mot;
+      speakWord(`Trouve une anagramme du mot ${current.mot}`);
+      message.textContent = "Écris une anagramme correcte.";
       message.style.color = "#fff";
       answerInput.value = "";
       answerInput.focus();
@@ -201,21 +206,20 @@ fonction speakWord(word, rate = speechRate) {
 
     function checkAnswer() {
       const userAnswer = answerInput.value.trim().toLowerCase();
-      const correctAnswer = words[currentWordIndex].toLowerCase();
-      if (userAnswer === correctAnswer) {
-        message.textContent = "✅ Correct !";
-        message.style.color = "#00e676"; // Vert
-        wordDisplay.textContent = correctAnswer;
+      const anagramList = words[currentWordIndex].anagrammes.map(a => a.toLowerCase());
+
+      if (anagramList.includes(userAnswer)) {
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
         setTimeout(() => {
           nextWord();
         }, 1500);
       } else {
-        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
-        message.style.color = "#ff5252"; // Rouge
-        spellWord(correctAnswer);
+        message.textContent = "❌ Incorrect. Écoute les bonnes réponses.";
+        message.style.color = "#ff5252";
+        speakWord(`Il fallait penser à : ${anagramList.join(", ")}`);
       }
     }
-
 
     function nextWord() {
       currentWordIndex++;
