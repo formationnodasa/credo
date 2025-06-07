@@ -1,68 +1,121 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Calcul à deviner</title>
+  <title>Bienvenue sur Nodasa</title>
   <style>
-    .calcul {
-      font-family: Arial, sans-serif;
-      font-size: 18px;
-      margin-bottom: 20px;
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #0f0f1c, #060612);
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+      color: #fff;
+      text-align: center;
     }
 
-    .operator {
-      color: red;
-      font-weight: bold;
-      padding: 0 5px;
+    h1 {
+      font-size: 3em;
+      margin-top: 20vh;
+      animation: neon-glow 2s infinite alternate;
     }
 
-    .result {
-      font-weight: bold;
-      color: black;
-      padding-left: 5px;
+    @keyframes neon-glow {
+      from { text-shadow: 0 0 5px #00faff, 0 0 10px #00faff; }
+      to { text-shadow: 0 0 20px #00faff, 0 0 40px #00faff; }
     }
 
-    .btn-verifier {
-      margin-top: 10px;
-      padding: 6px 14px;
-      font-size: 15px;
-      font-weight: bold;
-      color: white;
-      background-color: #d9534f; /* rouge */
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    #nodasa {
+      font-size: 5em;
+      margin-top: 20px;
+      animation: pulse 3s infinite;
+      background: linear-gradient(90deg, #0ff, #00f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .btn-verifier:hover {
-      background-color: #c9302c;
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-<div class="calcul">
-  36<span class="operator" data-op="−"> ? </span>12
-  <span class="operator" data-op="÷"> ? </span>4
-  <span class="operator" data-op="+"> ? </span>7
-  <span class="operator" data-op="×"> ? </span>2 = 
-  <span class="result">47</span>
-  <br>
-  <button class="btn-verifier" onclick="afficherReponse(this)">Vérifier</button>
-</div>
+  <audio id="trumpet" src="trompette.mp3" preload="auto"></audio>
 
-<script>
-  function afficherReponse(button) {
-    const parent = button.parentElement;
-    const operators = parent.querySelectorAll('.operator');
-    operators.forEach(op => {
-      op.textContent = ' ' + op.dataset.op + ' ';
+  <h1>🎺 Bienvenue sur</h1>
+  <div id="nodasa">NODASA</div>
+
+  <canvas id="confetti"></canvas>
+
+  <script>
+    // Jouer la trompette
+    window.addEventListener("load", () => {
+      document.getElementById("trumpet").play().catch(() => {
+        console.log("Audio bloqué, clic utilisateur nécessaire");
+      });
     });
-    button.style.display = 'none';
-  }
-</script>
+
+    // Animation confettis simple
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+
+    let confettis = [];
+
+    for (let i = 0; i < 150; i++) {
+      confettis.push({
+        x: Math.random() * W,
+        y: Math.random() * H - H,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 30,
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+        tilt: Math.random() * 10 - 10
+      });
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, W, H);
+      confettis.forEach(c => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt, c.y);
+        ctx.lineTo(c.x + c.tilt + c.r / 2, c.y + c.r);
+        ctx.stroke();
+      });
+      update();
+    }
+
+    function update() {
+      confettis.forEach(c => {
+        c.y += Math.cos(c.d) + 1 + c.r / 2;
+        c.x += Math.sin(0.01 * c.d);
+        if (c.y > H) {
+          c.y = -10;
+          c.x = Math.random() * W;
+        }
+      });
+    }
+
+    setInterval(drawConfetti, 20);
+    window.addEventListener("resize", () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    });
+  </script>
 
 </body>
 </html>
