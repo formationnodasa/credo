@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jeu d'Anagrammes Bibliques</title>
   <style>
-    /* STYLE IDENTIQUE AU TIEN POUR LE VISUEL */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
@@ -165,35 +163,31 @@
     let speechRate = 1;
 
     function speakWord(text, rate = speechRate) {
-  if (!('speechSynthesis' in window)) {
-    message.textContent = "Synthèse vocale non disponible.";
-    return;
-  }
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "Synthèse vocale non disponible.";
+        return;
+      }
 
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
+      const speak = () => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "fr-FR";
+        utterance.rate = rate;
 
-    const voices = speechSynthesis.getVoices();
-    const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
-    if (frenchVoice) {
-      utterance.voice = frenchVoice;
-    }
+        const voices = speechSynthesis.getVoices();
+        const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
+        if (frenchVoice) {
+          utterance.voice = frenchVoice;
+        }
 
-    speechSynthesis.cancel(); // Stop any current speech
-    speechSynthesis.speak(utterance);
-  };
+        speechSynthesis.cancel(); // Stop any current speech
+        speechSynthesis.speak(utterance);
+      };
 
-  if (speechSynthesis.getVoices().length === 0) {
-    speechSynthesis.onvoiceschanged = speak;
-  } else {
-    speak();
-  }
-}
-
-    
-    
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.onvoiceschanged = speak;
+      } else {
+        speak();
+      }
     }
 
     function playWord() {
@@ -231,7 +225,7 @@
           nextWord();
         }, 1500);
       } else {
-        message.textContent = "❌ Incorrect. Réessaie.";
+        message.textContent = "❌ Incorrect. Écoute les bonnes réponses.";
         message.style.color = "#ff5252";
         speakWord(`Il fallait penser à : ${anagramList.join(", ")}`);
       }
@@ -263,48 +257,4 @@
       }
     });
 
-    btnPlay.addEventListener("click", playWord);
-   
-  function speakWord(text, rate = speechRate) {
-  if (!('speechSynthesis' in window)) {
-    message.textContent = "Synthèse vocale non disponible.";
-    return;
-  }
-
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
-
-    const voices = speechSynthesis.getVoices();
-    const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
-    if (frenchVoice) {
-      utterance.voice = frenchVoice;
-    }
-
-    speechSynthesis.cancel(); // Stop any current speech
-    speechSynthesis.speak(utterance);
-  };
-
-  if (speechSynthesis.getVoices().length === 0) {
-    // Voix pas encore chargées, on attend
-    speechSynthesis.onvoiceschanged = speak;
-  } else {
-    speak();
-  }
-}
-
-btnSlow.addEventListener("click", playWordSlow);
-btnFast.addEventListener("click", playWordFast);
-btnRepeat.addEventListener("click", repeatWord);
-btnSkip.addEventListener("click", nextWord);
-
-answerInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    checkAnswer();
-  }
-});
-
-playWord();
-
-
+    btnPlay
