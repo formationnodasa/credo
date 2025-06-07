@@ -162,33 +162,40 @@
 
     let speechRate = 1;
 
-    function speakWord(text, rate = speechRate) {
-      if (!('speechSynthesis' in window)) {
-        message.textContent = "Synthèse vocale non disponible.";
-        return;
-      }
 
-      const speak = () => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "fr-FR";
-        utterance.rate = rate;
+function speakWord(text, rate = speechRate) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "Synthèse vocale non disponible.";
+    return;
+  }
 
-        const voices = speechSynthesis.getVoices();
-        const frenchVoice = voices.find(voice => voice.lang.startsWith("fr"));
-        if (frenchVoice) {
-          utterance.voice = frenchVoice;
-        }
+  const speak = () => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR";
+    utterance.rate = rate;
 
-        speechSynthesis.cancel(); // Stop any current speech
-        speechSynthesis.speak(utterance);
-      };
+    const voices = speechSynthesis.getVoices();
 
-      if (speechSynthesis.getVoices().length === 0) {
-        speechSynthesis.onvoiceschanged = speak;
-      } else {
-        speak();
-      }
+    // Essayer de forcer une voix française spécifique (Google ou autre)
+    const frenchVoice =
+      voices.find(v => v.name.includes("Google Français")) ||
+      voices.find(v => v.lang === "fr-FR") ||
+      voices.find(v => v.lang.startsWith("fr"));
+
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
     }
+
+    speechSynthesis.cancel(); // Stoppe toute parole en cours
+    speechSynthesis.speak(utterance);
+  };
+
+  if (speechSynthesis.getVoices().length === 0) {
+    speechSynthesis.onvoiceschanged = speak;
+  } else {
+    speak();
+  }
+}
 
     function playWord() {
       const current = words[currentWordIndex];
