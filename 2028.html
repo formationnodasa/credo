@@ -1,14 +1,12 @@
 
-Modifie-moi ce code dans lequel, au lieu que l’audio puisse épeler le mot qui puisse donner la réponse qui vient après le :
-exemple ; Partie : patrie, Parité , Tipera , Pirate , Paître , Prêtait  (Qu’il puisse mettre ça en const World )
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Module Épellation Vocal de la bible - Liste Complète</title>
+  <title>Jeu d'Anagrammes Bibliques</title>
   <style>
+    /* STYLE IDENTIQUE AU TIEN POUR LE VISUEL */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
@@ -73,6 +71,7 @@ exemple ; Partie : patrie, Parité , Tipera , Pirate , Paître , Prêtait  (Qu�
       box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
       transition: all 0.3s ease;
     }
+
     input[type="text"]:focus {
       box-shadow: 0 0 10px #2575fc;
       caret-color: #2575fc;
@@ -118,9 +117,9 @@ exemple ; Partie : patrie, Parité , Tipera , Pirate , Paître , Prêtait  (Qu�
 </head>
 <body>
   <div class="container">
-    <h1>Épellation vocale des mots de la bible </h1>
-    <div id="wordDisplay">Mot à écouter</div>
-    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <h1>Jeu d’Anagrammes Bibliques</h1>
+    <div id="wordDisplay">Mot mystère</div>
+    <input type="text" id="answer" placeholder="Entre une anagramme..." />
     <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
@@ -133,145 +132,116 @@ exemple ; Partie : patrie, Parité , Tipera , Pirate , Paître , Prêtait  (Qu�
   </div>
 
   <script>
-  
-  
+    const words = [
+      {
+        mot: "Partie",
+        anagrammes: ["patrie", "parité", "tipera", "pirate", "paître", "prêtait"]
+      },
+      {
+        mot: "Alliance",
+        anagrammes: ["silence", "reliance", "balance", "distance"]
+      },
+      {
+        mot: "Foi",
+        anagrammes: ["loi", "roi", "bois", "moi"]
+      },
+      {
+        mot: "Prière",
+        anagrammes: ["lumière", "rivière", "poussière", "arrière"]
+      }
+    ];
 
+    let currentWordIndex = 0;
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
 
-const words = [
-  {
-    mot: "Partie",
-    indice: "Partie : patrie, Parité, Tipera, Pirate, Paître, Prêtait"
-  },
-  {
-    mot: "Alliance",
-    indice: "Alliance : silence, reliance, balance, distance"
-  },
-  {
-    mot: "Bénédiction",
-    indice: "Bénédiction : protection, affection, sanction, partition"
-  },
-  {
-    mot: "Foi",
-    indice: "Foi : loi, roi, bois, moi"
-  },
-  {
-    mot: "Prière",
-    indice: "Prière : lumière, rivière, poussière, arrière"
-  }
-];
+    let speechRate = 1;
 
-let currentWordIndex = 0;
-const wordDisplay = document.getElementById("wordDisplay");
-const answerInput = document.getElementById("answer");
-const message = document.getElementById("message");
-const btnPlay = document.getElementById("btnPlay");
-const btnSlow = document.getElementById("btnSlow");
-const btnFast = document.getElementById("btnFast");
-const btnRepeat = document.getElementById("btnRepeat");
-const btnSkip = document.getElementById("btnSkip");
-const btnBack = document.getElementById("btnBack");
+    function speakWord(text, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "Synthèse vocale non disponible.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
+    }
 
-let speechRate = 1;
+    function playWord() {
+      const current = words[currentWordIndex];
+      wordDisplay.textContent = current.mot;
+      speakWord(`Trouve une anagramme du mot ${current.mot}`);
+      message.textContent = "Écris une anagramme correcte.";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.focus();
+    }
 
-function speakWord(phrase, rate = speechRate) {
-  if (!('speechSynthesis' in window)) {
-    message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
-    return;
-  }
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(phrase);
-  utterance.lang = "fr-FR";
-  utterance.rate = rate;
-  speechSynthesis.speak(utterance);
-}
+    function playWordSlow() {
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      playWord();
+    }
 
-function playWord() {
-  const current = words[currentWordIndex];
-  wordDisplay.textContent = ""; // On cache le mot
-  speakWord(current.indice);
-  message.textContent = "Écoutez l’indice et devinez le mot.";
-  message.style.color = "#fff";
-  answerInput.value = "";
-  answerInput.focus();
-}
+    function playWordFast() {
+      speechRate = Math.min(2, speechRate + 0.25);
+      playWord();
+    }
 
-function playWordSlow() {
-  speechRate = Math.max(0.5, speechRate - 0.25);
-  playWord();
-}
+    function repeatWord() {
+      playWord();
+    }
 
-function playWordFast() {
-  speechRate = Math.min(2, speechRate + 0.25);
-  playWord();
-}
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const anagramList = words[currentWordIndex].anagrammes.map(a => a.toLowerCase());
 
-function repeatWord() {
-  playWord();
-}
+      if (anagramList.includes(userAnswer)) {
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
+        setTimeout(() => {
+          nextWord();
+        }, 1500);
+      } else {
+        message.textContent = "❌ Incorrect. Réessaie.";
+        message.style.color = "#ff5252";
+        speakWord(`Il fallait penser à : ${anagramList.join(", ")}`);
+      }
+    }
 
-function checkAnswer() {
-  const userAnswer = answerInput.value.trim().toLowerCase();
-  const correctAnswer = words[currentWordIndex].mot.toLowerCase();
-  if (userAnswer === correctAnswer) {
-    message.textContent = "✅ Correct !";
-    message.style.color = "#00e676";
-    wordDisplay.textContent = correctAnswer;
-    setTimeout(() => {
-      nextWord();
-    }, 1500);
-  } else {
-    message.textContent = "❌ Incorrect, écoutez l’indice de nouveau.";
-    message.style.color = "#ff5252";
-    speakWord(words[currentWordIndex].indice);
-  }
-}
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        message.textContent = "🎉 Bravo, vous avez complété la liste !";
+        wordDisplay.textContent = "";
+        answerInput.value = "";
+        answerInput.disabled = true;
+        btnPlay.disabled = true;
+        btnSlow.disabled = true;
+        btnFast.disabled = true;
+        btnRepeat.disabled = true;
+        btnSkip.disabled = true;
+        btnBack.disabled = true;
+      } else {
+        playWord();
+      }
+    }
 
-function nextWord() {
-  currentWordIndex++;
-  if (currentWordIndex >= words.length) {
-    message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
-    wordDisplay.textContent = "";
-    answerInput.value = "";
-    answerInput.disabled = true;
-    btnPlay.disabled = true;
-    btnSlow.disabled = true;
-    btnFast.disabled = true;
-    btnRepeat.disabled = true;
-    btnSkip.disabled = true;
-    btnBack.disabled = true;
-  } else {
-    playWord();
-  }
-}
-
-btnBack.addEventListener("click", () => {
-  if (currentWordIndex > 0) {
-    currentWordIndex--;
-    message.textContent = "";
-    playWord();
-  }
-});
-
-btnPlay.addEventListener("click", playWord);
-btnSlow.addEventListener("click", playWordSlow);
-btnFast.addEventListener("click", playWordFast);
-btnRepeat.addEventListener("click", repeatWord);
-btnSkip.addEventListener("click", nextWord);
-
-answerInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    checkAnswer();
-  }
-});
-
-playWord(); // lancer au chargement
-answerInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        checkAnswer();
+    btnBack.addEventListener("click", () => {
+      if (currentWordIndex > 0) {
+        currentWordIndex--;
+        message.textContent = "";
+        playWord();
       }
     });
 
-    playWord(); // lancer au chargement
-  </script>
-</body>
-</html>
+    btnPlay.addEventListener("click", playWord);
+   
