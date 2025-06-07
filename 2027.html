@@ -2,73 +2,131 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dictée Interactive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dictée Interactive Enfant</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      color: #000;
+      font-family: 'Comic Sans MS', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #f2f9ff, #d0e6ff);
+      color: #333;
       transition: background 0.3s, color 0.3s;
     }
+
     body.dark {
-      background-color: #111;
-      color: #fff;
+      background: #1e1e1e;
+      color: #eee;
     }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2a6f97;
+    }
+
     .dictée {
-      margin: 20px;
+      background-color: #ffffffbb;
       padding: 20px;
-      border: 1px solid #999;
-      border-radius: 8px;
-    }
-    button {
-      margin: 5px;
-    }
-    #controls {
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       margin-top: 20px;
     }
+
+    .dictée.dark {
+      background-color: #2c2c2c;
+    }
+
+    #controls, #options {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    button {
+      margin: 6px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #2a6f97;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1b4f6b;
+    }
+
+    label {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #phrase {
+      font-size: 1.3em;
+      margin-bottom: 10px;
+    }
+
   </style>
 </head>
 <body>
 
-<h1>Module de Dictée Interactive</h1>
-<label><input type="checkbox" id="darkModeToggle"> Mode sombre</label>
+<div class="container">
+  <h1>Dictée Interactive</h1>
+  <label><input type="checkbox" id="darkModeToggle"> 🌙 Activer le mode sombre</label>
 
-<div class="dictée" id="dictée-container">
-  <h2 id="titre-dictée">T1</h2>
-  <p id="phrase">Phrase en attente...</p>
-</div>
-
-<div id="controls">
-  <button onclick="lirePhrase()">▶️ Lire</button>
-  <button onclick="pause()">⏸️ Pause</button>
-  <button onclick="ralentir()">🐢 Ralentir</button>
-  <button onclick="accelerer()">🐇 Accélérer</button>
-  <button onclick="reculer()">⏪ Retour</button>
-  <button onclick="passer()">⏭️ Passer</button>
+  <div class="dictée" id="dictée-container">
+    <h2 id="titre-dictée">T1</h2>
+    <p id="phrase">Clique sur "Vérifier" pour écouter la dictée</p>
+    <div id="controls">
+      <button onclick="verifier()">✅ Vérifier</button>
+      <button onclick="pause()">⏸️ Pause</button>
+      <button onclick="ralentir()">🐢 Ralentir</button>
+      <button onclick="accelerer()">🐇 Accélérer</button>
+      <button onclick="reculer()">⏪ Retour</button>
+      <button onclick="passer()">⏭️ Suivant</button>
+    </div>
+  </div>
 </div>
 
 <script>
   const phrases = [
-    "Le soleil se lève à l'est.",
-    "Les enfants jouent dans le jardin.",
-    "La maîtresse corrige les devoirs.",
-    "Le chat dort sur le canapé."
+    "Le soleil brille sur les collines.",
+    "Un oiseau chante dans le grand arbre vert.",
+    "Les enfants jouent dans la cour de l'école.",
+    "Le chat saute sur la table de la cuisine."
   ];
+
   let index = 0;
   let synth = window.speechSynthesis;
   let utterance = null;
   let vitesse = 1;
 
-  function lirePhrase() {
-    if (utterance) synth.cancel(); // Annule lecture en cours
-    utterance = new SpeechSynthesisUtterance(phrases[index]);
+  function speak(texte) {
+    synth.cancel();
+    utterance = new SpeechSynthesisUtterance(texte);
     utterance.lang = 'fr-FR';
     utterance.rate = vitesse;
-    utterance.voice = synth.getVoices().find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes("homme")) || synth.getVoices()[0];
-    document.getElementById("phrase").textContent = phrases[index];
-    document.getElementById("titre-dictée").textContent = "T" + (index + 1);
+
+    // Recherche d'une voix d’homme puissante
+    const voices = synth.getVoices();
+    const maleVoice = voices.find(v => v.lang === 'fr-FR' && /homme|male|paul|thomas/i.test(v.name));
+    utterance.voice = maleVoice || voices.find(v => v.lang === 'fr-FR') || voices[0];
+
     synth.speak(utterance);
+  }
+
+  function verifier() {
+    const phrase = phrases[index];
+    document.getElementById("phrase").textContent = phrase;
+    document.getElementById("titre-dictée").textContent = "T" + (index + 1);
+    speak(phrase);
   }
 
   function pause() {
@@ -81,33 +139,39 @@
 
   function accelerer() {
     vitesse = Math.min(vitesse + 0.2, 2);
-    lirePhrase();
+    verifier();
   }
 
   function ralentir() {
     vitesse = Math.max(vitesse - 0.2, 0.4);
-    lirePhrase();
+    verifier();
   }
 
   function reculer() {
     index = Math.max(0, index - 1);
-    lirePhrase();
+    verifier();
   }
 
   function passer() {
     index = Math.min(phrases.length - 1, index + 1);
-    lirePhrase();
+    verifier();
   }
 
   // Mode sombre
   document.getElementById("darkModeToggle").addEventListener("change", function () {
     document.body.classList.toggle("dark", this.checked);
+    document.getElementById("dictée-container").classList.toggle("dark", this.checked);
   });
 
-  // Bloque le clavier
+  // Bloquer clavier
   window.addEventListener("keydown", function (e) {
     e.preventDefault();
   }, true);
+
+  // Précharger les voix
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => {};
+  }
 
 </script>
 
