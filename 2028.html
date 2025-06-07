@@ -6,13 +6,13 @@
   <style>
     body {
       margin: 0;
-      background: #111;
+      background: #000;
       height: 100vh;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      perspective: 1200px;
+      perspective: 1500px;
       font-family: Arial, sans-serif;
     }
 
@@ -24,7 +24,7 @@
       border: 4px solid #999;
       overflow: hidden;
       transform-style: preserve-3d;
-      transition: transform 3s ease-in-out;
+      transition: transform 4s ease-in-out;
     }
 
     .porte {
@@ -33,7 +33,7 @@
       height: 100%;
       background: linear-gradient(to right, #666, #aaa);
       top: 0;
-      transition: transform 2s ease-in-out;
+      transition: transform 2.5s ease-in-out;
       z-index: 3;
     }
 
@@ -70,21 +70,7 @@
       font-size: 2.5em;
       opacity: 0;
       z-index: 2;
-      transition: opacity 2s ease-in-out, transform 2s ease-in-out;
-    }
-
-    .ecran {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: black;
-      color: lime;
-      padding: 5px 10px;
-      font-size: 1em;
-      font-family: monospace;
-      border-radius: 4px;
-      z-index: 2;
+      transition: opacity 2s ease-in-out 1s, transform 2s ease-in-out;
     }
 
     .boutons {
@@ -105,7 +91,7 @@
       color: white;
       font-weight: bold;
       border-radius: 4px;
-      cursor: pointer;
+      cursor: default;
     }
 
     .ascenseur.ouvert .gauche {
@@ -121,8 +107,8 @@
       transform: translate(-50%, -50%) scale(1.1);
     }
 
-    .ascenseur.ouvert {
-      transform: scale(1.15) translateZ(100px);
+    .ascenseur.zoom {
+      transform: scale(2.5) translateZ(200px);
     }
   </style>
 </head>
@@ -132,13 +118,7 @@
   <div class="porte gauche"></div>
   <div class="porte droite"></div>
   <div class="interieur"></div>
-  <div class="ecran">Niveau 0</div>
   <div class="texte">Bienvenue</div>
-  <div class="boutons">
-    <button>1</button>
-    <button>2</button>
-    <button>3</button>
-  </div>
 </div>
 
 <audio id="son" src="ding.mp3" preload="auto"></audio>
@@ -147,15 +127,21 @@
   const ascenseur = document.getElementById('ascenseur');
   const audio = document.getElementById('son');
 
+  // Ouvre les portes
   setTimeout(() => {
     ascenseur.classList.add('ouvert');
     audio.play();
-  }, 1000); // Démarre après 1 sec
+  }, 1000);
 
-  // Redirige vers Domi.html après 5 secondes
+  // Lance le zoom vers l’intérieur après ouverture
+  setTimeout(() => {
+    ascenseur.classList.add('zoom');
+  }, 3000); // délai pour laisser les portes s’ouvrir
+
+  // Redirection après le zoom
   setTimeout(() => {
     window.location.href = 'Domi.html';
-  }, 6000);
+  }, 6000); // total ≈ 6s
 </script>
 
 </body>
