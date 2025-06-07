@@ -1,149 +1,172 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictée Vocale Interactive</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            padding: 20px;
-            width: 80%;
-            max-width: 800px;
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        .dictation-text {
-            margin-bottom: 20px;
-            font-size: 1.2em;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .controls button {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .controls button:hover {
-            background-color: #555;
-        }
-        .controls button:disabled {
-            background-color: #777;
-            cursor: not-allowed;
-        }
-        .audio-player {
-            width: 100%;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictée Vocale Interactive</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+    .container {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      color: #6a0dad;
+      font-size: 2rem;
+    }
+    .dictation-text {
+      margin: 20px 0;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      background-color: #6a0dad;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #5a0b9b;
+    }
+    .speed-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .speed-control input {
+      width: 100px;
+      margin: 0 10px;
+    }
+    .verify-btn {
+      background-color: #4CAF50;
+    }
+    .verify-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
+  <div class="container">
     <h1>Dictée Vocale Interactive</h1>
     <div class="dictation-text" id="dictationText">
-        <!-- Le texte de la dictée sera inséré ici -->
+      <!-- Le texte de la dictée sera inséré ici -->
     </div>
-    <audio id="audioPlayer" class="audio-player" controls>
-        <source src="dictation.mp3" type="audio/mpeg">
-        Votre navigateur ne supporte pas l'élément audio.
-    </audio>
     <div class="controls">
-        <button id="prevBtn">Retour</button>
-        <button id="playPauseBtn">Lecture</button>
-        <button id="checkBtn">Vérifier</button>
-        <button id="speedDownBtn">−</button>
-        <button id="speedUpBtn">+</button>
+      <button onclick="startDictation()">Démarrer la dictée</button>
+      <button onclick="stopDictation()">Arrêter la dictée</button>
+      <button onclick="checkDictation()" class="verify-btn">Vérifier la dictée</button>
     </div>
-</div>
+    <div class="speed-control">
+      <label for="speed">Vitesse :</label>
+      <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1" onchange="changeSpeed(this.value)">
+      <span id="speedValue">1x</span>
+    </div>
+  </div>
 
-<script>
-    const audioPlayer = document.getElementById('audioPlayer');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const checkBtn = document.getElementById('checkBtn');
-    const speedDownBtn = document.getElementById('speedDownBtn');
-    const speedUpBtn = document.getElementById('speedUpBtn');
-    const prevBtn = document.getElementById('prevBtn');
+  <script>
     const dictationText = document.getElementById('dictationText');
+    const speedValue = document.getElementById('speedValue');
+    let recognition;
+    let isDictating = false;
+    let currentSpeed = 1;
 
-    let currentDictation = 1;
-    const dictations = [
-        `Dictée 1: Le laboureur et ses enfants\nTravaillez, prenez de la peine : C'est le fonds qui manque le moins.`,
-        `Dictée 2: La Cigale et la Fourmi\nLa Cigale, ayant chanté tout l'été, Se trouva fort dépourvue quand la bise fut venue.`,
-        `Dictée 3: Le Lièvre et la Tortue\nTout le monde savait que le Lièvre était l'animal le plus rapide, et le Lièvre adorait s'en vanter.`,
-        `Dictée 4: Le Corbeau et le Renard\nMaître Corbeau, sur un arbre perché, Tenait en son bec un fromage.`,
-        `Dictée 5: La Grenouille qui veut se faire aussi grosse que le bœuf\nUne Grenouille vit un bœuf Qui lui sembla de belle taille.`,
-        `Dictée 6: La Fourmi et la Sauterelle\nNous étions au milieu de l'hiver, un jour clair et glacial. Malgré le froid, la Fourmi se chauffait au soleil.`,
-        `Dictée 7: Le Lièvre et la Tortue\nRien ne sert de courir ; il faut partir à point. Le Lièvre et la Tortue en sont un témoignage.`,
-        `Dictée 8: La Raison du plus fort\nLa raison du plus fort est toujours la meilleure : Nous l'allons montrer tout à l'heure.`,
-        `Dictée 9: Le Héron et les Poissons\nUn jour, sur ses longs pieds, allait je ne sais où, Le Héron au long bec emmanché d'un long cou.`,
-        `Dictée 10: Le Lion et le Rat\nIl faut, autant qu'on peut, obliger tout le monde : On a souvent besoin d'un plus petit que soi.`
-    ];
+    const text = `1. Le laboureur et ses enfants
+Travaillez, prenez de la peine :
+C'est le fonds qui manque le moins.
+Un riche Laboureur, sentant sa mort prochaine,
+Fit venir ses enfants, leur parla sans témoins.
+Gardez-vous, leur dit-il, de vendre l'héritage
+Que nous ont laissé nos parents.
+Un trésor est caché dedans.
+Je ne sais pas l'endroit ; mais un peu de courage
+Vous le fera trouver, vous en viendrez à bout.
+Remuez votre champ dès qu'on aura fait l'Oût.
+Creusez, fouillez, bêchez ; ne laissez nulle place
+Où la main ne passe et repasse.
+Le père mort, les fils vous retournent le champ
+Deçà, delà, partout ; si bien qu'au bout de l'an
+Il en rapporta davantage.
+D'argent, point de caché. Mais le père fut sage
+De leur montrer avant sa mort
+Que le travail est un trésor.`;
 
-    function updateDictation() {
-        dictationText.textContent = dictations[currentDictation - 1];
-        audioPlayer.src = `dictation${currentDictation}.mp3`;
-        audioPlayer.load();
+    dictationText.textContent = text;
+
+    function startDictation() {
+      if (isDictating) return;
+      isDictating = true;
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => console.log('Dictée commencée...');
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        dictationText.textContent = transcript;
+      };
+      recognition.onerror = (event) => console.error('Erreur de reconnaissance vocale :', event.error);
+      recognition.onend = () => {
+        isDictating = false;
+        console.log('Dictée terminée.');
+      };
+      recognition.start();
     }
 
-    playPauseBtn.addEventListener('click', () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            playPauseBtn.textContent = 'Pause';
-        } else {
-            audioPlayer.pause();
-            playPauseBtn.textContent = 'Lecture';
-        }
-    });
+    function stopDictation() {
+      if (!isDictating) return;
+      recognition.stop();
+    }
 
-    checkBtn.addEventListener('click', () => {
-        alert('Vérification de la dictée...');
-        // Implémenter la logique de vérification ici
-    });
+    function checkDictation() {
+      const originalText = text.split('\n').map(line => line.trim()).join(' ');
+      const userText = dictationText.textContent.trim();
+      if (userText === originalText) {
+        alert('Bravo ! Votre dictée est correcte.');
+      } else {
+        alert('Il y a des erreurs. Veuillez réessayer.');
+      }
+    }
 
-    speedDownBtn.addEventListener('click', () => {
-        audioPlayer.playbackRate = Math.max(0.5, audioPlayer.playbackRate - 0.25);
-    });
-
-    speedUpBtn.addEventListener('click', () => {
-        audioPlayer.playbackRate = Math.min(2, audioPlayer.playbackRate + 0.25);
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentDictation > 1) {
-            currentDictation--;
-            updateDictation();
-        }
-    });
-
-    // Initialisation
-    updateDictation();
-</script>
-
+    function changeSpeed(value) {
+      currentSpeed = value;
+      speedValue.textContent = `${value}x`;
+      if (recognition) {
+        recognition.stop();
+        recognition.start();
+      }
+    }
+  </script>
 </body>
 </html>
