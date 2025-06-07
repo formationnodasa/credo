@@ -1,344 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Module Épellation Vocal - Liste Complète</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .container {
-    background: rgba(255,255,255,0.1);
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
-    width: 90%;
-    max-width: 480px;
-    text-align: center;
-    backdrop-filter: blur(8px);
-  }
-  h1 {
-    margin-bottom: 20px;
-    font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  }
-  #wordDisplay {
-    font-size: 2.3rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-    letter-spacing: 0.12em;
-    min-height: 48px;
-  }
-  input[type="text"] {
-    font-size: 1.5rem;
-    padding: 12px 15px;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-    margin-bottom: 20px;
-    color: #333;
-    background-color: #fff;
-    caret-color: #2575fc;
-    /* Empêche la correction automatique */
-    autocorrect: off;
-    autocomplete: off;
-    spellcheck: false;
-  }
-  input[type="text"]::-webkit-autofill,
-  input[type="text"]::-webkit-autofill:hover,
-  input[type="text"]::-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px white inset !important;
-    -webkit-text-fill-color: #333 !important;
-  }
-  .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-  }
-  button {
-    flex: 1 1 40%;
-    padding: 12px 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    color: #2575fc;
-    background-color: #fff;
-    transition: background-color 0.3s, color 0.3s;
-    user-select: none;
-  }
-  button:hover {
-    background-color: #2575fc;
-    color: #fff;
-  }
-  #message {
-    margin-top: 20px;
-    min-height: 28px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-shadow: 0 0 8px rgba(0,0,0,0.15);
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Ascenseur 3D Immersif</title>
+  <style>
+    body, html { margin: 0; padding: 0; overflow: hidden; height: 100%; }
+    canvas { display: block; }
+    #scene2 { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; color: white; text-align: center; padding-top: 20%; font-size: 2em; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Épellation vocale</h1>
-    <div id="wordDisplay">Mot à écouter</div>
-    <input type="text" id="answer" placeholder="Écris le mot ici..." />
-    <div class="buttons">
-      <button id="btnPlay">▶️ Jouer</button>
-      <button id="btnSlow">🐢 Ralentir</button>
-      <button id="btnFast">🐇 Accélérer</button>
-      <button id="btnRepeat">🔁 Répéter</button>
-      <button id="btnSkip">⏭ Passer</button>
-    </div>
-    <div id="message"></div>
-  </div>
+  <canvas id="scene"></canvas>
+  <div id="scene2">Bienvenue dans la nouvelle scène !</div>
 
-<script>
-  const words = [
-    "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
-    "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
-    "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
-    "acide","bourgeon","croquis","délimitation","écart","format","gentiment","harmonieux",
-    "amplitude","bidonville","cylindre","descendre","épaisseur","fonctionnement","gabarit","hypothèse",
-    "analogie","bissectrice","contrebasse","dent","égoïste","frétiller","galanterie","hypermarché",
-    "antécédent","bissextile","cyclope","désoler","équilatéral","faillite","gâchis","humanité",
-    "anaphore","bouillir","cellule","disparaître","expression","facturation","gangrène","hippopotame",
-    "antipathie","botanique","cancer","dollar","esquisse","fluidifier","galipette","hirondelle",
-    "archéologie","bonheur","câble","doigt","emprunt","fœtus","gargouiller","heurter",
-    "anticorps","banquette","chronologie","déesse","enceinte","fanfare","garde-robe","honnêteté",
-    "anatomie","bientôt","compas","devis","électron","fertilité","gencive",
-    "aquatique","bicyclette","calomnie","déduction","éclipse","furieux","généralement","illustrateur",
-    "anecdote","baptême","chorale","développement","euphorie","frayeur","gentillesse","inflation",
-    "abonnement","bégayer","corail","différemment","euphémisme","fugitif","ghetto","impersonnel",
-    "absence","barbecue","concentration","dégradation","extinction","fraiseuse","glaciaire","isoloir",
-    "abréger","bactérie","carambolage","discriminatoire","équerre","fabuleux","index",
-    "abyme","bracelet","concubin","différencier","ébauche","fainéant","harceler","intérieur",
-    "accueil","boulangère","conteneur","délocalisation","ébène","faisable","happer","industrie",
-    "actuellement","brûler","cadenasser","démangeaison","épithète","falsifier","handicap","impression",
-    "adhésion","baroque","chromosome","dilemme","estomac","favoritisme","homogène","insecte",
-    "agenda","boulevard","compas","désarroi","épilogue","humain","information",
-    "affliger","banquise","circonflexe","dinosaure","épicentre","géologue","harpie","indigo",
-    "allégorie","bourgeonner","contraception","dissolution","effigie","gestionnaire","hamster","intolérance",
-    "anesthésie","bain-marie","contemporain","démagogie","emboîter","gouache","humain","infinitif",
-    "antiquaire","bafouer","commettre","douillet","écarquiller","gravitation","hectare","inondation",
-    "apostrophe","barrette","coefficient","droiture","graffiti","hypoténuse","induction",
-    "apparaître","boycotter","confidentialité","dubitatif","fécondation","géant","hauteur","impulsion",
-    "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant",
-    "amertume","bizutage","chronomètre","dyslexie","fossile","génocide","hiérarchie","isocèle",
-    "assiduité","balbutier","cynique","dorénavant","fusain","grammaire","hypocrisie","internet",
-    "allégresse","bouddhisme","claustrophobe","faille","genre","hydratant","illusion",
-    "appendice","biodiversité","crainte","écho","fasciste","gradation","homicide","invention",
-    "adjacent","bioclimatique","couveuse","échapper","fascination","gouvernement","hasard","impair",
-    "antisémitisme","banlieue","couvre-feu","échéance","fresque","grenade","hibiscus","interrogation",
-    "asphyxie","biennale","craquement","emphatique","faisceau","graphisme","hostile","inoubliable",
-    "anonyme","bienfait","entreprise","fédération","grenouillère","harmonie","incorrigible",
-    "anaconda","bifteck","débris","esclavage","famine","griffon","hospitalier","importer",
-    "auparavant","bimestriel","décontracté","endurance","friable","gesticuler","herse","innocent",
-    "accumulation","bistouri","décennie","emploi","fréquence","guitariste","humanisme","ingrédient",
-    "accouplement","biochimie","décès","explicatif","formule","grappe","hiéroglyphe","infraction",
-    "acrobatie","démographie","enthousiasme","fiche","gratte-ciel","hectare","icône",
-    "affranchir","climat","devise","énonciation","fraction","gladiateur","hypoténuse","inversion",
-    "abstention","compassion","discrimination","élection","facteur","gaspillage","hyperbole","instaurer",
-    "abstinence","comparaison","dioxyde","essor","figure","gentilhomme","hommage","immortaliser",
-    "arbrisseau","calendrier","diminution","engagement","flûte","griffer","haut-parleur","intègre",
-    "calculatrice","dénouement","émeraude","fragile","guillemet","hérédité","intention",
-    "bâiller","crayon","démocratie","enzyme","fond","ginseng","homophone","iceberg",
-    "budget","contour","désodorisant","entrepôt","falloir","gymnase","héros","interrupteur",
-    "beaucoup","collectivité","dissoudre","expérience","front","grossesse","habitat","insolent",
-    "ballade","charte","distillation","espace","frapper","goût","hymne","intellectuel",
-    "bâtiment","cercueil","dérivation","étendue","fenêtre","goéland","hystérie","infaisable",
-    "intervalle","loi","marionnette","nausée","pathétique","quadruple","suffixe","travailler",
-    "illégalité","laudatif","maïpouri","navette","papyrus","quereller","syntaxé","toucher",
-    "identification","littoral","magistrat","négligence","plasticien","qualité","syndicat","toile",
-    "igloo","lyrique","mascotte","névrose","perspective","quartier","seigneur","trompette",
-    "idiotie","logique","meilleur","nœud","percussion","quitter","scène","tambourin",
-    "idolâtrer","largeur","monastère","noisette","précipiter","quadrilatère","sympathique","thérapeutique",
-    "liquide","médiatrice","nonchalance","perpendiculaire","scrutin","toupie",
-    "juxtaposition","local","millionnaire","nombril","pollution","reconnaissance","strophe","thermomètre",
-    "juge","logiciels","métamorphose","notamment","polythéiste","résistant","somme","taureau",
-    "journal","lunette","mâcher","nucléaire","poème","rayon","semaine","tyrannie",
-    "journaliste","lumière","monstrueux","nourrisson","problème","république","symphonie","terroriste",
-    "jadis","lentille","misogyne","personne","renaissance","suggestion","trapèze",
-    "jamais","liberté","migrant","orchidée","pathétique","règlement","sérieux","tressaillir",
-    "jeunesse","lieutenant","mutation","orchestration","préfixe","racisme","silencieux","trahison",
-    "justice","louveteau","mâchoire","opticien","psychologique","résultat","science","transsexuel",
-    "joyeux","ludothèque","maigreur","oxygène","président","rivière","seconde","tremplin",
-    "joie","lusophone","magnésium","orientation","prix","record","souffrir","trachée",
-    "jambe","lacérer","maillon","œil","pétrole","rectangle","sembler","transmutation",
-    "journaux","leucémie","maintien","oreille","pape","rassasier","serrer","tromper",
-    "jaunisse","littéral","majestueux","ombre","pharaon","reste","sculpture","tronçonneuse",
-    "joncher","loyer","orthographe","patin","rapporteur","souffle",
-    "jouissance","lucidité","naturel","occasionnellement","processus","relatif","sceptre","veillée",
-    "jonquille","loquace","narrateur","oser","proportion","règle","sédiment","vermeille",
-    "juvénile","labyrinthe","nouveauté","onde","peut-être","ramifier","synchroniser","vieillesse",
-    "justifier","lâcher","nouvelle","orchestre","plutôt","résolution","sceau","vidéoprojecteur",
-    "jubiler","navigateur","ordonnance","purée","ronronner","sédentaire","vainqueur",
-    "joyau","monarchie","nettoyage","opinion","plongée","rituel","sagittaire","vestiaire",
-    "joaillerie","maritime","nécessaire","obésité","polyglotte","rhétorique","sceptique","variable",
-    "jogging","monothéiste","naître","organe","péripétie","restreint","systématique","ventilation",
-    "mourir","nutrition","océan","pourcentage","rhinocéros","souverain","vociférer",
-    "kiwi","médaille","noyau","ouragan","psychopathe","récepteur","synonyme","velours",
-    "kilomètre","mondialisation","nourrir","octet","patrimoine","rayonnement","scintiller","vieillard",
-    "ketchup","musée","nénuphar","organisation","polyphonie","répertoire","subjuguer","vingtaine",
-    "klaxonner","moine","néanmoins","outil","paratexte","rancoeur","sanctuaire","verglas",
-    "kidnapper","ministre","néant","odorat","patiemment","rejoindre","sarcophage","vendange",
-    "kilowatt","mortalité","nuance","ouïe","propagande","réflexion","sonnet",
-    "kiosque","mythe","nymphe","orpaillage","pression","raquette","segment",
-    "kung-fu","médiane","noyau","œuvre","printemps","rabbin","silhouette",
-    "kermesse","mammifère","négatif","oxygène","périphérie","rétroprojecteur","statistique",
-    "métaphore","noblesse","opération","pâtisserie","relique",
-    "landau","mosaïque","natation","orchestre","pitoyable","recueil","technique",
-    "lauréat","mégalopole","naturalisation","oxymore","périlleux","renouement","tiède",
-    "licenciement","métropole","neutre","oreillette","périodique","radioactif","théâtre",
-    "littérature","messagerie","nostalgie","opaque","péremption","référendum","tangente",
-    "lutter","motion","natalité","omniscient","royaume","tolérance",
-    "lettre","molécules","nature","occurrence","quiproquo","renouvelable","thèse",
-    "liberté","mouvement","nombre","œsophage","quotient","théorème",
-    "laïque","mangrove","navire","orthodoxe","quart","sceau","tonalité",
-    "localisation","messager","nuque","obèse","quatuor","scénario","toile",
-    "lexical","méthode","nuisance","quotidien","salaire","thème",
-    "législatif","merveille","numérique","pyramide","qualificatif","syndrome","tourment",
-    "lutte","méchanceté","nuageux","parenthèse","quelconque","stylistique","temps"
-  ];
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script>
+    let scene, camera, renderer, elevator, mixer, clock;
+    let doorsOpen = false;
 
-  let currentWordIndex = 0;
-  const wordDisplay = document.getElementById("wordDisplay");
-  const answerInput = document.getElementById("answer");
-  const message = document.getElementById("message");
-  const btnPlay = document.getElementById("btnPlay");
-  const btnSlow = document.getElementById("btnSlow");
-  const btnFast = document.getElementById("btnFast");
-  const btnRepeat = document.getElementById("btnRepeat");
-  const btnSkip = document.getElementById("btnSkip");
+    // Initialisation de la scène
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      clock = new THREE.Clock();
 
-  let speechRate = 1;
+      // Lumière
+      const light = new THREE.PointLight(0xFFFFFF, 1, 100);
+      light.position.set(0, 10, 0);
+      scene.add(light);
 
-  function speakWord(word, rate = speechRate) {
-    if (!('speechSynthesis' in window)) {
-      message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
-      return;
+      // Sol de l'ascenseur
+      const floorGeometry = new THREE.PlaneGeometry(10, 10);
+      const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 });
+      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      // Chargement du modèle 3D de l'ascenseur
+      const loader = new THREE.GLTFLoader();
+      loader.load('ascenseur.glb', function(gltf) {
+        elevator = gltf.scene;
+        mixer = new THREE.AnimationMixer(elevator);
+        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+        scene.add(elevator);
+        camera.position.set(0, 2, 5);
+        animate();
+      });
     }
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = "fr-FR";
-    utterance.rate = rate;
-    speechSynthesis.speak(utterance);
-  }
 
-  function playWord() {
-    const word = words[currentWordIndex];
-    wordDisplay.textContent = ""; // cache le mot écrit
-    speakWord(word);
-    message.textContent = "Écoutez attentivement et écrivez le mot.";
-    answerInput.value = "";
-    answerInput.focus();
-  }
-
-  function playWordSlow() {
-    speechRate = Math.max(0.5, speechRate - 0.25);
-    playWord();
-  }
-
-  function playWordFast() {
-    speechRate = Math.min(2, speechRate + 0.25);
-    playWord();
-  }
-
-  function repeatWord() {
-    playWord();
-  }
-
-  function checkAnswer() {
-    const userAnswer = answerInput.value.trim().toLowerCase();
-    const correctAnswer = words[currentWordIndex].toLowerCase();
-    if (userAnswer === correctAnswer) {
-      message.textContent = "✅ Correct !";
-      wordDisplay.textContent = correctAnswer;
-      setTimeout(() => {
-        nextWord();
-      }, 1500);
-    } else {
-      message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
-      spellWord(correctAnswer);
+    // Animation de la scène
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      if (mixer) mixer.update(delta);
+      renderer.render(scene, camera);
     }
-  }
 
-  function spellWord(word) {
-    speechSynthesis.cancel();
-    let letters = [...word.replace(/[-\s]/g, "")]; // enlève espaces et tirets
-    let i = 0;
-    function spellNext() {
-      if (i < letters.length) {
-        const utterance = new SpeechSynthesisUtterance(letters[i]);
-        utterance.lang = "fr-FR";
-        utterance.rate = 0.6;
-        utterance.onend = () => {
-          i++;
-          setTimeout(spellNext, 350);
-        };
-        speechSynthesis.speak(utterance);
-      } else {
-        message.textContent = "Réessayez d'écrire le mot.";
-        answerInput.value = "";
-        answerInput.focus();
+    // Ouverture des portes de l'ascenseur
+    function openDoors() {
+      if (!doorsOpen) {
+        doorsOpen = true;
+        elevator.traverse((child) => {
+          if (child.name === 'porteGauche' || child.name === 'porteDroite') {
+            new TWEEN.Tween(child.rotation)
+              .to({ y: Math.PI / 2 }, 1000)
+              .easing(TWEEN.Easing.Quadratic.Out)
+              .start();
+          }
+        });
       }
     }
-    spellNext();
-  }
 
-  function nextWord() {
-    currentWordIndex++;
-    if (currentWordIndex >= words.length) {
-      message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
-      wordDisplay.textContent = "";
-      answerInput.value = "";
-      answerInput.disabled = true;
-      btnPlay.disabled = true;
-      btnSlow.disabled = true;
-      btnFast.disabled = true;
-      btnRepeat.disabled = true;
-      btnSkip.disabled = true;
-    } else {
-      playWord();
+    // Transition vers une nouvelle scène
+    function transitionToScene2() {
+      document.getElementById('scene2').style.display = 'block';
+      document.getElementById('scene').style.display = 'none';
     }
-  }
 
-  btnPlay.addEventListener("click", playWord);
-  btnSlow.addEventListener("click", playWordSlow);
-  btnFast.addEventListener("click", playWordFast);
-  btnRepeat.addEventListener("click", repeatWord);
-  btnSkip.addEventListener("click", () => {
-    message.textContent = `Mot sauté : ${words[currentWordIndex]}`;
-    wordDisplay.textContent = words[currentWordIndex];
-    nextWord();
-  });
+    // Événement de clic pour ouvrir les portes et lancer la transition
+    window.addEventListener('click', () => {
+      openDoors();
+      setTimeout(transitionToScene2, 2000); // Attendre 2 secondes avant la transition
+    });
 
-  // Vérification automatique à la saisie (si tu préfères, sinon supprime cet event)
-  answerInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      checkAnswer();
-    }
-  });
-
-  // Au chargement, jouer premier mot
-  window.onload = () => {
-    playWord();
-  };
-</script>
+    // Initialisation
+    init();
+  </script>
 </body>
 </html>
