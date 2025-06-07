@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Ascenseur Réaliste</title>
+  <title>Ascenseur Immersif</title>
   <style>
     body {
       margin: 0;
@@ -12,7 +12,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      perspective: 1000px;
+      perspective: 1200px;
       font-family: Arial, sans-serif;
     }
 
@@ -34,7 +34,7 @@
       background: linear-gradient(to right, #666, #aaa);
       top: 0;
       transition: transform 2s ease-in-out;
-      z-index: 2;
+      z-index: 3;
     }
 
     .gauche {
@@ -47,27 +47,67 @@
       border-left: 2px solid #ccc;
     }
 
+    .interieur {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #555, #222);
+      animation: pulseLight 3s infinite alternate;
+      z-index: 1;
+    }
+
+    @keyframes pulseLight {
+      from { background: radial-gradient(circle at center, #666, #222); }
+      to   { background: radial-gradient(circle at center, #444, #111); }
+    }
+
     .texte {
       position: absolute;
-      top: 50%;
+      top: 55%;
       left: 50%;
       transform: translate(-50%, -50%) scale(1);
       color: #fff;
       font-size: 2.5em;
       opacity: 0;
-      z-index: 1;
+      z-index: 2;
       transition: opacity 2s ease-in-out, transform 2s ease-in-out;
     }
 
-    .interieur {
+    .ecran {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(#444, #222);
-      z-index: 0;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: black;
+      color: lime;
+      padding: 5px 10px;
+      font-size: 1em;
+      font-family: monospace;
+      border-radius: 4px;
+      z-index: 2;
     }
 
-    /* Animation quand l’ascenseur s’ouvre */
+    .boutons {
+      position: absolute;
+      bottom: 20px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .boutons button {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: #666;
+      color: white;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
     .ascenseur.ouvert .gauche {
       transform: translateX(-100%);
     }
@@ -82,7 +122,7 @@
     }
 
     .ascenseur.ouvert {
-      transform: scale(1.2) translateZ(100px);
+      transform: scale(1.15) translateZ(100px);
     }
   </style>
 </head>
@@ -92,13 +132,30 @@
   <div class="porte gauche"></div>
   <div class="porte droite"></div>
   <div class="interieur"></div>
+  <div class="ecran">Niveau 0</div>
   <div class="texte">Bienvenue</div>
+  <div class="boutons">
+    <button>1</button>
+    <button>2</button>
+    <button>3</button>
+  </div>
 </div>
 
+<audio id="son" src="ding.mp3" preload="auto"></audio>
+
 <script>
+  const ascenseur = document.getElementById('ascenseur');
+  const audio = document.getElementById('son');
+
   setTimeout(() => {
-    document.getElementById('ascenseur').classList.add('ouvert');
-  }, 1000); // après 1 seconde
+    ascenseur.classList.add('ouvert');
+    audio.play();
+  }, 1000); // Démarre après 1 sec
+
+  // Redirige vers Domi.html après 5 secondes
+  setTimeout(() => {
+    window.location.href = 'Domi.html';
+  }, 6000);
 </script>
 
 </body>
