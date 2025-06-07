@@ -1,126 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Dictée Vocale Interactive</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    button {
-      margin: 5px;
-      padding: 10px 15px;
-    }
-    select {
-      margin-top: 10px;
-      padding: 5px;
-    }
-    #fullText {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      background: #f9f9f9;
-      white-space: pre-wrap;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictée Vocale Interactive</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .dictation-text {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .controls button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .controls button:hover {
+            background-color: #555;
+        }
+        .controls button:disabled {
+            background-color: #777;
+            cursor: not-allowed;
+        }
+        .audio-player {
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Dictée Vocale Interactive</h1>
 
-  <label for="dictationSelect">Choisissez une dictée :</label>
-  <select id="dictationSelect">
-    <option value="1">Dictée 1 - Le Laboureur et ses enfants</option>
-    <option value="2">Dictée 2 - La Cigale et la Fourmi</option>
-    <option value="3">Dictée 3 - Le Lièvre et la Tortue</option>
-    <option value="4">Dictée 4 - Le Corbeau et le Renard</option>
-    <option value="5">Dictée 5 - La Grenouille et le Bœuf</option>
-    <option value="6">Dictée 6 - La Fourmi et la Sauterelle</option>
-    <option value="7">Dictée 7 - Rien ne sert de courir</option>
-    <option value="9">Dictée 9 - Le Loup et l’Agneau</option>
-    <option value="10">Dictée 10 - Le Héron</option>
-    <option value="11">Dictée 11 - Le Lion et le Rat</option>
-  </select>
+<div class="container">
+    <h1>Dictée Vocale Interactive</h1>
+    <div class="dictation-text" id="dictationText">
+        <!-- Le texte de la dictée sera inséré ici -->
+    </div>
+    <audio id="audioPlayer" class="audio-player" controls>
+        <source src="dictation.mp3" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+    <div class="controls">
+        <button id="prevBtn">Retour</button>
+        <button id="playPauseBtn">Lecture</button>
+        <button id="checkBtn">Vérifier</button>
+        <button id="speedDownBtn">−</button>
+        <button id="speedUpBtn">+</button>
+    </div>
+</div>
 
-  <div>
-    <button onclick="speak()">Lire</button>
-    <button onclick="pauseSpeech()">Pause</button>
-    <button onclick="resumeSpeech()">Reprendre</button>
-    <button onclick="stopSpeech()">Arrêter</button>
-    <button onclick="repeatSpeech()">Répéter</button>
-    <button onclick="speedDown()">Ralentir</button>
-    <button onclick="speedUp()">Accélérer</button>
-    <button onclick="showFullText()">Vérifier la dictée</button>
-  </div>
+<script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const speedDownBtn = document.getElementById('speedDownBtn');
+    const speedUpBtn = document.getElementById('speedUpBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const dictationText = document.getElementById('dictationText');
 
-  <div id="fullText"></div>
+    let currentDictation = 1;
+    const dictations = [
+        `Dictée 1: Le laboureur et ses enfants\nTravaillez, prenez de la peine : C'est le fonds qui manque le moins.`,
+        `Dictée 2: La Cigale et la Fourmi\nLa Cigale, ayant chanté tout l'été, Se trouva fort dépourvue quand la bise fut venue.`,
+        `Dictée 3: Le Lièvre et la Tortue\nTout le monde savait que le Lièvre était l'animal le plus rapide, et le Lièvre adorait s'en vanter.`,
+        `Dictée 4: Le Corbeau et le Renard\nMaître Corbeau, sur un arbre perché, Tenait en son bec un fromage.`,
+        `Dictée 5: La Grenouille qui veut se faire aussi grosse que le bœuf\nUne Grenouille vit un bœuf Qui lui sembla de belle taille.`,
+        `Dictée 6: La Fourmi et la Sauterelle\nNous étions au milieu de l'hiver, un jour clair et glacial. Malgré le froid, la Fourmi se chauffait au soleil.`,
+        `Dictée 7: Le Lièvre et la Tortue\nRien ne sert de courir ; il faut partir à point. Le Lièvre et la Tortue en sont un témoignage.`,
+        `Dictée 8: La Raison du plus fort\nLa raison du plus fort est toujours la meilleure : Nous l'allons montrer tout à l'heure.`,
+        `Dictée 9: Le Héron et les Poissons\nUn jour, sur ses longs pieds, allait je ne sais où, Le Héron au long bec emmanché d'un long cou.`,
+        `Dictée 10: Le Lion et le Rat\nIl faut, autant qu'on peut, obliger tout le monde : On a souvent besoin d'un plus petit que soi.`
+    ];
 
-  <script>
-    const dictations = {
-      1: `Dictée 1 – Le laboureur et ses enfants : ...`, // Remplace par le texte complet (déjà donné)
-      2: `Dictée 2 – La Cigale et la Fourmi : ...`,       // Idem pour les autres
-      3: `Dictée 3 – Le Lièvre et la Tortue : ...`,
-      4: `Dictée 4 – Le Corbeau et le Renard : ...`,
-      5: `Dictée 5 – La Grenouille et le Bœuf : ...`,
-      6: `Dictée 6 – La Fourmi et la Sauterelle : ...`,
-      7: `Dictée 7 – Rien ne sert de courir : ...`,
-      9: `Dictée 9 – Le Loup et l’Agneau : ...`,
-      10: `Dictée 10 – Le Héron : ...`,
-      11: `Dictée 11 – Le Lion et le Rat : ...`
-    };
-
-    let currentUtterance;
-    const synth = window.speechSynthesis;
-    let currentRate = 1;
-
-    function speak() {
-      stopSpeech();
-      const selectedId = document.getElementById("dictationSelect").value;
-      const text = dictations[selectedId];
-      currentUtterance = new SpeechSynthesisUtterance(text);
-      currentUtterance.lang = 'fr-FR';
-      currentUtterance.rate = currentRate;
-      synth.speak(currentUtterance);
+    function updateDictation() {
+        dictationText.textContent = dictations[currentDictation - 1];
+        audioPlayer.src = `dictation${currentDictation}.mp3`;
+        audioPlayer.load();
     }
 
-    function pauseSpeech() {
-      if (synth.speaking && !synth.paused) synth.pause();
-    }
+    playPauseBtn.addEventListener('click', () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseBtn.textContent = 'Pause';
+        } else {
+            audioPlayer.pause();
+            playPauseBtn.textContent = 'Lecture';
+        }
+    });
 
-    function resumeSpeech() {
-      if (synth.paused) synth.resume();
-    }
+    checkBtn.addEventListener('click', () => {
+        alert('Vérification de la dictée...');
+        // Implémenter la logique de vérification ici
+    });
 
-    function stopSpeech() {
-      if (synth.speaking) synth.cancel();
-    }
+    speedDownBtn.addEventListener('click', () => {
+        audioPlayer.playbackRate = Math.max(0.5, audioPlayer.playbackRate - 0.25);
+    });
 
-    function repeatSpeech() {
-      speak();
-    }
+    speedUpBtn.addEventListener('click', () => {
+        audioPlayer.playbackRate = Math.min(2, audioPlayer.playbackRate + 0.25);
+    });
 
-    function showFullText() {
-      const selectedId = document.getElementById("dictationSelect").value;
-      const fullTextDiv = document.getElementById("fullText");
-      fullTextDiv.textContent = dictations[selectedId];
-      fullTextDiv.style.display = 'block';
-    }
+    prevBtn.addEventListener('click', () => {
+        if (currentDictation > 1) {
+            currentDictation--;
+            updateDictation();
+        }
+    });
 
-    function speedUp() {
-      if (currentRate < 2) {
-        currentRate += 0.1;
-        speak();
-      }
-    }
+    // Initialisation
+    updateDictation();
+</script>
 
-    function speedDown() {
-      if (currentRate > 0.5) {
-        currentRate -= 0.1;
-        speak();
-      }
-    }
-  </script>
 </body>
 </html>
-
