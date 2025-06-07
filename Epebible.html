@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Module Épellation Vocal de la bible - Liste Complète</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-weight: 800;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #wordDisplay {
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      margin-bottom: 30px;
+      min-height: 50px;
+    }
+
+    input[type="text"] {
+      font-size: 1.4rem;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      margin-bottom: 25px;
+      background-color: #fff;
+      color: #333;
+      outline: none;
+      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #2575fc;
+      caret-color: #2575fc;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background: #2575fc;
+      color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    }
+
+    #message {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 32px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.1);
+      transition: color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Épellation vocale des mots de la bible </h1>
+    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+  
+  
+
+
+const words = [
+  "Abomination", "Anathème", "Antéchrist", "Apocryphe", "Benedictus", "Catéchisme", 
+  "Célébration", "Christocentrisme", "Doxologie", "Écclésiastique", 
+  "Abel", "Abraham", "Adam", "adamique", "alléluia", "alliance", "ange", "antéchrist", "antibiblique", "apôtre", "Amen", "Ararat", 
+  "arche d’alliance", "arche de Noé", "Assuérus", "Babylone", "baptême", "Baruch", "bénédiction", "biblicisme", "bouc émissaire",
+  "Caïn", "Cantique des Cantiques", "Capharnaum", "César", "chair", "chérubin", "chien", "Christ", "circoncision", "Colossiens", 
+  "confusion des langues", "Corinthien", "Dalila", "Doxologie", "David", "davidique", "déluge", "démon", "diable", "Éden", "eisegèse", 
+  "Élisabeth", "Éphésien", "épitre", "épître", "évangile", "Ève", "exode", "Exode", "foi", "Galilée", "géhenne", "Genèse", "Gideon", 
+  "Goliath", "grâce", "Haman", "Hérode", "Hébreu", "hittite", "holocauste", "hosanna", "Isaac", "Israël", "Jacob", "Jérémie", "Jésus", 
+  "Job", "judas", "Judas", "Judith", "kikajon", "la paix soit avec vous", "Lazare", "Louange", "Léa", "Lévi", "Léviathan", "Levy", "limon",
+  "main de Dieu", "Mammon", "manne", "Marc", "Mardochée", "Marie", "Mathusalem", "Matthieu", "Melchisédech", "Melchisédek", "Melkisédeq", 
+  "Moïse", "Moïse", "mystère", "Nazareth", "nazir", "naziréat", "naziréen", "Nemrod", "noachique", "Noé", "oindre", "Onan", "Pâque", 
+  "Pâques", "parabiblique", "parabole", "paraclet", "paradis", "patriarche", "Pentateuque", "Pentecôte", "pharisien", "pharisienne", 
+  "Philippiens", "Philistin", "Pilate", "porte étroite", "prophète", "prophétesse", "prophétiser", "propitiatoire", "Protoclet", "psaume", 
+  "Psaumes", "Rachel", "Rébecca", "Rébecca", "rédempteur", "Ressusciter", "Ruth", "sabaoth", "saint", "Salomon", "Samarie", "samaritain", 
+  "Sambation", "Samson", "Samuel", "sanhédrin", "Satan", "Saül", "selah", "sélah", "shabbat", "shéol", "shibboleth", "Sinaï", "Sophonie", 
+  "synoptique", "temple", "tétrarque", "tohu-bohu", "Tout-Puissant", "veau d’or", "Zélote", "Épiphanie", "Ésotérique", 
+  "Exaltation", "Exégèse", "Expiatoire", "Généalogique", "Hagiographie", "Hérésie", "Holocauste", 
+  "Inerrance", "Intercession", "Intertestamentaire", "Jéhovisme", "Ménorah", "Miséricordieux", 
+  "Monothéisme", "Monts_des_Oliviers", "Mysticisme", "Néoplatonisme", "Parousie", "Péché_véniel", 
+  "Pneumatologie", "Polygamie", "Prophétisme", "Rédempteur", "Reinsertion", "Sabbatique", "Sacramental", 
+  "Salvifique", "Sanctification", "Soteriologie", "Transsubstantiation", "Transgression", "Trinité", 
+  "Vénération", "Zélote", "Ziggourat", "Admonition", "Anthropocentrisme", "Apophatique", "Archevêque", 
+  "Divinité", "Dogmatique", "Écumenisme", "Élection_divine", "Excommunication", "Exorcisme", "Herméneutique", 
+  "Ictus", "Incarnation", "Luminisme", "Mystagogie", "Panthéisme", "Parabole", "Pharisaïsme", 
+  "Prière_de_bénédiction", "Prophétie_apocalyptique", "Sacerdoce", "Sacrifice_expiatoire", "Sanhedrin", 
+  "Sola_Scriptura", "Talmudique", "Théophanie", "Transfiguration", "Zézaiement", "Divinisation", 
+  "Fiduciaire", "Liturgie", "Néoménie", "Anagogie", "Dieu", "Amour", "Foi", "Espérance", "Prière", "Lumière", 
+  "Paix", "Rédemption", "Salvation", "Miséricorde", "Commandement", "Jésus", "Christ", "Saint_Esprit", 
+  "Sagesse", "Prophète", "Vie", "Justice", "Vérité", "Adoration", "Péché", "Repentance", "Grâce", "Roi", 
+  "Seigneur", "Temple", "Alliance", "Ciel", "Terre", "Sabbat", "Méditation", "Bénédiction", "Consolation", 
+  "Miracle", "Disciples", "Apôtre", "Église", "Témoignage", "Gloire", "Sauvée", "Lévites", "Prophétie", 
+  "Avenir", "Roi_David", "Vierge", "Cœur", "Législation", "Commandements", "Fermeté", "Suffisance", "L_Agneau", 
+  "Rédempteur", "Sainte_Cène", "Parabole", "Miracles", "Rois", "Légende", "Apocalypse", "Monde", "Noé", 
+  "Abraham", "Isaac", "Jacob", "Moses", "Pharaon", "Exode", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique", 
+  "Job", "Péché_originel", "Genèse", "Expiation", "Évangile", "Répétition", "Messie", "Révélation", "Pèlerinage", 
+  "Héritage", "Sermon", "Alliance_Nouvelle", "Moïse", "Corps_du_Christ", "Sainteté", "Réconciliation", 
+  "Amour_fraternel", "Conscience", "Évangéliste", "Vierge_Marie", "Bénédiction_divine", "Confession", 
+  "Royaume_de_Dieu", "Fidélité", "Veillée", "Prisonnier", "Soutien", "Espoir", "Rassemblement", "Agneau_de_Dieu", 
+  "Bonté", "Légion", "Croix", "Sang", "Fleur", "Sagesse_divine", "Miséricordieux", "Exode", "Courage", "Zèle", 
+  "Amnésie", "Serviteur", "Victoire", "Sacrifice", "Justification", "Révélation", "Repos", "Pardon", "Abandon", 
+  "Légitimation", "L_Esprit_de_Dieu", "Témoignage_de_foi", "Divinité", "Prophétie", "Obéissance", "Protection", 
+  "Verbe", "Conseil", "Miséricorde_infinie", "Semence", "Vérité_éternelle", "Repentir_sincère", "Générosité", 
+  "Fidèle", "Lumière_du_monde", "Soeur", "Péché_mortal", "Christ_crucifié", "Voie", "Garde", "Pèlerin", 
+  "Recueillir", "Souffrance", "Bienveillance", "Semence_divine", "Salvateur", "Généalogie", "Vierge", "Ascension", 
+  "Alliance_éternelle", "Adversaire", "Ange", "Baptême", "Bonté_divine", "Cieux", "Charité", "Chemin", 
+  "Clé_de_la_connaissance", "Comité", "Communion", "Confesser", "Confiance", "Conviction", "Corruption", 
+  "Crucifixion", "Délivrance", "Dispensations", "Divorce", "Domination", "Écriture", "Éternité", "Évangélisation", 
+  "Exhortation", "Fruits_de_l_Esprit", "Golgotha", "Grâce_sur_grâce", "Homme_de_Dieu", "Hosanna", "Jeûne", 
+  "Jérusalem", "Jubilé", "Juridiction", "Justice_divine", "Juin", "Législation_divine", "Levée_des_mains", "Loi", 
+  "Lumière_éclatante", "Manger_le_pain", "Mains_élevées", "Manna", "Miséricorde_du_Seigneur", "Nativité", 
+  "Nouveau_Testament", "Oblation", "Oint", "Pacte", "Parole_vivante", "Purification", "Abraham", "Balaam", 
+  "Baruch", "Béthel", "Calvaire", "Césarée", "Cicéron", "Édène", "Élie", "Élisée", "Éphésiens", "Ézéchiel", 
+  "Galilée", "Goliath", "Gomorrhe", "Hébreux", "Hérode", "Isaïe", "Israël", "Jérémie", "Jésus_Christ", "Job", 
+  "Judas", "Juge", "Jumelage", "Kéroub", "Lévite", "Lot", "Malachie", "Mardochée", "Matthieu", "Nabuchodonosor", 
+  "Néhémie", "Noé", "Nouveau_Jérusalem", "Paul", "Pétra", "Philippiens", "Pharaon", "Psaume", "Rahab", "Rahab", 
+  "Ruth", "Salomon", "Saul", "Sodomie", "Titus", "Zacharie", "Zachée", "Zébu", "Zion", "Apocalypse", "Archange", 
+  "Apostolat", "Apostolat", "Apôtre", "Barabbas", "Bethléem", "Babel", "Corinthiens", "Crucifixion", "Délivrance"
+];
+
+          
+    let currentWordIndex = 0;
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+
+    let speechRate = 1;
+
+    function speakWord(word, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
+    }
+
+    function playWord() {
+      const word = words[currentWordIndex];
+      wordDisplay.textContent = "";
+      speakWord(word);
+      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.focus();
+    }
+
+    function playWordSlow() {
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      playWord();
+    }
+
+    function playWordFast() {
+      speechRate = Math.min(2, speechRate + 0.25);
+      playWord();
+    }
+
+    function repeatWord() {
+      playWord();
+    }
+
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const correctAnswer = words[currentWordIndex].toLowerCase();
+      if (userAnswer === correctAnswer) {
+        message.textContent = "✅ Correct !";
+        message.style.color = "#00e676"; // Vert
+        wordDisplay.textContent = correctAnswer;
+        setTimeout(() => {
+          nextWord();
+        }, 1500);
+      } else {
+        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252"; // Rouge
+        spellWord(correctAnswer);
+      }
+    }
+
+    function spellWord(word) {
+      speechSynthesis.cancel();
+      let letters = [...word.replace(/[-\s]/g, "")];
+      let i = 0;
+      function spellNext() {
+        if (i < letters.length) {
+          const utterance = new SpeechSynthesisUtterance(letters[i]);
+          utterance.lang = "fr-FR";
+          utterance.rate = 0.6;
+          utterance.onend = () => {
+            i++;
+            setTimeout(spellNext, 350);
+          };
+          speechSynthesis.speak(utterance);
+        } else {
+          message.textContent = "Réessayez d'écrire le mot.";
+          message.style.color = "#fff";
+          answerInput.value = "";
+          answerInput.focus();
+        }
+      }
+      spellNext();
+    }
+
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
+        wordDisplay.textContent = "";
+        answerInput.value = "";
+        answerInput.disabled = true;
+        btnPlay.disabled = true;
+        btnSlow.disabled = true;
+        btnFast.disabled = true;
+        btnRepeat.disabled = true;
+        btnSkip.disabled = true;
+        btnBack.disabled = true;
+      } else {
+        playWord();
+      }
+    }
+
+    btnBack.addEventListener("click", () => {
+      if (currentWordIndex > 0) {
+        currentWordIndex--;
+        message.textContent = "";
+        playWord();
+      }
+    });
+
+    btnPlay.addEventListener("click", playWord);
+    btnSlow.addEventListener("click", playWordSlow);
+    btnFast.addEventListener("click", playWordFast);
+    btnRepeat.addEventListener("click", repeatWord);
+    btnSkip.addEventListener("click", nextWord);
+
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    playWord(); // lancer au chargement
+  </script>
+</body>
+</html>
