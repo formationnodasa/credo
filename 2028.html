@@ -129,7 +129,7 @@
     <div id="message"></div>
   </div>
 
-  <script>
+<script>
 const questions = [
   { question: "81 ÷ 9", answer: 9 },
   { question: "6 × 2 + 4 ÷ 2", answer: 14 },
@@ -155,6 +155,15 @@ const btnSkip = document.getElementById("btnSkip");
 const btnBack = document.getElementById("btnBack");
 
 let speechRate = 1;
+
+// Fonction pour remplacer les symboles mathématiques par des mots
+function replaceOperators(text) {
+  return text
+    .replace(/÷/g, "divisé")
+    .replace(/×/g, "fois")
+    .replace(/-/g, "moins")
+    .replace(/\+/g, "plus");
+}
 
 function speakQuestion(text, rate = speechRate) {
   if (!('speechSynthesis' in window)) {
@@ -187,10 +196,11 @@ function explainMathCalculation(question) {
 
 function playQuestion() {
   const current = questions[currentQuestionIndex];
+  const questionText = replaceOperators(current.question);  // Remplacer les opérateurs dans la question
   questionDisplay.textContent = current.question;
 
   // Lire la question à haute voix
-  speakQuestion(`Résolvez cette question : ${current.question}`);
+  speakQuestion(`Résolvez cette question : ${questionText}`);
   message.textContent = "Entrez la réponse correcte.";
   message.style.color = "#fff";
   answerInput.value = "";
@@ -276,6 +286,4 @@ answerInput.addEventListener("keydown", (e) => {
 
 // Démarrage automatique
 window.addEventListener("load", playQuestion);
-  </script>
-</body>
-</html>
+</script>
