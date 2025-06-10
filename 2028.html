@@ -146,4 +146,73 @@
         const feedback = document.getElementById("feedback");
         const select = document.getElementById("dictationSelect");
 
-        function formatPunctuation
+                function formatPunctuation(text) {
+            return text.replace(/[,;:.!?]/g, match => `${match} `);
+         }
+
+         function playDictation() {
+            const textToPlay = dictations[currentDictationIndex].text.join(" ");
+            currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
+            currentUtterance.rate = rate;
+            currentUtterance.onend = () => {
+                paused = false;
+            };
+            speechSynthesis.speak(currentUtterance);
+        }
+
+         function repeatDictation() {
+            if (currentUtterance) {
+                speechSynthesis.speak(currentUtterance);
+            } else {
+                playDictation();
+            }
+        }
+
+         function slowDown() {
+            rate = Math.max(0.5, rate - 0.1);
+            if (currentUtterance) {
+                currentUtterance.rate = rate;
+            }
+        }
+
+         function pauseDictation() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.pause();
+                paused = true;
+            }
+         }
+
+         function resumeDictation() {
+            if (paused) {
+                speechSynthesis.resume();
+                paused = false;
+            }
+         }
+
+         function checkInput() {
+            const originalText = dictations[currentDictationIndex].text.join(" ");
+            const userText = userInput.value.trim();
+            if (userText === originalText) {
+                feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
+            } else {
+                feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n" + originalText;
+            }
+         }
+
+         document.getElementById("btnPlay").addEventListener("click", playDictation);
+         document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
+         document.getElementById("btnSlow").addEventListener("click", slowDown);
+         document.getElementById("btnPause").addEventListener("click", pauseDictation);
+         document.getElementById("btnResume").addEventListener("click", resumeDictation);
+         document.getElementById("btnCheck").addEventListener("click", checkInput);
+         select.addEventListener("change", function() {
+            currentDictationIndex = this.value;
+            userInput.value = ""; // Clear the textarea for new dictation
+            feedback.textContent = ""; // Clear previous feedback
+         });
+
+         // Initialize with the first dictation
+         playDictation();
+      </script>
+   </body>
+</html>
