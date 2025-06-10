@@ -137,82 +137,86 @@
             }
         ];
 
-        let currentDictationIndex = 0;
-        let rate = 1;
-        let paused = false;
-        let currentUtterance = null;
+    
+         <script>
+    const dictations = [/* ton tableau inchangé */];
 
-        const userInput = document.getElementById("userInput");
-        const feedback = document.getElementById("feedback");
-        const select = document.getElementById("dictationSelect");
+    let currentDictationIndex = 0;
+    let rate = 1;
+    let paused = false;
+    let currentUtterance = null;
 
-                function formatPunctuation(text) {
-            return text.replace(/[,;:.!?]/g, match => `${match} `);
-         }
+    const userInput = document.getElementById("userInput");
+    const feedback = document.getElementById("feedback");
+    const select = document.getElementById("dictationSelect");
 
-         function playDictation() {
-            const textToPlay = dictations[currentDictationIndex].text.join(" ");
-            currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
-            currentUtterance.rate = rate;
-            currentUtterance.onend = () => {
-                paused = false;
-            };
-            speechSynthesis.speak(currentUtterance);
+    function formatPunctuation(text) {
+        return text.replace(/[,;:.!?]/g, match => `${match} `);
+    }
+
+    function playDictation() {
+        speechSynthesis.cancel(); // 🔄 Pour éviter les chevauchements
+        const textToPlay = dictations[currentDictationIndex].text.join(" ");
+        currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
+        currentUtterance.rate = rate;
+        currentUtterance.onend = () => {
+            paused = false;
+        };
+        speechSynthesis.speak(currentUtterance);
+    }
+
+    function repeatDictation() {
+        if (currentUtterance) {
+            speechSynthesis.cancel();
+            playDictation();
+        } else {
+            playDictation();
         }
+    }
 
-         function repeatDictation() {
-            if (currentUtterance) {
-                speechSynthesis.speak(currentUtterance);
-            } else {
-                playDictation();
-            }
+    function slowDown() {
+        rate = Math.max(0.5, rate - 0.1);
+        speechSynthesis.cancel();
+        playDictation();
+    }
+
+    function pauseDictation() {
+        if (speechSynthesis.speaking) {
+            speechSynthesis.pause();
+            paused = true;
         }
+    }
 
-         function slowDown() {
-            rate = Math.max(0.5, rate - 0.1);
-            if (currentUtterance) {
-                currentUtterance.rate = rate;
-            }
+    function resumeDictation() {
+        if (paused) {
+            speechSynthesis.resume();
+            paused = false;
         }
+    }
 
-         function pauseDictation() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.pause();
-                paused = true;
-            }
-         }
+    function checkInput() {
+        const originalText = dictations[currentDictationIndex].text.join(" ");
+        const userText = userInput.value.trim();
+        if (userText === originalText) {
+            feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
+        } else {
+            feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n" + originalText;
+        }
+    }
 
-         function resumeDictation() {
-            if (paused) {
-                speechSynthesis.resume();
-                paused = false;
-            }
-         }
+    document.getElementById("btnPlay").addEventListener("click", playDictation);
+    document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
+    document.getElementById("btnSlow").addEventListener("click", slowDown);
+    document.getElementById("btnPause").addEventListener("click", pauseDictation);
+    document.getElementById("btnResume").addEventListener("click", resumeDictation);
+    document.getElementById("btnCheck").addEventListener("click", checkInput);
 
-         function checkInput() {
-            const originalText = dictations[currentDictationIndex].text.join(" ");
-            const userText = userInput.value.trim();
-            if (userText === originalText) {
-                feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
-            } else {
-                feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n" + originalText;
-            }
-         }
+    select.addEventListener("change", function() {
+        currentDictationIndex = parseInt(this.value, 10); // 🔧 Correction ici
+        userInput.value = "";
+        feedback.textContent = "";
+    });
 
-         document.getElementById("btnPlay").addEventListener("click", playDictation);
-         document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
-         document.getElementById("btnSlow").addEventListener("click", slowDown);
-         document.getElementById("btnPause").addEventListener("click", pauseDictation);
-         document.getElementById("btnResume").addEventListener("click", resumeDictation);
-         document.getElementById("btnCheck").addEventListener("click", checkInput);
-         select.addEventListener("change", function() {
-            currentDictationIndex = this.value;
-            userInput.value = ""; // Clear the textarea for new dictation
-            feedback.textContent = ""; // Clear previous feedback
-         });
-
-         // Initialize with the first dictation
-         playDictation();
-      </script>
-   </body>
-</html>
+    // Démarrage automatique
+    playDictation();
+</script>
