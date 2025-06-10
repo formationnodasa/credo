@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dictée Interactive</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+
+    select, textarea, button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    textarea {
+      height: 180px;
+      resize: vertical;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+    }
+
+    select {
+      background: rgba(255,255,255,0.9);
+      color: #333;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .buttons button {
+      flex: 1 1 calc(50% - 10px);
+      background: #fff;
+      color: #2575fc;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .buttons button:hover {
+      background: #2575fc;
+      color: #fff;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 1.2em;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📜 Dictée Interactive</h1>
+
+    <select id="dictationSelect">
+      <option value="laboureur">Le Laboureur et ses enfants</option>
+      <option value="cigale">La Cigale et la Fourmi</option>
+      <option value="lievre">Le Lièvre et la Tortue</option>
+      <option value="corbeau">Le Corbeau et le Renard</option>
+      <option value="grenouille">La Grenouille et le Bœuf</option>
+      <option value="fourmi">La Fourmi et la Sauterelle</option>
+      <option value="tortue">La Tortue et le Lièvre</option>
+      <option value="agneau">Le Loup et l’Agneau</option>
+      <option value="heron">L’Héron</option>
+    </select>
+
+    <div class="buttons">
+      <button onclick="playDictation()">▶️ Écouter</button>
+      <button onclick="togglePause()">⏸️ Pause / Reprendre</button>
+      <button onclick="slowDown()">🐢 Ralentir</button>
+      <button onclick="speedUp()">🐇 Accélérer</button>
+      <button onclick="checkDictation()">✅ Vérifier</button>
+    </div>
+
+    <textarea id="userInput" placeholder="Écris ici ta dictée..."></textarea>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const dictations = {
+      laboureur: `Travaillez, prenez de la peine :
+C'est le fonds qui manque le moins.
+Un riche Laboureur, sentant sa mort prochaine,
+Fit venir ses enfants, leur parla sans témoins.
+Gardez-vous, leur dit-il, de vendre l'héritage
+Que nous ont laissé nos parents.
+Un trésor est caché dedans.
+Je ne sais pas l'endroit ; mais un peu de courage
+Vous le fera trouver, vous en viendrez à bout.
+Remuez votre champ dès qu'on aura fait l'Oût.
+Creusez, fouillez, bêchez ; ne laissez nulle place
+Où la main ne passe et repasse...`,
+
+      cigale: `La Cigale, ayant chanté Tout l'été,
+Se trouva fort dépourvue Quand la bise fut venue :
+Pas un seul petit morceau De mouche ou de vermisseau.
+Elle alla crier famine Chez la Fourmi sa voisine...`,
+
+      lievre: `Tout le monde savait que le Lièvre était l'animal le plus rapide...
+Un jour, le Lièvre proposa une course à la Tortue. La Chouette donna le départ.
+Le Lièvre partit vite, s'arrêta pour dormir... et la Tortue gagna la course.`,
+
+      tortue: `Rien ne sert de courir ; il faut partir à point.
+Le Lièvre et la Tortue en sont un témoignage...
+La Tortue arriva la première. Eh bien ! lui cria-t-elle, avais-je pas raison ?`,
+
+      corbeau: `Maître Corbeau, sur un arbre perché,
+Tenait en son bec un fromage.
+Maître Renard, par l'odeur alléché,
+Lui tint à peu près ce langage : ...`,
+
+      grenouille: `Une Grenouille vit un Bœuf Qui lui sembla de belle taille.
+Elle qui n'était pas grosse en tout comme un œuf,
+Envieuse s'étend, s'enfle, et crève...`,
+
+      fourmi: `Nous étions au milieu de l'hiver, un jour clair et glacial...
+La Sauterelle affamée demanda des graines à la Fourmi,
+Mais cette dernière lui répondit que ceux qui ne travaillent pas auront faim.`,
+
+      agneau: `La raison du plus fort est toujours la meilleure :
+Un Agneau se désaltérait Dans le courant d'une onde pure.
+Un Loup survint à jeun et l'accusa faussement...
+Il le mangea.`,
+
+      heron: `Un jour, sur ses longs pieds, allait je ne sais où,
+Le Héron au long bec emmanché d'un long cou...
+Il dédaigna les poissons faciles, et finit par manger un limaçon.`
+    };
+
+    let rate = 0.5;
+    const minRate = 0.25;
+    const maxRate = 2.0;
+    let paused = false;
+    let speaking = false;
+    let queue = [];
+    let voice = null;
+
+    function getVoice() {
+      const voices = speechSynthesis.getVoices();
+      // On garde la même voix dans la variable globale
+      if (!voice) {
+        voice = voices.find(v => v.lang === 'fr-FR' && /thomas|paul|yves|homme/i.test(v.name)) || voices.find(v => v.lang === 'fr-FR');
+      }
+      return voice;
+    }
+
+    function speak(text) {
+      speechSynthesis.cancel();
+      queue = [];
+
+      // Découpe en parties mots/ponctuations
+      const parts = text
+        .replace(/\n/g, ' ')
+        .split(/([.,;:!?])/g)
+        .filter(p => p.trim() !== '');
+
+      for (let part of parts) {
+        // Création de l'énoncé à lire
+        let utterance = null;
+        if (['.', ',', ';', ':', '!', '?'].includes(part)) {
+          // On lit la ponctuation sous forme orale (optionnel)
+          // ou on peut ne rien lire et juste faire pause
+          utterance = new SpeechSynthesisUtterance(part); 
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          // Marque cette utterance comme ponctuation pour pause plus longue
+          utterance.isPunctuation = true;
+        } else {
+          utterance = new SpeechSynthesisUtterance(part.trim());
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          utterance.isPunctuation = false;
+        }
+        queue.push(utterance);
+      }
+
+      speaking = true;
+      playQueue();
+    }
+
+    async function playQueue() {
+      for (let utterance of queue) {
+        while (paused) await new Promise(r => setTimeout(r, 100));
+        if (!speaking) return;
+
+        speechSynthesis.speak(utterance);
+        await new Promise(resolve => {
+          utterance.onend = resolve;
+        });
+
+        // Pause de 5 secondes après une ponctuation, sinon pause de 0.5s
+        if (utterance.isPunctuation) {
+          await new Promise(r => setTimeout(r, 5000)); 
+        } else {
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+      speaking = false;
+    }
+
+    function playDictation() {
+      const selected = document.getElementById('dictationSelect').value;
+      const text = dictations[selected];
+      if (text) {
+        paused = false;
+        speaking = true;
+        speak(text);
+      }
+    }
+
+    function togglePause() {
+      paused = !paused;
+      if (paused) {
+        speechSynthesis.pause();
+      } else {
+        speechSynthesis.resume();
+      }
+    }
+
+    function slowDown() {
+      if (rate > minRate) {
+        rate -= 0.1;
+        if (rate < minRate) rate = minRate;
+      }
+    }
+
+    function speedUp() {
+      if (rate < maxRate) {
+        rate += 0.1;
+        if (rate > maxRate) rate = maxRate;
+      }
+    }
+
+    function checkDictation() {
+      const selected = document.getElementById('dictationSelect').value;
+      const original = dictations[selected].replace(/\s+/g, ' ').trim();
+      const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim();
+
+      const isExact = original.toLowerCase() === userText.toLowerCase();
+
+      const result = isExact
+        ? '✅ Parfait ! Aucune erreur détectée.'
+        : '❌ Il y a des différences. Relis ta dictée et réessaie !';
+
+      document.getElementById('result').textContent = `${result}\n\n--- Dictée originale ---\n${original}`;
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      getVoice();
+    };
+  </script>
+</body>
+</html>
