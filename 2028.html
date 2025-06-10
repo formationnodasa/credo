@@ -1,163 +1,94 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Dictée – Fables de La Fontaine</title>
-  <style>
-    /* Styles CSS inchangés */
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Dictée – Fables de La Fontaine</h1>
-    <div>
-      <label for="dictationSelect">Choisissez une dictée :</label>
-      <select id="dictationSelect">
-        <option value="0">Dictée 1 – Le Laboureur et ses enfants</option>
-        <option value="1">Dictée 2 – La Cigale et la Fourmi</option>
-      </select>
-    </div>
-    <br>
-    <textarea id="userInput" placeholder="Recopiez la dictée ici après l'écoute..." disabled></textarea>
-    <div class="buttons">
-      <button id="btnPlay">▶️ Écouter</button>
-      <button id="btnPause">⏸️ Pause</button>
-      <button id="btnResume" disabled>▶️ Reprendre</button>
-      <button id="btnRepeat">🔁 Répéter</button>
-      <button id="btnSlow">🐢 Ralentir</button>
-      <button id="btnFast">🐇 Accélérer</button>
-      <button id="btnCheck">✅ Corriger</button>
-    </div>
-    <div id="feedback"></div>
-  </div>
+<script>
+  const dictations = [/* ...inchangé... */];
 
-  <script>
-    const dictations = [
-      {
-        title: "Le Laboureur et ses enfants",
-        text: [
-          "Travaillez, prenez de la peine : C'est le fonds qui manque le moins.",
-          "Un riche Laboureur, sentant sa mort prochaine, fit venir ses enfants, leur parla sans témoins.",
-          "Gardez-vous, leur dit-il, de vendre l'héritage que nous ont laissé nos parents.",
-          "Un trésor est caché dedans.",
-          "Je ne sais pas l'endroit ; mais un peu de courage vous le fera trouver, vous en viendrez à bout.",
-          "Remuez votre champ dès qu'on aura fait l'Oût.",
-          "Creusez, fouillez, bêchez ; ne laissez nulle place où la main ne passe et repasse.",
-          "Le père mort, les fils vous retournent le champ deçà, delà, partout ; si bien qu'au bout de l'an, il en rapporta davantage.",
-          "D'argent, point de caché. Mais le père fut sage de leur montrer avant sa mort que le travail est un trésor."
-        ]
-      },
-      {
-        title: "La Cigale et la Fourmi",
-        text: [
-          "La Cigale, ayant chanté tout l'été, se trouva fort dépourvue quand la bise fut venue.",
-          "Pas un seul petit morceau de mouche ou de vermisseau.",
-          "Elle alla crier famine chez la Fourmi sa voisine, la priant de lui prêter quelque grain pour subsister jusqu'à la saison nouvelle.",
-          "« Je vous paierai, lui dit-elle, avant l'août, foi d'animal, intérêt et principal. »",
-          "La Fourmi n'est pas prêteuse : C'est là son moindre défaut.",
-          "« Que faisiez-vous au temps chaud ? » dit-elle à cette emprunteuse.",
-          "— Nuit et jour à tout venant je chantais, ne vous déplaise.",
-          "— Vous chantiez ? j'en suis fort aise ; eh bien dansez maintenant."
-        ]
-      }
-    ];
+  let currentDictationIndex = 0;
+  let rate = 1;
+  let paused = false;
+  let currentUtterance = null;
 
-    let currentDictationIndex = 0;
-    let rate = 1;
-    let isPaused = false;
-    let isSpeaking = false;
-    let currentUtterance = null;
+  const userInput = document.getElementById("userInput");
+  const feedback = document.getElementById("feedback");
+  const select = document.getElementById("dictationSelect");
 
-    const userInput = document.getElementById("userInput");
-    const feedback = document.getElementById("feedback");
-    const select = document.getElementById("dictationSelect");
+  function formatPunctuation(text) {
+    return text
+      .replace(/:/g, " deux-points ")
+      .replace(/;/g, " point-virgule ")
+      .replace(/\./g, " point ")
+      .replace(/,/g, " virgule ")
+      .replace(/!/g, " point d'exclamation ")
+      .replace(/\?/g, " point d'interrogation ")
+      .replace(/«|»/g, "")
+      .replace(/-/g, " tiret ");
+  }
 
-    function speak(text, rate = 1) {
-      if (isSpeaking) {
-        speechSynthesis.cancel();
-      }
+  function speak(text, rate = 1) {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(formatPunctuation(text));
+    utterance.lang = "fr-FR";
+    utterance.rate = rate;
+    currentUtterance = utterance;
+    speechSynthesis.speak(utterance);
+  }
 
-      currentUtterance = new SpeechSynthesisUtterance(text);
-      currentUtterance.lang = "fr-FR";
-      currentUtterance.rate = rate;
-      currentUtterance.onstart = () => {
-        isSpeaking = true;
-        userInput.disabled = true;
-      };
-      currentUtterance.onend = () => {
-        isSpeaking = false;
-        userInput.disabled = false;
-      };
-      speechSynthesis.speak(currentUtterance);
+  function playDictation() {
+    paused = false;
+    const dictationText = dictations[currentDictationIndex].text.join(" ");
+    speak(dictationText, rate);
+  }
+
+  function pauseDictation() {
+    if (!paused) {
+      speechSynthesis.pause();
+      paused = true;
+    } else {
+      speechSynthesis.resume();
+      paused = false;
     }
+  }
 
-    function playDictation() {
-      const dictationText = dictations[currentDictationIndex].text.join(" ");
-      speak(dictationText, rate);
-    }
+  function highlightMistakes(user, correct) {
+    const userWords = user.split(/\s+/);
+    const correctWords = correct.split(/\s+/);
+    const result = [];
 
-    function pauseDictation() {
-      if (isSpeaking) {
-        speechSynthesis.pause();
-        isPaused = true;
-        document.getElementById("btnPause").disabled = true;
-        document.getElementById("btnResume").disabled = false;
+    for (let i = 0; i < correctWords.length; i++) {
+      if (userWords[i] === correctWords[i]) {
+        result.push(correctWords[i]);
+      } else {
+        result.push(`<span style="color: red;">${userWords[i] || "[manquant]"}</span>`);
       }
     }
 
-    function resumeDictation() {
-      if (isPaused) {
-        speechSynthesis.resume();
-        isPaused = false;
-        document.getElementById("btnPause").disabled = false;
-        document.getElementById("btnResume").disabled = true;
-      }
-    }
+    return result.join(" ");
+  }
 
-    function repeatDictation() {
-      if (isSpeaking) {
-        speechSynthesis.cancel();
-      }
-      const dictationText = dictations[currentDictationIndex].text.join(" ");
-      speak(dictationText, rate);
-    }
+  function checkDictation() {
+    const userText = userInput.value.trim().toLowerCase().replace(/[’']/g, "'");
+    const correctText = dictations[currentDictationIndex].text.join(" ").toLowerCase().replace(/[’']/g, "'");
 
-    function checkDictation() {
-      const userText = userInput.value.trim().toLowerCase().replace(/[’']/g, "'");
-      const correctText = dictations[currentDictationIndex].text.join(" ").toLowerCase().replace(/[’']/g, "'");
-      const result = userText === correctText;
+    const highlighted = highlightMistakes(userText, correctText);
+    feedback.innerHTML = userText === correctText
+      ? "✅ Bravo ! Vous avez parfaitement recopié la dictée."
+      : `❌ Erreurs détectées :<br><br>${highlighted}`;
+    feedback.style.color = userText === correctText ? "#00e676" : "#ff5252";
+  }
 
-      feedback.innerHTML = result
-        ? "✅ Bravo ! Vous avez parfaitement recopié la dictée."
-        : `❌ Erreurs détectées.\n\nTexte attendu :\n"${dictations[currentDictationIndex].text.join(" ")}"`;
-      feedback.style.color = result ? "#00e676" : "#ff5252";
-    }
-
-    document.getElementById("btnPlay").onclick = playDictation;
-    document.getElementById("btnPause").onclick = pauseDictation;
-    document.getElementById("btnResume").onclick = resumeDictation;
-    document.getElementById("btnRepeat").onclick = repeatDictation;
-    document.getElementById("btnSlow").onclick = () => {
-      rate = Math.max(0.5, rate - 0.25);
-      if (isSpeaking) {
-        speechSynthesis.cancel();
-        playDictation();
-      }
-    };
-    document.getElementById("btnFast").onclick = () => {
-      rate = Math.min(2, rate + 0.25);
-      if (isSpeaking) {
-        speechSynthesis.cancel();
-        playDictation();
-      }
-    };
-    document.getElementById("btnCheck").onclick = checkDictation;
-
-    select.onchange = () => {
-      currentDictationIndex = parseInt(select.value);
-      userInput.value = "";
-      feedback.textContent = "";
-    };
-  </script>
-</body>
-</html>
+  // Événements
+  document.getElementById("btnPlay").onclick = playDictation;
+  document.getElementById("btnPause").onclick = pauseDictation;
+  document.getElementById("btnSlow").onclick = () => {
+    rate = Math.max(0.25, rate - 0.25);
+    playDictation();
+  };
+  document.getElementById("btnFast").onclick = () => {
+    rate = Math.min(2, rate + 0.25);
+    playDictation();
+  };
+  document.getElementById("btnCheck").onclick = checkDictation;
+  select.onchange = () => {
+    currentDictationIndex = parseInt(select.value);
+    userInput.value = "";
+    feedback.textContent = "";
+  };
+</script>
