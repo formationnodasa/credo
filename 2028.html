@@ -1,209 +1,181 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dictée Interactive</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       margin: 0;
       padding: 20px;
     }
 
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
     .container {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 16px;
       max-width: 700px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
     }
 
     h1 {
-      text-align: center;
-      font-size: 24px;
       margin-bottom: 20px;
+      font-size: 1.8rem;
     }
 
     select, textarea, button {
       width: 100%;
+      margin-top: 12px;
       padding: 12px;
-      font-size: 16px;
-      margin-top: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
     }
 
     textarea {
+      height: 180px;
       resize: vertical;
+      background: rgba(255,255,255,0.9);
+      color: #333;
     }
 
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    select {
+      background: rgba(255,255,255,0.9);
+      color: #333;
     }
 
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    .button-row {
+    .buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
-    .button-row button {
-      flex: 1 1 calc(50% - 10px);
-    }
-
-    #message {
-      margin-top: 20px;
+    .buttons button {
+      flex: 1 1 calc(33.33% - 10px);
+      background: #fff;
+      color: #2575fc;
       font-weight: bold;
-      font-size: 16px;
-      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .buttons button:hover {
+      background: #2575fc;
+      color: #fff;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 1.2em;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📝 Dictée Interactive</h1>
 
-    <label for="textSelect">Choisissez une dictée :</label>
-    <select id="textSelect">
+  <div class="container">
+    <h1>📜 Dictée Interactive</h1>
+
+    <select id="dictationSelect">
       <option value="laboureur">Le laboureur et ses enfants</option>
       <option value="cigale">La Cigale et la Fourmi</option>
     </select>
 
-    <div class="button-row">
+    <div class="buttons">
       <button onclick="playDictation()">▶️ Écouter</button>
-      <button onclick="pauseOrResumeDictation()">⏸️ Pause / Reprendre</button>
       <button onclick="slowDown()">🐢 Ralentir</button>
-      <button onclick="resetSpeed()">🚀 Vitesse normale</button>
+      <button onclick="speedUp()">🐇 Accélérer</button>
+      <button onclick="checkDictation()">✅ Vérifier</button>
     </div>
 
-    <textarea id="userInput" rows="10" placeholder="Tape ici ta dictée..."></textarea>
-    <button onclick="checkDictation()">✅ Vérifier</button>
+    <textarea id="userInput" placeholder="Écris ici ta dictée..."></textarea>
 
-    <div id="message"></div>
+    <div id="result"></div>
   </div>
 
   <script>
     const dictations = {
-      laboureur: `Travaillez, prenez de la peine :
-C'est le fonds qui manque le moins.
-Un riche Laboureur, sentant sa mort prochaine,
-Fit venir ses enfants, leur parla sans témoins.
-Gardez-vous, leur dit-il, de vendre l'héritage
-Que nous ont laissé nos parents.
-Un trésor est caché dedans.
-Je ne sais pas l'endroit ; mais un peu de courage
-Vous le fera trouver, vous en viendrez à bout.
-Remuez votre champ dès qu'on aura fait l'Oût.
-Creusez, fouillez, bêchez ; ne laissez nulle place
-Où la main ne passe et repasse.
-Le père mort, les fils vous retournent le champ
-Deçà, delà, partout ; si bien qu'au bout de l'an
-Il en rapporta davantage.
-D'argent, point de caché. Mais le père fut sage
-De leur montrer avant sa mort
-Que le travail est un trésor.`,
-
-      cigale: `La Cigale, ayant chanté Tout l'été,
-Se trouva fort dépourvue Quand la bise fut venue : Pas un seul petit morceau De mouche ou de vermisseau.
-Elle alla crier famine Chez la Fourmi sa voisine, La priant de lui prêter Quelque grain pour subsister Jusqu'à la saison nouvelle. « Je vous paierai, lui dit-elle, Avant l'août, foi d'animal, Intérêt et principal. »
-La Fourmi n'est pas prêteuse : C'est là son moindre défaut.
-« Que faisiez-vous au temps chaud ? Dit-elle à cette emprunteuse.
-— Nuit et jour à tout venant
-Je chantais, ne vous déplaise.
-— Vous chantiez ? j'en suis fort aise ; Eh bien dansez maintenant. »`
+      laboureur: `Travaillez, prenez de la peine :\nC'est le fonds qui manque le moins.\nUn riche Laboureur, sentant sa mort prochaine,\nFit venir ses enfants, leur parla sans témoins.\nGardez-vous, leur dit-il, de vendre l'héritage\nQue nous ont laissé nos parents.\nUn trésor est caché dedans.\nJe ne sais pas l'endroit ; mais un peu de courage\nVous le fera trouver, vous en viendrez à bout.\nRemuez votre champ dès qu'on aura fait l'Oût.\nCreusez, fouillez, bêchez ; ne laissez nulle place\nOù la main ne passe et repasse.\nLe père mort, les fils vous retournent le champ\nDeçà, delà, partout ; si bien qu'au bout de l'an\nIl en rapporta davantage.\nD'argent, point de caché. Mais le père fut sage\nDe leur montrer avant sa mort\nQue le travail est un trésor.`,
+      cigale: `La Cigale, ayant chanté Tout l'été,\nSe trouva fort dépourvue Quand la bise fut venue :\nPas un seul petit morceau De mouche ou de vermisseau.\nElle alla crier famine Chez la Fourmi sa voisine,\nLa priant de lui prêter Quelque grain pour subsister\nJusqu'à la saison nouvelle. « Je vous paierai, lui dit-elle,\nAvant l'août, foi d'animal, Intérêt et principal. »\nLa Fourmi n'est pas prêteuse : C'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ? Dit-elle à cette emprunteuse.\n— Nuit et jour à tout venant Je chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise ; Eh bien dansez maintenant. »`
     };
 
-    let utterance = null;
-    let speechRate = 1;
+    let rate = 1.0;
+    const minRate = 0.5;
+    const maxRate = 2.0;
 
-    function getSelectedText() {
-      const select = document.getElementById("textSelect");
-      return dictations[select.value];
-    }
-
-    function convertPunctuation(text) {
-      return text
-        .replace(/:/g, " deux-points ")
-        .replace(/;/g, " point-virgule ")
-        .replace(/\./g, " point ")
-        .replace(/,/g, " virgule ")
-        .replace(/«/g, " ouvrez les guillemets ")
-        .replace(/»/g, " fermez les guillemets ")
-        .replace(/—/g, " tiret ")
-        .replace(/\?/g, " point d'interrogation ")
-        .replace(/\!/g, " point d'exclamation ")
-        .replace(/\n/g, ". ");
+    function speak(text) {
+      if (!speechSynthesis) return;
+      speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(
+        text
+          .replace(/:/g, " deux-points ")
+          .replace(/;/g, " point-virgule ")
+          .replace(/\./g, " point ")
+          .replace(/,/g, " virgule ")
+          .replace(/\n/g, ". ")
+      );
+      utt.lang = 'fr-FR';
+      utt.rate = rate;
+      speechSynthesis.speak(utt);
     }
 
     function playDictation() {
-      const text = convertPunctuation(getSelectedText());
-      if (!("speechSynthesis" in window)) {
-        alert("La synthèse vocale n'est pas disponible.");
-        return;
-      }
-
-      speechSynthesis.cancel();
-      utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = speechRate;
-
-      // Voix masculine si disponible
-      const voices = window.speechSynthesis.getVoices();
-      const maleVoice = voices.find(v => v.lang.startsWith("fr") && v.name.toLowerCase().includes("homme"));
-      if (maleVoice) utterance.voice = maleVoice;
-
-      speechSynthesis.speak(utterance);
-    }
-
-    function pauseOrResumeDictation() {
-      if (speechSynthesis.speaking) {
-        if (speechSynthesis.paused) {
-          speechSynthesis.resume();
-        } else {
-          speechSynthesis.pause();
-        }
-      }
+      const sel = document.getElementById('dictationSelect').value;
+      speak(dictations[sel]);
     }
 
     function slowDown() {
-      speechRate = Math.max(0.2, speechRate - 0.1);
+      rate = Math.max(minRate, rate - 0.1);
       playDictation();
     }
 
-    function resetSpeed() {
-      speechRate = 1.0;
+    function speedUp() {
+      rate = Math.min(maxRate, rate + 0.1);
       playDictation();
+    }
+
+    function normalize(str) {
+      return str
+        .toLowerCase()
+        .replace(/[.,;:!?«»"”“’‘]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
 
     function checkDictation() {
-      const original = getSelectedText().replace(/\s+/g, " ").trim().toLowerCase();
-      const user = document.getElementById("userInput").value.replace(/\s+/g, " ").trim().toLowerCase();
-      const message = document.getElementById("message");
+      const sel = document.getElementById('dictationSelect').value;
+      const original = normalize(dictations[sel]);
+      const user = normalize(document.getElementById('userInput').value);
+      const res = document.getElementById('result');
 
       if (user === original) {
-        message.textContent = "✅ Bravo ! Ta dictée est parfaitement correcte.";
-        message.style.color = "green";
+        res.textContent = '✅ Parfait, ta dictée est exacte !';
+        res.style.color = '#00e676';
       } else {
-        message.textContent = "❌ Il y a des erreurs dans ta dictée. Réécoute et corrige-toi.";
-        message.style.color = "red";
+        res.textContent = '❌ Des erreurs restent à corriger.';
+        res.style.color = '#ff5252';
       }
     }
-
-    // Nécessaire sur certains navigateurs
-    window.speechSynthesis.onvoiceschanged = () => {};
   </script>
 </body>
 </html>
