@@ -71,7 +71,7 @@
     }
 
     .buttons button {
-      flex: 1 1 calc(33.33% - 10px);
+      flex: 1 1 calc(50% - 10px);
       background: #fff;
       color: #2575fc;
       font-weight: bold;
@@ -88,6 +88,7 @@
       margin-top: 15px;
       font-weight: bold;
       min-height: 1.2em;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -103,6 +104,7 @@
 
     <div class="buttons">
       <button onclick="playDictation()">▶️ Écouter</button>
+      <button onclick="togglePause()">⏸️ Pause / Reprendre</button>
       <button onclick="slowDown()">🐢 Ralentir</button>
       <button onclick="speedUp()">🐇 Accélérer</button>
       <button onclick="checkDictation()">✅ Vérifier</button>
@@ -119,34 +121,79 @@
       cigale: `La Cigale, ayant chanté Tout l'été,\nSe trouva fort dépourvue Quand la bise fut venue :\nPas un seul petit morceau De mouche ou de vermisseau.\nElle alla crier famine Chez la Fourmi sa voisine,\nLa priant de lui prêter Quelque grain pour subsister\nJusqu'à la saison nouvelle. « Je vous paierai, lui dit-elle,\nAvant l'août, foi d'animal, Intérêt et principal. »\nLa Fourmi n'est pas prêteuse : C'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ? Dit-elle à cette emprunteuse.\n— Nuit et jour à tout venant Je chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise ; Eh bien dansez maintenant. »`
     };
 
-    let rate = 0.5; // Lecture plus lente par défaut
+    let rate = 0.5;
     const minRate = 0.25;
     const maxRate = 2.0;
+    let paused = false;
+    let speaking = false;
+    let queue = [];
+
+    function getVoice() {
+      const voices = speechSynthesis.getVoices();
+      return voices.find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes('homme')) || voices.find(v => v.lang === 'fr-FR');
+    }
 
     function speak(text) {
-      if (!speechSynthesis) return;
       speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(
-        text
-          .replace(/:/g, " deux-points ")
-          .replace(/;/g, " point-virgule ")
-          .replace(/\./g, " point ")
-          .replace(/,/g, " virgule ")
-          .replace(/\n/g, ". ")
-      );
-      utt.lang = 'fr-FR';
-      utt.rate = rate;
+      queue = [];
 
-      const voices = window.speechSynthesis.getVoices();
-      const maleVoice = voices.find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes('homme'));
-      if (maleVoice) utt.voice = maleVoice;
+      const parts = text
+        .replace(/\n/g, ' ')
+        .split(/([.,;:!?])/g)
+        .filter(p => p.trim() !== '');
 
-      speechSynthesis.speak(utt);
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i].trim();
+        if (part === '') continue;
+
+        const utterance = new SpeechSynthesisUtterance(part);
+        utterance.lang = 'fr-FR';
+        utterance.voice = getVoice();
+        utterance.rate = rate;
+
+        queue.push(utterance);
+
+        if (/[.,;:!?]/.test(part)) {
+          queue.push('pause');
+        }
+      }
+
+      speaking = true;
+      playQueue();
+    }
+
+    async function playQueue() {
+      for (let item of queue) {
+        while (paused) await new Promise(r => setTimeout(r, 100));
+        if (!speaking) return;
+
+        if (item === 'pause') {
+          await new Promise(r => setTimeout(r, 5000));
+        } else {
+          speechSynthesis.speak(item);
+          await new Promise(resolve => {
+            item.onend = resolve;
+          });
+        }
+      }
+      speaking = false;
     }
 
     function playDictation() {
       const sel = document.getElementById('dictationSelect').value;
+      paused = false;
+      speaking = true;
       speak(dictations[sel]);
+    }
+
+    function togglePause() {
+      if (!speaking) return;
+      paused = !paused;
+      if (paused) {
+        speechSynthesis.pause();
+      } else {
+        speechSynthesis.resume();
+      }
     }
 
     function slowDown() {
@@ -169,18 +216,20 @@
 
     function checkDictation() {
       const sel = document.getElementById('dictationSelect').value;
-      const original = normalize(dictations[sel]);
+      const original = dictations[sel];
+      const originalNormalized = normalize(original);
       const user = normalize(document.getElementById('userInput').value);
       const res = document.getElementById('result');
 
-      if (user === original) {
-        res.textContent = '✅ Parfait, ta dictée est exacte !';
-        res.style.color = '#00e676';
+      if (user === originalNormalized) {
+        res.innerHTML = `<div style="color:#00e676;">✅ Parfait, ta dictée est exacte !</div><pre>${original}</pre>`;
       } else {
-        res.textContent = '❌ Des erreurs restent à corriger.';
-        res.style.color = '#ff5252';
+        res.innerHTML = `<div style="color:#ff5252;">❌ Des erreurs restent à corriger.</div><pre>${original}</pre>`;
       }
     }
+
+    // S'assure que les voix sont chargées (important pour certains navigateurs)
+    window.speechSynthesis.onvoiceschanged = () => {};
   </script>
 </body>
 </html>
