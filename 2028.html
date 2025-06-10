@@ -188,103 +188,73 @@ Il dédaigna les poissons faciles, et finit par manger un limaçon.`
       );
     }
 
-    function speak(text) {
-      speechSynthesis.cancel();
-      queue = [];
+function speak(text) {
+  speechSynthesis.cancel();
+  queue = [];
 
-      const parts = text
-        .replace(/\n/g, ' ')
-        .split(/([.,;:!?])/g)
-        .filter(p => p.trim() !== '')
-        .map(part => {
-          if (part === '.') return 'point';
-          if (part === ',') return 'virgule';
-          if (part === ';') return 'point-virgule';
-          if (part === ':') return 'deux-points';
-          if (part === '!') return 'point d\'exclamation';
-          if (part === '?') return 'point d\'interrogation';
-          return part.trim();
-        });
+  const parts = text
+    .replace(/\n/g, ' ')
+    .split(/([.,;:!?])/g)
+    .filter(p => p.trim() !== '')
+    .map(part => {
+      if (part === '.') return 'point';
+      if (part === ',') return 'virgule';
+      if (part === ';') return 'point-virgule';
+      if (part === ':') return 'deux-points';
+      if (part === '!') return 'point d\'exclamation';
+      if (part === '?') return 'point d\'interrogation';
+      return part.trim();
+    });
 
-      for (let part of parts) {
-        const utterance = new SpeechSynthesisUtterance(part);
-        utterance.lang = 'fr-FR';
-        utterance.voice = getVoice();
-        utterance.rate = rate;
+  for (let part of parts) {
+    const utterance = new SpeechSynthesisUtterance(part);
+    utterance.lang = 'fr-FR';
+    utterance.voice = getVoice();
+    utterance.rate = rate;
 
-        queue.push(utterance);
+    queue.push({ type: 'speak', utterance });
 
-        if (['point', 'virgule', 'point-virgule', 'deux-points', 'point d\'exclamation', 'point d\'interrogation'].includes(part)) {
-          queue.push('pause');
-        }
-      }
-
-      speaking = true;
-      playQueue();
+    if (['point', 'virgule', 'point-virgule', 'deux-points', 'point d\'exclamation'].includes(part)) {
+      queue.push({ type: 'pause', duration: 500 });
+    } else if (part === 'point d\'interrogation') {
+      queue.push({ type: 'pause', duration: 5000 }); // 5 secondes après '?'
     }
+  }
 
-    async function playQueue() {
-      for (let item of queue) {
-        while (paused) await new Promise(r => setTimeout(r, 100));
-        if (!speaking) return;
+  speaking = true;
+  playQueue();
+}
 
-        if (item === 'pause') {
-          await new Promise(r => setTimeout(r, 500));
-        } else {
-          speechSynthesis.speak(item);
-          await new Promise(resolve => {
-            item.onend = resolve;
-          });
-        }
-      }
+async function playQueue() {
+  for (let item of queue) {
+    while (paused) await new Promise(r => setTimeout(r, 100));
+    if (!speaking) return;
 
-      speaking = false;
+    if (item.type === 'pause') {
+      await new Promise(r => setTimeout(r, item.duration));
+    } else if (item.type === 'speak') {
+      speechSynthesis.speak(item.utterance);
+      await new Promise(resolve => {
+        item.utterance.onend = resolve;
+      });
     }
+  }
 
-    function playDictation() {
-      const selected = document.getElementById('dictationSelect').value;
-      const text = dictations[selected];
-      if (text) {
-        paused = false;
-        speaking = true;
-        speak(text);
-      }
-    }
+  speaking = false;
+}
 
-    function togglePause() {
-      paused = !paused;
-      if (paused) {
-        speechSynthesis.pause();
-      } else {
-        speechSynthesis.resume();
-      }
-    }
+function checkDictation() {
+  const selected = document.getElementById('dictationSelect').value;
+  const originalText = dictations[selected];
+  const normalizedOriginal = originalText.replace(/\s+/g, ' ').trim().toLowerCase();
+  const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim().toLowerCase();
 
-    function slowDown() {
-      if (rate > minRate) {
-        rate -= 0.1;
-        if (rate < minRate) rate = minRate;
-      }
-    }
+  const resultMessage = normalizedOriginal === userText
+    ? '✅ Parfait ! Aucune erreur détectée.\n\n'
+    : '❌ Il y a des différences. Relis ta dictée et réessaie !\n\n';
 
-    function speedUp() {
-      if (rate < maxRate) {
-        rate += 0.1;
-        if (rate > maxRate) rate = maxRate;
-      }
-    }
-
-    function checkDictation() {
-      const selected = document.getElementById('dictationSelect').value;
-      const original = dictations[selected].replace(/\s+/g, ' ').trim().toLowerCase();
-      const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim().toLowerCase();
-
-      const result = original === userText
-        ? '✅ Parfait ! Aucune erreur détectée.'
-        : '❌ Il y a des différences. Relis ta dictée et réessaie !';
-
-      document.getElementById('result').textContent = result;
-    }
+  document.getElementById('result').textContent = resultMessage + "📜 Texte original :\n" + originalText;
+}
 
     // Chargement des voix
     window.speechSynthesis.onvoiceschanged = () => {
