@@ -100,6 +100,13 @@
     <select id="dictationSelect">
       <option value="laboureur">Le Laboureur et ses enfants</option>
       <option value="cigale">La Cigale et la Fourmi</option>
+      <option value="lievre">Le Lièvre et la Tortue</option>
+      <option value="corbeau">Le Corbeau et le Renard</option>
+      <option value="grenouille">La Grenouille et le Bœuf</option>
+      <option value="fourmi">La Fourmi et la Sauterelle</option>
+      <option value="tortue">La Tortue et le Lièvre</option>
+      <option value="agneau">Le Loup et l’Agneau</option>
+      <option value="heron">L’Héron</option>
     </select>
 
     <div class="buttons">
@@ -130,81 +137,114 @@ Remuez votre champ dès qu'on aura fait l'Oût.
 Creusez, fouillez, bêchez ; ne laissez nulle place
 Où la main ne passe et repasse...`,
 
-      cigale: `La Cigale, ayant chanté tout l'été,
-Se trouva fort dépourvue quand la bise fut venue :
-Pas un seul petit morceau de mouche ou de vermisseau.
-Elle alla crier famine chez la Fourmi sa voisine...`
+      cigale: `La Cigale, ayant chanté Tout l'été,
+Se trouva fort dépourvue Quand la bise fut venue :
+Pas un seul petit morceau De mouche ou de vermisseau.
+Elle alla crier famine Chez la Fourmi sa voisine...`,
+
+      lievre: `Tout le monde savait que le Lièvre était l'animal le plus rapide...
+Un jour, le Lièvre proposa une course à la Tortue. La Chouette donna le départ.
+Le Lièvre partit vite, s'arrêta pour dormir... et la Tortue gagna la course.`,
+
+      tortue: `Rien ne sert de courir ; il faut partir à point.
+Le Lièvre et la Tortue en sont un témoignage...
+La Tortue arriva la première. Eh bien ! lui cria-t-elle, avais-je pas raison ?`,
+
+      corbeau: `Maître Corbeau, sur un arbre perché,
+Tenait en son bec un fromage.
+Maître Renard, par l'odeur alléché,
+Lui tint à peu près ce langage : ...`,
+
+      grenouille: `Une Grenouille vit un Bœuf Qui lui sembla de belle taille.
+Elle qui n'était pas grosse en tout comme un œuf,
+Envieuse s'étend, s'enfle, et crève...`,
+
+      fourmi: `Nous étions au milieu de l'hiver, un jour clair et glacial...
+La Sauterelle affamée demanda des graines à la Fourmi,
+Mais cette dernière lui répondit que ceux qui ne travaillent pas auront faim.`,
+
+      agneau: `La raison du plus fort est toujours la meilleure :
+Un Agneau se désaltérait Dans le courant d'une onde pure.
+Un Loup survint à jeun et l'accusa faussement...
+Il le mangea.`,
+
+      heron: `Un jour, sur ses longs pieds, allait je ne sais où,
+Le Héron au long bec emmanché d'un long cou...
+Il dédaigna les poissons faciles, et finit par manger un limaçon.`
     };
 
-    let rate = 0.9;
-    const minRate = 0.5;
+    let rate = 0.5;
+    const minRate = 0.25;
     const maxRate = 2.0;
     let paused = false;
     let speaking = false;
     let queue = [];
+    let voice = null;
 
     function getVoice() {
       const voices = speechSynthesis.getVoices();
-      return voices.find(v => v.lang === 'fr-FR') || voices[0];
+      // On garde la même voix dans la variable globale
+      if (!voice) {
+        voice = voices.find(v => v.lang === 'fr-FR' && /thomas|paul|yves|homme/i.test(v.name)) || voices.find(v => v.lang === 'fr-FR');
+      }
+      return voice;
     }
 
     function speak(text) {
       speechSynthesis.cancel();
       queue = [];
 
+      // Découpe en parties mots/ponctuations
       const parts = text
         .replace(/\n/g, ' ')
         .split(/([.,;:!?])/g)
-        .filter(p => p.trim() !== '')
-        .map(part => {
-          if (part === '.') return 'point';
-          if (part === ',') return 'virgule';
-          if (part === ';') return 'point-virgule';
-          if (part === ':') return 'deux-points';
-          if (part === '!') return 'point d\'exclamation';
-          if (part === '?') return 'point d\'interrogation';
-          return part.trim();
-        });
+        .filter(p => p.trim() !== '');
 
-      for (let i = 0; i < parts.length; i++) {
-  const part = parts[i];
-  const utterance = new SpeechSynthesisUtterance(part);
-  utterance.lang = 'fr-FR';
-  utterance.voice = getVoice();
-  utterance.rate = rate;
-
-  queue.push(utterance);
-
-  // Ajouter une pause après la ponctuation
-  if (['point', 'virgule', 'point-virgule', 'deux-points', 'point d\'exclamation', 'point d\'interrogation'].includes(part)) {
-    let pauseDuration = 500; // durée par défaut
-    if (part === 'point d\'interrogation') pauseDuration = 5000;
-    queue.push({ type: 'pause', duration: pauseDuration });
-  }
-}
+      for (let part of parts) {
+        // Création de l'énoncé à lire
+        let utterance = null;
+        if (['.', ',', ';', ':', '!', '?'].includes(part)) {
+          // On lit la ponctuation sous forme orale (optionnel)
+          // ou on peut ne rien lire et juste faire pause
+          utterance = new SpeechSynthesisUtterance(part); 
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          // Marque cette utterance comme ponctuation pour pause plus longue
+          utterance.isPunctuation = true;
+        } else {
+          utterance = new SpeechSynthesisUtterance(part.trim());
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          utterance.isPunctuation = false;
+        }
+        queue.push(utterance);
+      }
 
       speaking = true;
       playQueue();
     }
 
     async function playQueue() {
-  for (let item of queue) {
-    while (paused) await new Promise(r => setTimeout(r, 100));
-    if (!speaking) return;
+      for (let utterance of queue) {
+        while (paused) await new Promise(r => setTimeout(r, 100));
+        if (!speaking) return;
 
-    if (typeof item === 'object' && item.type === 'pause') {
-      await new Promise(r => setTimeout(r, item.duration));
-    } else {
-      speechSynthesis.speak(item);
-      await new Promise(resolve => {
-        item.onend = resolve;
-      });
+        speechSynthesis.speak(utterance);
+        await new Promise(resolve => {
+          utterance.onend = resolve;
+        });
+
+        // Pause de 5 secondes après une ponctuation, sinon pause de 0.5s
+        if (utterance.isPunctuation) {
+          await new Promise(r => setTimeout(r, 5000)); 
+        } else {
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+      speaking = false;
     }
-  }
-
-  speaking = false;
-}
-
 
     function playDictation() {
       const selected = document.getElementById('dictationSelect').value;
@@ -226,26 +266,32 @@ Elle alla crier famine chez la Fourmi sa voisine...`
     }
 
     function slowDown() {
-      if (rate > minRate) rate = Math.max(rate - 0.1, minRate);
+      if (rate > minRate) {
+        rate -= 0.1;
+        if (rate < minRate) rate = minRate;
+      }
     }
 
     function speedUp() {
-      if (rate < maxRate) rate = Math.min(rate + 0.1, maxRate);
+      if (rate < maxRate) {
+        rate += 0.1;
+        if (rate > maxRate) rate = maxRate;
+      }
     }
 
-function checkDictation() {
-  const selected = document.getElementById('dictationSelect').value;
-  const originalText = dictations[selected];
-  const original = originalText.replace(/\s+/g, ' ').trim().toLowerCase();
-  const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim().toLowerCase();
+    function checkDictation() {
+      const selected = document.getElementById('dictationSelect').value;
+      const original = dictations[selected].replace(/\s+/g, ' ').trim();
+      const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim();
 
-  const result = original === userText
-    ? '✅ Parfait ! Aucune erreur détectée.'
-    : '❌ Il y a des différences. Relis ta dictée et réessaie !';
+      const isExact = original.toLowerCase() === userText.toLowerCase();
 
-  document.getElementById('result').innerHTML = result + `\n\n📜 Texte original :\n${originalText}`;
-}
+      const result = isExact
+        ? '✅ Parfait ! Aucune erreur détectée.'
+        : '❌ Il y a des différences. Relis ta dictée et réessaie !';
 
+      document.getElementById('result').textContent = `${result}\n\n--- Dictée originale ---\n${original}`;
+    }
 
     window.speechSynthesis.onvoiceschanged = () => {
       getVoice();
