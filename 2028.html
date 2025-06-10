@@ -1,214 +1,157 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Dictées – La Fontaine</title>
-    <style>
-        body {
-            background: linear-gradient(270deg, #8e44ad, #3498db);
-            background-size: 600% 600%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #fff;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dictée Interactive</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 800px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
 
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 15px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            border: none;
-            resize: vertical;
-            outline: none;
-            margin-bottom: 15px;
-        }
+    select, textarea, button {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: none;
+      outline: none;
+    }
 
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
+    textarea {
+      height: 200px;
+      resize: vertical;
+    }
 
-        button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 8px;
-            background: #fff;
-            color: #3498db;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    button {
+      background-color: #fff;
+      color: #2575fc;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-        button:hover {
-            background: #3498db;
-            color: #fff;
-        }
+    button:hover {
+      background-color: #2575fc;
+      color: white;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    }
 
-        #feedback {
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            white-space: pre-line;
-        }
-    </style>
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      white-space: pre-wrap;
+    }
+
+    .correct { color: #00e676; }
+    .incorrect { color: #ff5252; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Dictées – Fables de La Fontaine</h1>
-        <div>
-            <label for="dictationSelect">Choisissez une dictée :</label>
-            <select id="dictationSelect">
-                <option value="0">Dictée 1 – Le Laboureur et ses enfants</option>
-                <option value="1">Dictée 2 – La Cigale et la Fourmi</option>
-            </select>
-        </div>
-        <br>
-        <textarea id="userInput" placeholder="Recopiez la dictée ici après l'écoute..."></textarea>
-        <div class="buttons">
-            <button id="btnPlay">▶️ Écouter</button>
-            <button id="btnRepeat">🔄 Répéter</button>
-            <button id="btnSlow">🐢 Ralentir</button>
-            <button id="btnPause">⏸️ Pause</button>
-            <button id="btnResume">▶️ Reprendre</button>
-            <button id="btnCheck">✅ Corriger</button>
-        </div>
-        <div id="feedback"></div>
-    </div>
+  <div class="container">
+    <h1>📜 Dictée Interactive</h1>
+    <select id="dictationSelect">
+      <option value="0">Le laboureur et ses enfants</option>
+      <option value="1">La Cigale et la Fourmi</option>
+    </select>
 
-    <script>
-        const dictations = [
-            {
-                title: "Le Laboureur et ses enfants",
-                text: [
-                    "Travaillez, prenez de la peine : C'est le fonds qui manque le moins.",
-                    "Un riche Laboureur, sentant sa mort prochaine, fit venir ses enfants, leur parla sans témoins.",
-                    "Gardez-vous, leur dit-il, de vendre l'héritage que nous ont laissé nos parents.",
-                    "Un trésor est caché dedans.",
-                    "Je ne sais pas l'endroit ; mais un peu de courage vous le fera trouver, vous en viendrez à bout.",
-                    "Remuez votre champ dès qu'on aura fait l'Oût.",
-                    "Creusez, fouillez, bêchez ; ne laissez nulle place où la main ne passe et repasse.",
-                    "Le père mort, les fils vous retournent le champ deçà, delà, partout ; si bien qu'au bout de l'an, il en rapporta davantage.",
-                    "D'argent, point de caché. Mais le père fut sage de leur montrer avant sa mort que le travail est un trésor."
-                ]
-            },
-            {
-                title: "La Cigale et la Fourmi",
-                text: [
-                    "La Cigale, ayant chanté tout l'été, se trouva fort dépourvue quand la bise fut venue.",
-                    "Pas un seul petit morceau de mouche ou de vermisseau.",
-                    "Elle alla crier famine chez la Fourmi sa voisine, la priant de lui prêter quelque grain pour subsister jusqu'à la saison nouvelle.",
-                    "« Je vous paierai, lui dit-elle, avant l'août, foi d'animal, intérêt et principal. »",
-                    "La Fourmi n'est pas prêteuse : C'est là son moindre défaut.",
-                    "« Que faisiez-vous au temps chaud ? » dit-elle à cette emprunteuse.",
-                    "— Nuit et jour à tout venant je chantais, ne vous déplaise.",
-                    "— Vous chantiez ? j'en suis fort aise ; eh bien dansez maintenant."
-                ]
-            }
-        ];
+    <textarea id="userInput" placeholder="Écris ici ta dictée..."></textarea>
 
-        let currentDictationIndex = 0;
-        let rate = 1;
-        let paused = false;
-        let currentUtterance = null;
+    <button onclick="speakDictation()">🎧 Écouter</button>
+    <button onclick="checkDictation()">✔️ Vérifier</button>
 
-        const userInput = document.getElementById("userInput");
-        const feedback = document.getElementById("feedback");
-        const select = document.getElementById("dictationSelect");
+    <div id="result" class="result"></div>
+  </div>
 
-        function formatPunctuation(text) {
-            return text.replace(/[,;:.!?]/g, match => `${match} `);
-        }
+  <script>
+    const dictations = [
+`Travaillez, prenez de la peine :
+C'est le fonds qui manque le moins.
+Un riche Laboureur, sentant sa mort prochaine,
+Fit venir ses enfants, leur parla sans témoins.
+Gardez-vous, leur dit-il, de vendre l'héritage
+Que nous ont laissé nos parents.
+Un trésor est caché dedans.
+Je ne sais pas l'endroit ; mais un peu de courage
+Vous le fera trouver, vous en viendrez à bout.
+Remuez votre champ dès qu'on aura fait l'Oût.
+Creusez, fouillez, bêchez ; ne laissez nulle place
+Où la main ne passe et repasse.
+Le père mort, les fils vous retournent le champ
+Deçà, delà, partout ; si bien qu'au bout de l'an
+Il en rapporta davantage.
+D'argent, point de caché. Mais le père fut sage
+De leur montrer avant sa mort
+Que le travail est un trésor.`,
 
-        function playDictation() {
-            speechSynthesis.cancel(); // Évite les doublons
-            const textToPlay = dictations[currentDictationIndex].text.join(" ");
-            currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
-            currentUtterance.rate = rate;
-            currentUtterance.onend = () => { paused = false; };
-            speechSynthesis.speak(currentUtterance);
-        }
+`La Cigale, ayant chanté Tout l'été,
+Se trouva fort dépourvue Quand la bise fut venue : Pas un seul petit morceau De mouche ou de vermisseau.
+Elle alla crier famine Chez la Fourmi sa voisine, La priant de lui prêter Quelque grain pour subsister Jusqu'à la saison nouvelle. « Je vous paierai, lui dit-elle, Avant l'août, foi d'animal, Intérêt et principal. »
+La Fourmi n'est pas prêteuse : C'est là son moindre défaut.
+« Que faisiez-vous au temps chaud ? Dit-elle à cette emprunteuse.
+— Nuit et jour à tout venant
+Je chantais, ne vous déplaise.
+— Vous chantiez ? j'en suis fort aise ; Eh bien dansez maintenant. »`
+    ];
 
-        function repeatDictation() {
-            speechSynthesis.cancel();
-            playDictation();
-        }
+    function speakDictation() {
+      const index = document.getElementById("dictationSelect").value;
+      const text = dictations[index];
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "fr-FR";
+      utterance.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
 
-        function slowDown() {
-            rate = Math.max(0.5, rate - 0.1);
-            speechSynthesis.cancel();
-            playDictation();
-        }
+    function checkDictation() {
+      const index = document.getElementById("dictationSelect").value;
+      const original = dictations[index].replace(/\s+/g, ' ').trim().toLowerCase();
+      const user = document.getElementById("userInput").value.replace(/\s+/g, ' ').trim().toLowerCase();
 
-        function pauseDictation() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.pause();
-                paused = true;
-            }
-        }
+      const resultDiv = document.getElementById("result");
 
-        function resumeDictation() {
-            if (paused) {
-                speechSynthesis.resume();
-                paused = false;
-            }
-        }
-
-        function checkInput() {
-            const originalText = dictations[currentDictationIndex].text.join(" ");
-            const userText = userInput.value.trim();
-            if (userText === originalText) {
-                feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
-            } else {
-                feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n\n" + originalText;
-            }
-        }
-
-        document.getElementById("btnPlay").addEventListener("click", playDictation);
-        document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
-        document.getElementById("btnSlow").addEventListener("click", slowDown);
-        document.getElementById("btnPause").addEventListener("click", pauseDictation);
-        document.getElementById("btnResume").addEventListener("click", resumeDictation);
-        document.getElementById("btnCheck").addEventListener("click", checkInput);
-
-        select.addEventListener("change", function() {
-            currentDictationIndex = parseInt(this.value, 10); // Corrigé
-            userInput.value = "";
-            feedback.textContent = "";
-            playDictation(); // relancer automatiquement à chaque changement ?
-        });
-
-        playDictation(); // démarrage
-    </script>
+      if (original === user) {
+        resultDiv.innerHTML = "<span class='correct'>✅ Bravo ! La dictée est correcte.</span>";
+      } else {
+        resultDiv.innerHTML = "<span class='incorrect'>❌ Il y a des erreurs dans la dictée.</span><br><br>";
+        resultDiv.innerHTML += "<strong>Texte original :</strong><br>" + dictations[index];
+      }
+    }
+  </script>
 </body>
 </html>
