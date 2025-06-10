@@ -166,41 +166,45 @@ Elle alla crier famine chez la Fourmi sa voisine...`
           return part.trim();
         });
 
-      for (let part of parts) {
-        const utterance = new SpeechSynthesisUtterance(part);
-        utterance.lang = 'fr-FR';
-        utterance.voice = getVoice();
-        utterance.rate = rate;
+      for (let i = 0; i < parts.length; i++) {
+  const part = parts[i];
+  const utterance = new SpeechSynthesisUtterance(part);
+  utterance.lang = 'fr-FR';
+  utterance.voice = getVoice();
+  utterance.rate = rate;
 
-        queue.push({ type: 'speak', utterance });
+  queue.push(utterance);
 
-        if (part === 'point d\'interrogation') {
-          queue.push({ type: 'pause', duration: 5000 });
-        } else if (['point', 'virgule', 'point-virgule', 'deux-points', 'point d\'exclamation'].includes(part)) {
-          queue.push({ type: 'pause', duration: 500 });
-        }
-      }
+  // Ajouter une pause après la ponctuation
+  if (['point', 'virgule', 'point-virgule', 'deux-points', 'point d\'exclamation', 'point d\'interrogation'].includes(part)) {
+    let pauseDuration = 500; // durée par défaut
+    if (part === 'point d\'interrogation') pauseDuration = 5000;
+    queue.push({ type: 'pause', duration: pauseDuration });
+  }
+}
 
       speaking = true;
       playQueue();
     }
 
     async function playQueue() {
-      for (let item of queue) {
-        while (paused) await new Promise(r => setTimeout(r, 100));
-        if (!speaking) return;
+  for (let item of queue) {
+    while (paused) await new Promise(r => setTimeout(r, 100));
+    if (!speaking) return;
 
-        if (item.type === 'pause') {
-          await new Promise(r => setTimeout(r, item.duration));
-        } else if (item.type === 'speak') {
-          speechSynthesis.speak(item.utterance);
-          await new Promise(resolve => {
-            item.utterance.onend = resolve;
-          });
-        }
-      }
-      speaking = false;
+    if (typeof item === 'object' && item.type === 'pause') {
+      await new Promise(r => setTimeout(r, item.duration));
+    } else {
+      speechSynthesis.speak(item);
+      await new Promise(resolve => {
+        item.onend = resolve;
+      });
     }
+  }
+
+  speaking = false;
+}
+
 
     function playDictation() {
       const selected = document.getElementById('dictationSelect').value;
@@ -229,20 +233,19 @@ Elle alla crier famine chez la Fourmi sa voisine...`
       if (rate < maxRate) rate = Math.min(rate + 0.1, maxRate);
     }
 
-    function checkDictation() {
-      const selected = document.getElementById('dictationSelect').value;
-      const original = dictations[selected];
-      const userText = document.getElementById('userInput').value;
+function checkDictation() {
+  const selected = document.getElementById('dictationSelect').value;
+  const originalText = dictations[selected];
+  const original = originalText.replace(/\s+/g, ' ').trim().toLowerCase();
+  const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim().toLowerCase();
 
-      const normalizedOriginal = original.replace(/\s+/g, ' ').trim().toLowerCase();
-      const normalizedUser = userText.replace(/\s+/g, ' ').trim().toLowerCase();
+  const result = original === userText
+    ? '✅ Parfait ! Aucune erreur détectée.'
+    : '❌ Il y a des différences. Relis ta dictée et réessaie !';
 
-      const result = normalizedOriginal === normalizedUser
-        ? '✅ Parfait ! Aucune erreur détectée.\n\n'
-        : '❌ Il y a des erreurs. Relis ta dictée et réessaie !\n\n';
+  document.getElementById('result').innerHTML = result + `\n\n📜 Texte original :\n${originalText}`;
+}
 
-      document.getElementById('result').textContent = result + "📜 Texte original :\n" + original;
-    }
 
     window.speechSynthesis.onvoiceschanged = () => {
       getVoice();
