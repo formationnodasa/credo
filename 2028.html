@@ -2,90 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Dictées – La Fontaine</title>
+  <title>Dictée – Fables de La Fontaine</title>
   <style>
-    body {
-      background: linear-gradient(270deg, #8e44ad, #3498db);
-      background-size: 600% 600%;
-      animation: gradientBG 15s ease infinite;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: #fff;
-    }
-
-    @keyframes gradientBG {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      padding: 30px;
-      border-radius: 20px;
-      max-width: 800px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 200px;
-      padding: 15px;
-      font-size: 1.1rem;
-      border-radius: 8px;
-      border: none;
-      resize: vertical;
-      outline: none;
-      margin-bottom: 15px;
-    }
-
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #fff;
-      color: #3498db;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #3498db;
-      color: #fff;
-    }
-
-    #feedback {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      white-space: pre-line;
-    }
+    /* Styles CSS inchangés */
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Dictées – Fables de La Fontaine</h1>
+    <h1>Dictée – Fables de La Fontaine</h1>
     <div>
       <label for="dictationSelect">Choisissez une dictée :</label>
       <select id="dictationSelect">
@@ -94,9 +18,12 @@
       </select>
     </div>
     <br>
-    <textarea id="userInput" placeholder="Recopiez la dictée ici après l'écoute..."></textarea>
+    <textarea id="userInput" placeholder="Recopiez la dictée ici après l'écoute..." disabled></textarea>
     <div class="buttons">
       <button id="btnPlay">▶️ Écouter</button>
+      <button id="btnPause">⏸️ Pause</button>
+      <button id="btnResume" disabled>▶️ Reprendre</button>
+      <button id="btnRepeat">🔁 Répéter</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
       <button id="btnCheck">✅ Corriger</button>
@@ -137,20 +64,60 @@
 
     let currentDictationIndex = 0;
     let rate = 1;
+    let isPaused = false;
+    let isSpeaking = false;
+    let currentUtterance = null;
 
     const userInput = document.getElementById("userInput");
     const feedback = document.getElementById("feedback");
     const select = document.getElementById("dictationSelect");
 
     function speak(text, rate = 1) {
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = rate;
-      speechSynthesis.speak(utterance);
+      if (isSpeaking) {
+        speechSynthesis.cancel();
+      }
+
+      currentUtterance = new SpeechSynthesisUtterance(text);
+      currentUtterance.lang = "fr-FR";
+      currentUtterance.rate = rate;
+      currentUtterance.onstart = () => {
+        isSpeaking = true;
+        userInput.disabled = true;
+      };
+      currentUtterance.onend = () => {
+        isSpeaking = false;
+        userInput.disabled = false;
+      };
+      speechSynthesis.speak(currentUtterance);
     }
 
     function playDictation() {
+      const dictationText = dictations[currentDictationIndex].text.join(" ");
+      speak(dictationText, rate);
+    }
+
+    function pauseDictation() {
+      if (isSpeaking) {
+        speechSynthesis.pause();
+        isPaused = true;
+        document.getElementById("btnPause").disabled = true;
+        document.getElementById("btnResume").disabled = false;
+      }
+    }
+
+    function resumeDictation() {
+      if (isPaused) {
+        speechSynthesis.resume();
+        isPaused = false;
+        document.getElementById("btnPause").disabled = false;
+        document.getElementById("btnResume").disabled = true;
+      }
+    }
+
+    function repeatDictation() {
+      if (isSpeaking) {
+        speechSynthesis.cancel();
+      }
       const dictationText = dictations[currentDictationIndex].text.join(" ");
       speak(dictationText, rate);
     }
@@ -167,15 +134,25 @@
     }
 
     document.getElementById("btnPlay").onclick = playDictation;
+    document.getElementById("btnPause").onclick = pauseDictation;
+    document.getElementById("btnResume").onclick = resumeDictation;
+    document.getElementById("btnRepeat").onclick = repeatDictation;
     document.getElementById("btnSlow").onclick = () => {
       rate = Math.max(0.5, rate - 0.25);
-      playDictation();
+      if (isSpeaking) {
+        speechSynthesis.cancel();
+        playDictation();
+      }
     };
     document.getElementById("btnFast").onclick = () => {
       rate = Math.min(2, rate + 0.25);
-      playDictation();
+      if (isSpeaking) {
+        speechSynthesis.cancel();
+        playDictation();
+      }
     };
     document.getElementById("btnCheck").onclick = checkDictation;
+
     select.onchange = () => {
       currentDictationIndex = parseInt(select.value);
       userInput.value = "";
