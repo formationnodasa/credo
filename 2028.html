@@ -18,20 +18,20 @@
         }
 
         @keyframes gradientBG {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             padding: 30px;
             border-radius: 20px;
             max-width: 800px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
@@ -137,86 +137,78 @@
             }
         ];
 
-    
-         <script>
-    const dictations = [/* ton tableau inchangé */];
+        let currentDictationIndex = 0;
+        let rate = 1;
+        let paused = false;
+        let currentUtterance = null;
 
-    let currentDictationIndex = 0;
-    let rate = 1;
-    let paused = false;
-    let currentUtterance = null;
+        const userInput = document.getElementById("userInput");
+        const feedback = document.getElementById("feedback");
+        const select = document.getElementById("dictationSelect");
 
-    const userInput = document.getElementById("userInput");
-    const feedback = document.getElementById("feedback");
-    const select = document.getElementById("dictationSelect");
+        function formatPunctuation(text) {
+            return text.replace(/[,;:.!?]/g, match => `${match} `);
+        }
 
-    function formatPunctuation(text) {
-        return text.replace(/[,;:.!?]/g, match => `${match} `);
-    }
+        function playDictation() {
+            speechSynthesis.cancel(); // Évite les doublons
+            const textToPlay = dictations[currentDictationIndex].text.join(" ");
+            currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
+            currentUtterance.rate = rate;
+            currentUtterance.onend = () => { paused = false; };
+            speechSynthesis.speak(currentUtterance);
+        }
 
-    function playDictation() {
-        speechSynthesis.cancel(); // 🔄 Pour éviter les chevauchements
-        const textToPlay = dictations[currentDictationIndex].text.join(" ");
-        currentUtterance = new SpeechSynthesisUtterance(formatPunctuation(textToPlay));
-        currentUtterance.rate = rate;
-        currentUtterance.onend = () => {
-            paused = false;
-        };
-        speechSynthesis.speak(currentUtterance);
-    }
-
-    function repeatDictation() {
-        if (currentUtterance) {
+        function repeatDictation() {
             speechSynthesis.cancel();
             playDictation();
-        } else {
+        }
+
+        function slowDown() {
+            rate = Math.max(0.5, rate - 0.1);
+            speechSynthesis.cancel();
             playDictation();
         }
-    }
 
-    function slowDown() {
-        rate = Math.max(0.5, rate - 0.1);
-        speechSynthesis.cancel();
-        playDictation();
-    }
-
-    function pauseDictation() {
-        if (speechSynthesis.speaking) {
-            speechSynthesis.pause();
-            paused = true;
+        function pauseDictation() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.pause();
+                paused = true;
+            }
         }
-    }
 
-    function resumeDictation() {
-        if (paused) {
-            speechSynthesis.resume();
-            paused = false;
+        function resumeDictation() {
+            if (paused) {
+                speechSynthesis.resume();
+                paused = false;
+            }
         }
-    }
 
-    function checkInput() {
-        const originalText = dictations[currentDictationIndex].text.join(" ");
-        const userText = userInput.value.trim();
-        if (userText === originalText) {
-            feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
-        } else {
-            feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n" + originalText;
+        function checkInput() {
+            const originalText = dictations[currentDictationIndex].text.join(" ");
+            const userText = userInput.value.trim();
+            if (userText === originalText) {
+                feedback.textContent = "✅ Bravo ! Vous avez bien recopié la dictée.";
+            } else {
+                feedback.textContent = "❌ Incorrect. Voici la dictée correcte :\n\n" + originalText;
+            }
         }
-    }
 
-    document.getElementById("btnPlay").addEventListener("click", playDictation);
-    document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
-    document.getElementById("btnSlow").addEventListener("click", slowDown);
-    document.getElementById("btnPause").addEventListener("click", pauseDictation);
-    document.getElementById("btnResume").addEventListener("click", resumeDictation);
-    document.getElementById("btnCheck").addEventListener("click", checkInput);
+        document.getElementById("btnPlay").addEventListener("click", playDictation);
+        document.getElementById("btnRepeat").addEventListener("click", repeatDictation);
+        document.getElementById("btnSlow").addEventListener("click", slowDown);
+        document.getElementById("btnPause").addEventListener("click", pauseDictation);
+        document.getElementById("btnResume").addEventListener("click", resumeDictation);
+        document.getElementById("btnCheck").addEventListener("click", checkInput);
 
-    select.addEventListener("change", function() {
-        currentDictationIndex = parseInt(this.value, 10); // 🔧 Correction ici
-        userInput.value = "";
-        feedback.textContent = "";
-    });
+        select.addEventListener("change", function() {
+            currentDictationIndex = parseInt(this.value, 10); // Corrigé
+            userInput.value = "";
+            feedback.textContent = "";
+            playDictation(); // relancer automatiquement à chaque changement ?
+        });
 
-    // Démarrage automatique
-    playDictation();
-</script>
+        playDictation(); // démarrage
+    </script>
+</body>
+</html>
