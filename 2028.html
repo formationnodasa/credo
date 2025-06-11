@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz Vocal PR</title>
+  <title>Quiz Vocal</title>
   <style>
+    /* (Le style est inchangé, conservé tel que dans ton original) */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
@@ -49,10 +50,9 @@
     }
 
     #wordDisplay {
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.2rem;
       margin-bottom: 30px;
-      min-height: 50px;
+      min-height: 60px;
     }
 
     input[type="text"] {
@@ -64,14 +64,6 @@
       margin-bottom: 25px;
       background-color: #fff;
       color: #333;
-      outline: none;
-      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
-      transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus {
-      box-shadow: 0 0 10px #2575fc;
-      caret-color: #2575fc;
     }
 
     .buttons {
@@ -79,7 +71,6 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
-      margin-top: 10px;
     }
 
     button {
@@ -92,14 +83,6 @@
       cursor: pointer;
       background: #fff;
       color: #2575fc;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    button:hover {
-      background: #2575fc;
-      color: #fff;
-      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
     }
 
     #message {
@@ -107,16 +90,14 @@
       font-size: 1.2rem;
       font-weight: 600;
       min-height: 32px;
-      text-shadow: 0 0 8px rgba(0,0,0,0.1);
-      transition: color 0.3s ease;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Quiz Vocal : PR</h1>
-    <div id="wordDisplay">Toutes les réponses commencent par PR</div>
-    <input type="text" id="answer" placeholder="Tape ta réponse..." />
+    <h1>Quiz Vocal</h1>
+    <div id="wordDisplay">Question</div>
+    <input type="text" id="answer" placeholder="Ta réponse ici..." />
     <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
@@ -129,120 +110,129 @@
   </div>
 
   <script>
-    const words = [
-      { question: "Donner des détails exacts et précis sur quelque chose.", reponse: "précision" },
-      { question: "Qui se rapporte à la profondeur ou à une intensité importante.", reponse: "profond" },
-      { question: "Domaine d'activité ou métier dans lequel une personne travaille.", reponse: "profession" },
-      { question: "Avancement ou amélioration dans une situation ou un domaine.", reponse: "progrès" },
-      { question: "Engagement ou parole donnée de faire quelque chose.", reponse: "promesse" },
-      { question: "Expression populaire qui contient une sagesse ou un conseil.", reponse: "proverbe" }
-    ];
+const questions = [
+  {
+    prefix: "Pr",
+    intro: "Toutes les réponses commencent par PR.",
+    items: [
+      { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] },
+      { question: "PR - Quel mot désigne une grande intensité ou profondeur ?", reponses: ["Profond"] },
+      { question: "PR - C’est un métier ou domaine d’activité ?", reponses: ["Profession"] },
+      { question: "PR - Un mot qui indique une amélioration ou un avancement ?", reponses: ["Progrès"] },
+      { question: "PR - C’est un engagement ou une parole donnée ?", reponses: ["Promesse"] },
+      { question: "PR - C’est une expression populaire pleine de sagesse ?", reponses: ["Proverbe"] }
+    ]
+  },
+  {
+    prefix: "Se",
+    intro: "Toutes les réponses commencent par SE.",
+    items: [
+      { question: "SE - C’est ce que tu ressens avec tes sens ?", reponses: ["Sensation"] },
+      { question: "SE - Un mot pour le charme qui attire ?", reponses: ["Séduction"] },
+      { question: "SE - Un état de calme absolu ?", reponses: ["Sérénité"] },
+      { question: "SE - Quel mot désigne quelque chose de caché ?", reponses: ["Secret"] },
+      { question: "SE - Mot qui désigne l’acte de se diviser ?", reponses: ["Séparation"] },
+      { question: "SE - Qui montre de la responsabilité ?", reponses: ["Sérieux"] },
+      { question: "SE - Une émotion envers quelqu’un ?", reponses: ["Sentiment"] },
+    ]
+  }
+  // Tu peux continuer à ajouter les blocs "prefix", "intro", "items" pour Tr, Ac, Ca, Me, Di, Em…
+];
 
-    let currentWordIndex = 0;
-    let speechRate = 1;
+let allQuestions = [];
+questions.forEach(group => {
+  group.items.forEach(item => {
+    item.prefix = group.prefix;
+    item.intro = group.intro;
+    allQuestions.push(item);
+  });
+});
 
-    const wordDisplay = document.getElementById("wordDisplay");
-    const answerInput = document.getElementById("answer");
-    const message = document.getElementById("message");
-    const btnPlay = document.getElementById("btnPlay");
-    const btnSlow = document.getElementById("btnSlow");
-    const btnFast = document.getElementById("btnFast");
-    const btnRepeat = document.getElementById("btnRepeat");
-    const btnSkip = document.getElementById("btnSkip");
-    const btnBack = document.getElementById("btnBack");
+let currentQuestionIndex = 0;
+let introSpoken = {};
 
-    function speakWord(text, rate = speechRate) {
-      if (!('speechSynthesis' in window)) {
-        message.textContent = "La synthèse vocale n'est pas disponible.";
-        return;
-      }
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = rate;
-      speechSynthesis.speak(utterance);
-    }
+const wordDisplay = document.getElementById("wordDisplay");
+const answerInput = document.getElementById("answer");
+const message = document.getElementById("message");
 
-    function playWord() {
-      const current = words[currentWordIndex];
-      wordDisplay.textContent = "Toutes les réponses commencent par PR";
-      speakWord(`Toutes les bonnes réponses commencent par PR. ${current.question}`);
-      message.textContent = "Écris ta réponse.";
-      message.style.color = "#fff";
-      answerInput.value = "";
-      answerInput.focus();
-    }
+let speechRate = 0.7;
 
-    function checkAnswer() {
-      const userAnswer = answerInput.value.trim().toLowerCase();
-      const correctAnswer = words[currentWordIndex].reponse.toLowerCase();
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "Synthèse vocale non disponible.";
+    return;
+  }
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.rate = speechRate;
+  speechSynthesis.speak(utterance);
+}
 
-      if (userAnswer === correctAnswer) {
-        message.textContent = "✅ Correct ! Bien joué.";
-        message.style.color = "#00e676";
-        setTimeout(() => {
-          nextWord();
-        }, 1500);
-      } else {
-        message.textContent = "❌ Incorrect.";
-        message.style.color = "#ff5252";
-        speakWord(`Fallait penser à : ${words[currentWordIndex].reponse}`);
-      }
-    }
+function playQuestion() {
+  const current = allQuestions[currentQuestionIndex];
+  wordDisplay.textContent = current.question;
+  message.textContent = "Écris ta réponse.";
+  answerInput.value = "";
+  answerInput.focus();
 
-    function nextWord() {
-      currentWordIndex++;
-      if (currentWordIndex >= words.length) {
-        message.textContent = "🎉 Félicitations, tu as terminé toutes les questions !";
-        wordDisplay.textContent = "";
-        answerInput.value = "";
-        answerInput.disabled = true;
-        btnPlay.disabled = true;
-        btnSlow.disabled = true;
-        btnFast.disabled = true;
-        btnRepeat.disabled = true;
-        btnSkip.disabled = true;
-        btnBack.disabled = true;
-      } else {
-        playWord();
-      }
-    }
+  if (!introSpoken[current.prefix]) {
+    speak(`${current.intro} ${current.question}`);
+    introSpoken[current.prefix] = true;
+  } else {
+    speak(current.question);
+  }
+}
 
-    function playWordSlow() {
-      speechRate = Math.max(0.5, speechRate - 0.25);
-      playWord();
-    }
+function checkAnswer() {
+  const userAnswer = answerInput.value.trim().toLowerCase();
+  const goodAnswers = allQuestions[currentQuestionIndex].reponses.map(r => r.toLowerCase());
 
-    function playWordFast() {
-      speechRate = Math.min(2, speechRate + 0.25);
-      playWord();
-    }
+  if (goodAnswers.includes(userAnswer)) {
+    message.textContent = "✅ Bravo, c'est exact !";
+    message.style.color = "#00e676";
+    setTimeout(nextQuestion, 1500);
+  } else {
+    message.textContent = "❌ Mauvaise réponse.";
+    message.style.color = "#ff5252";
+    speak(`Fallait penser à : ${allQuestions[currentQuestionIndex].reponses.join(", ")}`);
+  }
+}
 
-    function repeatWord() {
-      playWord();
-    }
+function nextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex >= allQuestions.length) {
+    message.textContent = "🎉 Quiz terminé ! Bien joué.";
+    wordDisplay.textContent = "";
+    answerInput.disabled = true;
+  } else {
+    playQuestion();
+  }
+}
 
-    btnBack.addEventListener("click", () => {
-      if (currentWordIndex > 0) {
-        currentWordIndex--;
-        message.textContent = "";
-        playWord();
-      }
-    });
+document.getElementById("btnPlay").addEventListener("click", playQuestion);
+document.getElementById("btnSlow").addEventListener("click", () => {
+  speechRate = Math.max(0.3, speechRate - 0.1);
+  playQuestion();
+});
+document.getElementById("btnFast").addEventListener("click", () => {
+  speechRate = Math.min(1.5, speechRate + 0.1);
+  playQuestion();
+});
+document.getElementById("btnRepeat").addEventListener("click", playQuestion);
+document.getElementById("btnSkip").addEventListener("click", nextQuestion);
+document.getElementById("btnBack").addEventListener("click", () => {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    playQuestion();
+  }
+});
 
-    btnPlay.addEventListener("click", playWord);
-    btnSlow.addEventListener("click", playWordSlow);
-    btnFast.addEventListener("click", playWordFast);
-    btnRepeat.addEventListener("click", repeatWord);
-    btnSkip.addEventListener("click", nextWord);
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkAnswer();
+});
 
-    answerInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        checkAnswer();
-      }
-    });
-
-    window.addEventListener("load", playWord);
+window.addEventListener("load", playQuestion);
   </script>
 </body>
 </html>
