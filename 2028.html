@@ -586,129 +586,122 @@ Internet permet aujourd’hui de communiquer instantanément.`,
 };
 
 
-    let rate = 0.5;
-    const minRate = 0.25;
-    const maxRate = 2.0;
-    let paused = false;
-    let speaking = false;
-    let queue = [];
-    let voice = null;
+<script>
+  let rate = 0.9;
+  const minRate = 0.25;
+  const maxRate = 2.0;
+  let paused = false;
+  let speaking = false;
+  let queue = [];
+  let voice = null;
 
-    function getVoice() {
-      const voices = speechSynthesis.getVoices();
-      // On garde la même voix dans la variable globale
-      if (!voice) {
-        voice = voices.find(v => v.lang === 'fr-FR' && /thomas|paul|yves|homme/i.test(v.name)) || voices.find(v => v.lang === 'fr-FR');
-      }
-      return voice;
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function loadVoices() {
+    return new Promise(resolve => {
+      let voices = speechSynthesis.getVoices();
+      if (voices.length) return resolve(voices);
+
+      speechSynthesis.onvoiceschanged = () => {
+        resolve(speechSynthesis.getVoices());
+      };
+    });
+  }
+
+  async function getVoice() {
+    const voices = await loadVoices();
+    // Choix d'une voix française, homme si possible
+    voice = voices.find(v => v.lang === 'fr-FR' && /homme|male|paul|thomas|yves/i.test(v.name)) ||
+            voices.find(v => v.lang === 'fr-FR') ||
+            voices[0]; // fallback
+    return voice;
+  }
+
+  async function speak(text) {
+    await getVoice();
+    speechSynthesis.cancel();
+    queue = [];
+
+    const parts = text
+      .replace(/\n/g, ' ')
+      .split(/([.,;:!?])/g)
+      .filter(p => p.trim() !== '');
+
+    for (let part of parts) {
+      let utter = new SpeechSynthesisUtterance(part.trim());
+      utter.voice = voice;
+      utter.lang = 'fr-FR';
+      utter.rate = rate;
+      utter.isPunctuation = ['.', ',', ';', ':', '!', '?'].includes(part);
+      queue.push(utter);
     }
 
-    function speak(text) {
-      speechSynthesis.cancel();
-      queue = [];
+    speaking = true;
+    playQueue();
+  }
 
-      // Découpe en parties mots/ponctuations
-      const parts = text
-        .replace(/\n/g, ' ')
-        .split(/([.,;:!?])/g)
-        .filter(p => p.trim() !== '');
+  async function playQueue() {
+    for (let utter of queue) {
+      if (!speaking) return;
 
-      for (let part of parts) {
-        // Création de l'énoncé à lire
-        let utterance = null;
-        if (['.', ',', ';', ':', '!', '?'].includes(part)) {
-          // On lit la ponctuation sous forme orale (optionnel)
-          // ou on peut ne rien lire et juste faire pause
-          utterance = new SpeechSynthesisUtterance(part); 
-          utterance.lang = 'fr-FR';
-          utterance.voice = getVoice();
-          utterance.rate = rate;
-          // Marque cette utterance comme ponctuation pour pause plus longue
-          utterance.isPunctuation = true;
-        } else {
-          utterance = new SpeechSynthesisUtterance(part.trim());
-          utterance.lang = 'fr-FR';
-          utterance.voice = getVoice();
-          utterance.rate = rate;
-          utterance.isPunctuation = false;
-        }
-        queue.push(utterance);
-      }
+      while (paused) await wait(100);
 
-      speaking = true;
-      playQueue();
-    }
+      const finished = new Promise(resolve => {
+        utter.onend = resolve;
+      });
 
-    async function playQueue() {
-      for (let utterance of queue) {
-        while (paused) await new Promise(r => setTimeout(r, 100));
-        if (!speaking) return;
+      speechSynthesis.speak(utter);
+      await finished;
 
-        speechSynthesis.speak(utterance);
-        await new Promise(resolve => {
-          utterance.onend = resolve;
-        });
-
-        // Pause de 5 secondes après une ponctuation, sinon pause de 0.5s
-        if (utterance.isPunctuation) {
-          await new Promise(r => setTimeout(r, 5000)); 
-        } else {
-          await new Promise(r => setTimeout(r, 500));
-        }
-      }
-      speaking = false;
-    }
-
-    function playDictation() {
-      const selected = document.getElementById('dictationSelect').value;
-      const text = dictations[selected];
-      if (text) {
-        paused = false;
-        speaking = true;
-        speak(text);
-      }
-    }
-
-    function togglePause() {
-      paused = !paused;
-      if (paused) {
-        speechSynthesis.pause();
+      if (utter.isPunctuation) {
+        await wait(1000); // 1s pause pour ponctuation
       } else {
-        speechSynthesis.resume();
+        await wait(200); // courte pause entre phrases
       }
     }
+    speaking = false;
+  }
 
-    function slowDown() {
-      if (rate > minRate) {
-        rate -= 0.1;
-        if (rate < minRate) rate = minRate;
-      }
+  function playDictation() {
+    const selected = document.getElementById('dictationSelect').value;
+    const text = dictations[selected];
+    if (text) {
+      paused = false;
+      speaking = true;
+      speak(text);
     }
+  }
 
-    function speedUp() {
-      if (rate < maxRate) {
-        rate += 0.1;
-        if (rate > maxRate) rate = maxRate;
-      }
+  function togglePause() {
+    paused = !paused;
+    if (paused) {
+      speechSynthesis.pause();
+    } else {
+      speechSynthesis.resume();
     }
+  }
 
-    function checkDictation() {
-      const selected = document.getElementById('dictationSelect').value;
-      const original = dictations[selected].replace(/\s+/g, ' ').trim();
-      const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim();
+  function slowDown() {
+    rate = Math.max(rate - 0.1, minRate);
+  }
 
-      const isExact = original.toLowerCase() === userText.toLowerCase();
+  function speedUp() {
+    rate = Math.min(rate + 0.1, maxRate);
+  }
 
-      const result = isExact
-        ? '✅ Parfait ! Aucune erreur détectée.'
-        : '❌ Il y a des différences. Relis ta dictée et réessaie !';
+  function checkDictation() {
+    const selected = document.getElementById('dictationSelect').value;
+    const original = dictations[selected].replace(/\s+/g, ' ').trim();
+    const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim();
 
-      document.getElementById('result').textContent = `${result}\n\n--- Dictée originale ---\n${original}`;
-    }
+    const isExact = original.toLowerCase() === userText.toLowerCase();
+    const result = isExact
+      ? '✅ Parfait ! Aucune erreur détectée.'
+      : '❌ Il y a des différences. Relis ta dictée et réessaie !';
 
-    window.speechSynthesis.onvoiceschanged = () => {
-      getVoice();
-    };
-  </script>
-</body>
-</html>
+    document.getElementById('result').textContent =
+      `${result}\n\n--- Dictée originale ---\n${original}`;
+  }
+</script>
