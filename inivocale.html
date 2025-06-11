@@ -1,0 +1,683 @@
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Module Épellation Vocal du dictionnaire - Liste Complète</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-weight: 800;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #wordDisplay {
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      margin-bottom: 30px;
+      min-height: 50px;
+    }
+
+    input[type="text"] {
+      font-size: 1.4rem;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      margin-bottom: 25px;
+      background-color: #fff;
+      color: #333;
+      outline: none;
+      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #2575fc;
+      caret-color: #2575fc;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background: #2575fc;
+      color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    }
+
+    #message {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 32px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.1);
+      transition: color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Épellation vocale des mots du dictionnaire </h1>
+    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+          const words = [
+   
+
+"Mapéra", "Initiatique", "Idéal", "Spiritualité", "Martyr", "Yahvé ( YHWH)", "Slogan", "Joseph Mukasa Balikuddembe", "Athanase Bazzekuketta", "Matthias Mulumba", "Charles Lwanga", "Kizito", "MUGAGGA LUBOWA", "Gyavira Musoke", "Mukasa Kiriwawanvu", "Ambroise Kibuka", "Achille Kiwanuka", "Luc Banabakintu", "Adolphe Mukasa Ludigo", "Anatole KIRIGGWAJJO", "Jacques Buzabaliawo", "Bruno Serunkuma", "Mbaga Tuzinde", "André Kaggwa", "Denis ssebuggwawo", "Pontien Ngondwe", "Jean-Marie Muzeyi", "Noé Mawaggali", "Gonzague GONZA", "Tibère : Empereur romain", "Buganda : Royaume de l’Ouganda", "Bunyoro : Royaume de l’Ouganda", "Toro : Royaume de l’Ouganda", "Ankolé : Royaume de l’Ouganda", "Karagwe : Royaume de l’Ouganda", "Kabaka", "Mutesa", "Mukasa - Kasima", "Lwanga - Kahenga", "Kaggwa - Meka", "Mulumba - Bakoma", "Nyondo", "Mwanga", "Lubiri :", "Bel’ange :", "Rubaga - Maïka", "Mityana - Ibambi", "Mengo - Pawa-Vube", "Namugongo - Isiro", "Bûcher", "Bourreau", "Senkole", "Katikkiro", "Munyonyo", "Mugatto", "Singo", "Simon Lourdel", "Siméon Sebutta", "Denis Kamyaka", "Charles Werabé", "Béatitude", "Béatification", "Canonisation", "Marie-Clémentine Anuarité Nengapeta :", "Wamba", "Amisi Batshuru Batobobo : père de la bienheureuse Anuarite", "ISUDE Julienne : Mère de la bienheureuse Anuarite", "Leontine : Soeur aînée d’Anuarite", "Pauline : Soeur cadette d’Anuarite", "Bafwabaka", "Justin Segbande", "Noviciat", "Paquet d’eau", "Mangandja", "Inguéré", "Tamari", "Dogme", "Maternité divine", "Virginité perpétuelle", "Immaculée Conception", "Assomption", "Kim ( jeu de Kim )", "Rudyard Kipling", "Lurgan ( personnage du jeu de Kim )", "Scoutisme ( Fondateur Baden Powell )", "Robert Baden Powell", "Joseph Mobutu", "Laurent-Désiré Kabila", "Flambeau", "Boka et Lutumba ( Hymne National)", "Assistant Spirituel", "Colonie de vacances", "LIKONZI", "Libanga", "Efelo", "Libota", "Excursion", "Anselme Masua ( créateur de l’hymne des K.A )", "Sainte Marie - Goretti ( sa paroisse )", "Zaïrois ( habitant du zaïre )", "Foulard ( insigne initiatique )", "Sacerdotal", "Pastoral", "Apostolat", "Décanal", "Sacerdoce", "Mijerca", "Diocèse", "Doyenné", "Stagiaire", "Metanoïa ( 22 ème leçon 4 ème voyage )", "Maranatha ( 22 ème leçon 4 ème voyage )", "Mission ( 22 ème leçon 4 ème voyage )", "Libala ya Mwinda ( 22 ème leçon 4 ème voyage )", "Secourisme", "Alcool", "Vermifuge", "Ouate", "Phaspholgel", "Plaie", "Morsure", "Médecin", "Venin", "Asphyxier", "Paracetamol", "Aiguillon", "Thermomètre", "Sparadrap", "Analgésique", "Antipyrétique", "Antihistaminique", "Pansement", "Technologie", "Léonard Santedi ( Co-fondateur du groupe K.A )", "Paroissien", "Paroissial", "Botomolo", "Cabane", "Engagement", "Cérémonie", "Pierre Bosangia ( Mapera Boss )", "Boboto / Bondeko", "Shaloom", "Bienheureuse", "Mnémonique", "Clanique", "Ouganda", "Diocésain", "Encadreur", "Aumônier", "Aumônerie", "Hiérarchie", "Jamaa Takatifu", "Batelier", "Cravate", "Voyage", "Noeud", "Décoration", "La jachère", "Tabora", "païen", "Kigowa", "Kiwatule", "Matthieu Kisule", "catéchisme", "Évêque Anglican", "Muwafu", "Moïse Mukasa", "Kirugi", "Béatifier", "Canoniser", "Hannington", "Kirimânyi", "Père Giraud", "Père Amans", "Sebo Kabaka", "Dr Lambert Swert", "Ngalo ( Histoire d’Anuarité )", "Olombe", "Yuma Deo", "Simba", "Baganda", "Écrevisse", "Araignée", "Hygiène", "Chapelle", "Trinité", "Angélus", "Vieille ( Vieille et le méchant voisin )", "Naba", "Baobab : ( conte 1 )", "Louange", "Pentateuque ( 5 livres de Moïse )", "Signalisation routière", "J.P Knight", "Léon Foenquinos", "Thérèse IZAY Kirongozi  ( Robot roulage en 2013 )", "Piéton", "Carrefour", "Samuel FINDLEY Breese Morse (Inventeur du code morse )", "Code Morse", "SOS", "Triduum", "Octave", "Pâques : célèbre la résurrection du Christ.", "pâque : sans majuscule désigne par extension l'agneau pascal", "Panser", "Redemption", "Horloge", "Kyrie", "Homélie", "Credo", "Quête ou offertoire", "Sanctus", "Agnus Dei", "Ave Maria", "Chapelet", "Transfiguration ( Marc 9 , 1-10 )", "Gethsémani", "Flagellation", "Couronnement", "Résurrection", "Ascension", "Assomption", "Pentecôte", "pentecôtisme", "Bricolage", "Orner", "Embellir", "Eucharistique", "Liturgique", "Gloria", "Calomnier", "Idolâtrie", "Crucifix", "Chérubin", "Sémaphore", "Claude Chappe ( inventeur du sémaphore )", "Louis Jacob ( Créateur du sémaphore maritime en 1806 )", "Fanion", "Saint Paul", "Saint Luc", "Tradition", "Magistère", "World wide web ( signification de WWW )", "épilepsie", "Hyperdulie", "Butaka", "Nika", "Conscience", "Préséance", "Mabota", "Katonda", "Seggulu", "Kirimânyi", "Catéchuménat", "Nauséabonde", "Kiwatule", "Majordome", "Espièglerie", "Seigneurie", "Mukama", "Nnyondo", "Mwango", "Mackay", "Matthieu Kisule", "Musulman", "Aime et fais plaisir", "Mukajanga", "Bulange", "Chapelet", "Pape Benoît XV ( Béatifié les martyrs de l’Ouganda )", "Pape Paul VI ( Canonisé les martyrs de l’Ouganda )", "Pape Pie VI ( Proclamé Charles Lwamga comme étant le patron de la jeunesse chrétienne africaine )", "Congrégation", "Servir et faire plaisir", "Légionnaire", "Xavérienne", "Orphelinat", "Kisangani", "Archevêque", "Simba", "Olombe", "Balonnette", "Soeur Bokuma", "Soeur Nabeane", "Pape Jean Paul II ( béatifié la bienheureuse Anuarite )", "Colonel Dep", "Signe Conventionnel", "Tour cheminée", "Chapelle", "Moulin à vent", "Moulin à eau", "Ruine", "Hangar", "Gloire au père ( Gloria Patri )", "Notre père ( Pater Noster )", "Je vous salue Marie ( Ave Maria)", "Ngonga Malu", "Pentateuque", "Livres Poétiques et sapientiaux", "Livres prophétiques", "Corpus Paulinnien", "Limitrophe", "Croquis", "Position Ready", "Hanse", "Ka-Botomolo", "Righini-Gombele", "José Moko Ekanga", "Binza", "Abbé Claude Lufungula", "Matonge", "Éléphant", "La devise des Anuarite", "La devise des Kizito", "Prenons courage ( Kizito )", "Aime et fais plaisir ( Anuarite )", "Bon tour", "Vaisselle", "Lessive", "Les principes des KA", "Popvap", "Amexcor", "Organigramme",
+
+  "Fanion", "Drapelet", "A. NTANGU", "E. LUWENGA", "P. MBUYU", "Cardinal Frederic ETSOU", "N'djili",
+  "Eugène MOKE", "Bienvenu NDOMBE", "Benjamin MOLASOKO", "Philippe MASAMBA", "Sébastien MUYENGO",
+  "Révérende Sœur Mimy MONTILI", "Viviane MINIKONGO", "Philippe BUKHETE", "Valentin MPUTU",
+  "YAV (assistant médical)", "Blaise MAKUIZA", "Dominique AMBANGITO", "Gabriel TAMFUMU",
+  "MANGU WA KANIKA", "MULUMBA MUDIBO", "SANTEDI Léonard", "BOSANGIA Pierre", "MPIANA",
+  "EYENGA Emmanuel", "AMBANGITO Dominique", "Michel Gérard", "l'Abbé Kibwila", "Alphonse",
+  "Saint Laurent (Kinshasa-Ngaba)", "Saint Clément (Kinshasa-Makala)", "Théologat Jean XXIII (Kinshasa-Kintambo)",
+  "Allary", "Adumanisa et Ibanda", "Jean-Paul Ier à Righini-Gombele", "Cardinal Malula",
+  "Patrick Monga Mpyana", "Les Pères de Scheut", "COORDINATION DIOCESAINE DES KA", "brochure polycopiée",
+  "MANGOLE", "KAMBU (Histoire d'un clan. les \"KA.\" et la paroisse Saint Cyprien dix ans après 1983 - 1993)",
+  "DE MEESTER", "MARIE - ANDRE", "MONINGA", "DE MEESTER et ROSIER (Martyrs d'Afrique, Témoins de la foi en Christ, Kinshasa, Ed. Loyola, 1991, 80)",
+  "Lisanga", "MAKENGO", "MAKITU", "MBIYA VANGA", "MPANZU", "NTANGU", "LUWENGA", "MBUYU", "ROSIER",
+  "Bamartiru", "BACH", "CHARPENTIER", "DE BLAES (M.) et MILLER (F.)", "DEFOUR", "DE HAES", "DELHEZ",
+  "DEZUTTER", "HUNERMANN", "KALANDA", "LEYSBETH", "MATONDO", "MUSUA", "PAUL",
+  "Pistes (Le scout dans sa patrouille, 5è éd., Dublin, Ed. F.S.C. Scouts Baden Powell de Belgique, 1959)",
+  "Abbé Kalanda", "ROSARIO", "Secourir", "THEUNISSEN", "VATICAN II, Dei Verbum (Constitution sur la Révélation)",
+  "Symptôme", "Denis Kamyaka", "Kiriwawanvu", "probandat", "Chevet", "Sacristie", "Monitrice", "Congo-Kinshasa",
+  "Rébellion", "Halte", "Obscène", "Jupon", "Colonel Deo", "Ta biblia", "Eklesia", "Léproserie",
+  "République du Congo", "République Centrafricaine (RCA)", "Soudan", "Ouganda", "Rwanda", "Burundi",
+  "Tanzanie", "Zambie", "Angola", "Brazzaville", "Bangui", "Khartoum", "Kampala", "Kigali", "Bujumbura",
+  "Dar-es-Salam", "Lusaka", "Luanda", "Analogie", "Alliance", "Bibelots", "Pierres précieuses",
+  "Soixante secondes", "Dispensaire", "Les Campeurs", "Eau malsaine", "Eau potable", "Herbes nouées",
+  "La Zaïroise pour le Zaïre", "La Marseillaise pour la France", "La Brabançonne pour la Belgique",
+  "Logis familial", "Alléché", "Cycliste", "Pied", "Piéton", "Sacrément", "Mongenda", "Siloé", "Le baptême",
+  "Eucharistie", "Confirmation", "L’onction des malades", "Aiguille", "Exhortation", "Révélation",
+  "Vénération de la Vierge Marie", "Annonciation", "Allégresse", "Tressaillit", "Tressaillir", "Grippal",
+  "Courbatures", "Céphalées", "Incubation", "Fatigue", "Analgésique", "Fourmi noire", "Nativité",
+  "Flagellation", "Léopard", "Ricaner", "Je ferai le guet", "Géométrique", "Jouet", "Crèche", "Décoration",
+  "Célébration", "Embellir", "Enrichir", "Apocalypse", "Offrande", "Lavandier", "Solennellement", "Vaisselle",
+  "Lessive", "Repasser", "Médire", "Calomnier", "Idolâtrie", "Fétiche", "Génuflexion", "Pentecôte", "Occasion",
+  "Joseph KASA VUBU", "Patrice Emery LUMUMBA", "Discours historique", "Mgr Laurent MOSENGWO", "Kisangani",
+  "Etienne TSHISEKEDI", "Laurent-Désiré KABILA", "Déchiffrement", "Alphabétique", "Sainte Thérèse de Lisieux",
+  "Mémorisation", "Privilégié", "Maladie du foie", "Fièvre typhoïde", "Rougeole", "Les doigts",
+  "Conjonctivite", "Forgeron", "Nasse", "Échine", "Nœud", "Brandit", "Successeur", "Succession", "Israël",
+  "Israélite", "Église Militante", "Héroïsme", "Universelle", "Mes agneaux", "Galilée", "Noeud de tisserand",
+  "Noeud de pêcheur", "Noeud de vache", "Noeud plat", "Noeud de capucin", "Noeud en huit", "Noeud simple",
+  "Noeud de raccourcissement ou noeud de jambe de chien", "Noeud de chaise simple", "Noeud de batelier",
+  "Choyé", "Conscience et responsabilité", "Tâcher", "Épiscopale", "Bondeko", "Renouveau", "Légion de Marie",
+  "Transgresser", "Bien-fondé", "Torpeur", "Pétrole", "Venimeux", "Dard", "Phénergan", "Longifène",
+  "Stériliser", "Pansement", "Alcool iodé", "Dakin", "Pompe à venin", "Stimulant", "Potassium", "Désinfecter",
+  "Termitière", "Pédiatrie", "Malaria", "Dose", "CHLOROQUINE", "NIVAQUINE", "RESOCHINE", "AVLOQUINE",
+  "S’engourdir", "Lait", "Diluer", "Contre acide", "Craie pulvérisée", "Magnésie", "Contre alcalin",
+  "Jus de citron", "Eau vinaigrée", "Voie buccale", "Thérapeutique", "Toxicité", "DECARIS", "Ascaris",
+  "Ankylostomes", "Anguillules", "Oxyures", "Trichocéphales", "MINTEZOL", "POTION PECTORALE",
+  "ANTIDIARRHEE", "Sérum", "Déshydratation", "Réhydratation", "COLLYRE ARGYROL", "Rhume", "EPHEDRINE",
+  "GOUTTES NASALES", "POUDRE INSECTICIDE", "Baygon", "Baytex p", "Poux", "Puces", "Punaises", "Saupoudrer",
+  "MERCUROCHROME", "Badigeonner", "Muqueuses", "Cutané", "Palabre", "Œil de lynx",
+  "NOTRE SALUT EST DANS LA VIE CHRÉTIENNE", "Fou et bonté", "Utile à la société", "Toujours ami de la vérité",
+  "Cardinal Fridolin Ambongo", "Malongi", "Exécution", "Amitié", "Correction",
+  "Mystères joyeux", "Annonciation", "Visitation", "Nativité", "Présentation de Jésus", "Jésus retrouvé au temple",
+  "Mystères douloureux", "Agonie au jardin des Oliviers", "Couronnement d'épines", "Portement de croix", "Mort du Christ sur la croix",
+  "Mystères glorieux", "Résurrection", "Ascension", "Pentecôte", "Assomption de Marie", "Couronnement de la Vierge",
+  "St. Paul Afrique et Bandari", "Socio-religieux", "Religion", "SELON LE CŒUR DE JÉSUS-CHRIST", "Piété", "Pureté",
+  "Salamu-Amani", "Parallélisme", "COMITÉ DE PARENTS", "Salama", "Dénominateur commun", "DOCTRINALE",
+  "RELIGIEUSE et SPIRITUELLE", "Formation MORALE, INTELLECTUELLE et CIVIQUE", "Formation TECHNIQUE et PRATIQUE",
+  "Sifflet", "La salutation des K.A", "Les devises des K.A", "Persévérance", "Semblable", "La vie publique de Jésus",
+  "Sinon-pierre", "La vie des martyrs de l'Ouganda", "Le martyre d'Anuarite", "Martyr", "Martyre",
+  "Swahili", "Sportif", "Feeling", "Délicatesse", "Discrétion", "Hôte", "Ruineuses", "L'AMOUR-SERVICE", "Consœur",
+  "Messie", "12 apôtres", "Armurier", "Servir et faire plaisir", "Baseane", "Carrefour",
+  "Statuette de l’Immaculée", "Ibamba-Isiro", "Les néophytes", "Ecclésiastique", "Fusil", "Fusillade", "Révolver",
+  "Jour anniversaire de sa naissance au ciel", "Salle d’attente", "Corporelle et vestimentaire", "Prières usuelles",
+  "Enseveli", "Je vous salue Marie", "Gloire au Père", "Notre Père", "Bienfait", "Accablée de désespoir",
+  "Glorifier", "Miséricordieux", "Foi ardente", "Grâce", "Zaïroise", "Djiping", "Excursion",
+  "TOUJOURS PLUS, TOUJOURS PLUS HAUT", "AMOUR ET SACRIFICE", "Pierre-fondation", "Rassemblement", "Prière",
+  "Parole de vie", "Vie en mabota", "Chants et jeux d'ensemble", "Organisation des colonies de vacances",
+  "Causerie", "Rite d'admission ou d'entrée", "Rite de conclusion ou de sortie",
+  "Bilako bya ba Kizito-Anuarite", "Quête", "DEVENIR ENCADREUR DES KA", "RITES D'INITIATION", "Bénéficiaire",
+  "Lucidité", "Henry Morton Stanley", "Tabora", "Ujiji", "Udjiji", "Oudjiji", "Kabeyi", "Père Barbot",
+  "Père Girauld", "Ceefac", "Motema Mosantu", "Légion de Marie Mosantu", "Focolari", "Mieec", "JMV", "JOV",
+
+  "Denis Kamyaka",
+  "Kiriwawanvu",
+  "probandat",
+  "Chevet",
+  "Sacristie",
+  "Monitrice",
+  "Congo-Kinshasa",
+  "Rébellion",
+  "Halte",
+  "Obscène",
+  "Jupon",
+  "Colonel Deo",
+  "Ta biblia",
+  "Eklesia",
+  "léproserie",
+  "République du Congo",
+  "République Centrafricaine (RCA)",
+  "Soudan",
+  "Ouganda",
+  "Rwanda",
+  "Burundi",
+  "Tanzanie",
+  "Zambie",
+  "Angola",
+  "Brazzaville",
+  "Bangui",
+  "Khartoum",
+  "Kampala",
+  "Kigali",
+  "Bujumbura",
+  "Dar-es-Salam",
+  "Lusaka",
+  "Luanda",
+  "Analogie",
+  "Alliance",
+  "Bibelots",
+  "pierres précieuses",
+  "Soixante secondes",
+  "Dispensaire",
+  "Les Campeurs",
+  "Eau malsaine",
+  "Eau potable",
+  "Herbes nouées",
+  "La Zaïroise pour le Zaïre",
+  "La Marseillaise pour la France",
+  "La Brabançonne pour la Belgique",
+  "Logis familial",
+  "Alléché",
+  "Cycliste",
+  "Pied",
+  "Piéton",
+  "Sacrément",
+  "Mongenda",
+  "Siloé",
+  "Le baptême",
+  "Eucharistie",
+  "Confirmation",
+  "L’onction des malades",
+  "Aiguille",
+  "Exhortation",
+  "Révélation",
+  "Vénération de la vierge Marie",
+  "Annonciation",
+  "Allégresse",
+  "Tressaillit",
+  "Tressaillir",
+  "Grippal",
+  "Courbatures",
+  "céphalées",
+  "Incubation",
+  "fatigue",
+  "Analgésique",
+  "Fourmi noire",
+  "Nativité",
+  "Flagellation",
+  "Léopard",
+  "Ricaner",
+  "Je ferai le guet",
+  "Géométrique",
+  "Jouet",
+  "Crèche",
+  "Décoration",
+  "Célébration",
+  "Embellir",
+  "Enrichir",
+  "Apocalypse",
+  "Offrande",
+  "Lavandier",
+  "Solennellement",
+  "Vaisselle",
+  "Lessive",
+  "Repasser",
+  "Médire",
+  "Calomnier",
+  "Idolâtrie",
+  "Fétiche",
+  "génuflexion",
+  "Pentecôte",
+  "Occasion",
+  "Joseph KASA VUBU",
+  "Patrice Emery LUMUMBA",
+  "discours historique",
+  "Mgr Laurent MOSENGWO",
+  "Kisangani",
+  "Etienne TSHISEKEDI",
+  "Laurent-Désiré KABILA",
+  "déchiffrement",
+  "alphabétique",
+  "Sainte Thérèse de Lisieux",
+  "mémorisation",
+  "Privilégié",
+  "maladie du foie",
+  "fièvre typhoïde",
+  "rougeole",
+  "Les doigts",
+  "conjonctivite",
+  "Forgeron",
+  "Nasse",
+  "Échine",
+  "Noeud",
+  "Brandit",
+  "Successeur",
+  "Succession",
+  "Israël",
+  "Israélite",
+  "Église Militante",
+  "Héroïsme",
+  "Universelle",
+  "Mes agneaux",
+  "Galilée",
+  "NOEUD DE TISSERAND",
+  "LE NOEUD DE PECHEUR",
+  "LE NOEUD DE VACHE",
+  "Le NOEUD PLAT",
+  "NOEUD DE CAPUCIN",
+  "NOEUD EN HUIT",
+  "NOEUD SIMPLE",
+  "Le NOEUD DE RACCOURCISSEMENT ou NOEUD DE JAMBE DE CHIEN",
+  "NOEUD DE CHAISE SIMPLE",
+  "NOEUD DE BATELIER",
+  "Choyé",
+  "Conscience et responsabilité",
+  "Tâcher",
+  "Épiscopale",
+  "Bondeko",
+  "Renouveau",
+  "légion de Marie",
+  "transgresser",
+  "bien-fondé",
+  "torpeur",
+  "pétrole",
+  "Venimeux",
+  "Dard",
+  "Phé-nergan",
+  "Longifène",
+  "Stériliser",
+  "Pansement",
+  "Alcool iodé",
+  "Dakin",
+  "Pompe à venin",
+  "Stimulant",
+  "Potassium",
+  "Désinfecter",
+  "Termitière",
+  "Pédiatrie",
+  "Malaria",
+  "Dose",
+  "CHLOROQUINE",
+  "NIVAQUINE",
+  "RESOCHINE",
+  "AVLOQUINE",
+  "S’engourdir",
+  "Lait",
+  "diluer",
+  "Contre acide : craie pulvérisée, magnésie",
+  "Contre alcalin : jus de citron, eau vinaigrée",
+  "voie buccale",
+  "thérapeutique",
+  "toxicité",
+  "DECARIS",
+  "les ascaris",
+  "les ankylostomes",
+  "les anguillules",
+  "les oxyures",
+  "les trichocéphales",
+  "MINTEZOL",
+  "POTION PECTORALE",
+  "ANTIDIARRHEE",
+  "Sérum",
+  "Déshydratation",
+  "Réhydratation",
+  "COLLYRE ARGYROL",
+  "Rhume",
+  "EPHEDRINE",
+  "GOUTTES NASALES",
+  "POUDRE INSECTICIDE",
+  "Baygon",
+  "Baytex p",
+  "poux",
+  "puces",
+  "punaises",
+  "Saupoudrer",
+  "MERCUROCHROME",
+  "badigeonner",
+  "muqueuses",
+  "cutané",
+  "Palabre",
+  "Œil de lynx",
+  "NOTRE SALUT EST DANS LA VIE CHRÉTIENNE",
+  "Fou et bonté",
+  "Utile à la société",
+  "Toujours ami de la vérité",
+  "Cardinal Fridolin Ambongo",
+  "Malongi",
+  "Exécution",
+  "Amitié",
+  "Correction",
+  "Mystères joyeux",
+  "Annonciation",
+  "Visitation",
+  "Nativité",
+  "Présentation de Jésus",
+  "Jésus retrouvé au temple",
+  "Mystères douloureux",
+  "Agonie au jardin des Oliviers",
+  "Couronnement d'épines",
+  "Portement de croix",
+  "Mort du Christ sur la croix",
+  "Mystères glorieux",
+  "Résurrection",
+  "Ascension",
+  "Pentecôte",
+  "Assomption de Marie",
+  "Couronnement de la Vierge Marie",
+  "St. Paul Afrique et Bandari",
+  "Socio-religieux",
+  "Religion",
+  "SELON LE COEUR DE JESUS-CHRIST",
+  "Piété",
+  "Pureté",
+  "Salamu-Amani",
+  "Parallélisme",
+  "COMITE DE PARENTS",
+  "Salama",
+  "Dénominateur commun",
+  "DOCTRINALE",
+  "RELIGIEUSE et SPIRITUELLE",
+  "La formation MORALE, INTELLECTUELLE et CIVIQUE",
+  "La formation TECHNIQUE et PRATIQUE",
+  "Sifflet",
+  "La salutation des K.A",
+  "Les devises des K.A",
+  "Persévérance",
+  "Semblable",
+  "La vie publique de Jésus",
+  "Sinon-pierre",
+  "La vie des martyrs de l'Ouganda",
+  "le martyre d'Anuarite",
+  "Martyr",
+  "le martyre",
+  "swahili",
+  "Sportif",
+  "feeling",
+  "délicatesse",
+  "discrétion",
+  "Hôte",
+  "Ruineuses",
+  "L'AMOUR-SERVICE",
+  "Consœur",
+  "Messie",
+  "12 apôtres",
+  "Armurier",
+  "Servir et faire plaisir",
+  "Baseane",
+  "Carrefour",
+  "Statuette de l’immaculée",
+  "Ibamba-Isiro",
+  "Les néophytes",
+  "Ecclésiastique",
+  "Fusil",
+  "Fusillade",
+  "Révolver",
+  "jour anniversaire de sa naissance au ciel",
+  "Salle d’attente",
+  "Corporelle et vestimentaire",
+  "Prières usuelles",
+  "Enseveli",
+  "Je vous salue Marie",
+  "Gloire au père",
+  "Notre père",
+  "Bienfait",
+  "Accablée de désespoir",
+  "Glorifier",
+  "miséricordieux",
+  "Foi Ardente",
+  "Grâce",
+  "Zaïroise",
+  "Djiping",
+  "Excursion",
+  "TOUJOURS PLUS, TOUJOURS PLUS HAUT",
+  "AMOUR ET SACRIFICE",
+  "Pierre-fondation",
+  "Rassemblement",
+  "prière",
+  "Parole de vie",
+  "Vie en mabota",
+  "Chants et jeux d'ensemble",
+  "Organisation des colonies de vacances",
+  "Causerie",
+  "Rite d'admission ou d'entrée",
+  "Rite de conclusion ou de sortie",
+  "Bilako bya ba Kizito-Anuarite",
+  "Quête",
+  "DEVENIR ENCADREUR DES KA",
+  "RITES D'INITIATION",
+  "Bénéficiaire",
+  "Lucidité",
+  "Henry Morton Stanley",
+  "Tabora",
+  "Ujiji",
+  "Udjiji",
+  "Oudjiji",
+  "Kabeyi",
+  "Père Barbot",
+  "Pere Girauld",
+  "Ceefac",
+  "Motema Mosantu",
+  "Légion de Marie Mosantu",
+  "Focolari",
+  "Mieec",
+  "JMV",
+  "JOV",
+];
+
+
+ 
+
+
+
+
+
+
+    let currentWordIndex = 0;
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+
+    let speechRate = 1;
+
+    function speakWord(word, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
+    }
+
+    function playWord() {
+      const word = words[currentWordIndex];
+      wordDisplay.textContent = "";
+      speakWord(word);
+      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.focus();
+    }
+
+    function playWordSlow() {
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      playWord();
+    }
+
+    function playWordFast() {
+      speechRate = Math.min(2, speechRate + 0.25);
+      playWord();
+    }
+
+    function repeatWord() {
+      playWord();
+    }
+
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const correctAnswer = words[currentWordIndex].toLowerCase();
+      if (userAnswer === correctAnswer) {
+        message.textContent = "✅ Correct !";
+        message.style.color = "#00e676"; // Vert
+        wordDisplay.textContent = correctAnswer;
+        setTimeout(() => {
+          nextWord();
+        }, 1500);
+      } else {
+        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252"; // Rouge
+        spellWord(correctAnswer);
+      }
+    }
+
+    function spellWord(word) {
+      speechSynthesis.cancel();
+      let letters = [...word.replace(/[-\s]/g, "")];
+      let i = 0;
+      function spellNext() {
+        if (i < letters.length) {
+          const utterance = new SpeechSynthesisUtterance(letters[i]);
+          utterance.lang = "fr-FR";
+          utterance.rate = 0.6;
+          utterance.onend = () => {
+            i++;
+            setTimeout(spellNext, 350);
+          };
+          speechSynthesis.speak(utterance);
+        } else {
+          message.textContent = "Réessayez d'écrire le mot.";
+          message.style.color = "#fff";
+          answerInput.value = "";
+          answerInput.focus();
+        }
+      }
+      spellNext();
+    }
+
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        message.textContent = "🎉 Félicitations, vous avez terminé la liste !";
+        wordDisplay.textContent = "";
+        answerInput.value = "";
+        answerInput.disabled = true;
+        btnPlay.disabled = true;
+        btnSlow.disabled = true;
+        btnFast.disabled = true;
+        btnRepeat.disabled = true;
+        btnSkip.disabled = true;
+        btnBack.disabled = true;
+      } else {
+        playWord();
+      }
+    }
+
+    btnBack.addEventListener("click", () => {
+      if (currentWordIndex > 0) {
+        currentWordIndex--;
+        message.textContent = "";
+        playWord();
+      }
+    });
+
+    btnPlay.addEventListener("click", playWord);
+    btnSlow.addEventListener("click", playWordSlow);
+    btnFast.addEventListener("click", playWordFast);
+    btnRepeat.addEventListener("click", repeatWord);
+    btnSkip.addEventListener("click", nextWord);
+
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    playWord(); // lancer au chargement
+  </script>
+</body>
+</html>
