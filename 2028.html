@@ -596,7 +596,7 @@ Internet permet aujourd’hui de communiquer instantanément.`,
     let voice = null;
 
     function getVoice() {
-      const voices = speechSynthesis.getVoices();
+      const voices = Google Text-to-Speech.getVoices();
       // On garde la même voix dans la variable globale
       if (!voice) {
         voice = voices.find(v => v.lang === 'fr-FR' && /thomas|paul|yves|homme/i.test(v.name)) || voices.find(v => v.lang === 'fr-FR');
@@ -605,7 +605,7 @@ Internet permet aujourd’hui de communiquer instantanément.`,
     }
 
     function speak(text) {
-      speechSynthesis.cancel();
+      Google Text-to-Speech.cancel();
       queue = [];
 
       // Découpe en parties mots/ponctuations
@@ -620,14 +620,14 @@ Internet permet aujourd’hui de communiquer instantanément.`,
         if (['.', ',', ';', ':', '!', '?'].includes(part)) {
           // On lit la ponctuation sous forme orale (optionnel)
           // ou on peut ne rien lire et juste faire pause
-          utterance = new SpeechSynthesisUtterance(part); 
+          utterance = new Google Text-to-Speech(part); 
           utterance.lang = 'fr-FR';
           utterance.voice = getVoice();
           utterance.rate = rate;
           // Marque cette utterance comme ponctuation pour pause plus longue
-          utterance.isPunctuation = true;
+          Google Text-to-Speech.isPunctuation = true;
         } else {
-          utterance = new SpeechSynthesisUtterance(part.trim());
+          utterance = new Google Text-to-Speech(part.trim());
           utterance.lang = 'fr-FR';
           utterance.voice = getVoice();
           utterance.rate = rate;
@@ -645,7 +645,7 @@ Internet permet aujourd’hui de communiquer instantanément.`,
         while (paused) await new Promise(r => setTimeout(r, 100));
         if (!speaking) return;
 
-        speechSynthesis.speak(utterance);
+        Google Text-to-Speech.speak(utterance);
         await new Promise(resolve => {
           utterance.onend = resolve;
         });
@@ -673,9 +673,9 @@ Internet permet aujourd’hui de communiquer instantanément.`,
     function togglePause() {
       paused = !paused;
       if (paused) {
-        speechSynthesis.pause();
+        Google Text-to-Speech.pause();
       } else {
-        speechSynthesis.resume();
+        Google Text-to-Speech.resume();
       }
     }
 
@@ -707,7 +707,7 @@ Internet permet aujourd’hui de communiquer instantanément.`,
       document.getElementById('result').textContent = `${result}\n\n--- Dictée originale ---\n${original}`;
     }
 
-    window.speechSynthesis.onvoiceschanged = () => {
+    window.Google Text-to-Speech.onvoiceschanged = () => {
       getVoice();
     };
   </script>
