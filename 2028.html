@@ -1,7 +1,3 @@
-
-
-Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écrire seulement les deux premières lettres, mais plutôt que ça puisse faire en sorte que à chaque fois que on a pu avoir les indices que ça puisse montrer la liste de deux premières lettres et lorsque tu appuieras sur une lettre. Exemple TR, ça te dirigera vers les questions de TR tu as quand tu as appuie sur Ca,… ça te dirigera vers les quiz vocal de ces deux premières lettres
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -97,9 +93,20 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
 
     #prefixList {
       margin-top: 25px;
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: #fff;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .prefix-btn {
+      padding: 8px 15px;
+      background-color: #fff;
+      color: #2575fc;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
     }
 
     #showPrefixesBtn {
@@ -135,22 +142,25 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
 
   <script>
     const questions = [
-      { prefix: "Pr", intro: "Toutes les réponses commencent par PR.", items: [] },
-      { prefix: "Tr", intro: "Toutes les réponses commencent par TR.", items: [] },
-      { prefix: "Ac", intro: "Toutes les réponses commencent par AC.", items: [] },
-      { prefix: "Ca", intro: "Toutes les réponses commencent par CA.", items: [] },
-      { prefix: "Me", intro: "Toutes les réponses commencent par ME.", items: [] },
-      { prefix: "Di", intro: "Toutes les réponses commencent par DI.", items: [] }
+      { prefix: "Pr", intro: "Toutes les réponses commencent par PR.", items: [
+        { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] }
+      ]},
+      { prefix: "Tr", intro: "Toutes les réponses commencent par TR.", items: [
+        { question: "TR - Changement ou métamorphose d'une chose en une autre ?", reponses: ["Transformation"] }
+      ]},
+      { prefix: "Ac", intro: "Toutes les réponses commencent par AC.", items: [
+        { question: "AC - Quel mot désigne un accord entre deux personnes ?", reponses: ["Accord"] }
+      ]},
+      { prefix: "Ca", intro: "Toutes les réponses commencent par CA.", items: [
+        { question: "CA - Mot pour exprimer une grande peur ou désastre ?", reponses: ["Catastrophe"] }
+      ]},
+      { prefix: "Me", intro: "Toutes les réponses commencent par ME.", items: [
+        { question: "ME - Action de se rappeler un souvenir ?", reponses: ["Mémoire"] }
+      ]},
+      { prefix: "Di", intro: "Toutes les réponses commencent par DI.", items: [
+        { question: "DI - Relatif à une fête chrétienne importante ?", reponses: ["Dimanche"] }
+      ]}
     ];
-
-    // Remplir chaque série avec des exemples (extrait pour clarté, tu peux compléter comme avant)
-    questions[0].items = [
-      { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] }
-    ];
-    questions[1].items = [
-      { question: "TR - Changement ou métamorphose d'une chose en une autre ?", reponses: ["Transformation"] }
-    ];
-    // ... (complète les autres séries comme dans ton code initial)
 
     let allQuestions = [];
     questions.forEach(group => {
@@ -162,10 +172,12 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
     });
 
     let currentQuestionIndex = 0;
+    let currentGroup = allQuestions;
     let introSpoken = {};
     const wordDisplay = document.getElementById("wordDisplay");
     const answerInput = document.getElementById("answer");
     const message = document.getElementById("message");
+    const prefixList = document.getElementById("prefixList");
     let speechRate = 0.7;
 
     function speak(text) {
@@ -181,10 +193,12 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
     }
 
     function playQuestion() {
-      const current = allQuestions[currentQuestionIndex];
+      const current = currentGroup[currentQuestionIndex];
+      if (!current) return;
       wordDisplay.textContent = current.question;
       message.textContent = "Écris ta réponse.";
       answerInput.value = "";
+      answerInput.disabled = false;
       answerInput.focus();
       if (!introSpoken[current.prefix]) {
         speak(`${current.intro} ${current.question}`);
@@ -196,7 +210,7 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
 
     function checkAnswer() {
       const userAnswer = answerInput.value.trim().toLowerCase();
-      const goodAnswers = allQuestions[currentQuestionIndex].reponses.map(r => r.toLowerCase());
+      const goodAnswers = currentGroup[currentQuestionIndex].reponses.map(r => r.toLowerCase());
       if (goodAnswers.includes(userAnswer)) {
         message.textContent = "✅ Bravo, c'est exact !";
         message.style.color = "#00e676";
@@ -204,17 +218,27 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
       } else {
         message.textContent = "❌ Mauvaise réponse.";
         message.style.color = "#ff5252";
-        speak(`Fallait penser à : ${allQuestions[currentQuestionIndex].reponses.join(", ")}`);
+        speak(`Fallait penser à : ${currentGroup[currentQuestionIndex].reponses.join(", ")}`);
       }
     }
 
     function nextQuestion() {
       currentQuestionIndex++;
-      if (currentQuestionIndex >= allQuestions.length) {
+      if (currentQuestionIndex >= currentGroup.length) {
         message.textContent = "🎉 Quiz terminé ! Bien joué.";
         wordDisplay.textContent = "";
         answerInput.disabled = true;
       } else {
+        playQuestion();
+      }
+    }
+
+    function resetWithPrefix(prefix) {
+      const group = questions.find(q => q.prefix === prefix);
+      if (group) {
+        currentGroup = group.items;
+        currentQuestionIndex = 0;
+        introSpoken = {};
         playQuestion();
       }
     }
@@ -243,10 +267,16 @@ Fais en sorte que lorsqu’on appuie Voir les indices que ce ne puisse pas écri
 
     window.addEventListener("load", playQuestion);
 
-    // Affichage des préfixes au clic
     document.getElementById("showPrefixesBtn").addEventListener("click", () => {
+      prefixList.innerHTML = "";
       const uniquePrefixes = [...new Set(questions.map(q => q.prefix))];
-      document.getElementById("prefixList").textContent = "Préfixes : " + uniquePrefixes.join(", ");
+      uniquePrefixes.forEach(prefix => {
+        const btn = document.createElement("button");
+        btn.className = "prefix-btn";
+        btn.textContent = prefix;
+        btn.onclick = () => resetWithPrefix(prefix);
+        prefixList.appendChild(btn);
+      });
     });
   </script>
 </body>
