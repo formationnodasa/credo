@@ -1,0 +1,713 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dictée Interactive</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+
+    select, textarea, button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    textarea {
+      height: 180px;
+      resize: vertical;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+    }
+
+    select {
+      background: rgba(255,255,255,0.9);
+      color: #333;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .buttons button {
+      flex: 1 1 calc(50% - 10px);
+      background: #fff;
+      color: #2575fc;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .buttons button:hover {
+      background: #2575fc;
+      color: #fff;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 1.2em;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📜 Dictée</h1>
+
+    <select id="dictationSelect">
+      <option value="laboureur">Le Laboureur et ses enfants</option>
+      <option value="cigale">La Cigale et la Fourmi</option>
+      <option value="lievre">Le Lièvre et la grenouille</option>
+      <option value="corbeau">Le Corbeau et le Renard</option>
+      <option value="grenouille">La Grenouille et le Bœuf</option>
+      <option value="fourmi">La Fourmi et la Sauterelle</option>
+      <option value="tortue">La Tortue et le Lièvre</option>
+      <option value="agneau">Le Loup et l’Agneau</option>
+      <option value="coq">Le Coq et le Renard</option>
+      <option value="poisson">Le Petit Poisson</option>
+      <option value="cheval">Le Cheval et l’Âne</option>
+      <option value="pluie">La Pluie et le Beau Temps</option>
+      <option value="chat">Le Chat et la Souris</option>
+      <option value="chene">Le Vieux Chêne</option>
+      <option value="marchand">Le Marchand et son Âne</option>
+      <option value="papillon">Le Papillon et la Fleur</option>
+      <option value="pluieEte">La Pluie d’Été</option>
+      <option value="foret">La Forêt Enchantée</option>
+      <option value="vent">Le Vent et les Feuilles</option>
+
+      <option value="carnaval">Le Carnaval des Illusions</option>
+      <option value="orage">L’Orage Approchait</option>
+      <option value="archeologie">Une Découverte Archéologique</option>
+      <option value="phare">Le Phare Abandonné</option>
+      <option value="violoniste">Le Vieux Violoniste</option>
+      <option value="bibliotheque">La Bibliothèque Souterraine</option>
+      <option value="mission">Une Mission Périlleuse</option>
+      <option value="apparition">L’Étrange Apparition</option>
+      <option value="ambre">Le Parfum de l’Ambre</option>
+      <option value="cloche">La Cloche Enfouie</option>
+
+      <!-- Dictées 41 à 50 -->
+      <option value="saisons"> Les Saisons de l’Année</option>
+      <option value="ecole">À l’École</option>
+      <option value="societe">Les Règles de la Vie en Société</option>
+      <option value="ferme">Les Animaux de la Ferme</option>
+      <option value="metiers">Les Métiers d’Aujourd’hui</option>
+      <option value="alimentation">L’Alimentation Équilibrée</option>
+      <option value="planetes">Les Planètes du Système Solaire</option>
+      <option value="environnement">Le Respect de l’Environnement</option>
+      <option value="journee">La Journée d’un Enfant</option>
+      <option value="inventions">Les Inventions qui ont changé le monde</option>
+<option value="droitsEnfant">Les Droits de l’Enfant</option>
+<option value="musique">La Musique et ses Bienfaits</option>
+<option value="lecture">L’Importance de Lire</option>
+<option value="corpsHumain">Le Corps Humain</option>
+<option value="transports">Les Moyens de Transport</option>
+<option value="emotions">Les Émotions</option>
+<option value="cycleEau">Le Cycle de l’Eau</option>
+<option value="explorateurs">Les Grands Explorateurs</option>
+<option value="sportSante">Le Sport et la Santé</option>
+<option value="objetsQuotidien">Les Objets du Quotidien</option>
+<option value="inventionsUtiles">Les Inventions Utiles</option>
+<option value="protectionAnimaux">La Protection des Animaux</option>
+<option value="ecoleMonde">L’École dans le Monde</option>
+<option value="pompier">Le Métier de Pompier</option>
+<option value="alimentation">L’Alimentation Équilibrée</option>
+<option value="saisons">Les Saisons de l’Année</option>
+<option value="valeursSport">Les Valeurs du Sport</option>
+<option value="astronaute">La Journée d’un Astronaute</option>
+<option value="regles">L’Importance des Règles</option>
+<option value="jardinPotager">Le Jardin Potager</option>
+<option value="paonRossignol">Le Paon et le Rossignol</option>
+<option value="potTerreFer">Le Pot de terre et le Pot de fer</option>
+<option value="chienOmbre">Le Chien et l’Ombre</option>
+<option value="loupAgneau">Le Loup et l’Agneau</option>
+<option value="ratVilleChamp">Le Rat de ville et le Rat des champs</option>
+<option value="lionRat">Le Lion et le Rat</option>
+<option value="renardRaisins">Le Renard et les Raisins</option>
+<option value="cheneRoseau">Le Chêne et le Roseau</option>
+<option value="loupChien">Le Loup et le Chien</option>
+<option value="renardCigogne">Le Renard et la Cigogne</option>
+<option value="renardBouc">Le Renard et le Bouc</option>
+<option value="papillonFlamme">Le Papillon et la Flamme</option>
+<option value="pouleOeufsOr">La Poule aux œufs d’or</option>
+<option value="vieilHommeMort">Le Vieil Homme et la Mort</option>
+<option value="aigleTortue">L’Aigle et la Tortue</option>
+<option value="herissonSerpent">Le Hérisson et le Serpent</option>
+<option value="ventChamps">Le vent et les champs</option>
+<option value="histoireSons">Une histoire de sons</option>
+<option value="voleurDiscret">Le voleur discret</option>
+<option value="accordDifficile">L’accord difficile</option>
+<option value="chatParesseux">Le chat paresseux</option>
+<option value="eleveDistrait">L’élève distrait</option>
+<option value="perroquetBavard">Le perroquet bavard</option>
+<option value="hamsterFugitif">Le jour où le hamster a fui</option>
+<option value="jourSansDevoirs">Le jour sans devoirs</option>
+<option value="discoursProfesseur">Le discours du professeur</option>
+<option value="voyageInterminable">Le voyage interminable</option>
+<option value="concoursRhetorique">Le concours de rhétorique</option>
+<option value="peintreOublie">Le peintre oublié</option>
+<option value="confusionTemps">La confusion des temps</option>
+<option value="natureSaisons">La nature et ses saisons</option>
+<option value="respectEnvironnement">Le respect de l’environnement</option>
+<option value="animauxDomestiques">Les animaux domestiques</option>
+<option value="importanceLecture">L’importance de la lecture</option>
+<option value="reglesPolitesse">Les règles de la politesse</option>
+    <option value="cabane">La cabane en bois</option>
+    <option value="eclipse">L’éclipse mystérieuse</option>
+    <option value="crepes">Une recette de crêpes</option>
+    <option value="orchestre">L’orchestre de l’école</option>
+    <option value="foret">La forêt enchantée</option>
+    <option value="tempete">Le jour de la tempête</option>
+    <option value="musee">Une visite au musée</option>
+    <option value="hibou">Le hibou et la pleine lune</option>
+    <option value="cirque">Le cirque en ville</option>
+    <option value="grenier">Le secret du grenier</option>
+    <option value="bruit">L’étrange bruit dans la nuit</option>
+       </select>
+
+    <div class="buttons">
+      <button onclick="playDictation()">▶️ Écouter</button>
+      <button onclick="togglePause()">⏸️ Pause / Reprendre</button>
+      <button onclick="slowDown()">🐢 Ralentir</button>
+      <button onclick="speedUp()">🐇 Accélérer</button>
+      <button onclick="checkDictation()">✅ Vérifier</button>
+    </div>
+
+    <textarea id="userInput" placeholder="Écris ici ta dictée..."></textarea>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    
+      
+      
+      
+    const dictations = {
+      laboureur: `Travaillez, prenez de la peine :
+C'est le fonds qui manque le moins.
+Un riche Laboureur, sentant sa mort prochaine,
+Fit venir ses enfants, leur parla sans témoins.
+Gardez-vous, leur dit-il, de vendre l'héritage
+Que nous ont laissé nos parents.
+Un trésor est caché dedans.
+Je ne sais pas l'endroit ; mais un peu de courage
+Vous le fera trouver, vous en viendrez à bout.
+Remuez votre champ dès qu'on aura fait l'Oût.
+Creusez, fouillez, bêchez ; ne laissez nulle place
+Où la main ne passe et repasse...`,
+
+      cigale: `La Cigale, ayant chanté Tout l’été,
+Se trouva fort dépourvue Quand la bise fut venue :
+Pas un seul petit morceau De mouche ou de vermisseau.
+Elle alla crier famine Chez la Fourmi sa voisine...
+La priant de lui prêter Quelque grain pour subsister
+Jusqu’à la saison nouvelle.
+« Je vous paierai, lui dit-elle, Avant l’août, foi d’animal... »
+La Fourmi n’est pas prêteuse ; C’est là son moindre défaut.
+« Que faisiez-vous au temps chaud ?
+– Nuit et jour à tout venant Je chantais, ne vous déplaise.
+– Vous chantiez ? Eh bien ! dansez maintenant. »`,
+
+      lievre: `Tout le monde savait que le Lièvre était l'animal le plus rapide...
+Un jour, le Lièvre proposa une course à la Tortue. La Chouette donna le départ.
+Le Lièvre partit vite, s'arrêta pour dormir... et la Tortue gagna la course.`,
+
+      tortue: `Rien ne sert de courir; il faut partir à point.
+Le Lièvre et la Tortue en sont un témoignage...
+La Tortue arriva la première. Eh bien ! lui cria‑t‑elle :
+« Avais‑je pas raison ? »`,
+
+      corbeau: `Maître Corbeau, sur un arbre perché,
+Tenait en son bec un fromage.
+Maître Renard, par l’odeur alléché,
+Lui tint à peu près ce langage :
+« Hé ! bonjour, monsieur du Corbeau.
+... Cette leçon vaut bien un fromage, sans doute. »`,
+
+      grenouille: `Une Grenouille vit un Bœuf Qui lui sembla de belle taille.
+Elle, qui n’était pas grosse en tout comme un œuf,
+Envieuse, s’étend, s’enfle et crève...`,
+
+      fourmi: `Nous étions au milieu de l'hiver, un jour clair et glacial...
+La Sauterelle affamée demanda des graines à la Fourmi,
+Mais cette dernière lui répondit que ceux qui ne travaillent pas auront faim.`,
+
+      agneau: `La raison du plus fort est toujours la meilleure :
+Un Agneau se désaltérait Dans le courant d’une onde pure.
+Un Loup survint à jeun et l'accusa faussement...
+Il le mangea.`,
+
+      coq: `Sur la branche d’un arbre était en sentinelle
+Un vieux Coq adroit et matois.
+« Frère, dit un Renard, adoucissant sa voix... »
+Car c’est double plaisir de tromper le trompeur.`,
+
+      poisson: `Un petit poisson nageait dans la rivière claire.
+Il aimait jouer parmi les algues et les pierres.
+Un jour, il rencontra une grenouille qui sautait joyeusement sur la berge.
+« Bonjour, petit poisson, veux-tu jouer avec moi ? » demanda la grenouille.
+Le poisson fit un petit saut et accepta avec plaisir.`,
+
+      cheval: `Un cheval et un âne travaillaient ensemble dans un champ.
+Le cheval tirait la charrue tandis que l’âne portait les sacs de graines.
+Un jour, l’âne dit au cheval : « Tu travailles trop dur, laisse-moi t’aider davantage. »
+Le cheval répondit : « Ensemble, nous pouvons tout accomplir. »
+Depuis ce jour, ils travaillaient en équipe et étaient très heureux.`,
+
+      pluie: `La pluie tombait doucement sur le jardin.
+Les fleurs buvaient l’eau avec joie.
+Puis, le beau temps revint avec un grand soleil.
+Les oiseaux chantaient et les enfants jouaient dehors.
+La pluie et le soleil se succédaient pour rendre la nature belle.`,
+
+      chat: `Un chat gris regardait une petite souris courir vite.
+La souris cherchait du fromage près de la porte.
+Le chat voulut attraper la souris, mais elle était trop rapide.
+Finalement, le chat se fatigua et laissa la souris partir.
+La souris s’enfuit, heureuse d’avoir échappé au chat.`,
+
+      chene: `Un vieux chêne se dressait au milieu du champ.
+Il avait des branches larges et des feuilles vertes.
+Les enfants aimaient jouer à l’ombre de ce chêne.
+Un jour, une tempête forte fit tomber une branche.
+Mais le vieux chêne resta fier et solide malgré les années.`,
+
+      marchand: `Un marchand avait un âne fidèle qui l’aidait à porter ses marchandises.
+Chaque jour, ils traversaient le village ensemble.
+Un matin, l’âne tomba dans un fossé profond.
+Le marchand chercha de l’aide pour le sauver.
+Finalement, l’âne fut tiré hors du trou, et tous deux reprirent leur chemin.`,
+
+      papillon: `Un joli papillon coloré voletait autour d’une fleur.
+Il butinait le nectar avec délicatesse.
+La fleur s’ouvrait sous le soleil chaud de l’été.
+Le papillon dansait de fleur en fleur, heureux.
+Ils vivaient une belle histoire de nature et de beauté.`,
+
+      pluieEte: `La pluie d’été tombe souvent en fin d’après-midi.
+Elle rafraîchit les champs et les jardins.
+Les enfants aiment sauter dans les flaques d’eau.
+Après la pluie, un arc-en-ciel apparaît dans le ciel bleu.
+La nature remercie la pluie qui fait tout grandir.`,
+
+      foret: `Dans une forêt enchantée, les arbres parlaient aux voyageurs.
+Les animaux y vivaient en paix et en harmonie.
+Un petit garçon s’aventura dans cette forêt magique.
+Il rencontra une fée qui lui offrit un cadeau merveilleux.
+Il rentra chez lui avec un cœur rempli de joie.`,
+
+      vent: `Le vent soufflait fort dans les arbres du parc.
+Les feuilles rouges et jaunes tourbillonnaient dans l’air.
+Elles dansaient une danse folle avant de tomber au sol.
+Le vent riait en emportant les feuilles au loin.
+C’était l’arrivée de l’automne, saison des couleurs chaudes.`,
+
+      carnaval: `Le carnaval, organisé annuellement, attire une foule bigarrée.
+Les acrobates exécutaient des figures spectaculaires au rythme d’une fanfare endiablée.
+Derrière les masques colorés, les visages restaient méconnaissables.
+Cette atmosphère éphémère laissait une impression inoubliable aux spectateurs émerveillés.`,
+
+      orage: `Le ciel s’assombrissait dangereusement, présageant un orage imminent.
+Les feuilles tourbillonnaient sous les rafales capricieuses du vent.
+Les éclairs zébraient l’horizon dans un fracas assourdissant.
+La pluie diluvienne s’abattit, inondant rapidement les ruelles étroites.`,
+
+      archeologie: `Les archéologues mirent au jour une sépulture millénaire enfouie sous la terre.
+Les vestiges retrouvés étaient minutieusement analysés en laboratoire.
+Chaque artefact racontait une parcelle d’histoire oubliée.
+L’équipe rédigea un compte-rendu rigoureux pour la revue spécialisée.`,
+
+      phare: `Isolé sur une presqu’île battue par les vents, le vieux phare semblait inhabité.
+Sa lanterne fissurée laissait passer un éclat vacillant.
+La structure, pourtant délabrée, conservait une prestance singulière.
+Le gardien, jadis intransigeant, y avait laissé un journal énigmatique.`,
+
+      violoniste: `Assis sur un tabouret bancal, le vieil homme jouait du violon.
+Ses doigts ridés parcouraient l’archet avec une précision remarquable.
+La mélodie mélancolique résonnait dans la ruelle silencieuse.
+Quelques passants, fascinés, déposaient discrètement une pièce dans son étui.`,
+
+      bibliotheque: `Sous le manoir s’étendait une bibliothèque secrète insoupçonnée.
+Les étagères
+ croulaient sous des volumes poussiéreux aux reliures anciennes.
+Une odeur de parchemin et d’humidité flottait dans l’air stagnant.
+Parmi les manuscrits, un grimoire énigmatique attirait l’attention.`,
+
+      mission: `Le capitaine accepta une mission particulièrement périlleuse.
+Il devait franchir les montagnes enneigées malgré les conditions extrêmes.
+Son équipe, bien équipée, avançait prudemment dans le blizzard.
+La moindre erreur aurait pu compromettre l’expédition tout entière.`,
+
+      apparition: `Un soir, une lueur vacillante traversa le salon désert.
+Intriguée, la jeune fille s’approcha sans bruit, retenant son souffle.
+Elle aperçut une silhouette translucide qui flottait doucement.
+Son imagination débordante mêlait réalité et illusion.`,
+
+      ambre: `Sur les rives orientales, un marchand vendait des fioles d’ambre précieux.
+Son parfum entêtant évoquait les marchés de Marrakech ou d’Istanbul.
+Chaque flacon était soigneusement scellé à la cire dorée.
+Les clients affluaient, attirés par l’arôme enivrant et mystérieux.`,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      cloche: `Lors de travaux de restauration, les ouvriers découvrirent une cloche enfouie.
+Elle portait une inscription latine à moitié effacée.
+Le métal oxydé témoignait d’un passé révolu et glorieux.
+Les habitants décidèrent de la suspendre à nouveau dans le clocher rénové.`,
+
+      /* Dictées 41 à 50 */
+      saisons: `Le printemps apporte les bourgeons et les premières fleurs colorées.
+L’été réchauffe les journées et invite aux vacances à la mer ou à la montagne.
+En automne, les feuilles tombent et les couleurs deviennent chaudes.
+L’hiver recouvre les paysages de neige et fait frissonner les passants.`,
+
+      ecole: `Chaque matin, les élèves entrent en classe en saluant leur professeur.
+Ils écoutent les leçons, participent activement et notent les devoirs.
+La récréation est un moment de détente où les enfants jouent ensemble.
+À la fin de la journée, chacun rentre chez soi, cartable sur le dos.`,
+
+      societe: `Respecter les autres est une valeur essentielle pour bien vivre ensemble.
+Il faut attendre son tour, écouter sans interrompre et aider les plus faibles.
+La politesse se manifeste par des mots simples : bonjour, merci, s’il vous plaît.
+Chaque citoyen a des droits, mais aussi des devoirs.`,
+
+      ferme: `Dans la ferme, la vache donne du lait, la poule pond des œufs, et le cochon fouille la terre.
+Le coq chante dès l’aube, et les moutons broutent dans le pré.
+Les animaux ont besoin de soins, d’eau et de nourriture.
+Le fermier travaille chaque jour pour s’occuper d’eux.`,
+
+      metiers: `Le boulanger prépare le pain que l’on mange chaque matin.
+L’infirmière soigne les patients avec douceur et attention.
+Le pompier éteint les incendies et sauve des vies.
+Chaque métier est utile pour faire fonctionner la société.`,
+
+      alimentation: `Pour être en bonne santé, il faut manger varié et équilibré.
+Les fruits et légumes apportent des vitamines.
+Il est important de boire de l’eau et de limiter les sucreries.
+Faire du sport complète une alimentation saine.`,
+
+      planetes: `La Terre est la seule planète connue à abriter la vie.
+Elle tourne autour du Soleil comme les autres planètes : Mars, Jupiter ou Vénus.
+Chaque planète a une taille et une composition différente.
+L’Univers reste encore plein de mystères à explorer.`,
+
+      environnement: `Il faut trier les déchets, économiser l’eau et l’électricité.
+Les forêts doivent être protégées pour abriter les animaux.
+La pollution abîme la planète et menace notre avenir.
+Chaque geste compte pour préserver la nature.`,
+
+      journee: `Le matin, l’enfant se lève, se lave et prend son petit-déjeuner…
+Il va à l’école, apprend de nouvelles choses et joue avec ses amis.
+L’après-midi, il fait ses devoirs, puis se détend en famille.
+Le soir, il se couche pour bien dormir et être en forme le lendemain.`,
+
+      inventions: `L’imprimerie a permis de diffuser les livres partout dans le monde.
+L’électricité a révolutionné les maisons et les villes.
+L’avion a rapproché les continents et facilité les voyages.
+Internet permet aujourd’hui de communiquer instantanément.`,
+
+
+      droitsEnfant: `Chaque enfant a le droit d’aller à l’école, d’être protégé et aimé. Il a le droit de jouer, de grandir en bonne santé et d’exprimer ses idées. Les adultes doivent veiller à ce que ses droits soient respectés. Un monde plus juste commence par la protection de l’enfance.`,
+
+      musique: `La musique apaise, fait danser ou rêve. Elle accompagne nos émotions et nos souvenirs. Jouer d’un instrument demande de la rigueur et de la passion. Grâce à elle, les peuples du monde entier peuvent se comprendre sans paroles.`,
+
+      lecture: `Lire permet de découvrir des mondes imaginaires et d’apprendre de nouvelles choses. Un livre peut faire rire, réfléchir ou émouvoir. La lecture enrichit le vocabulaire et développe la mémoire. Elle est une clé précieuse pour réussir à l’école.`,
+
+      corpsHumain: `Le corps humain est une machine incroyable. Le cœur bat sans arrêt, les poumons nous permettent de respirer. Le cerveau contrôle nos mouvements, nos pensées et nos sensations. Il faut en prendre soin grâce à une bonne hygiène de vie.`,
+
+      transports: `Autrefois, on se déplaçait à pied, à cheval ou en charrette. Aujourd’hui, les voitures, les trains, les avions et les bateaux relient les villes et les pays. Les transports rapides facilitent les voyages, mais polluent souvent l’environnement. Les solutions écologiques se développent pour préserver la planète.`,
+
+      emotions: `La joie, la tristesse, la peur, la colère : les émotions font partie de la vie. Il est normal d’en ressentir, mais il faut apprendre à les exprimer calmement. Parler à quelqu’un de confiance peut aider à se sentir mieux. Comprendre ses émotions aide à grandir sereinement.`,
+
+      cycleEau: `L’eau s’évapore, forme des nuages, retombe en pluie, puis rejoint les rivières et les mers. Ce cycle naturel se répète sans cesse. Sans eau, la vie serait impossible sur Terre. Il faut donc l’économiser et la protéger de la pollution.`,
+
+      explorateurs: `Christophe Colomb a découvert l’Amérique en 1492. Magellan a fait le tour du monde par la mer. Ces hommes courageux ont permis de mieux connaître la planète. Leurs voyages ont marqué l’histoire et ouvert de nouvelles routes.`,
+
+      sportSante: `Faire du sport aide à rester en forme et à se sentir bien. Il renforce les muscles, le cœur et le moral. Le sport enseigne aussi le respect des règles, la persévérance et l’esprit d’équipe. Même une simple marche quotidienne est bénéfique.`,
+
+      objetsQuotidien: `La lampe éclaire la pièce, le réfrigérateur garde les aliments au frais. La montre donne l’heure, l’ordinateur permet de travailler ou de jouer. Tous ces objets nous rendent service chaque jour. Apprendre à les nommer et à les utiliser correctement est essentiel.`,
+
+
+      inventionsUtiles: `La roue, l’imprimerie, l’électricité et l’Internet sont des inventions majeures. Elles ont transformé la manière de vivre, de communiquer et de se déplacer. Chaque invention commence par une idée, puis demande des essais et de la persévérance. L’innovation naît souvent d’un besoin ou d’un rêve.`,
+
+      protectionAnimaux: `Les animaux sauvages vivent dans des forêts, des océans ou des déserts. Beaucoup sont menacés par la pollution ou la chasse. Protéger leur habitat, c’est préserver l’équilibre de la nature. Chacun peut agir en respectant les animaux et en réduisant ses déchets.`,
+
+      ecoleMonde: `Dans certains pays, les enfants vont à l’école à pied, en barque ou à vélo. Tous n’ont pas des livres, des cahiers ou des ordinateurs. L’éducation est un droit essentiel pour construire un avenir meilleur. Apprendre est une chance qu’il faut saisir chaque jour.`,
+
+      pompier: `Les pompiers sauvent des vies, éteignent les incendies et aident en cas d’accident. Ils doivent être rapides, courageux et bien entraînés. Leur travail demande de la solidarité et du sang-froid. C’est un métier au service des autres.`,
+
+      alimentation: `Manger des fruits, des légumes, des céréales et boire de l’eau est important. Trop de sucre ou de graisses peut nuire à la santé. Il faut varier les repas et bouger chaque jour. Une bonne alimentation aide à grandir et à se concentrer.`,
+
+      saisons: `Le printemps fait renaître les fleurs, l’été apporte la chaleur. L’automne colore les feuilles, l’hiver couvre la terre de froid. Chaque saison a son rythme, ses vêtements, ses fêtes et ses activités. Les saisons rythment la vie de la nature et des humains.`,
+
+      valeursSport: `Le sport enseigne la patience, le respect et la coopération. On y apprend à gagner sans arrogance et à perdre avec dignité. L’entraînement renforce le corps, mais aussi l’esprit. L’esprit d’équipe est parfois plus fort que la victoire.`,
+
+      astronaute: `Dans l’espace, les astronautes flottent dans leur station. Ils mangent des aliments spéciaux et s’entraînent pour rester en forme. Ils observent la Terre, mènent des expériences et communiquent avec le sol. C’est un métier exigeant, mais fascinant.`,
+
+      regles: `À l’école, à la maison ou sur la route, les règles organisent la vie commune. Elles protègent chacun et permettent de vivre ensemble en paix. Respecter les règles, c’est aussi respecter les autres. Elles sont parfois strictes, mais souvent nécessaires.`,
+
+      jardinPotager: `Dans un potager, on plante des tomates, des carottes ou des salades. Il faut arroser, désherber et attendre avec patience. Voir pousser ses légumes est une grande satisfaction. C’est aussi une façon d’apprendre le respect de la nature.`,
+
+      paonRossignol: `Le paon se plaint de ne pas avoir une belle voix malgré sa beauté. Il envie le rossignol. Jupiter lui rappelle qu’on ne peut pas tout avoir. Chacun a ses qualités, nul ne les a toutes.`,
+
+      potTerreFer: `Un pot de fer propose à un pot de terre de voyager ensemble. Le pot de terre finit par se briser, car il est trop fragile pour supporter les chocs du plus fort.`,
+
+      chienOmbre: `Un chien transporte un morceau de viande dans sa gueule. En voyant son reflet dans l’eau, il croit voir un autre chien avec un plus gros morceau et tente de lui prendre… Il lâche le sien et le perd.`,
+
+      loupAgneau: `La raison du plus fort est toujours la meilleure. Un Agneau se désaltérait dans le courant d’une onde pure. Survient un Loup, qui cherche querelle. « Tu troubles mon breuvage ! » dit le Loup. L’Agneau se défend avec douceur… Mais le Loup le mange, sans autre forme de procès.`,
+
+      ratVilleChamp: `Autrefois, le Rat de ville invita le Rat des champs. Ils dînèrent de mets fins, dans un riche logis. Mais soudain, un bruit les fit fuir. Le Rat des champs déclara : « Adieu ! Je préfère un repas modeste sans danger qu’un festin en pleine frayeur. »`,
+
+      lionRat: `Un Lion prit un jour un petit Rat. Le Rat supplia qu’on l’épargne. Le Lion, magnanime, le laissa partir. Plus tard, le Lion fut pris au piège d’un chasseur. Le Rat, reconnaissant, rongea les liens et libéra le roi des animaux.`,
+
+      renardRaisins: `Un renard affamé essaie d’atteindre des raisins suspendus trop haut. Après plusieurs tentatives ratées, il s’en va en disant qu’ils étaient sûrement trop verts.`,
+
+      cheneRoseau: `Le Chêne disait au Roseau : « Vous pliez, mais ne rompez pas. » Lui, fort et droit, résistait à tout… sauf à l’ouragan. Un jour, la tempête l’abattit. Le Roseau, lui, avait plié, mais survécu. La souplesse peut être plus forte que la rigidité.`,
+
+      loupChien: `Un Loup maigre rencontra un Chien gras. Le Chien l’invita à le suivre chez son maître, où il serait bien nourri… Mais enchaîné. Le Loup refusa. Il préférait sa liberté à la servitude.`,
+
+      renardCigogne: `Le Renard invita la Cigogne à dîner, dans une assiette plate. Elle ne put rien manger avec son long bec. Elle l’invita ensuite à son tour… dans un vase étroit. Le Renard n’en mangea pas. La Cigogne lui avait rendu la pareille.`,
+
+      renardBouc: `Le renard tombe dans un puits. Un bouc l’aide à sortir, mais le renard s’enfuit en le laissant coincé. Réfléchis avant d’agir. Ne suis pas quelqu’un sans penser aux conséquences.`,
+
+      papillonFlamme: `Un papillon fasciné par la lumière s’approche d’une flamme et s’y brûle. Ce qui attire n’est pas toujours bon pour nous. La fascination peut être dangereuse.`,
+
+      pouleOeufsOr: `Un fermier tue sa poule qui pond un œuf d’or chaque jour, espérant en trouver un trésor à l’intérieur. Il perd tout.`,
+
+      vieilHommeMort: `Un vieillard fatigué appelle la Mort. Quand elle arrive, il lui demande juste de l’aider à porter son fagot. On croit vouloir mourir, mais la vie reste précieuse, même difficile.`,
+
+      aigleTortue: `Une tortue veut voler comme l’aigle. L’aigle la prend et la laisse tomber de haut. Connaître ses limites évite les désastres.`,
+
+      herissonSerpent: `Le hérisson demande au serpent de l’héberger. Il entre, puis le pique et refuse de sortir. Aide avec discernement. Certains abusent de la gentillesse.`,
+
+      ventChamps: `Le vent soufflait fort ce matin-là. La pluie tombait sans cesse, et leurs champs étaient détrempés. Le fermier montra la colline, puis dit qu’il l’a vue s’effondrer. Il fallait que chacun prenne soin de leur terre, même si leurs efforts semblaient inutiles. Là, tout était calme à nouveau.`,
+
+      histoireSons: `Son cœur battait fort. Les cloches sonnent au loin. Les soldats sont là, sans bruit, mais pas sans courage. Il restait à peine cent mètres avant d’atteindre le camp. Le général avait perdu beaucoup de sang, mais il continuait d’avancer.`,
+
+      voleurDiscret: `Le chat regardait vers le jardin. Un ver sortait doucement de la terre verte. Dans la cuisine, un voleur avait cassé un verre et laissé des traces de vair sur le sol. La nuit tombait, et l’enquête pouvait commencer.`,
+
+      accordDifficile: `Il voulait qu’elle ait confiance, et qu’elle aie le courage d’avancer. Mais elle était fatiguée, elle est tombée. Tous souhaitaient qu’ils aient compris le message. Le plus important est d’y croire.`,
+
+
+      chatParesseux: `Le chat de Mamie ne chasse plus les souris. Il préfère dormir sur le canapé, la tête dans le saladier. Un jour, il a confondu une balle de laine avec un hérisson. Depuis, il ne bouge plus… sauf pour manger trois fois par jour.`,
+
+      eleveDistrait: `Lundi matin, Arthur est arrivé à l’école avec un chausson et une pantoufle. Il avait mis son pull à l’envers et son cartable contenait… une poêle à crêpes ! La maîtresse a dit qu’il devait être en mode "grasse matinée".`,
+
+      perroquetBavard: `Le perroquet de mon oncle parle trop. Il répète tout ce qu’il entend : les gros mots de papy, les chansons de mamie, et même le mot de passe du Wi-Fi. Un jour, il a appelé les pompiers… juste pour dire bonjour.`,
+
+      hamsterFugitif: `Le hamster de Lila s’est échappé. Il a grignoté les fils du chargeur, est entré dans la chaussure de papa, puis a dormi dans le saladier de chips. On l’a retrouvé deux jours plus tard, assis dans la télécommande.`,
+
+      jourSansDevoirs: `Ce soir-là, j’ai dit à papa que je n’avais pas de devoirs. Il m’a cru… jusqu’à ce qu’il trouve mon cahier de conjugaison caché sous le coussin. J’ai alors tenté de fuir, mais il m’a coincé avec une règle et une feuille.`,
+
+      discoursProfesseur: `Le professeur, tout en corrigeant les copies, s'indignait de l’indolence générale. Non seulement les élèves avaient omis les consignes, mais certains, manifestement distraits, confondaient encore "évoquer" et "invoquer", ou "emmener" et "amener". Quelle aberration linguistique !`,
+
+  voyageInterminable: `L\'expédition, interrompue maintes fois par les intempéries, avançait péniblement à travers des sentiers escarpés, où la moindre inattention pouvait être fatale. Malgré la fatigue, ils persévéraient, mus par une volonté indéfectible et un espoir tenace de retrouver le village disparu.`,
+  concoursRhetorique:  `Devant un jury exigeant, les candidats devaient discourir sur des sujets aussi variés que la temporalité de l\'existence ou les paradoxes de la liberté. L\'un d\'eux, confondant éloquence et arrogance, se perdit dans une logorrhée prétentieuse, truffée d\'anacoluthes et de pléonasmes.`,
+  peintreOublie: `Ce peintre, méconnu de son vivant, laissa pourtant une œuvre foisonnante, empreinte de mélancolie et de lumière. Ses toiles, redécouvertes postérieurement, suscitèrent l\'admiration des critiques, qui saluèrent la justesse de sa palette et la sobriété de ses compositions chromatiques.`,
+  confusionTemps:  `Si j\'eusse su qu\'il viendrait, je l\'eusse attendu. Mais puisqu\'il est venu sans prévenir, j\'aurais préféré qu\'il eût au moins songé à me prévenir ! Il fallait qu\'il s\'en souvînt, ou, à tout le moins, qu\'il n\'oubliât point les usages les plus élémentaires de la politesse.`,
+  natureSaisons:  `Chaque saison apporte son charme unique. Au printemps, les fleurs s\'épanouissent, tandis qu\'en automne, les feuilles tombent et couvrent le sol d\'un tapis coloré.`,
+  respectEnvironnement:  `Il est important de protéger notre planète. Recycler, économiser l\'eau et éviter le gaspillage sont des gestes simples qui font une grande différence.`,
+  animauxDomestiques:  `Les chiens et les chats sont les compagnons préférés de beaucoup de familles. Ils demandent de l\'attention, de la nourriture et beaucoup d\'affection.`,
+  importanceLecture:  `Lire permet d\'apprendre, de s\'évader et de découvrir de nouveaux horizons. Chaque livre ouvre une porte vers un monde différent.`,
+  reglesPolitesse:  `Dire "bonjour", "merci" ou "s\'il vous plaît" est essentiel dans la vie quotidienne. La politesse facilite les échanges et crée un climat agréable.`,
+  cabane:  `Léo a construit une cabane en bois avec son grand-père. Ils ont cloué des planches, scié des morceaux et peint les murs en bleu. Maintenant, il y lit des bandes dessinées tous les mercredis.`,
+  eclipse:  `Ce matin-là, le ciel est devenu sombre. Les élèves, munis de lunettes spéciales, observaient l\'éclipse avec fascination. La lune cachait le soleil, et tout semblait figé, silencieux, presque magique.`,
+  crepes:  `Pour faire de bonnes crêpes, il faut de la farine, du lait, des œufs et une pincée de sel. Maman ajoute un peu de fleur d\'oranger. On mélange bien, on laisse reposer… et on se régale !`,
+  orchestre:  `Chaque jeudi, l\'orchestre de l\'école répète dans la salle polyvalente. Violons, flûtes, guitares et tambours s\'accordent pour préparer le concert de fin d\'année. Le chef lève la baguette : la musique commence.`,
+  foret:  `Dans cette forêt, les arbres semblent parler. Le vent souffle doucement dans les branches, les écureuils courent entre les racines, et un hibou surveille tout du haut d\'un chêne centenaire.`,
+  tempete: `La pluie battait les vitres, le vent hurlait comme un loup. Dans la maison, les enfants allumaient des bougies. Sans électricité, ils racontaient des histoires, blottis sous une couverture.`,
+  musee:  `Nous sommes allés au musée d\'histoire. J\'ai vu un squelette de dinosaure, un casque de chevalier et une momie venue d\'Égypte. Mon carnet était rempli de croquis à la fin de la journée.`,
+  hibou: `Le hibou s\'éveilla au coucher du soleil. Il déploya ses ailes et vola silencieusement vers la clairière. Sous la pleine lune, il chassa sans un bruit, roi de la nuit.`,
+  cirque: `Le chapiteau s\'est installé près de l\'école. Les clowns font rire, les acrobates volent dans les airs, et les musiciens accompagnent le spectacle. Les enfants applaudissent à tout rompre.`,
+  grenier:  `Dans le grenier poussiéreux de Mamie, j\'ai trouvé une vieille boîte. À l\'intérieur, des lettres jaunies, des photos en noir et blanc, et une montre à gousset… C\'était le trésor de Papy.`,
+  bruit: `À minuit, un bruit étrange a réveillé Emma. Elle a pris sa lampe et s\'est aventurée dans le couloir. C\'était juste son chat, qui jouait avec un bouchon tombé dans la cuisine.`,
+};
+
+
+    let rate = 0.5;
+    const minRate = 0.25;
+    const maxRate = 2.0;
+    let paused = false;
+    let speaking = false;
+    let queue = [];
+    let voice = null;
+
+    function getVoice() {
+      const voices = speechSynthesis.getVoices();
+      // On garde la même voix dans la variable globale
+      if (!voice) {
+        voice = voices.find(v => v.lang === 'fr-FR' && /thomas|paul|yves|homme/i.test(v.name)) || voices.find(v => v.lang === 'fr-FR');
+      }
+      return voice;
+    }
+
+    function speak(text) {
+      speechSynthesis.cancel();
+      queue = [];
+
+      // Découpe en parties mots/ponctuations
+      const parts = text
+        .replace(/\n/g, ' ')
+        .split(/([.,;:!?])/g)
+        .filter(p => p.trim() !== '');
+
+      for (let part of parts) {
+        // Création de l'énoncé à lire
+        let utterance = null;
+        if (['.', ',', ';', ':', '!', '?'].includes(part)) {
+          // On lit la ponctuation sous forme orale (optionnel)
+          // ou on peut ne rien lire et juste faire pause
+          utterance = new SpeechSynthesisUtterance(part); 
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          // Marque cette utterance comme ponctuation pour pause plus longue
+          utterance.isPunctuation = true;
+        } else {
+          utterance = new SpeechSynthesisUtterance(part.trim());
+          utterance.lang = 'fr-FR';
+          utterance.voice = getVoice();
+          utterance.rate = rate;
+          utterance.isPunctuation = false;
+        }
+        queue.push(utterance);
+      }
+
+      speaking = true;
+      playQueue();
+    }
+
+    async function playQueue() {
+      for (let utterance of queue) {
+        while (paused) await new Promise(r => setTimeout(r, 100));
+        if (!speaking) return;
+
+        speechSynthesis.speak(utterance);
+        await new Promise(resolve => {
+          utterance.onend = resolve;
+        });
+
+        // Pause de 5 secondes après une ponctuation, sinon pause de 0.5s
+        if (utterance.isPunctuation) {
+          await new Promise(r => setTimeout(r, 5000)); 
+        } else {
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+      speaking = false;
+    }
+
+    function playDictation() {
+      const selected = document.getElementById('dictationSelect').value;
+      const text = dictations[selected];
+      if (text) {
+        paused = false;
+        speaking = true;
+        speak(text);
+      }
+    }
+
+    function togglePause() {
+      paused = !paused;
+      if (paused) {
+        speechSynthesis.pause();
+      } else {
+        speechSynthesis.resume();
+      }
+    }
+
+    function slowDown() {
+      if (rate > minRate) {
+        rate -= 0.1;
+        if (rate < minRate) rate = minRate;
+      }
+    }
+
+    function speedUp() {
+      if (rate < maxRate) {
+        rate += 0.1;
+        if (rate > maxRate) rate = maxRate;
+      }
+    }
+
+    function checkDictation() {
+      const selected = document.getElementById('dictationSelect').value;
+      const original = dictations[selected].replace(/\s+/g, ' ').trim();
+      const userText = document.getElementById('userInput').value.replace(/\s+/g, ' ').trim();
+
+      const isExact = original.toLowerCase() === userText.toLowerCase();
+
+      const result = isExact
+        ? '✅ Parfait ! Aucune erreur détectée.'
+        : '❌ Il y a des différences. Relis ta dictée et réessaie !';
+
+      document.getElementById('result').textContent = `${result}\n\n--- Dictée originale ---\n${original}`;
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      getVoice();
+    };
+  </script>
+</body>
+</html>
