@@ -95,9 +95,20 @@
 
     #prefixList {
       margin-top: 25px;
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: #fff;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .prefix-btn {
+      padding: 8px 15px;
+      background-color: #fff;
+      color: #2575fc;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
     }
 
     #showPrefixesBtn {
@@ -132,23 +143,101 @@
   </div>
 
   <script>
-    const questions = [
-      { prefix: "Pr", intro: "Toutes les réponses commencent par PR.", items: [] },
-      { prefix: "Tr", intro: "Toutes les réponses commencent par TR.", items: [] },
-      { prefix: "Ac", intro: "Toutes les réponses commencent par AC.", items: [] },
-      { prefix: "Ca", intro: "Toutes les réponses commencent par CA.", items: [] },
-      { prefix: "Me", intro: "Toutes les réponses commencent par ME.", items: [] },
-      { prefix: "Di", intro: "Toutes les réponses commencent par DI.", items: [] }
-    ];
 
-    // Remplir chaque série avec des exemples (extrait pour clarté, tu peux compléter comme avant)
-    questions[0].items = [
-      { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] }
-    ];
-    questions[1].items = [
-      { question: "TR - Changement ou métamorphose d'une chose en une autre ?", reponses: ["Transformation"] }
-    ];
-    // ... (complète les autres séries comme dans ton code initial)
+const questions = [
+  {
+    prefix: "Pr",
+    intro: "Toutes les réponses commencent par PR.",
+    items: [
+      { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] },
+      { question: "PR - Quel mot désigne une grande intensité ou profondeur ?", reponses: ["Profond"] },
+      { question: "PR - C’est un métier ou domaine d’activité ?", reponses: ["Profession"] },
+      { question: "PR - Un mot qui indique une amélioration ou un avancement ?", reponses: ["Progrès"] },
+      { question: "PR - C’est un engagement ou une parole donnée ?", reponses: ["Promesse"] },
+      { question: "PR - C’est une expression populaire pleine de sagesse ?", reponses: ["Proverbe"] }
+    ]
+  },
+  {
+    prefix: "Tr",
+    intro: "Toutes les réponses commencent par TR.",
+    items: [
+      { question: "TR - Changement ou métamorphose d'une chose en une autre ?", reponses: ["Transformation"] },
+      { question: "TR - État de chagrin ou de mélancolie ?", reponses: ["Tristesse"] },
+      { question: "TR - Emploi ou activité professionnelle ?", reponses: ["Travail"] },
+      { question: "TR - Action de soigner ou de procéder à une procédure médicale ?", reponses: ["Traitement"] },
+      { question: "TR - Coutume ou héritage culturel transmis ?", reponses: ["Tradition"] },
+      { question: "TR - Drame ou catastrophe ?", reponses: ["Tragédie"] },
+      { question: "TR - Ordre ou position après le vingt-neuvième ?", reponses: ["Trentième"] },
+      { question: "TR - Victoire éclatante ?", reponses: ["Triomphe"] },
+      { question: "TR - Clarté ou lisibilité ?", reponses: ["Transparence"] },
+      { question: "TR - Richesse ou bien précieux ?", reponses: ["Trésor"] }
+    ]
+  },
+  {
+    prefix: "Ac",
+    intro: "Toutes les réponses commencent par AC.",
+    items: [
+      { question: "AC - Soutien ou aide fournie ?", reponses: ["Accompagnement"] },
+      { question: "AC - Possibilité d'entrer dans un lieu ?", reponses: ["Accès"] },
+      { question: "AC - Acte de faire quelque chose ?", reponses: ["Action"] },
+      { question: "AC - Occupation ou exercice ?", reponses: ["Activité"] },
+      { question: "AC - Acquisition ou achat ?", reponses: ["Achat"] },
+      { question: "AC - Incident imprévu ?", reponses: ["Accident"] },
+      { question: "AC - Entente ou consensus ?", reponses: ["Accord"] },
+      { question: "AC - Gain ou obtention d'une chose ?", reponses: ["Acquisition"] },
+      { question: "AC - Personne jouant dans un film ?", reponses: ["Acteur"] },
+      { question: "AC - Applaudissements enthousiastes ?", reponses: ["Acclamation"] }
+    ]
+  },
+  {
+    prefix: "Ca",
+    intro: "Toutes les réponses commencent par CA.",
+    items: [
+      { question: "CA - Ensemble de traits distinctifs ?", reponses: ["Caractère"] },
+      { question: "CA - Document représentant une région ?", reponses: ["Carte"] },
+      { question: "CA - Chute d'eau ?", reponses: ["Cascade"] },
+      { question: "CA - Objet offert ?", reponses: ["Cadeau"] },
+      { question: "CA - Contenant en bois ou métal ?", reponses: ["Caisse"] },
+      { question: "CA - Appareil pour filmer ?", reponses: ["Caméra"] },
+      { question: "CA - Région rurale ?", reponses: ["Campagne"] },
+      { question: "CA - Voie d'eau artificielle ?", reponses: ["Canal"] },
+      { question: "CA - Aptitude à comprendre ?", reponses: ["Capacité"] },
+      { question: "CA - Ville principale d'un pays ?", reponses: ["Capitale"] }
+    ]
+  },
+  {
+    prefix: "Me",
+    intro: "Toutes les réponses commencent par ME.",
+    items: [
+      { question: "ME - Capacité de se souvenir ?", reponses: ["Mémoire"] },
+      { question: "ME - Manière d'effectuer une tâche ?", reponses: ["Méthode"] },
+      { question: "ME - Séquence musicale agréable ?", reponses: ["Mélodie"] },
+      { question: "ME - Liste des plats ?", reponses: ["Menu"] },
+      { question: "ME - Sentiment d'insatisfaction ?", reponses: ["Mécontentement"] },
+      { question: "ME - Échelle d’évaluation ?", reponses: ["Mesure"] },
+      { question: "ME - Chose très impressionnante ?", reponses: ["Merveille"] },
+      { question: "ME - Pratique de relaxation ?", reponses: ["Méditation"] },
+      { question: "ME - Système de communication électronique ?", reponses: ["Messagerie"] },
+      { question: "ME - Qui mérite d’être mémorisé ?", reponses: ["Mémorable"] }
+    ]
+  },
+  {
+    prefix: "Di",
+    intro: "Toutes les réponses commencent par DI.",
+    items: [
+      { question: "DI - Position vers laquelle on se déplace ?", reponses: ["Direction"] },
+      { question: "DI - Obstacle ou défi ?", reponses: ["Difficulté"] },
+      { question: "DI - Obéissance à des règles ?", reponses: ["Discipline"] },
+      { question: "DI - Conversation entre personnes ?", reponses: ["Dialogue"] },
+      { question: "DI - Variété dans un groupe ?", reponses: ["Diversité"] },
+      { question: "DI - Art de négocier ?", reponses: ["Diplomatie"] },
+      { question: "DI - Livre des mots et définitions ?", reponses: ["Dictionnaire"] },
+      { question: "DI - Fait de ne plus être présent ?", reponses: ["Disparition"] },
+      { question: "DI - Mesure de la taille ?", reponses: ["Dimension"] },
+      { question: "DI - Quelque chose qui divertit ?", reponses: ["Divertissement"] }
+    ]
+  }
+];
 
     let allQuestions = [];
     questions.forEach(group => {
@@ -160,10 +249,12 @@
     });
 
     let currentQuestionIndex = 0;
+    let currentGroup = allQuestions;
     let introSpoken = {};
     const wordDisplay = document.getElementById("wordDisplay");
     const answerInput = document.getElementById("answer");
     const message = document.getElementById("message");
+    const prefixList = document.getElementById("prefixList");
     let speechRate = 0.7;
 
     function speak(text) {
@@ -179,10 +270,12 @@
     }
 
     function playQuestion() {
-      const current = allQuestions[currentQuestionIndex];
+      const current = currentGroup[currentQuestionIndex];
+      if (!current) return;
       wordDisplay.textContent = current.question;
       message.textContent = "Écris ta réponse.";
       answerInput.value = "";
+      answerInput.disabled = false;
       answerInput.focus();
       if (!introSpoken[current.prefix]) {
         speak(`${current.intro} ${current.question}`);
@@ -194,7 +287,7 @@
 
     function checkAnswer() {
       const userAnswer = answerInput.value.trim().toLowerCase();
-      const goodAnswers = allQuestions[currentQuestionIndex].reponses.map(r => r.toLowerCase());
+      const goodAnswers = currentGroup[currentQuestionIndex].reponses.map(r => r.toLowerCase());
       if (goodAnswers.includes(userAnswer)) {
         message.textContent = "✅ Bravo, c'est exact !";
         message.style.color = "#00e676";
@@ -202,17 +295,27 @@
       } else {
         message.textContent = "❌ Mauvaise réponse.";
         message.style.color = "#ff5252";
-        speak(`Fallait penser à : ${allQuestions[currentQuestionIndex].reponses.join(", ")}`);
+        speak(`Fallait penser à : ${currentGroup[currentQuestionIndex].reponses.join(", ")}`);
       }
     }
 
     function nextQuestion() {
       currentQuestionIndex++;
-      if (currentQuestionIndex >= allQuestions.length) {
+      if (currentQuestionIndex >= currentGroup.length) {
         message.textContent = "🎉 Quiz terminé ! Bien joué.";
         wordDisplay.textContent = "";
         answerInput.disabled = true;
       } else {
+        playQuestion();
+      }
+    }
+
+    function resetWithPrefix(prefix) {
+      const group = questions.find(q => q.prefix === prefix);
+      if (group) {
+        currentGroup = group.items;
+        currentQuestionIndex = 0;
+        introSpoken = {};
         playQuestion();
       }
     }
@@ -241,10 +344,16 @@
 
     window.addEventListener("load", playQuestion);
 
-    // Affichage des préfixes au clic
     document.getElementById("showPrefixesBtn").addEventListener("click", () => {
+      prefixList.innerHTML = "";
       const uniquePrefixes = [...new Set(questions.map(q => q.prefix))];
-      document.getElementById("prefixList").textContent = "Préfixes : " + uniquePrefixes.join(", ");
+      uniquePrefixes.forEach(prefix => {
+        const btn = document.createElement("button");
+        btn.className = "prefix-btn";
+        btn.textContent = prefix;
+        btn.onclick = () => resetWithPrefix(prefix);
+        prefixList.appendChild(btn);
+      });
     });
   </script>
 </body>
