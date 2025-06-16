@@ -3,228 +3,249 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Espace des Champions</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Vocal</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: 'Orbitron', sans-serif;
-      background-color: black;
-      color: white;
-    }
-
-    #scene, #overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    #overlay {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
       display: flex;
-      align-items: center;
       justify-content: center;
-      z-index: 2;
-      pointer-events: none;
-      font-size: 2em;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    .scanner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: rgba(0,255,255,0.6);
-      animation: scan 2s linear forwards;
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
 
-    @keyframes scan {
-      0% { top: 0; }
-      100% { top: 100%; }
-    }
-
-    .vibration {
-      animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-      0% { transform: translate(1px, 1px); }
-      20% { transform: translate(-1px, -2px); }
-      40% { transform: translate(-3px, 1px); }
-      60% { transform: translate(3px, 2px); }
-      80% { transform: translate(1px, -1px); }
-      100% { transform: translate(1px, 1px); }
-    }
-
-    #mainRoom {
-      display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(#111, #000);
-      z-index: 3;
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 500px;
+      width: 90%;
       text-align: center;
-      padding-top: 5%;
+      animation: fadeIn 1.2s ease;
     }
 
-    .typewriter-text {
-      display: inline-block;
-      overflow: hidden;
-      border-right: .15em solid orange;
-      white-space: nowrap;
-      animation: typing 3s steps(30, end), blink .75s step-end infinite;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
+    h1 {
+      font-weight: 800;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
 
-    @keyframes blink {
-      50% { border-color: transparent }
+    #wordDisplay {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      min-height: 60px;
     }
 
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: gold;
-      animation: fall 3s linear infinite;
+    input[type="text"] {
+      font-size: 1.4rem;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      margin-bottom: 25px;
+      background-color: #fff;
+      color: #333;
     }
 
-    @keyframes fall {
-      0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(100vh); opacity: 0; }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
     }
 
-    #options > div {
-      margin: 10px auto;
-      padding: 10px 20px;
-      border: 1px solid #fff;
-      width: fit-content;
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
       cursor: pointer;
+      background: #fff;
+      color: #2575fc;
     }
 
-    .sub-options {
-      display: none;
-      margin-top: 10px;
+    #message {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 32px;
     }
 
-    .sub-options div {
-      margin: 5px;
-      padding: 8px 15px;
-      border: 1px dashed #ccc;
+    #prefixList {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    #showPrefixesBtn {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #fff;
+      color: #2575fc;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-<canvas id="scene"></canvas>
-<div id="overlay">Bienvenue dans l’espace des Champions</div>
-<div class="scanner"></div>
-
-<div id="mainRoom">
-  <h3><span class="typewriter-text">Programme des Champions</span></h3>
-  <div id="options">
-    <div onclick="location.href='Dictéevocale.html'">📝 Dictée</div>
-
-    <div onclick="toggleSub('epellationSub')">🔤 Épellation</div>
-    <div id="epellationSub" class="sub-options">
-      <div onclick="location.href='inivocale.html'">Initiation</div>
-      <div onclick="location.href='Epebible.html'">Bible</div>
-      <div onclick="location.href='Epedico.html'">Dictionnaire</div>
+  <div class="container">
+    <h1>Champ lexical Vocal</h1>
+    <div id="wordDisplay">Question</div>
+    <input type="text" id="answer" placeholder="Ta réponse ici..." />
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
     </div>
-
-    <div onclick="location.href='Anagrammevocale.html'">🔀 Anagramme</div>
-    <div onclick="location.href='Mathvocal.html'">➕ Mathématiques</div>
-
-    <div onclick="toggleSub('lexicalSub')">🧠 Champ lexical</div>
-    <div id="lexicalSub" class="sub-options">
-      <div>Toutes les bonnes réponses tournent autour de</div>
-      <div>Toutes les bonnes réponses commencent avec deux lettres</div>
-      <div>Toutes les bonnes réponses commencent avec de trois lettres</div>
-      <div>Toutes les bonnes réponses commencent avec quatre lettres</div>
-      <div>Toutes les bonnes réponses se terminent par</div>
-    </div>
+    <button id="showPrefixesBtn">📖 Voir les indices</button>
+    <div id="prefixList"></div>
+    <div id="message"></div>
   </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <script>
+    const questions = [
+      { prefix: "Pr", intro: "Toutes les réponses commencent par PR.", items: [] },
+      { prefix: "Tr", intro: "Toutes les réponses commencent par TR.", items: [] },
+      { prefix: "Ac", intro: "Toutes les réponses commencent par AC.", items: [] },
+      { prefix: "Ca", intro: "Toutes les réponses commencent par CA.", items: [] },
+      { prefix: "Me", intro: "Toutes les réponses commencent par ME.", items: [] },
+      { prefix: "Di", intro: "Toutes les réponses commencent par DI.", items: [] }
+    ];
 
-<script>
-  // 🌌 Fond spatial
-  let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+    // Remplir chaque série avec des exemples (extrait pour clarté, tu peux compléter comme avant)
+    questions[0].items = [
+      { question: "PR - Donne un mot qui signifie donner des détails exacts.", reponses: ["Précision"] }
+    ];
+    questions[1].items = [
+      { question: "TR - Changement ou métamorphose d'une chose en une autre ?", reponses: ["Transformation"] }
+    ];
+    // ... (complète les autres séries comme dans ton code initial)
 
-  let starsGeometry = new THREE.BufferGeometry();
-  let positions = [];
-  for (let i = 0; i < 2000; i++) {
-    positions.push((Math.random() - 0.5) * 1000);
-    positions.push((Math.random() - 0.5) * 1000);
-    positions.push((Math.random() - 0.5) * 1000);
-  }
+    let allQuestions = [];
+    questions.forEach(group => {
+      group.items.forEach(item => {
+        item.prefix = group.prefix;
+        item.intro = group.intro;
+        allQuestions.push(item);
+      });
+    });
 
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  let starsMaterial = new THREE.PointsMaterial({ color: 0x8888ff });
-  let stars = new THREE.Points(starsGeometry, starsMaterial);
-  scene.add(stars);
-  camera.position.z = 5;
+    let currentQuestionIndex = 0;
+    let introSpoken = {};
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    let speechRate = 0.7;
 
-  function animate() {
-    requestAnimationFrame(animate);
-    stars.rotation.y += 0.0005;
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  // Accueil audio
-  const sound = new Howl({
-    src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3'],
-    volume: 0.5
-  });
-  sound.play();
-
-  setTimeout(() => document.body.classList.add("vibration"), 2000);
-
-  setTimeout(() => {
-    gsap.to("#overlay", { opacity: 0, duration: 1 });
-    gsap.to("#scene", { y: -window.innerHeight, duration: 2, ease: "power3.inOut", onComplete: showMainRoom });
-  }, 3000);
-
-  function showMainRoom() {
-    document.getElementById("mainRoom").style.display = "block";
-    launchConfetti();
-  }
-
-  function launchConfetti() {
-    for (let i = 0; i < 30; i++) {
-      let confetti = document.createElement('div');
-      confetti.classList.add('confetti');
-      confetti.style.left = Math.random() * window.innerWidth + 'px';
-      document.body.appendChild(confetti);
-      setTimeout(() => confetti.remove(), 3000);
+    function speak(text) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "Synthèse vocale non disponible.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "fr-FR";
+      utterance.rate = speechRate;
+      speechSynthesis.speak(utterance);
     }
 
-    const cheer = new Howl({
-      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3'],
-      volume: 0.3
+    function playQuestion() {
+      const current = allQuestions[currentQuestionIndex];
+      wordDisplay.textContent = current.question;
+      message.textContent = "Écris ta réponse.";
+      answerInput.value = "";
+      answerInput.focus();
+      if (!introSpoken[current.prefix]) {
+        speak(`${current.intro} ${current.question}`);
+        introSpoken[current.prefix] = true;
+      } else {
+        speak(current.question);
+      }
+    }
+
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const goodAnswers = allQuestions[currentQuestionIndex].reponses.map(r => r.toLowerCase());
+      if (goodAnswers.includes(userAnswer)) {
+        message.textContent = "✅ Bravo, c'est exact !";
+        message.style.color = "#00e676";
+        setTimeout(nextQuestion, 1500);
+      } else {
+        message.textContent = "❌ Mauvaise réponse.";
+        message.style.color = "#ff5252";
+        speak(`Fallait penser à : ${allQuestions[currentQuestionIndex].reponses.join(", ")}`);
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= allQuestions.length) {
+        message.textContent = "🎉 Quiz terminé ! Bien joué.";
+        wordDisplay.textContent = "";
+        answerInput.disabled = true;
+      } else {
+        playQuestion();
+      }
+    }
+
+    document.getElementById("btnPlay").addEventListener("click", playQuestion);
+    document.getElementById("btnSlow").addEventListener("click", () => {
+      speechRate = Math.max(0.3, speechRate - 0.1);
+      playQuestion();
     });
-    cheer.play();
-  }
+    document.getElementById("btnFast").addEventListener("click", () => {
+      speechRate = Math.min(1.5, speechRate + 0.1);
+      playQuestion();
+    });
+    document.getElementById("btnRepeat").addEventListener("click", playQuestion);
+    document.getElementById("btnSkip").addEventListener("click", nextQuestion);
+    document.getElementById("btnBack").addEventListener("click", () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        playQuestion();
+      }
+    });
 
-  function toggleSub(id) {
-    const el = document.getElementById(id);
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-</script>
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkAnswer();
+    });
 
+    window.addEventListener("load", playQuestion);
+
+    // Affichage des préfixes au clic
+    document.getElementById("showPrefixesBtn").addEventListener("click", () => {
+      const uniquePrefixes = [...new Set(questions.map(q => q.prefix))];
+      document.getElementById("prefixList").textContent = "Préfixes : " + uniquePrefixes.join(", ");
+    });
+  </script>
 </body>
 </html>
