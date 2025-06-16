@@ -2,171 +2,227 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dictée Vocale Interactive</title>
+  <title>Espace des Champions</title>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f9;
+    html, body {
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
-    }
-    .container {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      width: 80%;
-      max-width: 600px;
-      text-align: center;
-    }
-    h1 {
-      color: #6a0dad;
-      font-size: 2rem;
-    }
-    .dictation-text {
-      margin: 20px 0;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      text-align: left;
-      max-height: 300px;
-      overflow-y: auto;
-      padding-right: 20px;
-    }
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    button {
-      background-color: #6a0dad;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      background-color: black;
       color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #5a0b9b;
+
+    #scene, #overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
-    .speed-control {
+
+    #overlay {
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 2;
+      pointer-events: none;
+      font-size: 2em;
     }
-    .speed-control input {
-      width: 100px;
-      margin: 0 10px;
+
+    .scanner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(0,255,255,0.6);
+      animation: scan 2s linear forwards;
     }
-    .verify-btn {
-      background-color: #4CAF50;
+
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
     }
-    .verify-btn:hover {
-      background-color: #45a049;
+
+    .vibration {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(1px, 1px); }
+      20% { transform: translate(-1px, -2px); }
+      40% { transform: translate(-3px, 1px); }
+      60% { transform: translate(3px, 2px); }
+      80% { transform: translate(1px, -1px); }
+      100% { transform: translate(1px, 1px); }
+    }
+
+    #mainRoom {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(#111, #000);
+      z-index: 3;
+      text-align: center;
+      padding-top: 5%;
+    }
+
+    .typewriter-text {
+      display: inline-block;
+      overflow: hidden;
+      border-right: .15em solid orange;
+      white-space: nowrap;
+      animation: typing 3s steps(30, end), blink .75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: gold;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    #options > div {
+      margin: 10px auto;
+      padding: 10px 20px;
+      border: 1px solid #fff;
+      width: fit-content;
+      cursor: pointer;
+    }
+
+    .sub-options {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .sub-options div {
+      margin: 5px;
+      padding: 8px 15px;
+      border: 1px dashed #ccc;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Dictée Vocale Interactive</h1>
-    <div class="dictation-text" id="dictationText">
-      <!-- Le texte de la dictée sera inséré ici -->
+
+<canvas id="scene"></canvas>
+<div id="overlay">Bienvenue dans l’espace des Champions</div>
+<div class="scanner"></div>
+
+<div id="mainRoom">
+  <h1><span class="typewriter-text">Programme des Champions</span></h1>
+  <div id="options">
+    <div onclick="location.href='Dicteevocal.html'">📝 Dictée</div>
+
+    <div onclick="toggleSub('epellationSub')">🔤 Épellation</div>
+    <div id="epellationSub" class="sub-options">
+      <div onclick="location.href='inivocale.html'">Initiation</div>
+      <div onclick="location.href='Epebible.html'">Bible</div>
+      <div onclick="location.href='Epedico.html'">Dictionnaire</div>
     </div>
-    <div class="controls">
-      <button onclick="startDictation()">Démarrer la dictée</button>
-      <button onclick="stopDictation()">Arrêter la dictée</button>
-      <button onclick="checkDictation()" class="verify-btn">Vérifier la dictée</button>
-    </div>
-    <div class="speed-control">
-      <label for="speed">Vitesse :</label>
-      <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1" onchange="changeSpeed(this.value)">
-      <span id="speedValue">1x</span>
+
+    <div onclick="location.href='Anagrammevocale.html'">🔀 Anagramme</div>
+    <div onclick="location.href='Mathvocal.html'">➕ Mathématiques</div>
+
+    <div onclick="toggleSub('lexicalSub')">🧠 Champ lexical</div>
+    <div id="lexicalSub" class="sub-options">
+      <div>Toutes les bonnes réponses tournent autour de</div>
+      <div>Toutes les bonnes réponses commencent avec deux lettres</div>
+      <div>Toutes les bonnes tournent autour de trois lettres</div>
+      <div>Toutes les bonnes réponses autour de quatre lettres</div>
+      <div>Toutes les bonnes réponses se terminent par</div>
     </div>
   </div>
+</div>
 
-  <script>
-    const dictationText = document.getElementById('dictationText');
-    const speedValue = document.getElementById('speedValue');
-    let recognition;
-    let isDictating = false;
-    let currentSpeed = 1;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
-    const text = `1. Le laboureur et ses enfants
-Travaillez, prenez de la peine :
-C'est le fonds qui manque le moins.
-Un riche Laboureur, sentant sa mort prochaine,
-Fit venir ses enfants, leur parla sans témoins.
-Gardez-vous, leur dit-il, de vendre l'héritage
-Que nous ont laissé nos parents.
-Un trésor est caché dedans.
-Je ne sais pas l'endroit ; mais un peu de courage
-Vous le fera trouver, vous en viendrez à bout.
-Remuez votre champ dès qu'on aura fait l'Oût.
-Creusez, fouillez, bêchez ; ne laissez nulle place
-Où la main ne passe et repasse.
-Le père mort, les fils vous retournent le champ
-Deçà, delà, partout ; si bien qu'au bout de l'an
-Il en rapporta davantage.
-D'argent, point de caché. Mais le père fut sage
-De leur montrer avant sa mort
-Que le travail est un trésor.`;
+<script>
+  // 🌌 Fond spatial
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-    dictationText.textContent = text;
+  let starsGeometry = new THREE.BufferGeometry();
+  let positions = [];
+  for (let i = 0; i < 2000; i++) {
+    positions.push((Math.random() - 0.5) * 1000);
+    positions.push((Math.random() - 0.5) * 1000);
+    positions.push((Math.random() - 0.5) * 1000);
+  }
 
-    function startDictation() {
-      if (isDictating) return;
-      isDictating = true;
-      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  let starsMaterial = new THREE.PointsMaterial({ color: 0x8888ff });
+  let stars = new THREE.Points(starsGeometry, starsMaterial);
+  scene.add(stars);
+  camera.position.z = 5;
 
-      recognition.onstart = () => console.log('Dictée commencée...');
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        dictationText.textContent = transcript;
-      };
-      recognition.onerror = (event) => console.error('Erreur de reconnaissance vocale :', event.error);
-      recognition.onend = () => {
-        isDictating = false;
-        console.log('Dictée terminée.');
-      };
-      recognition.start();
+  function animate() {
+    requestAnimationFrame(animate);
+    stars.rotation.y += 0.0005;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Accueil audio
+  const sound = new Howl({
+    src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3'],
+    volume: 0.5
+  });
+  sound.play();
+
+  setTimeout(() => document.body.classList.add("vibration"), 2000);
+
+  setTimeout(() => {
+    gsap.to("#overlay", { opacity: 0, duration: 1 });
+    gsap.to("#scene", { y: -window.innerHeight, duration: 2, ease: "power3.inOut", onComplete: showMainRoom });
+  }, 3000);
+
+  function showMainRoom() {
+    document.getElementById("mainRoom").style.display = "block";
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    for (let i = 0; i < 30; i++) {
+      let confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 3000);
     }
 
-    function stopDictation() {
-      if (!isDictating) return;
-      recognition.stop();
-    }
+    const cheer = new Howl({
+      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3'],
+      volume: 0.3
+    });
+    cheer.play();
+  }
 
-    function checkDictation() {
-      const originalText = text.split('\n').map(line => line.trim()).join(' ');
-      const userText = dictationText.textContent.trim();
-      if (userText === originalText) {
-        alert('Bravo ! Votre dictée est correcte.');
-      } else {
-        alert('Il y a des erreurs. Veuillez réessayer.');
-      }
-    }
+  function toggleSub(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
 
-    function changeSpeed(value) {
-      currentSpeed = value;
-      speedValue.textContent = `${value}x`;
-      if (recognition) {
-        recognition.stop();
-        recognition.start();
-      }
-    }
-  </script>
 </body>
 </html>
