@@ -2,161 +2,230 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ascenseur Futuriste</title>
+  <title>Espace des Champions</title>
   <style>
-    /* Styles globaux */
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      background: #000;
-      font-family: 'Roboto', sans-serif;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      perspective: 1500px;
+      font-family: 'Orbitron', sans-serif;
+      background-color: black;
+      color: white;
     }
 
-    /* Conteneur de l'ascenseur */
-    .ascenseur {
-      position: relative;
-      width: 300px;
-      height: 500px;
-      background: #333;
-      border: 4px solid #999;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 4s ease-in-out;
-    }
-
-    /* Portes de l'ascenseur */
-    .porte {
-      position: absolute;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(to right, #666, #aaa);
-      top: 0;
-      transition: transform 2.5s ease-in-out;
-      z-index: 3;
-    }
-
-    .gauche {
-      left: 0;
-      border-right: 2px solid #ccc;
-    }
-
-    .droite {
-      right: 0;
-      border-left: 2px solid #ccc;
-    }
-
-    /* Intérieur de l'ascenseur */
-    .interieur {
+    #scene, #overlay {
       position: absolute;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at center, #555, #222);
-      animation: pulseLight 3s infinite alternate;
       z-index: 1;
     }
 
-    @keyframes pulseLight {
-      from { background: radial-gradient(circle at center, #666, #222); }
-      to   { background: radial-gradient(circle at center, #444, #111); }
-    }
-
-    /* Texte d'accueil */
-    .texte {
-      position: absolute;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      color: #fff;
-      font-size: 2.5em;
-      opacity: 0;
-      z-index: 2;
-      transition: opacity 2s ease-in-out 1s, transform 2s ease-in-out;
-    }
-
-    /* Boutons de l'ascenseur */
-    .boutons {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
+    #overlay {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
       z-index: 2;
+      pointer-events: none;
+      font-size: 2.5em;
     }
 
-    .boutons button {
-      width: 30px;
-      height: 30px;
-      border: none;
-      background: #666;
-      color: white;
-      font-weight: bold;
-      border-radius: 4px;
-      cursor: default;
+    .scanner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(0,255,255,0.6);
+      animation: scan 2s linear forwards;
     }
 
-    /* Animation d'ouverture des portes */
-    .ascenseur.ouvert .gauche {
-      transform: translateX(-100%);
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
     }
 
-    .ascenseur.ouvert .droite {
-      transform: translateX(100%);
+    .vibration {
+      animation: shake 0.5s;
     }
 
-    .ascenseur.ouvert .texte {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
+    @keyframes shake {
+      0% { transform: translate(1px, 1px); }
+      20% { transform: translate(-1px, -2px); }
+      40% { transform: translate(-3px, 1px); }
+      60% { transform: translate(3px, 2px); }
+      80% { transform: translate(1px, -1px); }
+      100% { transform: translate(1px, 1px); }
     }
 
-    /* Effet de zoom dans l'ascenseur */
-    .ascenseur.zoom {
-      transform: scale(2.5) translateZ(200px);
+    #mainRoom {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(#111, #000);
+      z-index: 3;
+      text-align: center;
+      padding-top: 5%;
+    }
+
+    .typewriter-text {
+      display: inline-block;
+      overflow: hidden;
+      border-right: .15em solid orange;
+      white-space: nowrap;
+      animation: typing 3s steps(30, end), blink .75s step-end infinite;
+      font-size: 3em;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: gold;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    #options > div {
+      margin: 20px auto;
+      padding: 20px 40px;
+      border: 2px solid #fff;
+      width: fit-content;
+      cursor: pointer;
+      font-size: 2em;
+    }
+
+    .sub-options {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .sub-options div {
+      margin: 10px auto;
+      padding: 15px 30px;
+      border: 2px dashed #ccc;
+      cursor: pointer;
+      font-size: 1.5em;
+      width: fit-content;
     }
   </style>
 </head>
 <body>
 
-<div class="ascenseur" id="ascenseur">
-  <div class="porte gauche"></div>
-  <div class="porte droite"></div>
-  <div class="interieur"></div>
-  <div class="texte">Bienvenue</div>
-  <div class="boutons">
-    <button>1</button>
-    <button>2</button>
-    <button>3</button>
+<canvas id="scene"></canvas>
+<div id="overlay">Bienvenue dans l’espace des Champions</div>
+<div class="scanner"></div>
+
+<div id="mainRoom">
+  <h1><span class="typewriter-text">Programme des Champions</span></h1>
+  <div id="options">
+    <div onclick="location.href='Dictéevocal.html'">📝 Dictée</div>
+
+    <div onclick="toggleSub('epellationSub')">🔤 Épellation</div>
+    <div id="epellationSub" class="sub-options">
+      <div onclick="location.href='inivocale.html'">Initiation</div>
+      <div onclick="location.href='Epebible.html'">Bible</div>
+      <div onclick="location.href='Epedico.html'">Dictionnaire</div>
+    </div>
+
+    <div onclick="location.href='Anagrammevocale.html'">🔀 Anagramme</div>
+    <div onclick="location.href='Mathvocal.html'">➕ Mathématiques</div>
+
+    <div onclick="toggleSub('lexicalSub')">🧠 Champ lexical</div>
+    <div id="lexicalSub" class="sub-options">
+      <div>Toutes les bonnes réponses tournent autour de</div>
+      <div>Toutes les bonnes réponses commencent avec deux lettres</div>
+      <div>Toutes les bonnes réponses commencent avec de trois lettres</div>
+      <div>Toutes les bonnes réponses commencent avec quatre lettres</div>
+      <div>Toutes les bonnes réponses se terminent par</div>
+    </div>
   </div>
 </div>
 
-<audio id="son" src="ding.mp3" preload="auto"></audio>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
 <script>
-  const ascenseur = document.getElementById('ascenseur');
-  const audio = document.getElementById('son');
+  // 🌌 Fond spatial
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-  // Ouvre les portes
-  setTimeout(() => {
-    ascenseur.classList.add('ouvert');
-    audio.play();
-  }, 1000);
+  let starsGeometry = new THREE.BufferGeometry();
+  let positions = [];
+  for (let i = 0; i < 2000; i++) {
+    positions.push((Math.random() - 0.5) * 1000);
+    positions.push((Math.random() - 0.5) * 1000);
+    positions.push((Math.random() - 0.5) * 1000);
+  }
 
-  // Lance le zoom vers l’intérieur après ouverture
-  setTimeout(() => {
-    ascenseur.classList.add('zoom');
-  }, 3000); // délai pour laisser les portes s’ouvrir
+  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  let starsMaterial = new THREE.PointsMaterial({ color: 0x8888ff });
+  let stars = new THREE.Points(starsGeometry, starsMaterial);
+  scene.add(stars);
+  camera.position.z = 5;
 
-  // Redirection après le zoom
+  function animate() {
+    requestAnimationFrame(animate);
+    stars.rotation.y += 0.0005;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Accueil audio
+  const sound = new Howl({
+    src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3'],
+    volume: 0.5
+  });
+  sound.play();
+
+  setTimeout(() => document.body.classList.add("vibration"), 2000);
+
   setTimeout(() => {
-    window.location.href = 'Domi.html';
-  }, 6000); // total ≈ 6s
+    gsap.to("#overlay", { opacity: 0, duration: 1 });
+    gsap.to("#scene", { y: -window.innerHeight, duration: 2, ease: "power3.inOut", onComplete: showMainRoom });
+  }, 3000);
+
+  function showMainRoom() {
+    document.getElementById("mainRoom").style.display = "block";
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    for (let i = 0; i < 30; i++) {
+      let confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 3000);
+    }
+
+    const cheer = new Howl({
+      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3'],
+      volume: 0.3
+    });
+    cheer.play();
+  }
+
+  function toggleSub(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
 </script>
 
 </body>
