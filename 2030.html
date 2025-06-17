@@ -2,87 +2,90 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Ascenseur 3D Immersif</title>
+  <title>Fusée vers les Champions</title>
   <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; height: 100%; }
-    canvas { display: block; }
+    body {
+      margin: 0;
+      background: radial-gradient(#000015, #000);
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+    }
+
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.ibb.co/1s4Bb0b/stars.png') repeat;
+      animation: moveStars 60s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes moveStars {
+      from { background-position: 0 0; }
+      to { background-position: 0 -2000px; }
+    }
+
+    .rocket {
+      position: absolute;
+      left: 50%;
+      bottom: -100px;
+      width: 60px;
+      height: 100px;
+      background: url('https://i.ibb.co/w6MCyRX/rocket.png') no-repeat center/contain;
+      transform: translateX(-50%);
+      animation: launch 8s ease-in-out forwards;
+      z-index: 2;
+    }
+
+    @keyframes launch {
+      0% { bottom: -100px; }
+      100% { bottom: 80%; }
+    }
+
+    .planet {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, #2b2bff, #111);
+      border-radius: 50%;
+      box-shadow: 0 0 30px 10px rgba(0, 100, 255, 0.5);
+      z-index: 1;
+    }
+
+    .title {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5em;
+      color: white;
+      white-space: nowrap;
+      border-right: 2px solid orange;
+      overflow: hidden;
+      width: 0;
+      animation: typing 4s steps(25, end) 8s forwards, blink 0.7s step-end infinite 12s;
+      z-index: 3;
+    }
+
+    @keyframes typing {
+      to { width: 350px; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
   </style>
 </head>
 <body>
-  <canvas id="scene"></canvas>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script>
-    let scene, camera, renderer, elevator, leftDoor, rightDoor;
-    let doorsOpen = false;
+<div class="stars"></div>
+<div class="planet"></div>
+<div class="rocket"></div>
+<div class="title">Programme des Champions</div>
 
-    // Initialisation de la scène
-    function init() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      // Lumière
-      const light = new THREE.PointLight(0xFFFFFF, 1, 100);
-      light.position.set(0, 10, 0);
-      scene.add(light);
-
-      // Sol de l'ascenseur
-      const floorGeometry = new THREE.PlaneGeometry(10, 10);
-      const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 });
-      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-      floor.rotation.x = -Math.PI / 2;
-      scene.add(floor);
-
-      // Création de l'ascenseur
-      elevator = new THREE.Group();
-
-      // Cage de l'ascenseur
-      const elevatorGeometry = new THREE.BoxGeometry(6, 6, 6);
-      const elevatorMaterial = new THREE.MeshBasicMaterial({ color: 0x888888 });
-      const elevatorMesh = new THREE.Mesh(elevatorGeometry, elevatorMaterial);
-      elevator.add(elevatorMesh);
-
-      // Portes de l'ascenseur
-      const doorGeometry = new THREE.BoxGeometry(3, 6, 0.1);
-      const doorMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 });
-
-      leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-      leftDoor.position.set(-1.5, 0, 3);
-      elevator.add(leftDoor);
-
-      rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-      rightDoor.position.set(1.5, 0, 3);
-      elevator.add(rightDoor);
-
-      scene.add(elevator);
-      camera.position.set(0, 3, 10);
-      animate();
-    }
-
-    // Animation de la scène
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    }
-
-    // Ouverture des portes
-    function openDoors() {
-      if (!doorsOpen) {
-        doorsOpen = true;
-        new THREE.AnimationMixer(elevator).clipAction(new THREE.AnimationClip('openDoors', -1, [
-          new THREE.KeyframeTrack('leftDoor.position.x', [0, 1], [-1.5, -3]),
-          new THREE.KeyframeTrack('rightDoor.position.x', [0, 1], [1.5, 3])
-        ])).play();
-      }
-    }
-
-    // Événement de clic pour ouvrir les portes
-    window.addEventListener('click', openDoors);
-
-    // Initialisation
-    init();
-  </script>
 </body>
 </html>
