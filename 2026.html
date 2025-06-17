@@ -2,30 +2,34 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Fusée dans l’espace - GSAP</title>
+  <title>Décollage Réaliste de Fusée</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at center, #0b0e1c 0%, #000000 100%);
       overflow: hidden;
-      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      font-family: sans-serif;
       height: 100vh;
+      width: 100vw;
     }
 
     .stars {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      background: transparent url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/stars.png') repeat;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/stars.png') repeat;
+      animation: driftStars 200s linear infinite;
       z-index: 0;
-      animation: scrollStars 200s linear infinite;
+      opacity: 0.5;
     }
 
-    @keyframes scrollStars {
-      from { background-position: 0 0; }
-      to { background-position: 0 -2000px; }
+    @keyframes driftStars {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-1000px); }
     }
 
     .rocket {
@@ -33,50 +37,65 @@
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 2;
+      width: 80px;
+      z-index: 10;
     }
 
     .rocket-body {
-      width: 60px;
-      height: 120px;
-      background: linear-gradient(to bottom, #dcdcdc, #888);
-      border-radius: 30px 30px 5px 5px;
+      width: 80px;
+      height: 180px;
+      background: linear-gradient(to bottom, #cfd8dc, #607d8b);
+      border-radius: 40px 40px 10px 10px;
       position: relative;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
 
     .rocket-tip {
       width: 0;
       height: 0;
-      border-left: 30px solid transparent;
-      border-right: 30px solid transparent;
-      border-bottom: 30px solid red;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 40px solid #f44336;
       position: absolute;
-      top: -30px;
+      top: -40px;
       left: 0;
     }
 
     .flame {
-      width: 20px;
-      height: 40px;
-      background: radial-gradient(ellipse at center, orange 0%, red 80%, transparent 100%);
-      border-radius: 50%;
       position: absolute;
-      bottom: -40px;
+      bottom: -50px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1;
+      width: 30px;
+      height: 60px;
+      background: radial-gradient(ellipse at center, yellow 0%, orange 60%, red 90%);
+      border-radius: 50% 50% 40% 40%;
+      filter: blur(2px);
       opacity: 0.8;
     }
 
     .smoke {
       position: absolute;
       bottom: 0;
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
       border-radius: 50%;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
+    }
+
+    .ground-glow {
+      position: absolute;
+      bottom: -50px;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      margin-left: -150px;
+      background: radial-gradient(circle, rgba(255, 140, 0, 0.5), transparent);
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: 1;
     }
   </style>
 </head>
@@ -91,48 +110,59 @@
     <div class="flame" id="flame"></div>
   </div>
 
+  <div class="ground-glow"></div>
+
   <script>
     const rocket = document.getElementById('rocket');
     const flame = document.getElementById('flame');
 
-    // Animation de décollage GSAP
+    // Lance la fusée vers le ciel
     gsap.to(rocket, {
-      y: "-150vh",
-      duration: 12,
-      ease: "power2.inOut"
+      y: "-250vh",
+      scale: 1.5,
+      duration: 14,
+      ease: "power4.inOut"
     });
 
-    // Flame pulsante
+    // Effet de pulsation de la flamme
     gsap.to(flame, {
-      scaleY: 1.5,
-      duration: 0.3,
+      scaleY: 2,
+      scaleX: 1.3,
+      duration: 0.25,
       repeat: -1,
       yoyo: true,
-      ease: "power1.inOut"
+      ease: "sine.inOut"
     });
 
-    // Génération automatique de fumée
-    function createSmoke() {
+    // Génération dynamique de fumée
+    function launchSmoke() {
       const smoke = document.createElement('div');
       smoke.className = 'smoke';
-      smoke.style.left = `${50 + (Math.random() * 20 - 10)}%`;
+      smoke.style.left = `${50 + (Math.random() * 30 - 15)}%`;
       document.body.appendChild(smoke);
 
-      gsap.to(smoke, {
-        y: -200,
-        scale: 2,
+      gsap.fromTo(smoke, {
+        y: 0,
+        opacity: 0.5,
+        scale: 0.5
+      }, {
+        y: -200 - Math.random() * 100,
         opacity: 0,
-        duration: 6,
+        scale: 2 + Math.random(),
+        duration: 5 + Math.random() * 2,
         ease: "power1.out",
         onComplete: () => smoke.remove()
       });
     }
 
-    // Lancer des panaches de fumée
-    let smokeInterval = setInterval(createSmoke, 300);
+    // Lance les nuages de fumée régulièrement
+    let smokeInterval = setInterval(launchSmoke, 180);
 
-    // Arrêter la fumée après 12s (fin du vol)
-    setTimeout(() => clearInterval(smokeInterval), 12000);
+    // Arrête les effets de sol après le décollage
+    setTimeout(() => {
+      clearInterval(smokeInterval);
+      gsap.to('.ground-glow', { opacity: 0, duration: 2 });
+    }, 10000);
   </script>
 </body>
 </html>
