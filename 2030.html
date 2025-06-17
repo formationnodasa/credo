@@ -2,46 +2,44 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Décollage de Fusée</title>
+  <title>Fusée dans l’espace - GSAP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      height: 100vh;
       font-family: sans-serif;
+      height: 100vh;
     }
 
     .stars {
       position: absolute;
       width: 100%;
       height: 100%;
-      background: transparent url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/stars.png') repeat top center;
+      background: transparent url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/stars.png') repeat;
       z-index: 0;
-      animation: moveStars 100s linear infinite;
+      animation: scrollStars 200s linear infinite;
     }
 
-    @keyframes moveStars {
+    @keyframes scrollStars {
       from { background-position: 0 0; }
-      to { background-position: 0 -10000px; }
+      to { background-position: 0 -2000px; }
     }
 
     .rocket {
       position: absolute;
       bottom: 0;
       left: 50%;
-      width: 60px;
-      height: 150px;
-      margin-left: -30px;
+      transform: translateX(-50%);
       z-index: 2;
-      animation: fly 12s ease-in forwards;
     }
 
     .rocket-body {
       width: 60px;
       height: 120px;
-      background: linear-gradient(to bottom, #dcdcdc, #999);
+      background: linear-gradient(to bottom, #dcdcdc, #888);
       border-radius: 30px 30px 5px 5px;
       position: relative;
     }
@@ -58,51 +56,27 @@
     }
 
     .flame {
+      width: 20px;
+      height: 40px;
+      background: radial-gradient(ellipse at center, orange 0%, red 80%, transparent 100%);
+      border-radius: 50%;
       position: absolute;
       bottom: -40px;
       left: 50%;
-      width: 20px;
-      height: 40px;
-      margin-left: -10px;
-      background: radial-gradient(ellipse at center, orange 0%, red 80%, transparent 100%);
-      border-radius: 50%;
-      opacity: 0.8;
-      animation: flameMove 0.2s infinite alternate;
+      transform: translateX(-50%);
       z-index: 1;
-    }
-
-    @keyframes flameMove {
-      0% { transform: scaleY(1); }
-      100% { transform: scaleY(1.5); }
-    }
-
-    @keyframes fly {
-      0% { bottom: 0; transform: translateY(0); }
-      100% { bottom: 100vh; transform: translateY(-200vh); }
+      opacity: 0.8;
     }
 
     .smoke {
       position: absolute;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
       width: 80px;
       height: 80px;
       background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
       border-radius: 50%;
-      animation: smokeRise 6s linear infinite;
+      pointer-events: none;
       z-index: 0;
-    }
-
-    @keyframes smokeRise {
-      0% {
-        opacity: 0.6;
-        transform: translate(-50%, 0) scale(0.5);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -200px) scale(2);
-      }
     }
   </style>
 </head>
@@ -110,29 +84,55 @@
 
   <div class="stars"></div>
 
-  <div class="rocket">
+  <div class="rocket" id="rocket">
     <div class="rocket-body">
       <div class="rocket-tip"></div>
     </div>
-    <div class="flame"></div>
+    <div class="flame" id="flame"></div>
   </div>
 
-  <div class="smoke"></div>
-
   <script>
-    // Génère automatiquement plusieurs panaches de fumée au démarrage
-    for(let i = 0; i < 15; i++) {
-      setTimeout(() => {
-        const smoke = document.createElement('div');
-        smoke.className = 'smoke';
-        smoke.style.left = `${50 + (Math.random() * 20 - 10)}%`;
-        document.body.appendChild(smoke);
+    const rocket = document.getElementById('rocket');
+    const flame = document.getElementById('flame');
 
-        setTimeout(() => {
-          smoke.remove();
-        }, 6000);
-      }, i * 400);
+    // Animation de décollage GSAP
+    gsap.to(rocket, {
+      y: "-150vh",
+      duration: 12,
+      ease: "power2.inOut"
+    });
+
+    // Flame pulsante
+    gsap.to(flame, {
+      scaleY: 1.5,
+      duration: 0.3,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut"
+    });
+
+    // Génération automatique de fumée
+    function createSmoke() {
+      const smoke = document.createElement('div');
+      smoke.className = 'smoke';
+      smoke.style.left = `${50 + (Math.random() * 20 - 10)}%`;
+      document.body.appendChild(smoke);
+
+      gsap.to(smoke, {
+        y: -200,
+        scale: 2,
+        opacity: 0,
+        duration: 6,
+        ease: "power1.out",
+        onComplete: () => smoke.remove()
+      });
     }
+
+    // Lancer des panaches de fumée
+    let smokeInterval = setInterval(createSmoke, 300);
+
+    // Arrêter la fumée après 12s (fin du vol)
+    setTimeout(() => clearInterval(smokeInterval), 12000);
   </script>
 </body>
 </html>
