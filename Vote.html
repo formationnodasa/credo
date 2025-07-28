@@ -1,1 +1,66 @@
-bonjour 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vote entre amis</title>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>Élections entre amis</h1>
+  <button onclick="login()">Se connecter avec Google</button>
+  <div id="voteSection" style="display:none;">
+    <p>Bonjour <span id="userEmail"></span> !</p>
+    <p>Vote pour ton candidat préféré :</p>
+    <button onclick="vote('Alice')">Alice</button>
+    <button onclick="vote('Bob')">Bob</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    // 🔧 CONFIGURATION FIREBASE À REMPLACER PAR LA TIENNE
+    const firebaseConfig = {
+      apiKey: "TON_API_KEY",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "XXXXXXX",
+      appId: "TON_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function login() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then((result) => {
+        const user = result.user;
+        document.getElementById('userEmail').innerText = user.email;
+        checkIfVoted(user.email);
+      });
+    }
+
+    function checkIfVoted(email) {
+      db.collection("votes").doc(email).get().then((doc) => {
+        if (doc.exists) {
+          document.getElementById("message").innerText = "Tu as déjà voté pour : " + doc.data().vote;
+        } else {
+          document.getElementById("voteSection").style.display = "block";
+        }
+      });
+    }
+
+    function vote(candidat) {
+      const email = auth.currentUser.email;
+      db.collection("votes").doc(email).set({
+        vote: candidat,
+        date: new Date()
+      }).then(() => {
+        document.getElementById("message").innerText = "Merci pour ton vote pour : " + candidat;
+        document.getElementById("voteSection").style.display = "none";
+      });
+    }
+  </script>
+</body>
+</html>
