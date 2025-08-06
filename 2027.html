@@ -12,6 +12,35 @@ function prononcerMot() {
 }
 </script>
 
+<!-- 🎯 Épellation + vérification -->
+<p>Écris le mot que tu entends :</p>
+<input type="text" id="reponse" placeholder="Tape le mot ici" />
+<button onclick="verifierMot()">✅ Vérifier</button>
+
+<p id="resultat"></p>
+
+<script>
+  const motCorrect = "chat"; // mot attendu
+
+  function prononcerMot() {
+    const utterance = new SpeechSynthesisUtterance(motCorrect);
+    utterance.lang = "fr-FR";
+    speechSynthesis.speak(utterance);
+  }
+
+  function verifierMot() {
+    const reponse = document.getElementById("reponse").value.trim().toLowerCase();
+    const resultat = document.getElementById("resultat");
+
+    if (reponse === motCorrect.toLowerCase()) {
+      resultat.innerHTML = "✅ Bravo ! C'est correct.";
+      resultat.style.color = "green";
+    } else {
+      resultat.innerHTML = "❌ Oups ! Réessaie.";
+      resultat.style.color = "red";
+    }
+  }
+</script>
 
 <!DOCTYPE html>
 <html lang="fr">
