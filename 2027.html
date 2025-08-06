@@ -1,44 +1,70 @@
-<!-- 🎤 Ajout d'un bouton pour entendre un mot -->
-<h2>Épellation Magique</h2>
-<p>Clique sur le bouton pour entendre le mot :</p>
-<button onclick="prononcerMot()">🔊 Écouter le mot</button>
 
-<script>
-function prononcerMot() {
-  const mot = "chat"; // mot à prononcer
-  const utterance = new SpeechSynthesisUtterance(mot);
-  utterance.lang = "fr-FR"; // ou 'en-US' pour anglais
-  speechSynthesis.speak(utterance);
-}
-</script>
-
-<!-- 🎯 Épellation + vérification -->
-<p>Écris le mot que tu entends :</p>
-<input type="text" id="reponse" placeholder="Tape le mot ici" />
-<button onclick="verifierMot()">✅ Vérifier</button>
-
-<p id="resultat"></p>
-
-<script>
-  const motCorrect = "chat"; // mot attendu
-
-  function prononcerMot() {
-    const utterance = new SpeechSynthesisUtterance(motCorrect);
-    utterance.lang = "fr-FR";
-    speechSynthesis.speak(utterance);
-  }
-
-  function verifierMot() {
-    const reponse = document.getElementById("reponse").value.trim().toLowerCase();
-    const resultat = document.getElementById("resultat");
-
-    if (reponse === motCorrect.toLowerCase()) {
-      resultat.innerHTML = "✅ Bravo ! C'est correct.";
-      resultat.style.color = "green";
-    } else {
-      resultat.innerHTML = "❌ Oups ! Réessaie.";
-      resultat.style.color = "red";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Recherche sur la page</title>
+  <style>
+    #search-bar {
+      margin: 20px;
     }
-  }
-</script>
 
+    #search-input {
+      padding: 8px;
+      width: 250px;
+      font-size: 16px;
+    }
+
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="Rechercher un mot..." oninput="searchText()" />
+  </div>
+
+  <div id="content">
+    <p>Voici un exemple de texte sur cette page. Tu peux rechercher n'importe quel mot qui s’y trouve.</p>
+    <p>Par exemple : soleil, montagne, ordinateur, café, etc.</p>
+  </div>
+
+  <script>
+    function removeHighlights() {
+      const elements = document.querySelectorAll(".highlight");
+      elements.forEach(el => {
+        const parent = el.parentNode;
+        parent.replaceChild(document.createTextNode(el.textContent), el);
+        parent.normalize();
+      });
+    }
+
+    function highlight(word) {
+      if (!word) return;
+
+      const regex = new RegExp(`(${word})`, 'gi');
+      const content = document.getElementById("content");
+
+      content.innerHTML = content.innerHTML.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function searchText() {
+      const input = document.getElementById("search-input").value.trim();
+      removeHighlights();
+      if (input.length > 0) {
+        highlight(input);
+      }
+    }
+  </script>
+
+</body>
+</html>
+
+
+
+
+chateau 
+route 
+cat
