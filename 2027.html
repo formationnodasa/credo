@@ -1,39 +1,60 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bienvenue Champion(ne)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #4b0082, #8b00ff, #ffd700); /* Violet → Or */
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      height: 100%;
       overflow: hidden;
       font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle, #0f0c29, #302b63, #24243e);
       color: white;
     }
 
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
     .container {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       text-align: center;
-      perspective: 1000px;
     }
 
     .welcome {
       font-size: 4rem;
-      animation: fadeOut 3s ease-in-out forwards;
-      text-shadow: 0 0 25px #ffd700, 0 0 40px #ff00ff;
+      color: #ffd700;
+      text-shadow: 0 0 20px #ffd700, 0 0 40px #ff00ff;
+      animation: zoomFade 4s ease-in-out forwards;
     }
 
-    @keyframes fadeOut {
-      0% { opacity: 1; transform: translateY(0px); }
-      90% { opacity: 1; }
-      100% { opacity: 0; transform: translateY(-60px); visibility: hidden; }
+    @keyframes zoomFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.8);
+        visibility: hidden;
+      }
     }
 
     .buttons {
@@ -44,40 +65,41 @@
       animation: fadeIn 2s ease forwards;
     }
 
-    .btn {
-      padding: 15px 30px;
-      border: none;
-      background: linear-gradient(145deg, #ffd700, #ff8c00);
-      color: #4b0082;
-      font-weight: bold;
-      font-size: 1.2rem;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 5px 25px rgba(255, 215, 0, 0.6);
-      transform: scale(1) rotateX(0deg);
-      transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      transform: scale(1.05) rotateX(8deg);
-      background: linear-gradient(145deg, #ffdb58, #ffa500);
-    }
-
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(40px);
       }
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
+    .btn {
+      padding: 15px 35px;
+      border: none;
+      background: linear-gradient(145deg, #ffe600, #ffa500);
+      color: #1b0033;
+      font-weight: bold;
+      font-size: 1.3rem;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 223, 0, 0.5);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05) rotateX(10deg);
+      background: linear-gradient(145deg, #fff86a, #ffb347);
+    }
   </style>
 </head>
 <body>
+  <canvas id="stars"></canvas>
+
   <div class="container">
-    <div class="welcome" id="welcomeText">Bienvenue champion(ne)</div>
+    <div class="welcome" id="welcomeText">🌟 Bienvenue champion(ne) 🌟</div>
 
     <div class="buttons" id="buttonContainer">
       <button class="btn" onclick="window.location.href='consigne.html'">Consigne de la légende</button>
@@ -88,11 +110,51 @@
   </div>
 
   <script>
-    // Attendre que le texte disparaisse, puis afficher les boutons
+    // Particules étoiles animées (canvas)
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function initStars() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 200; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.5,
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5,
+        });
+      }
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+        star.x += star.dx;
+        star.y += star.dy;
+
+        if (star.x < 0 || star.x > canvas.width) star.dx *= -1;
+        if (star.y < 0 || star.y > canvas.height) star.dy *= -1;
+      });
+      requestAnimationFrame(animateStars);
+    }
+
+    initStars();
+    animateStars();
+    window.addEventListener('resize', initStars);
+
+    // Afficher les boutons après animation
     setTimeout(() => {
       document.getElementById('welcomeText').style.display = 'none';
       document.getElementById('buttonContainer').style.display = 'flex';
-    }, 3500);
+    }, 4000);
   </script>
 </body>
 </html>
