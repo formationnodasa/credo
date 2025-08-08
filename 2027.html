@@ -1,15 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Coin Collector - Phaser.js</title>
+  <title>Mini Mario</title>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
   <style>
     body {
       margin: 0;
-      background: #000;
-      color: white;
-      text-align: center;
+      background: #1e1e1e;
     }
     canvas {
       display: block;
@@ -18,90 +17,134 @@
   </style>
 </head>
 <body>
-  <h1>💰 Coin Collector</h1>
-  <p>Utilise les flèches pour bouger et collecte les pièces !</p>
 
-  <script>
-    const config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      backgroundColor: '#1d1d1d',
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 0 },
-          debug: false
-        }
-      },
-      scene: {
-        preload: preload,
-        create: create,
-        update: update
-      }
-    };
-
-    const game = new Phaser.Game(config);
-
-    let player;
-    let coins;
-    let cursors;
-    let score = 0;
-    let scoreText;
-
-    function preload() {
-      this.load.image('player', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');
-      this.load.image('coin', 'https://labs.phaser.io/assets/sprites/coin.png');
+<script>
+const config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 600 },
+      debug: false
     }
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+};
 
-    function create() {
-      player = this.physics.add.sprite(400, 300, 'player');
-      player.setCollideWorldBounds(true);
+const game = new Phaser.Game(config);
 
-      coins = this.physics.add.group({
-        key: 'coin',
-        repeat: 11,
-        setXY: { x: 50, y: 50, stepX: 60 }
-      });
+let player;
+let platforms;
+let cursors;
+let coins;
+let score = 0;
+let scoreText;
 
-      coins.children.iterate((coin) => {
-        coin.setBounce(1);
-        coin.setCollideWorldBounds(true);
-        coin.setVelocity(Phaser.Math.Between(-100, 100), Phaser.Math.Between(-100, 100));
-      });
+function preload() {
+  this.load.image('sky', 'https://labs.phaser.io/assets/skies/sky4.png');
+  this.load.image('ground', 'https://labs.phaser.io/assets/sprites/platform.png');
+  this.load.image('coin', 'https://labs.phaser.io/assets/sprites/coin.png');
+  this.load.spritesheet('mario', 'https://labs.phaser.io/assets/sprites/dude.png', {
+    frameWidth: 32,
+    frameHeight: 48
+  });
+}
 
-      cursors = this.input.keyboard.createCursorKeys();
+function create() {
+  this.add.image(400, 300, 'sky');
 
-      scoreText = this.add.text(16, 16, 'Score : 0', { fontSize: '24px', fill: '#fff' });
+  platforms = this.physics.add.staticGroup();
 
-      this.physics.add.overlap(player, coins, collectCoin, null, this);
-    }
+  // Sol
+  platforms.create(400, 584, 'ground').setScale(2).refreshBody();
 
-    function update() {
-      player.setVelocity(0);
+  // Plateformes flottantes
+  platforms.create(600, 400, 'ground');
+  platforms.create(50, 300, 'ground');
+  platforms.create(750, 220, 'ground');
 
-      if (cursors.left.isDown) {
-        player.setVelocityX(-200);
-      } else if (cursors.right.isDown) {
-        player.setVelocityX(200);
-      }
+  // Joueur
+  player = this.physics.add.sprite(100, 450, 'mario');
+  player.setBounce(0.2);
+  player.setCollideWorldBounds(true);
 
-      if (cursors.up.isDown) {
-        player.setVelocityY(-200);
-      } else if (cursors.down.isDown) {
-        player.setVelocityY(200);
-      }
-    }
+  this.anims.create({
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('mario', { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1
+  });
 
-    function collectCoin(player, coin) {
-      coin.disableBody(true, true);
-      score += 10;
-      scoreText.setText('Score : ' + score);
+  this.anims.create({
+    key: 'turn',
+    frames: [ { key: 'mario', frame: 4 } ],
+    frameRate: 20
+  });
 
-      if (coins.countActive(true) === 0) {
-        scoreText.setText('🎉 Bravo ! Score final : ' + score);
-      }
-    }
-  </script>
+  this.anims.create({
+    key: 'right',
+    frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  cursors = this.input.keyboard.createCursorKeys();
+
+  this.physics.add.collider(player, platforms);
+
+  // Pièces à collecter
+  coins = this.physics.add.group({
+    key: 'coin',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+  });
+
+  coins.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  });
+
+  this.physics.add.collider(coins, platforms);
+  this.physics.add.overlap(player, coins, collectCoin, null, this);
+
+  // Score
+  scoreText = this.add.text(16, 16, 'Score : 0', {
+    fontSize: '24px',
+    fill: '#ffffff'
+  });
+}
+
+function update() {
+  if (cursors.left.isDown) {
+    player.setVelocityX(-160);
+    player.anims.play('left', true);
+  } else if (cursors.right.isDown) {
+    player.setVelocityX(160);
+    player.anims.play('right', true);
+  } else {
+    player.setVelocityX(0);
+    player.anims.play('turn');
+  }
+
+  if (cursors.up.isDown && player.body.touching.down) {
+    player.setVelocityY(-400);
+  }
+}
+
+function collectCoin(player, coin) {
+  coin.disableBody(true, true);
+  score += 10;
+  scoreText.setText('Score : ' + score);
+
+  if (coins.countActive(true) === 0) {
+    scoreText.setText('🎉 Bravo, toutes les pièces sont collectées !');
+  }
+}
+</script>
 </body>
 </html>
