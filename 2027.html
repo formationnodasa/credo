@@ -2,99 +2,106 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jeu du carré</title>
+  <title>Coin Collector - Phaser.js</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
-      padding: 0;
-      background-color: #f0f0f0;
+      background: #000;
+      color: white;
+      text-align: center;
     }
-
-    h1 {
-      margin-top: 30px;
-    }
-
-    #game-area {
-      width: 100vw;
-      height: 80vh;
-      position: relative;
-      margin-top: 20px;
-      background-color: white;
-      border: 2px solid #ccc;
-      overflow: hidden;
-    }
-
-    #square {
-      width: 50px;
-      height: 50px;
-      background-color: red;
-      position: absolute;
-      cursor: pointer;
-    }
-
-    #score {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
+    canvas {
+      display: block;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
-  <h1>🎯 Clique sur le carré rouge !</h1>
-  <div id="score">Score : 0</div>
-  <button onclick="startGame()">Démarrer le jeu</button>
-  <div id="game-area">
-    <div id="square" onclick="clickSquare()"></div>
-  </div>
+  <h1>💰 Coin Collector</h1>
+  <p>Utilise les flèches pour bouger et collecte les pièces !</p>
 
   <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      backgroundColor: '#1d1d1d',
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 0 },
+          debug: false
+        }
+      },
+      scene: {
+        preload: preload,
+        create: create,
+        update: update
+      }
+    };
+
+    const game = new Phaser.Game(config);
+
+    let player;
+    let coins;
+    let cursors;
     let score = 0;
-    let gameRunning = false;
-    const square = document.getElementById("square");
-    const gameArea = document.getElementById("game-area");
+    let scoreText;
 
-    function randomPosition() {
-      const maxX = gameArea.clientWidth - square.clientWidth;
-      const maxY = gameArea.clientHeight - square.clientHeight;
-      const x = Math.floor(Math.random() * maxX);
-      const y = Math.floor(Math.random() * maxY);
-      square.style.left = x + "px";
-      square.style.top = y + "px";
+    function preload() {
+      this.load.image('player', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');
+      this.load.image('coin', 'https://labs.phaser.io/assets/sprites/coin.png');
     }
 
-    function clickSquare() {
-      if (!gameRunning) return;
-      score++;
-      document.getElementById("score").textContent = "Score : " + score;
-      randomPosition();
+    function create() {
+      player = this.physics.add.sprite(400, 300, 'player');
+      player.setCollideWorldBounds(true);
+
+      coins = this.physics.add.group({
+        key: 'coin',
+        repeat: 11,
+        setXY: { x: 50, y: 50, stepX: 60 }
+      });
+
+      coins.children.iterate((coin) => {
+        coin.setBounce(1);
+        coin.setCollideWorldBounds(true);
+        coin.setVelocity(Phaser.Math.Between(-100, 100), Phaser.Math.Between(-100, 100));
+      });
+
+      cursors = this.input.keyboard.createCursorKeys();
+
+      scoreText = this.add.text(16, 16, 'Score : 0', { fontSize: '24px', fill: '#fff' });
+
+      this.physics.add.overlap(player, coins, collectCoin, null, this);
     }
 
-    function startGame() {
-      score = 0;
-      gameRunning = true;
-      document.getElementById("score").textContent = "Score : 0";
-      square.style.display = "block";
-      randomPosition();
+    function update() {
+      player.setVelocity(0);
 
-      // Arrête le jeu au bout de 30 secondes
-      setTimeout(() => {
-        gameRunning = false;
-        alert("⏱️ Temps écoulé ! Ton score : " + score);
-        square.style.display = "none";
-      }, 30000);
+      if (cursors.left.isDown) {
+        player.setVelocityX(-200);
+      } else if (cursors.right.isDown) {
+        player.setVelocityX(200);
+      }
+
+      if (cursors.up.isDown) {
+        player.setVelocityY(-200);
+      } else if (cursors.down.isDown) {
+        player.setVelocityY(200);
+      }
     }
 
-    // Masquer le carré au début
-    square.style.display = "none";
+    function collectCoin(player, coin) {
+      coin.disableBody(true, true);
+      score += 10;
+      scoreText.setText('Score : ' + score);
+
+      if (coins.countActive(true) === 0) {
+        scoreText.setText('🎉 Bravo ! Score final : ' + score);
+      }
+    }
   </script>
 </body>
 </html>
