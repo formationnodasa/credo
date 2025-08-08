@@ -1,150 +1,111 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Mario</title>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+  <title>Course 3D - Champion</title>
   <style>
     body {
       margin: 0;
-      background: #1e1e1e;
+      overflow: hidden;
+      background-color: #000;
+      font-family: Arial, sans-serif;
     }
-    canvas {
-      display: block;
-      margin: 0 auto;
+
+    #message {
+      position: absolute;
+      bottom: 30px;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px #000;
     }
   </style>
 </head>
 <body>
+  <div id="message">🏁 Nous avons une course à terminer...</div>
 
-<script>
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 600 },
-      debug: false
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/FontLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/geometries/TextGeometry.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/fonts/helvetiker_regular.typeface.json"></script>
+
+  <script>
+    // Scene
+    const scene = new THREE.Scene();
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(
+      75, window.innerWidth / window.innerHeight, 0.1, 1000
+    );
+    camera.position.set(0, 5, 20);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lumière
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 20, 10);
+    scene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0x404040); 
+    scene.add(ambientLight);
+
+    // Sol (route)
+    const roadGeometry = new THREE.PlaneGeometry(6, 100);
+    const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const road = new THREE.Mesh(roadGeometry, roadMaterial);
+    road.rotation.x = -Math.PI / 2;
+    scene.add(road);
+
+    // Lignes blanches centrales
+    for (let i = -45; i <= 45; i += 10) {
+      const lineGeometry = new THREE.BoxGeometry(0.2, 0.01, 2);
+      const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const line = new THREE.Mesh(lineGeometry, lineMaterial);
+      line.position.set(0, 0.01, i);
+      scene.add(line);
     }
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
-};
 
-const game = new Phaser.Game(config);
+    // Ligne d'arrivée
+    const finishLine = new THREE.Mesh(
+      new THREE.BoxGeometry(6, 0.1, 0.5),
+      new THREE.MeshStandardMaterial({ color: 0xff0000 })
+    );
+    finishLine.position.set(0, 0.05, 50);
+    scene.add(finishLine);
 
-let player;
-let platforms;
-let cursors;
-let coins;
-let score = 0;
-let scoreText;
+    // Texte "CHAMPION"
+    const loader = new THREE.FontLoader();
+    loader.load('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+      const textGeometry = new THREE.TextGeometry('CHAMPION', {
+        font: font,
+        size: 1,
+        height: 0.2,
+      });
+      const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+      textMesh.position.set(-4, 1, 51);
+      scene.add(textMesh);
+    });
 
-function preload() {
-  this.load.image('sky', 'https://labs.phaser.io/assets/skies/sky4.png');
-  this.load.image('ground', 'https://labs.phaser.io/assets/sprites/platform.png');
-  this.load.image('coin', 'https://labs.phaser.io/assets/sprites/coin.png');
-  this.load.spritesheet('mario', 'https://labs.phaser.io/assets/sprites/dude.png', {
-    frameWidth: 32,
-    frameHeight: 48
-  });
-}
+    // Animation (optionnel)
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
 
-function create() {
-  this.add.image(400, 300, 'sky');
+    animate();
 
-  platforms = this.physics.add.staticGroup();
-
-  // Sol
-  platforms.create(400, 584, 'ground').setScale(2).refreshBody();
-
-  // Plateformes flottantes
-  platforms.create(600, 400, 'ground');
-  platforms.create(50, 300, 'ground');
-  platforms.create(750, 220, 'ground');
-
-  // Joueur
-  player = this.physics.add.sprite(100, 450, 'mario');
-  player.setBounce(0.2);
-  player.setCollideWorldBounds(true);
-
-  this.anims.create({
-    key: 'left',
-    frames: this.anims.generateFrameNumbers('mario', { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'turn',
-    frames: [ { key: 'mario', frame: 4 } ],
-    frameRate: 20
-  });
-
-  this.anims.create({
-    key: 'right',
-    frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  cursors = this.input.keyboard.createCursorKeys();
-
-  this.physics.add.collider(player, platforms);
-
-  // Pièces à collecter
-  coins = this.physics.add.group({
-    key: 'coin',
-    repeat: 11,
-    setXY: { x: 12, y: 0, stepX: 70 }
-  });
-
-  coins.children.iterate(function (child) {
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  });
-
-  this.physics.add.collider(coins, platforms);
-  this.physics.add.overlap(player, coins, collectCoin, null, this);
-
-  // Score
-  scoreText = this.add.text(16, 16, 'Score : 0', {
-    fontSize: '24px',
-    fill: '#ffffff'
-  });
-}
-
-function update() {
-  if (cursors.left.isDown) {
-    player.setVelocityX(-160);
-    player.anims.play('left', true);
-  } else if (cursors.right.isDown) {
-    player.setVelocityX(160);
-    player.anims.play('right', true);
-  } else {
-    player.setVelocityX(0);
-    player.anims.play('turn');
-  }
-
-  if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-400);
-  }
-}
-
-function collectCoin(player, coin) {
-  coin.disableBody(true, true);
-  score += 10;
-  scoreText.setText('Score : ' + score);
-
-  if (coins.countActive(true) === 0) {
-    scoreText.setText('🎉 Bravo, toutes les pièces sont collectées !');
-  }
-}
-</script>
+    // Responsive
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
