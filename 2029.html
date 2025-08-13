@@ -1,104 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF‑8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Programme Jours 1–10 Animé 3D</title>
+  <meta charset="UTF-8">
+  <title>Animation Réaliste - Sphère 3D</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; overflow: hidden; background: #222; color: #fff; }
-    #three-container { position: absolute; top: 0; width: 100%; height: 100%; }
-    #message {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      font-size: 1.5em;
-      pointer-events: none;
-    }
+    body { margin: 0; overflow: hidden; background: #000; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <div id="three-container"></div>
-  <div id="message">Prépare-toi...</div>
+  <!-- Libs Three.js + Postprocessing -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/shaders/CopyShader.js"></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r176/three.min.js"></script>
-  <script>
-    // 1. Setup scène, caméra, renderer
-    const container = document.getElementById('three-container');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-
-    // Lumière
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 10, 7);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0x333));
-
-    // 2. Créer les "jours" en 3D (sphères espacées)
-    const daysGroup = new THREE.Group();
-    const geometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const material = new THREE.MeshPhongMaterial({ color: 0x007bff });
-
-    const messages = [
-      "Jour 1 : Revoir les bases de l'orthographe.",
-      "Jour 2 : Étudier préfixes/suffixes.",
-      "Jour 3 : Maîtriser les accords et accents.",
-      "Jour 4 : Apprendre 30 mots/jour.",
-      "Jour 5 : Dictée orale & écriture.",
-      "Jour 6 : Quiz rapide orthographique.",
-      "Jour 7 : Épellation en miroir.",
-      "Jour 8 : Pratique des pluriels/féminins.",
-      "Jour 9 : Accentuation complexe.",
-      "Jour 10 : Résumé + test final."
-    ];
-
-    const spheres = [];
-    messages.forEach((msg, idx) => {
-      const sphere = new THREE.Mesh(geometry, material.clone());
-      sphere.position.set((idx - 4.5) * 1.2, 0, 0); // alignement horizontal
-      daysGroup.add(sphere);
-      spheres.push(sphere);
-    });
-
-    scene.add(daysGroup);
-    camera.position.z = 7;
-
-    // 3. Animations séquentielles
-    let current = 0;
-    const msgDiv = document.getElementById('message');
-
-    function highlightDay(index) {
-      spheres.forEach((s, i) => {
-        s.material.color.set(i === index ? 0xffff00 : 0x007bff);
-      });
-      msgDiv.textContent = messages[index];
-    }
-
-    // Cycle des jours
-    highlightDay(0);
-    setInterval(() => {
-      current = (current + 1) % spheres.length;
-      highlightDay(current);
-    }, 2000);
-
-    // 4. Boucle d'animation
-    function animate() {
-      requestAnimationFrame(animate);
-      daysGroup.rotation.y += 0.005;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // 5. Redimensionnement
-    window.addEventListener('resize', () => {
-      const w = window.innerWidth, h = window.innerHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    });
-  </script>
+  <!-- Script principal -->
+  <script src="main.js"></script>
 </body>
 </html>
