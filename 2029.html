@@ -1,37 +1,99 @@
 
 
- <!DOCTYPE html> <html lang="fr"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <title>Mode Clair/Sombre</title> <style> :root { --bg-color: #ffffff; --text-color: #000000; } body.dark-mode { --bg-color: #121212; --text-color: #ffffff; } body { margin: 0; font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; } .toggle-btn { position: fixed; top: 10px; right: 20px; background: none; border: 2px solid var(--text-color); color: var(--text-color); padding: 10px 15px; cursor: pointer; border-radius: 5px; transition: background 0.3s, color 0.3s, border 0.3s; } .toggle-btn:hover { background: var(--text-color); color: var(--bg-color); } h1 { text-align: center; margin-top: 100px; } </style> </head> <body> <button class="toggle-btn" onclick="toggleMode()">Changer le mode</button> 
-<script> function toggleMode() { document.body.classList.toggle("dark-mode"); } </script> </body> </html> 
-
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programme 60 jours + 3D</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
+    header { padding: 20px; text-align: center; background: #007BFF; color: white; }
+    section { padding: 20px; max-width: 800px; margin: auto; }
+    h2 { color: #007BFF; }
+    pre { background: #eee; padding: 15px; overflow-x: auto; }
+    #three-container { width: 100%; height: 400px; }
+  </style>
 </head>
 <body>
-     <style>
-        h1{
-            background-color: rgb(88, 88, 238);
-            text-align: center;
-            text-decoration: double;
-        }
-        button{
-            padding: 10px;
-            border: none;
-border-radius: 500px;
-        }
-        button:hover{
-            background-color: rgb(72, 72, 245);
-            border: none;
-            padding: 10px;
-            
-        }
-         </style>
-    <a href="Test.html"><button>Back</button></a>
-    <h1> Année 2029</h1>
-    <h3>
-       
 
+<header>
+  <h1>Programme Intensif d’Épellation — 60 jours</h1>
+  <p><strong>Objectif :</strong> Épeler plus de 3 000 mots complexes, rapide, précis, confiant.</p>
+</header>
+
+<section id="plan">
+  <h2>Plan de formation</h2>
+  <pre>
+Phase 1 (Jours 1–10)
+• Revoir bases : préfixes/suffixes, accords, accents…
+• 30 mots/jour
+Exercices : dictées orales, quiz, épellation miroir.
+
+Phase 2 (Jours 11–30)
+• Thèmes : science, médecine, mots rares
+• 40 mots/jour
+Exercices : chronométrages, anagrammes, racines grecques/latines.
+
+Phase 3 (Jours 31–50)
+• Mots anciens, techniques, répétition espacée
+• 50 mots/jour
+Exercices : concours fictif, épellation inversée, étymologies.
+
+Phase 4 (Jours 51–60)
+• Révisions ciblées, mots difficiles
+• 60 mots/jour + relecture finale
+Exercices : simulations, épellation publique, dictionnaire aléatoire.
+
+Total visé : 3 000–3 500 mots.
+</pre>
+</section>
+
+<section id="threejs">
+  <h2>Ton cube de progression 3D</h2>
+  <div id="three-container"></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r176/three.min.js"></script>
+<script>
+// Setup scène, caméra, renderer
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, 400);
+document.getElementById('three-container').appendChild(renderer.domElement);
+
+// Cube
+const geometry = new THREE.BoxGeometry(2, 2, 2);
+const material = new THREE.MeshPhongMaterial({ color: 0x007bff });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+// Lumière
+const light = new THREE.PointLight(0xffffff, 1);
+light.position.set(5, 5, 5);
+scene.add(light);
+
+// Position caméra
+camera.position.z = 5;
+
+// Animation
+function animate() {
+  requestAnimationFrame(animate);
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+  renderer.render(scene, camera);
+}
+animate();
+
+// Adaptation au redimensionnement
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, 400);
+  camera.aspect = window.innerWidth / 400;
+  camera.updateProjectionMatrix();
+});
+</script>
+
+</body>
+</html>
