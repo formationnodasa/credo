@@ -1,14 +1,19 @@
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Champs Lexicaux — Jeu Vocal</title>
+  <title>Champs Lexicaux – Jeu Vocal</title>
   <style>
     :root{
       --bg1:#6a11cb; --bg2:#2575fc;
-      --glass: rgba(255,255,255,0.1);
-      --ok:#00e676; --ko:#ff5252; --ink:#1b1f2a;
+      --card: rgba(255,255,255,.12);
+      --glass: blur(12px);
+      --txt:#fff; --accent:#fff; --brand:#2575fc;
+      --ok:#00e676; --ko:#ff5252;
     }
     *{box-sizing:border-box}
     body{
@@ -16,464 +21,749 @@
       background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
-      color:#fff; display:flex; justify-content:center; align-items:center;
-      min-height:100vh; margin:0; padding:24px;
+      color: var(--txt);
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
     @keyframes gradientAnimation{
       0%{background-position:0% 50%}
       50%{background-position:100% 50%}
       100%{background-position:0% 50%}
     }
-    .app{
-      width:min(900px,100%); display:grid; gap:18px;
-    }
-    .card{
-      background:var(--glass); backdrop-filter:blur(12px);
-      border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.25);
-      animation:fadeIn .9s ease;
+    .container{
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      width: min(920px, 94vw);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: fadeIn .9s ease;
     }
     @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
-    h1{margin:0 0 6px; font-size:clamp(22px,3.6vw,34px); font-weight:800; text-shadow:0 3px 8px rgba(0,0,0,.3)}
-    .subtitle{opacity:.9; margin-bottom:10px}
-    .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
+    }
+    h1{
+      font-weight:800; margin:0; font-size: clamp(22px, 3.2vw, 34px);
+      text-shadow: 0 3px 8px rgba(0,0,0,.3);
+      letter-spacing:.3px;
+    }
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+      opacity:.95;
+    }
     .pill{
-      padding:10px 14px; border-radius:12px; background:#fff; color:var(--bg2);
-      font-weight:700; letter-spacing:.08em; box-shadow:0 4px 10px rgba(0,0,0,.12)
+      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size:.95rem
     }
-    .bigLetters{font-size: clamp(22px,4.5vw,32px)}
     .display{
-      display:grid; gap:10px; margin-top:6px
+      margin:24px 0 10px; display:grid; gap:10px;
     }
-    .label{opacity:.9; font-weight:600}
-    .definition{
-      font-size: clamp(18px,2.6vw,22px); line-height:1.35; background:#ffffff; color:var(--ink);
-      border-radius:14px; padding:16px; box-shadow:inset 0 0 0 rgba(0,0,0,0)
+    #prefixDisplay{
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight:900; letter-spacing:.18em; text-align:center;
+      text-shadow: 0 3px 8px rgba(0,0,0,.28);
     }
-    #answer{
-      font-size: clamp(18px,2.8vw,24px);
-      padding:16px; border-radius:12px; border:none; width:100%;
-      margin-top:6px; background-color:#fff; color:#333; outline:none;
-      box-shadow:inset 0 0 0 rgba(0,0,0,0); transition: box-shadow .25s ease, transform .06s ease;
+    #definitionDisplay{
+      font-size: clamp(16px, 2vw, 20px);
+      line-height:1.6; text-align:center;
+      background: rgba(0,0,0,.16);
+      border-radius:14px; padding:16px 18px;
     }
-    #answer:focus{box-shadow:0 0 10px var(--bg2); caret-color:var(--bg2)}
-    .gridBtns{display:grid; grid-template-columns:repeat(6,1fr); gap:10px}
+    .controls{
+      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+    }
     button{
-      padding:12px 10px; font-size:1rem; font-weight:700; border-radius:10px; border:none; cursor:pointer;
-      background:#fff; color:var(--bg2); transition:.2s ease; box-shadow:0 4px 10px rgba(0,0,0,.1)
+      padding:12px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
+      cursor:pointer; background:#fff; color:var(--brand);
+      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
     }
-    button:hover{background:var(--bg2); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa}
-    button:disabled{opacity:.5; cursor:not-allowed}
-    #message{min-height:28px; font-size:1.1rem; font-weight:700; margin-top:4px; text-shadow:0 0 8px rgba(0,0,0,.1)}
-    .footer{
-      display:flex; flex-wrap:wrap; align-items:center; gap:10px
+    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+    button:disabled{opacity:.55; cursor:not-allowed}
+    input[type="text"]{
+      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
+      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
     }
-    .initials{
-      display:flex; flex-wrap:wrap; gap:8px; margin-top:6px
+    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
+    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
+    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
     }
-    .chip{
-      border:2px solid #ffffffaa; color:#fff; background:transparent; padding:8px 10px; border-radius:999px; font-weight:800;
-      letter-spacing:.06em; cursor:pointer; transition:.2s ease
+    .bank button{
+      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18);
     }
-    .chip:hover{background:#ffffff22}
-    .chip.active{background:#fff; color:var(--bg2); border-color:#fff}
-    .progress{
-      width:100%; height:8px; background:#ffffff33; border-radius:999px; overflow:hidden
+    .bank button.active{ background:#fff; color:var(--brand) }
+    .footnote{
+      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
     }
-    .bar{height:100%; width:0%; background:#fff}
-    .mini{
-      opacity:.9; font-size:.95rem
-    }
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background:#ffffff; color:var(--bg2); padding:2px 8px; border-radius:6px; font-weight:800
-    }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <h1>Champs Lexicaux — Jeu Vocal</h1>
-      <div class="subtitle">L’IA annonce les initiales, lit une définition, tu tapes le mot qui commence par ces lettres.</div>
-      <div class="row">
-        <div class="pill bigLetters" id="currentInitials">—</div>
-        <div class="pill" id="stepInfo">1 / 1</div>
-        <div class="pill" id="speedInfo">🔊 x1.00</div>
+  <div class="container">
+    <header>
+      <h1>Champs lexicaux – Jeu vocal</h1>
+      <div class="status">
+        <span class="pill" id="progressPill">0 / 0</span>
+        <span class="pill" id="speedPill">Vitesse ×1.00</span>
+        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">– –</b></span>
       </div>
+    </header>
 
-      <div class="display">
-        <div class="label">Définition à deviner :</div>
-        <div class="definition" id="definition">—</div>
-        <input id="answer" type="text" placeholder="Tape ta réponse et presse Entrée…" autocomplete="off" />
-        <div id="message"></div>
-        <div class="progress"><div class="bar" id="progressBar"></div></div>
-      </div>
+    <div class="display">
+      <div id="prefixDisplay">– –</div>
+      <div id="definitionDisplay">Clique une initiale ci-dessous ou appuie sur ▶️ Jouer.</div>
     </div>
 
-    <div class="card">
-      <div class="gridBtns">
-        <button id="btnPlay">▶️ Jouer</button>
-        <button id="btnSlow">🐢 Ralentir</button>
-        <button id="btnFast">🐇 Accélérer</button>
-        <button id="btnRepeat">🔁 Répéter</button>
-        <button id="btnSkip">⏭ Passer</button>
-        <button id="btnBack">⬅️ Retour</button>
-      </div>
-      <div class="mini" style="margin-top:10px">
-        Astuces : presse <span class="kbd">Entrée</span> pour valider · <span class="kbd">↑</span>/<span class="kbd">↓</span> pour naviguer · <span class="kbd">R</span> pour répéter
-      </div>
+    <input type="text" id="answer" placeholder="Écris le mot correct (même initiales) et appuie sur Entrée…" autocomplete="off" />
+
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
     </div>
 
-    <div class="card">
-      <div class="footer">
-        <div class="label">Initiales disponibles :</div>
-        <div class="initials" id="initialsList"></div>
-      </div>
-      <div class="mini" style="margin-top:6px">
-        Clique une pastille pour choisir un champ lexical, ou suis l’ordre proposé.
-      </div>
-    </div>
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste d’initiales (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
   </div>
 
   <script>
-    // ——— Données EXACTES fournies (sans modification) ———
-    const DATA = [
-      {
-        initials: "Pr",
-        entries: [
-          { mot: "Précision", definition: "le fait de donner des détails exacts et précis sur quelque chose." },
-          { mot: "Profond", definition: "qui se rapporte à la profondeur ou à une intensité importante." },
-          { mot: "Profession", definition: "domaine d'activité ou métier dans lequel une personne travaille." },
-          { mot: "Progrès", definition: "avancement ou amélioration dans une situation ou un domaine." },
-          { mot: "Promesse", definition: "engagement ou parole donnée de faire quelque chose." },
-          { mot: "Proverbe", definition: "expression populaire qui contient une sagesse ou un conseil." },
-          { mot: "Précieux", definition: "qui a une grande valeur ou importance." },
-          { mot: "Préparation", definition: "action de se préparer ou de s'organiser en vue d'une certaine activité." },
-          { mot: "Précaution", definition: "mesure prise pour éviter un danger ou un problème." },
-          { mot: "Privilège", definition: "avantage ou droit spécial accordé à certaines personnes." }
-        ]
-      },
-      {
-        initials: "Se",
-        entries: [
-          { mot: "Sensation", definition: "perception ou ressenti d'un stimulus par les sens." },
-          { mot: "Séduction", definition: "charme ou pouvoir d'attraction envers quelqu'un." },
-          { mot: "Sérénité", definition: "état de calme et de tranquillité." },
-          { mot: "Secret", definition: "quelque chose qui est caché ou inconnu du public." },
-          { mot: "Séparation", definition: "acte de se séparer ou de se diviser." },
-          { mot: "Sérieux", definition: "état de responsabilité et de gravité." },
-          { mot: "Sentiment", definition: "émotion ou affection ressentie envers quelqu'un ou quelque chose." },
-          { mot: "Service", definition: "action d'aider ou d'assister quelqu'un." },
-          { mot: "Seconde", definition: "unité de temps ou rang après la première." },
-          { mot: "Septième", definition: "ordre ou position dans une série après le sixième." }
-        ]
-      },
-      {
-        initials: "Tr",
-        entries: [
-          { mot: "Transformation", definition: "changement ou métamorphose d'une chose en une autre." },
-          { mot: "Tristesse", definition: "état de chagrin ou de mélancolie." },
-          { mot: "Travail", definition: "c’est un emploi ou activité professionnelle." },
-          { mot: "Traitement", definition: "c’est une action de soigner ou de procéder à une procédure médicale." },
-          { mot: "Tradition", definition: "coutume ou héritage culturel transmis de génération en génération." },
-          { mot: "Tragédie", definition: "drame ou catastrophe qui provoque de la tristesse ou du désespoir." },
-          { mot: "Trentième", definition: "ordre ou position dans une série après le vingt-neuvième." },
-          { mot: "Triomphe", definition: "Victoire éclatante à l'issue d'une lutte, d'une rivalité." },
-          { mot: "Transparence", definition: "clarté ou lisibilité d'une substance ou d'une situation." },
-          { mot: "Trésor", definition: "richesse ou bien précieux à valeur sentimentale ou matérielle." }
-        ]
-      },
-      {
-        initials: "Ac",
-        entries: [
-          { mot: "Accompagnement", definition: "soutien ou aide fournie à quelqu'un." },
-          { mot: "Accès", definition: "moyen ou possibilité d'entrer dans un lieu ou d'obtenir quelque chose." },
-          { mot: "Action", definition: "acte de faire quelque chose ou mouvement." },
-          { mot: "Activité", definition: "occupation ou exercice d'une activité." },
-          { mot: "Achat", definition: "acquisition ou action d'acheter un bien." },
-          { mot: "Accident", definition: "incident ou événement imprévu et souvent tragique." },
-          { mot: "Accord", definition: "entente ou consensus entre plusieurs personnes." },
-          { mot: "Acquisition", definition: "gain ou obtention d'une chose." },
-          { mot: "Acteur", definition: "personne qui joue un rôle dans une pièce de théâtre, un film, etc." },
-          { mot: "Acclamation", definition: "applaudissements ou éloges enthousiastes envers quelqu'un ou quelque chose." },
-          { mot: "Acrimonie", definition: "Mauvaise humeur qui s'exprime par des propos acerbes ou hargneux." }
-        ]
-      },
-      {
-        initials: "Ca",
-        entries: [
-          { mot: "Caractère", definition: "Ensemble de traits distinctifs qui définissent une personne ou une chose." },
-          { mot: "Carte", definition: "Document représentant une région ou un territoire avec ses caractéristiques géographiques." },
-          { mot: "Cascade", definition: "Chute d'eau qui s'écoule sur une pente." },
-          { mot: "Cadeau", definition: "Objet offert à quelqu'un pour marquer une occasion spéciale ou pour témoigner de l'affection." },
-          { mot: "Caisse", definition: "Contenant en bois ou en métal pour transporter des objets." },
-          { mot: "Caméra", definition: "Appareil qui permet de prendre des photos ou de filmer des images en mouvement." },
-          { mot: "Campagne", definition: "Région rurale ou périurbaine, éloignée de la ville." },
-          { mot: "Canal", definition: "Voie d'eau artificielle utilisée pour le transport de marchandises." },
-          { mot: "Capacité", definition: "Aptitude à faire quelque chose, à comprendre ou à apprendre." },
-          { mot: "Capitale", definition: "Ville principale d'un pays ou d'une région." },
-          { mot: "Carrière", definition: "Ensemble des emplois successifs qu'une personne a occupés." },
-          { mot: "Carton", definition: "Matériau rigide et léger utilisé pour la fabrication d'emballages." },
-          { mot: "Casquette", definition: "Coiffure légère en forme de calotte, avec une visière à l'avant." }
-        ]
-      },
-      {
-        initials: "Me",
-        entries: [
-          { mot: "Mémoire", definition: "la capacité de se souvenir et de rappeler des informations." },
-          { mot: "Méthode", definition: "une manière spécifique d'effectuer une tâche ou de résoudre un problème." },
-          { mot: "Mélodie", definition: "une séquence agréable de notes musicales." },
-          { mot: "Menu", definition: "une liste des plats disponibles dans un restaurant ou d'options dans un programme informatique." },
-          { mot: "Mécontentement", definition: "le sentiment de ne pas être satisfait ou de ne pas être heureux avec quelque chose." },
-          { mot: "Mesure", definition: "une quantité ou une échelle utilisée pour évaluer ou quantifier quelque chose." },
-          { mot: "Merveille", definition: "quelque chose de très impressionnant ou étonnant." },
-          { mot: "Méditation", definition: "une pratique de relaxation et de concentration de l'esprit." },
-          { mot: "Messagerie", definition: "le système de communication électronique qui permet l'envoi et la réception de messages." },
-          { mot: "Mémorable", definition: "qui mérite d'être rappelé ou mémorisé." },
-          { mot: "Météo", definition: "les conditions atmosphériques à un moment précis." },
-          { mot: "Menuisier", definition: "" } // (texte original sans définition)
-        ]
-      },
-      {
-        initials: "Di",
-        entries: [
-          { mot: "Direction", definition: "la position ou la trajectoire vers laquelle quelqu'un ou quelque chose se déplace." },
-          { mot: "Difficulté", definition: "un obstacle ou un défi qui rend quelque chose difficile ou compliqué." },
-          { mot: "Discipline", definition: "l'obéissance à des règles ou des normes pour atteindre un objectif." },
-          { mot: "Dialogue", definition: "une conversation entre deux personnes ou plus." },
-          { mot: "Diversité", definition: "la variété ou la différence dans un groupe ou une société." },
-          { mot: "Diplomatie", definition: "l'art de négocier et de résoudre les conflits de manière pacifique." },
-          { mot: "Dictionnaire", definition: "un livre qui répertorie les mots et leurs définitions dans une langue donnée." },
-          { mot: "Disparition", definition: "le fait de ne plus être présent ou visible." },
-          { mot: "Dimension", definition: "une mesure de la taille, de l'étendue ou de la portée d'un objet ou d'un concept." },
-          { mot: "Directionnel", definition: "qui se rapporte à la direction ou à l'orientation." },
-          { mot: "Divertissement", definition: "quelque chose qui fournit du plaisir, de l'amusement ou de la détente." },
-          { mot: "Diamant", definition: "" }, // (texte original sans définition)
-          { mot: "Diamètre", definition: "Ligne droite qui va d'un point de la circonférence d'un cercle (ou d'une sphère) à un autre point en passant par le centre." },
-          { mot: "Discothèque", definition: "Lieu de réunion où l'on peut danser au son d'une musique enregistrée." }
-        ]
-      },
-      {
-        initials: "Em",
-        entries: [
-          { mot: "Emotion", definition: "une réaction affective intense envers quelque chose ou quelqu'un." },
-          { mot: "Empathie", definition: "la capacité de comprendre et de partager les sentiments des autres." },
-          { mot: "Emploi", definition: "un travail ou une occupation rémunéré." },
-          { mot: "Empreinte", definition: "une marque laissée par un objet ou une personne." },
-          { mot: "Émotionnel", definition: "qui est lié aux émotions ou qui les provoque." },
-          { mot: "Empire", definition: "un vaste territoire gouverné par un seul souverain." },
-          { mot: "Emblème", definition: "un symbole qui représente une idée, une organisation ou un pays." },
-          { mot: "Empoisonnement", definition: "l'état d'avoir été intoxiqué ou empoisonné." },
-          { mot: "Émérite", definition: "qui a acquis une reconnaissance et un respect particuliers dans un domaine." },
-          { mot: "Empressement", definition: "l'enthousiasme et la volonté de faire quelque chose rapidement ou immédiatement." },
-          { mot: "Émergence", definition: "le processus par lequel quelque chose devient visible, apparaît ou se manifeste pour la première fois." },
-          { mot: "Émancipation", definition: "le fait de se libérer ou d'être libéré de contraintes, de restrictions ou d'oppressions, généralement pour atteindre une plus grande autonomie ou liberté." }
-        ]
-      },
-      {
-        initials: "No",
-        entries: [
-          { mot: "Nourriture", definition: "les substances consommées pour se nourrir et se sustenter." },
-          { mot: "Nouvelle", definition: "une information ou un rapport sur des événements récents." },
-          { mot: "Nostalgie", definition: "le sentiment de désir ou de tristesse envers le passé." },
-          { mot: "Normalité", definition: "l'état ou la condition d'être normal ou conforme aux normes." },
-          { mot: "Notoriété", definition: "la renommée ou la célébrité d'une personne ou d'une chose." },
-          { mot: "Notre", definition: "utilisé pour indiquer que quelque chose appartient à \"nous\"." },
-          { mot: "Nocif", definition: "qui peut causer des dommages à la santé ou à l'environnement." },
-          { mot: "Novice", definition: "une personne qui est inexpérimentée ou peu familière avec quelque chose." },
-          { mot: "Nourrir", definition: "donner de la nourriture à quelqu'un ou à quelque chose." },
-          { mot: "Nomade", definition: "une personne ou un groupe qui se déplace souvent sans domicile fixe." }
-        ]
-      }
-    ];
+    // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
+    // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
+    const FIELDS = {
+      "Pr": [
+        {mot:"Précision", def:"Le fait de donner des détails exacts et précis sur quelque chose."},
+        {mot:"Profond", def:"Qui se rapporte à la profondeur ou à une intensité importante."},
+        {mot:"Profession", def:"Domaine d'activité ou métier dans lequel une personne travaille."},
+        {mot:"Progrès", def:"Avancement ou amélioration dans une situation ou un domaine."},
+        {mot:"Promesse", def:"Engagement ou parole donnée de faire quelque chose."},
+        {mot:"Proverbe", def:"Expression populaire qui contient une sagesse ou un conseil."},
+        {mot:"Précieux", def:"Qui a une grande valeur ou importance."},
+        {mot:"Préparation", def:"Action de se préparer en vue d'une activité."},
+        {mot:"Précaution", def:"Mesure prise pour éviter un danger ou un problème."},
+        {mot:"Privilège", def:"Avantage ou droit spécial accordé à certaines personnes."}
+      ],
+      "Se": [
+        {mot:"Sensation", def:"Perception ou ressenti d'un stimulus par les sens."},
+        {mot:"Séduction", def:"Charme ou pouvoir d'attraction envers quelqu'un."},
+        {mot:"Sérénité", def:"État de calme et de tranquillité."},
+        {mot:"Secret", def:"Quelque chose qui est caché ou inconnu du public."},
+        {mot:"Séparation", def:"Acte de se séparer ou de se diviser."},
+        {mot:"Sérieux", def:"État de responsabilité et de gravité."},
+        {mot:"Sentiment", def:"Émotion ou affection ressentie envers quelqu'un ou quelque chose."},
+        {mot:"Service", def:"Action d'aider ou d'assister quelqu'un."},
+        {mot:"Seconde", def:"Unité de temps ou rang après la première."},
+        {mot:"Septième", def:"Position dans une série après le sixième."}
+      ],
+      "Tr": [
+        {mot:"Transformation", def:"Changement ou métamorphose d'une chose en une autre."},
+        {mot:"Tristesse", def:"État de chagrin ou de mélancolie."},
+        {mot:"Travail", def:"Emploi ou activité professionnelle."},
+        {mot:"Traitement", def:"Action de soigner ou de procéder à une procédure médicale."},
+        {mot:"Tradition", def:"Coutume transmise de génération en génération."},
+        {mot:"Tragédie", def:"Drame qui provoque de la tristesse ou du désespoir."},
+        {mot:"Trentième", def:"Position dans une série après le vingt-neuvième."},
+        {mot:"Triomphe", def:"Victoire éclatante à l'issue d'une lutte."},
+        {mot:"Transparence", def:"Clarté d'une substance ou d'une situation."},
+        {mot:"Trésor", def:"Richesse ou bien précieux à valeur sentimentale ou matérielle."}
+      ],
+      "Ac": [
+        {mot:"Accompagnement", def:"Soutien ou aide fournie à quelqu'un."},
+        {mot:"Accès", def:"Possibilité d'entrer dans un lieu ou d'obtenir quelque chose."},
+        {mot:"Action", def:"Acte de faire quelque chose."},
+        {mot:"Activité", def:"Occupation ou exercice d'une action."},
+        {mot:"Achat", def:"Acquisition d'un bien."},
+        {mot:"Accident", def:"Événement imprévu, souvent tragique."},
+        {mot:"Accord", def:"Entente ou consensus entre plusieurs personnes."},
+        {mot:"Acquisition", def:"Obtention d'une chose."},
+        {mot:"Acteur", def:"Personne qui joue un rôle au théâtre ou au cinéma."},
+        {mot:"Acclamation", def:"Applaudissements ou éloges enthousiastes."},
+        {mot:"Acrimonie", def:"Mauvaise humeur qui s'exprime par des propos acerbes."}
+      ],
+      "Ca": [
+        {mot:"Caractère", def:"Ensemble de traits distinctifs d'une personne ou d'une chose."},
+        {mot:"Carte", def:"Document représentant une région ou un territoire."},
+        {mot:"Cascade", def:"Chute d'eau sur une pente."},
+        {mot:"Cadeau", def:"Objet offert pour une occasion ou par affection."},
+        {mot:"Caisse", def:"Contenant destiné au transport d'objets."},
+        {mot:"Caméra", def:"Appareil pour prendre des photos ou filmer."},
+        {mot:"Campagne", def:"Région rurale, éloignée de la ville."},
+        {mot:"Canal", def:"Voie d'eau artificielle pour le transport."},
+        {mot:"Capacité", def:"Aptitude à faire, comprendre ou apprendre."},
+        {mot:"Capitale", def:"Ville principale d'un pays ou d'une région."}
+      ],
+      "Me": [
+        {mot:"Mémoire", def:"Capacité de se souvenir et de rappeler des informations."},
+        {mot:"Méthode", def:"Manière spécifique d'effectuer une tâche."},
+        {mot:"Mélodie", def:"Séquence agréable de notes musicales."},
+        {mot:"Menu", def:"Liste de plats ou d'options dans un programme."},
+        {mot:"Mécontentement", def:"Sentiment de ne pas être satisfait."},
+        {mot:"Mesure", def:"Quantité ou échelle pour évaluer quelque chose."},
+        {mot:"Merveille", def:"Chose très impressionnante ou étonnante."},
+        {mot:"Méditation", def:"Pratique de relaxation et de concentration."},
+        {mot:"Messagerie", def:"Système d'envoi et de réception de messages."},
+        {mot:"Mémorable", def:"Qui mérite d'être rappelé."},
+        {mot:"Météo", def:"Conditions atmosphériques à un moment précis."}
+      ],
+      "Di": [
+        {mot:"Direction", def:"Position ou trajectoire d'un mouvement."},
+        {mot:"Difficulté", def:"Obstacle ou défi qui complique quelque chose."},
+        {mot:"Discipline", def:"Obéissance à des règles pour atteindre un objectif."},
+        {mot:"Dialogue", def:"Conversation entre deux personnes ou plus."},
+        {mot:"Diversité", def:"Variété dans un groupe ou une société."},
+        {mot:"Diplomatie", def:"Art de négocier et résoudre les conflits."},
+        {mot:"Dictionnaire", def:"Livre listant les mots et leurs définitions."},
+        {mot:"Disparition", def:"Fait de ne plus être présent ou visible."},
+        {mot:"Dimension", def:"Mesure de la taille ou de la portée d'un objet."},
+        {mot:"Directionnel", def:"Relatif à la direction ou l'orientation."},
+        {mot:"Divertissement", def:"Ce qui procure du plaisir ou de l'amusement."},
+        {mot:"Diamètre", def:"Segment passant par le centre d'un cercle entre deux points de la circonférence."},
+        {mot:"Discothèque", def:"Lieu où l'on danse au son d'une musique enregistrée."}
+      ],
+      "Em": [
+        {mot:"Emotion", def:"Réaction affective intense."},
+        {mot:"Empathie", def:"Capacité de comprendre et partager les sentiments d'autrui."},
+        {mot:"Emploi", def:"Travail ou occupation rémunéré."},
+        {mot:"Empreinte", def:"Marque laissée par un objet ou une personne."},
+        {mot:"Émotionnel", def:"Lié aux émotions."},
+        {mot:"Empire", def:"Vaste territoire gouverné par un seul souverain."},
+        {mot:"Emblème", def:"Symbole représentant une idée ou une organisation."},
+        {mot:"Empoisonnement", def:"État d'intoxication."},
+        {mot:"Émérite", def:"Qui a acquis une reconnaissance particulière dans un domaine."},
+        {mot:"Empressement", def:"Enthousiasme à faire quelque chose rapidement."},
+        {mot:"Émergence", def:"Processus par lequel quelque chose devient visible."},
+        {mot:"Émancipation", def:"Fait de se libérer de contraintes pour plus d'autonomie."}
+      ],
+      "No": [
+        {mot:"Nourriture", def:"Substances consommées pour se nourrir."},
+        {mot:"Nouvelle", def:"Information sur des événements récents."},
+        {mot:"Nostalgie", def:"Désir ou tristesse envers le passé."},
+        {mot:"Normalité", def:"État conforme aux normes."},
+        {mot:"Notoriété", def:"Renommée d'une personne ou d'une chose."},
+        {mot:"Notre", def:"Qui appartient à « nous »."},
+        {mot:"Nocif", def:"Qui peut causer des dommages."},
+        {mot:"Novice", def:"Personne inexpérimentée."},
+        {mot:"Nourrir", def:"Donner à manger."},
+        {mot:"Nomade", def:"Qui se déplace souvent sans domicile fixe."}
+      ],
+      "La": [
+        {mot:"Langage", def:"Système de communication humaine."},
+        {mot:"Labyrinthe", def:"Dédale complexe de passages."},
+        {mot:"Lampe", def:"Appareil d'éclairage."},
+        {mot:"Laconique", def:"Qui s'exprime de manière brève."},
+        {mot:"Larme", def:"Goutte d'eau produite par les glandes lacrymales."},
+        {mot:"Lavage", def:"Action de nettoyer avec de l'eau."},
+        {mot:"Laconisme", def:"Style de discours succinct."},
+        {mot:"Lancinant", def:"Douleur vive et persistante."},
+        {mot:"Laconiquement", def:"De manière concise."},
+        {mot:"Languissant", def:"Faible ou manquant d'énergie."}
+      ],
+      "Ch": [
+        {mot:"Chaleur", def:"Sensation de température élevée."},
+        {mot:"Chambre", def:"Pièce où l'on dort."},
+        {mot:"Chanson", def:"Composition musicale avec paroles."},
+        {mot:"Chapeau", def:"Coiffure protégeant du soleil ou de la pluie."},
+        {mot:"Charité", def:"Aide apportée aux personnes dans le besoin."},
+        {mot:"Chat", def:"Animal domestique qui miaule."},
+        {mot:"Château", def:"Bâtiment fortifié, résidence noble."},
+        {mot:"Chauffage", def:"Système pour chauffer une pièce."},
+        {mot:"Chaussure", def:"Accessoire qui recouvre le pied."},
+        {mot:"Chiffre", def:"Symbole numérique."},
+        {mot:"Chocolat", def:"Produit alimentaire à base de cacao."},
+        {mot:"Choix", def:"Action de choisir."},
+        {mot:"Chômage", def:"Situation d'une personne sans travail."},
+        {mot:"Chute", def:"Action de tomber."},
+        {mot:"Chèvre", def:"Animal domestique élevé pour son lait."},
+        {mot:"Chimie", def:"Science de la composition des substances."},
+        {mot:"Chirurgie", def:"Branche de la médecine utilisant des opérations."},
+        {mot:"Chouette", def:"Oiseau nocturne associé à la sagesse."}
+      ],
+      "Ci": [
+        {mot:"Ciel", def:"Espace atmosphérique au-dessus de la Terre."},
+        {mot:"Cire", def:"Substance solide pour bougies ou polir."},
+        {mot:"Cigogne", def:"Grand oiseau migrateur aux longues pattes."},
+        {mot:"Ciseaux", def:"Outil tranchant pour couper."},
+        {mot:"Ciment", def:"Poudre liant des matériaux de construction."},
+        {mot:"Cité", def:"Zone urbaine avec bâtiments et population."},
+        {mot:"Citation", def:"Phrase ou extrait tiré d'un texte."},
+        {mot:"Circulation", def:"Mouvement des véhicules et piétons."},
+        {mot:"Citadelle", def:"Forteresse sur une hauteur."},
+        {mot:"Cigarette", def:"Petit cylindre de tabac à fumer."},
+        {mot:"Cible", def:"Objet à atteindre au tir ou lancer."},
+        {mot:"Cinéma", def:"Art et projection des films."}
+      ],
+      "Jo": [
+        {mot:"Jovial", def:"Enjoué, gai, plein d'entrain."},
+        {mot:"Joli", def:"Agréable à regarder."},
+        {mot:"Jouet", def:"Objet de divertissement."},
+        {mot:"Journée", def:"Période de vingt-quatre heures."},
+        {mot:"Joie", def:"État de bonheur."},
+        {mot:"Journal", def:"Document rapportant des informations."},
+        {mot:"Joueur", def:"Personne qui participe à un jeu ou sport."},
+        {mot:"Jogging", def:"Course à rythme lent."},
+        {mot:"Joaillerie", def:"Art de fabriquer des bijoux."},
+        {mot:"Jonquille", def:"Plante à fleurs jaunes du printemps."},
+        {mot:"Journaliste", def:"Personne qui recueille et publie des informations."}
+      ],
+      "In": [
+        {mot:"Insecte", def:"Petit animal à six pattes, souvent ailé."},
+        {mot:"Inconnu", def:"Qui n'est pas reconnu ou identifié."},
+        {mot:"Innovant", def:"Qui apporte des idées ou méthodes nouvelles."},
+        {mot:"Innovation", def:"Introduction de nouvelles idées ou produits."},
+        {mot:"Injustice", def:"Absence d'équité."},
+        {mot:"Information", def:"Faits ou connaissances sur un sujet."},
+        {mot:"Inspection", def:"Action d'examiner attentivement."},
+        {mot:"Intégrité", def:"Respect de principes moraux."},
+        {mot:"Inviter", def:"Demander à quelqu'un de venir."},
+        {mot:"Industrie", def:"Activités de production de biens et services."},
+        {mot:"Informatique", def:"Science du traitement automatique de l'information."},
+        {mot:"Infirmerie", def:"Lieu de soins médicaux légers."},
+        {mot:"Infini", def:"Qui n'a pas de limite."},
+        {mot:"Invention", def:"Création d'une chose nouvelle."},
+        {mot:"Invitation", def:"Demande de participer à quelque chose."},
+        {mot:"Inédit", def:"Jamais publié ou montré."},
+        {mot:"Interlocuteur", def:"Personne avec qui l'on discute."},
+        {mot:"Interdit", def:"Non autorisé."},
+        {mot:"Intervention", def:"Action d'intervenir pour aider."}
+      ],
+      "Ge": [
+        {mot:"Géant", def:"Très grand ou imposant."},
+        {mot:"Géographie", def:"Étude de la Terre et de ses habitants."},
+        {mot:"Gérer", def:"S'occuper de, diriger une situation."},
+        {mot:"Géologie", def:"Étude des roches et de la structure de la Terre."},
+        {mot:"Genre", def:"Catégorie de choses similaires."},
+        {mot:"Géométrie", def:"Branche des mathématiques des formes."},
+        {mot:"Géantisme", def:"Croissance corporelle excessive."},
+        {mot:"Générosité", def:"Qualité de donner sans attendre en retour."},
+        {mot:"Gestion", def:"Action de diriger une organisation."},
+        {mot:"Génétique", def:"Étude des gènes et de l'hérédité."}
+      ],
+      "Fa": [
+        {mot:"Famille", def:"Groupe de personnes liées par le sang ou l'adoption."},
+        {mot:"Fabuleux", def:"Incroyablement merveilleux."},
+        {mot:"Facteur", def:"Variable qui influence un résultat."},
+        {mot:"Façon", def:"Manière dont quelque chose est fait."},
+        {mot:"Face", def:"Partie antérieure de la tête humaine."},
+        {mot:"Fabrication", def:"Production de biens à grande échelle."},
+        {mot:"Faculté", def:"Unité d'enseignement d'une université."},
+        {mot:"Fable", def:"Court récit imaginaire avec une morale."},
+        {mot:"Faim", def:"Sensation de besoin de nourriture."},
+        {mot:"Faune", def:"Ensemble des animaux d'une région."}
+      ],
+      "Ce": [
+        {mot:"Céréale", def:"Plante cultivée pour ses graines comestibles."},
+        {mot:"Cérémonie", def:"Rites solennels d'un événement."},
+        {mot:"Cétacé", def:"Animal marin à nageoires, comme la baleine."},
+        {mot:"Célibataire", def:"Personne non mariée."},
+        {mot:"Cercle", def:"Figure géométrique fermée."},
+        {mot:"César", def:"Titre des empereurs romains."},
+        {mot:"Césium", def:"Élément chimique, symbole Cs, n°55."},
+        {mot:"Césure", def:"Pause dans le vers poétique."},
+        {mot:"Cession", def:"Action de céder quelque chose."},
+        {mot:"Cénotaphe", def:"Monument funéraire sans corps."},
+        {mot:"Ceinture", def:"Bande autour de la taille pour maintenir un vêtement."}
+      ],
+      "Cl": [
+        {mot:"Classe", def:"Groupe partageant une fonction ou idéologie."},
+        {mot:"Clavier", def:"Ensemble de touches d'un appareil."},
+        {mot:"Climat", def:"Conditions atmosphériques d'une région."},
+        {mot:"Clinique", def:"Établissement de soins médicaux."},
+        {mot:"Clonage", def:"Technique de reproduction de clones."},
+        {mot:"Cloche", def:"Instrument produisant un son."},
+        {mot:"Clou", def:"Petit objet pointu pour fixer."},
+        {mot:"Club", def:"Association de personnes aux intérêts communs."},
+        {mot:"Clown", def:"Personnage comique de cirque."},
+        {mot:"Clôture", def:"Barrière délimitant une propriété."},
+        {mot:"Clémentine", def:"Fruit hybride entre mandarine et orange."}
+      ],
+      "Be": [
+        {mot:"Bébé", def:"Enfant en très bas âge."},
+        {mot:"Beauté", def:"Qualité d'être beau."},
+        {mot:"Bélier", def:"Signe astrologique; aussi l'animal."},
+        {mot:"Béguin", def:"Attirance amoureuse passagère."},
+        {mot:"Berceau", def:"Lit pour bébé."},
+        {mot:"Besoin", def:"Nécessité ou exigence."},
+        {mot:"Bête", def:"Animal; par extension, qui manque de jugement."},
+        {mot:"Beurre", def:"Produit laitier de la crème."},
+        {mot:"Bénéfice", def:"Profit ou avantage tiré d'une activité."},
+        {mot:"Béatitude", def:"Bonheur parfait et durable."}
+      ],
+      "Bl": [
+        {mot:"Blague", def:"Histoire drôle ou plaisanterie."},
+        {mot:"Blanc", def:"Couleur somme de toutes les couleurs (lumière)."},
+        {mot:"Blazer", def:"Veste de costume sportive."},
+        {mot:"Blessure", def:"Lésion physique ou morale."},
+        {mot:"Blocage", def:"Action de bloquer."},
+        {mot:"Blog", def:"Site personnel de publications."},
+        {mot:"Blondeur", def:"Qualité d'être blond(e)."},
+        {mot:"Blouse", def:"Vêtement de travail ample."},
+        {mot:"Bluff", def:"Attitude pour impressionner sans moyens réels."},
+        {mot:"Blancheur", def:"Qualité d'être blanc."}
+      ],
+      "Bo": [
+        {mot:"Bonbon", def:"Petite sucrerie."},
+        {mot:"Bonheur", def:"État de contentement."},
+        {mot:"Boîte", def:"Récipient rigide."},
+        {mot:"Bouteille", def:"Récipient pour liquides."},
+        {mot:"Boussole", def:"Instrument indiquant le nord magnétique."},
+        {mot:"Bougie", def:"Objet en cire servant à éclairer."},
+        {mot:"Boule", def:"Objet sphérique."},
+        {mot:"Bouquet", def:"Ensemble de fleurs arrangées."},
+        {mot:"Bouton", def:"Pièce en relief pour fermer un vêtement."},
+        {mot:"Boxe", def:"Sport de combat aux poings."},
+        {mot:"Bois", def:"Matériau provenant des arbres."}
+      ],
+      "Bi": [
+        {mot:"Bibliothèque", def:"Lieu de conservation des livres."},
+        {mot:"Bicyclette", def:"Véhicule à deux roues à pédales."},
+        {mot:"Biographie", def:"Récit de la vie d'une personne."},
+        {mot:"Bijou", def:"Objet ornemental porté sur le corps."},
+        {mot:"Bilan", def:"État des lieux ou compte rendu."},
+        {mot:"Bilingue", def:"Qui parle deux langues."},
+        {mot:"Biologie", def:"Science des êtres vivants."},
+        {mot:"Bisou", def:"Baiser amical ou affectueux."},
+        {mot:"Biscuit", def:"Petit gâteau sec."},
+        {mot:"Bistrot", def:"Petit restaurant ou café."},
+        {mot:"Bipède", def:"Animal qui marche sur deux pattes."}
+      ],
+      "Cr": [
+        {mot:"Crayon", def:"Instrument d'écriture ou de dessin."},
+        {mot:"Crème", def:"Substance onctueuse pour hydrater la peau."},
+        {mot:"Croissant", def:"Pâtisserie en forme de croissant."},
+        {mot:"Cravate", def:"Accessoire vestimentaire pour le cou."},
+        {mot:"Créativité", def:"Capacité à imaginer et inventer."},
+        {mot:"Crédit", def:"Somme d'argent empruntée."},
+        {mot:"Crise", def:"Période difficile ou de changement."},
+        {mot:"Crier", def:"Émettre un son fort."},
+        {mot:"Cristal", def:"Matériau transparent et brillant."},
+        {mot:"Crocodile", def:"Grand reptile semi-aquatique."}
+      ],
+      "Pl": [
+        {mot:"Plage", def:"Étendue de sable ou galets au bord de la mer."},
+        {mot:"Plaisir", def:"Sensation de satisfaction."},
+        {mot:"Plateau", def:"Surface plane pour transporter."},
+        {mot:"Plomb", def:"Métal lourd gris."},
+        {mot:"Plongée", def:"Action d'explorer sous l'eau."},
+        {mot:"Pluie", def:"Précipitation en gouttes d'eau."},
+        {mot:"Plus", def:"Exprime une quantité supérieure."},
+        {mot:"Plume", def:"Objet pour écrire ou décorer."},
+        {mot:"Pluriel", def:"Forme grammaticale du multiple."},
+        {mot:"Pluvieux", def:"Caractérisé par la pluie."},
+        {mot:"Pluviomètre", def:"Instrument mesurant la pluie."},
+        {mot:"Plombier", def:"Professionnel des installations d'eau."},
+        {mot:"Plante", def:"Être vivant végétal."}
+      ],
+      "Gl": [
+        {mot:"Glace", def:"Eau solidifiée; aussi dessert froid."},
+        {mot:"Globe", def:"Sphère terrestre ou céleste."},
+        {mot:"Glisser", def:"Se déplacer sur surface lisse."},
+        {mot:"Gladiateur", def:"Combattant de l'arène romaine."},
+        {mot:"Glorieux", def:"Digne d'éloges."},
+        {mot:"Glande", def:"Organe sécréteur."},
+        {mot:"Glacière", def:"Récipient isolé pour garder au froid."},
+        {mot:"Glauque", def:"De couleur verdâtre ou grisâtre."},
+        {mot:"Glissade", def:"Action de glisser."},
+        {mot:"Glucide", def:"Source d'énergie pour le corps."},
+        {mot:"Glaçon", def:"Morceau de glace."}
+      ],
+      "Fr": [
+        {mot:"Fraise", def:"Fruit rouge et sucré."},
+        {mot:"Frère", def:"Membre masculin de la fratrie."},
+        {mot:"Frontière", def:"Ligne séparant deux pays ou régions."},
+        {mot:"Frisson", def:"Sensation de froid ou de peur."},
+        {mot:"Frange", def:"Mèche de cheveux sur le front."},
+        {mot:"Frigo", def:"Appareil pour conserver au froid."},
+        {mot:"Frapper", def:"Donner des coups."},
+        {mot:"Fraternité", def:"Solidarité entre êtres humains."},
+        {mot:"Friser", def:"Faire des boucles aux cheveux."},
+        {mot:"Frissonner", def:"Trembler de froid ou de peur."},
+        {mot:"Fracas", def:"Bruit violent et soudain."},
+        {mot:"Franchir", def:"Passer au-delà d'une limite."},
+        {mot:"Fréquence", def:"Nombre de répétitions par unité de temps."}
+      ],
+      "Ba": [
+        {mot:"Baccalauréat", def:"Examen de fin d'études secondaires."},
+        {mot:"Banque", def:"Institution de services financiers."},
+        {mot:"Baroque", def:"Style artistique orné et extravagant."},
+        {mot:"Base", def:"Fondement sur lequel on construit."},
+        {mot:"Bataille", def:"Conflit armé entre groupes."},
+        {mot:"Bague", def:"Bijou porté au doigt."},
+        {mot:"Balle", def:"Objet sphérique de certains sports."},
+        {mot:"Banane", def:"Fruit jaune et courbé."},
+        {mot:"Barbe", def:"Pilosité faciale."},
+        {mot:"Barrière", def:"Obstacle qui empêche le passage."},
+        {mot:"Basket", def:"Chaussure de sport (ou le sport)."},
+        {mot:"Battement", def:"Mouvement répétitif d'un organe."},
+        {mot:"Bateau", def:"Embarcation naviguant sur l'eau."},
+        {mot:"Bâton", def:"Objet allongé et fin."},
+        {mot:"Batifoler", def:"S'amuser légèrement, sans but précis."},
+        {mot:"Bagarre", def:"Altercation violente."},
+        {mot:"Bandit", def:"Criminel ou hors-la-loi."},
+        {mot:"Barrissement", def:"Cri sonore de l'éléphant."},
+        {mot:"Bannir", def:"Exclure d'un lieu, interdire."}
+      ],
+      "De": [
+        {mot:"Définition", def:"Explication précise d'un mot ou concept."},
+        {mot:"Démocratie", def:"Système où le peuple exerce le pouvoir."},
+        {mot:"Dérision", def:"Moquerie ouverte."},
+        {mot:"Désespoir", def:"Tristesse profonde et perte d'espoir."},
+        {mot:"Détective", def:"Enquêteur résolvant des mystères."},
+        {mot:"Décision", def:"Choix pris après réflexion."},
+        {mot:"Désir", def:"Envie d'obtenir quelque chose."},
+        {mot:"Début", def:"Commencement d'une période ou action."},
+        {mot:"Découvrir", def:"Trouver ou faire connaître du nouveau."},
+        {mot:"Démarrer", def:"Mettre en marche."},
+        {mot:"Défaut", def:"Manque ou imperfection."},
+        {mot:"Détail", def:"Élément composant un ensemble."},
+        {mot:"Détente", def:"Moment de repos et de relaxation."},
+        {mot:"Déterminé", def:"D'une grande volonté."},
+        {mot:"Dentiste", def:"Praticien spécialisé des dents."},
+        {mot:"Décennie", def:"Période de dix ans."},
+        {mot:"Décor", def:"Éléments qui ornent un lieu."},
+        {mot:"Découragement", def:"Perte de courage."},
+        {mot:"Déchirure", def:"Action de déchirer; son résultat."},
+        {mot:"Déclin", def:"Affaiblissement progressif."},
+        {mot:"Découverte", def:"Action de découvrir."},
+        {mot:"Défi", def:"Provocation à une épreuve."},
+        {mot:"Défilé", def:"Passage ordonné; aussi vallée étroite."},
+        {mot:"Dégustation", def:"Action de goûter un aliment."}
+      ],
+      "Ma": [
+        {mot:"Magie", def:"Utilisation de pouvoirs surnaturels."},
+        {mot:"Maison", def:"Bâtiment où l'on vit."},
+        {mot:"Mariage", def:"Union légale de partenaires de vie."},
+        {mot:"Maladie", def:"Altération de la santé."},
+        {mot:"Matin", def:"Première partie de la journée."},
+        {mot:"Masque", def:"Objet porté sur le visage."},
+        {mot:"Magnétisme", def:"Force d'attraction ou répulsion de certains matériaux."},
+        {mot:"Malentendant", def:"Personne à déficience auditive."},
+        {mot:"Matière", def:"Substance composant les objets."},
+        {mot:"Marché", def:"Lieu d'achat et de vente."},
+        {mot:"Magasin", def:"Endroit où l'on vend des produits."},
+        {mot:"Main", def:"Partie du corps pour saisir."},
+        {mot:"Machine", def:"Appareil réalisant une tâche."},
+        {mot:"Mayonnaise", def:"Sauce froide à base d'huile et d'œufs."},
+        {mot:"Macadam", def:"Revêtement routier de pierres compactées."},
+        {mot:"Macabre", def:"Qui évoque la mort, sinistre."},
+        {mot:"Manifestation", def:"Rassemblement public d'expression."},
+        {mot:"Management", def:"Gestion d'une organisation."},
+        {mot:"Marketing", def:"Actions pour promouvoir et vendre."}
+      ],
+      "Su": [
+        {mot:"Subvention", def:"Aide financière pour soutenir un projet."},
+        {mot:"Survie", def:"Fait de rester en vie dans la difficulté."},
+        {mot:"Subtil", def:"Délicat, peu évident."},
+        {mot:"Succès", def:"Réalisation d'un résultat positif."},
+        {mot:"Sujet", def:"Thème principal d'un discours ou texte."},
+        {mot:"Surnaturel", def:"Au-delà des lois naturelles."},
+        {mot:"Suspendre", def:"Arrêter temporairement."},
+        {mot:"Supprimer", def:"Effacer ou enlever définitivement."},
+        {mot:"Surprise", def:"Événement inattendu."}
+        // (Note: "Suicide" retiré pour convenance pédagogique.)
+      ]
+    };
 
-    // ——— État & éléments UI ———
+    // --- Éléments DOM ---
+    const prefixDisplay = document.getElementById("prefixDisplay");
+    const definitionDisplay = document.getElementById("definitionDisplay");
     const answerInput = document.getElementById("answer");
-    const defEl = document.getElementById("definition");
-    const msgEl = document.getElementById("message");
-    const initEl = document.getElementById("currentInitials");
-    const stepEl = document.getElementById("stepInfo");
-    const speedEl = document.getElementById("speedInfo");
-    const initialsListEl = document.getElementById("initialsList");
-    const barEl = document.getElementById("progressBar");
-
+    const message = document.getElementById("message");
     const btnPlay = document.getElementById("btnPlay");
     const btnSlow = document.getElementById("btnSlow");
     const btnFast = document.getElementById("btnFast");
     const btnRepeat = document.getElementById("btnRepeat");
     const btnSkip = document.getElementById("btnSkip");
     const btnBack = document.getElementById("btnBack");
+    const initialBank = document.getElementById("initialBank");
+    const progressPill = document.getElementById("progressPill");
+    const speedPill = document.getElementById("speedPill");
+    const hintPrefix = document.getElementById("hintPrefix");
 
-    let currentFieldIdx = 0;
-    let currentEntryIdx = 0;
+    // --- État du jeu ---
+    let currentPrefix = null;
+    let currentIndex = 0;
     let speechRate = 1;
 
-    // ——— Utilitaires ———
-    const hasSpeech = () => 'speechSynthesis' in window;
-    function speak(text, rate = speechRate){
-      if(!hasSpeech()) { return; }
-      window.speechSynthesis.cancel();
+    // --- Utilitaires ---
+    const normalize = s => s
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // retire accents
+      .replace(/[^a-z\-’' ]/g,'')                       // garde lettres/espaces/apostrophes
+      .trim();
+
+    function updatePills(){
+      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
+      progressPill.textContent = total ? `${currentIndex+1} / ${total}` : `0 / 0`;
+      speedPill.textContent = `Vitesse ×${speechRate.toFixed(2)}`;
+      hintPrefix.textContent = currentPrefix || "– –";
+    }
+
+    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+    function speak(text, rate=speechRate){
+      if(!('speechSynthesis' in window)) { return; }
+      ttsCancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = "fr-FR";
+      u.lang = 'fr-FR';
       u.rate = rate;
-      window.speechSynthesis.speak(u);
-    }
-
-    function norm(s){
-      return s
-        .toString()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"")
-        .toLowerCase()
-        .trim();
-    }
-
-    function updateProgress(){
-      const total = DATA.reduce((acc, f)=> acc + f.entries.length, 0);
-      const before = DATA.slice(0, currentFieldIdx).reduce((acc, f)=> acc + f.entries.length, 0);
-      const done = before + currentEntryIdx;
-      const pct = Math.round((done / total) * 100);
-      barEl.style.width = pct + "%";
-      stepEl.textContent = `${done + 1} / ${total}`;
-    }
-
-    function refreshInitialsChips(){
-      initialsListEl.innerHTML = "";
-      DATA.forEach((f, i)=>{
-        const chip = document.createElement("button");
-        chip.className = "chip" + (i===currentFieldIdx ? " active" : "");
-        chip.textContent = f.initials.toUpperCase();
-        chip.addEventListener("click", ()=>{
-          currentFieldIdx = i;
-          currentEntryIdx = 0;
-          loadStep(true);
-        });
-        initialsListEl.appendChild(chip);
-      });
-    }
-
-    function currentEntry(){
-      return DATA[currentFieldIdx].entries[currentEntryIdx];
+      speechSynthesis.speak(u);
     }
 
     function announce(){
-      const init = DATA[currentFieldIdx].initials.toUpperCase();
-      const def = currentEntry().definition || "";
-      // 1) Dire les lettres, 2) Lire la définition fournie telle quelle (si vide, la voix reste silencieuse)
-      speak(`Toutes les bonnes réponses commencent par les lettres : ${init}.`);
-      if(def.trim()){
-        speak(def);
-      }
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
+      const def  = item.def;
+      speak(`${intro} Définition : ${def}`);
     }
 
-    function loadStep(announceNow=false){
-      const field = DATA[currentFieldIdx];
-      const entry = currentEntryIdx < field.entries.length ? field.entries[currentEntryIdx] : null;
-
-      initEl.textContent = field.initials.toUpperCase();
-      msgEl.textContent = "";
-      msgEl.style.color = "#fff";
-      answerInput.value = "";
-      answerInput.disabled = !entry;
-      btnPlay.disabled = !entry;
-
-      updateProgress();
-      refreshInitialsChips();
-
-      if(!entry){
-        defEl.textContent = "🎉 Bravo, tu as terminé ce champ lexical. Choisis une autre pastille pour continuer.";
+    function renderCard(){
+      if(!currentPrefix){
+        prefixDisplay.textContent = "– –";
+        definitionDisplay.textContent = "Choisis un champ lexical ci-dessous pour commencer, ou appuie sur ▶️ Jouer pour démarrer au premier.";
+        updatePills();
         return;
       }
+      const item = FIELDS[currentPrefix][currentIndex];
+      prefixDisplay.textContent = currentPrefix;
+      definitionDisplay.textContent = item.def;
+      message.textContent = "Écris le mot correspondant. (Il doit commencer par " + currentPrefix + ")";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.placeholder = `Un mot qui commence par « ${currentPrefix} »…`;
+      answerInput.disabled = false;
+      updatePills();
+    }
 
-      defEl.textContent = entry.definition || "—"; // Affiche tel quel (vide si non fourni)
-      if(announceNow){ announce(); }
+    function setPrefix(prefix){
+      if(!FIELDS[prefix]) return;
+      currentPrefix = prefix;
+      currentIndex = 0;
+      highlightBank(prefix);
+      renderCard();
+      announce();
       answerInput.focus();
     }
 
     function next(){
-      const field = DATA[currentFieldIdx];
-      currentEntryIdx++;
-      if(currentEntryIdx >= field.entries.length){
-        // Fin de ce champ — passer au suivant si possible
-        if(currentFieldIdx < DATA.length - 1){
-          currentFieldIdx++;
-          currentEntryIdx = 0;
-        }else{
-          // Fin globale
-          defEl.textContent = "🎉 Bravo, vous avez complété la liste !";
-          answerInput.value = "";
-          answerInput.disabled = true;
-          [btnPlay, btnSlow, btnFast, btnRepeat, btnSkip, btnBack].forEach(b=> b.disabled = true);
-        }
+      if(!currentPrefix) return;
+      currentIndex++;
+      const list = FIELDS[currentPrefix];
+      if(currentIndex >= list.length){
+        // Fin du champ courant -> message de bravo
+        currentIndex = list.length-1;
+        message.textContent = `🎉 Bravo ! Tu as terminé le champ lexical ${currentPrefix}. Choisis une autre initiale ci-dessous.`;
+        message.style.color = "#00e676";
+        answerInput.disabled = true;
+        ttsCancel();
+        speak(`Bravo ! Tu as terminé le champ lexical ${currentPrefix}.`);
+        return;
       }
-      loadStep(true);
+      renderCard();
+      announce();
+      answerInput.focus();
     }
 
     function back(){
-      if(currentEntryIdx > 0){
-        currentEntryIdx--;
-      } else if(currentFieldIdx > 0){
-        currentFieldIdx--;
-        currentEntryIdx = DATA[currentFieldIdx].entries.length - 1;
+      if(!currentPrefix) return;
+      if(currentIndex > 0){
+        currentIndex--;
+        renderCard();
+        announce();
+        answerInput.focus();
       }
-      loadStep(true);
     }
 
-    function play(){ announce(); msgEl.textContent = "🗣️ Écoute, puis tape ta réponse." }
+    function repeat(){ announce(); }
 
     function slower(){
       speechRate = Math.max(0.5, speechRate - 0.25);
-      speedEl.textContent = `🔊 x${speechRate.toFixed(2)}`;
-      play();
+      updatePills();
+      announce();
     }
     function faster(){
       speechRate = Math.min(2, speechRate + 0.25);
-      speedEl.textContent = `🔊 x${speechRate.toFixed(2)}`;
-      play();
+      updatePills();
+      announce();
     }
-    function repeat(){ play(); }
 
     function check(){
-      const entry = currentEntry();
-      if(!entry) return;
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const user = normalize(answerInput.value);
+      const target = normalize(item.mot);
 
-      const user = norm(answerInput.value);
-      const expected = norm(entry.mot);
-
-      const startsWithInitials = norm(answerInput.value).startsWith(norm(DATA[currentFieldIdx].initials));
-
-      if(user === expected && startsWithInitials){
-        msgEl.textContent = "✅ Correct ! Bien joué.";
-        msgEl.style.color = "#00e676";
+      // Doit commencer par le préfixe ET correspondre à la définition visée
+      if(user && user.startsWith(normalize(currentPrefix)) && user === target){
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
+        speak("Correct ! Bien joué.");
         setTimeout(next, 900);
-      } else {
-        msgEl.textContent = "❌ Incorrect. Il fallait penser à : " + entry.mot;
-        msgEl.style.color = "#ff5252";
-        // Lecture de la bonne réponse
-        speak(`Il fallait penser à : ${entry.mot}.`);
+      }else{
+        message.textContent = `❌ Incorrect. Il fallait penser à : ${item.mot}.`;
+        message.style.color = "#ff5252";
+        speak(`Incorrect. Il fallait penser à : ${item.mot}.`);
       }
     }
 
-    // ——— Raccourcis clavier ———
-    window.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){ check(); }
-      if(e.key.toLowerCase() === "r"){ repeat(); }
-      if(e.key === "ArrowUp"){ back(); }
-      if(e.key === "ArrowDown"){ next(); }
-    });
+    // --- Banque d'initiales cliquables ---
+    function buildBank(){
+      const keys = Object.keys(FIELDS);
+      keys.sort((a,b)=>a.localeCompare(b,'fr'));
+      initialBank.innerHTML = "";
+      for(const k of keys){
+        const btn = document.createElement("button");
+        btn.textContent = k.toUpperCase();
+        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
+        btn.addEventListener("click", ()=> setPrefix(k));
+        initialBank.appendChild(btn);
+      }
+    }
+    function highlightBank(k){
+      [...initialBank.children].forEach(b=>{
+        b.classList.toggle('active', b.textContent === k.toUpperCase());
+      });
+    }
 
-    // ——— Boutons ———
-    btnPlay.addEventListener("click", play);
+    // --- Écouteurs ---
+    btnPlay.addEventListener("click", ()=>{
+      if(!currentPrefix){
+        // Démarrage: premier champ par ordre alphabétique
+        const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
+        setPrefix(first);
+      }else{
+        announce();
+      }
+    });
     btnSlow.addEventListener("click", slower);
     btnFast.addEventListener("click", faster);
     btnRepeat.addEventListener("click", repeat);
     btnSkip.addEventListener("click", next);
     btnBack.addEventListener("click", back);
 
-    // ——— Démarrage ———
+    answerInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") check();
+    });
+
+    // --- Démarrage ---
     window.addEventListener("load", ()=>{
-      loadStep(true);
-      if(!hasSpeech()){
-        msgEl.textContent = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
+      buildBank();
+      renderCard();
+      // Message d'accessibilité si pas de TTS
+      if(!('speechSynthesis' in window)){
+        message.innerHTML = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
       }
     });
   </script>
