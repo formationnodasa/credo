@@ -1,149 +1,481 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Jeu de Mémoire</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Champs Lexicaux — Jeu Vocal</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --glass: rgba(255,255,255,0.1);
+      --ok:#00e676; --ko:#ff5252; --ink:#1b1f2a;
     }
-
-    h1 {
-      margin-bottom: 20px;
+    *{box-sizing:border-box}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color:#fff; display:flex; justify-content:center; align-items:center;
+      min-height:100vh; margin:0; padding:24px;
     }
-
-    #game {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      grid-gap: 15px;
-      justify-content: center;
-      margin: 0 auto;
+    @keyframes gradientAnimation{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
-
-    .card {
-      width: 100px;
-      height: 100px;
-      background-color: #888;
-      border-radius: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 40px;
-      color: white;
-      cursor: pointer;
-      user-select: none;
+    .app{
+      width:min(900px,100%); display:grid; gap:18px;
     }
-
-    .flipped {
-      background-color: #fff;
-      color: black;
-      cursor: default;
+    .card{
+      background:var(--glass); backdrop-filter:blur(12px);
+      border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.25);
+      animation:fadeIn .9s ease;
     }
-
-    #message {
-      margin-top: 20px;
-      font-size: 18px;
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    h1{margin:0 0 6px; font-size:clamp(22px,3.6vw,34px); font-weight:800; text-shadow:0 3px 8px rgba(0,0,0,.3)}
+    .subtitle{opacity:.9; margin-bottom:10px}
+    .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+    .pill{
+      padding:10px 14px; border-radius:12px; background:#fff; color:var(--bg2);
+      font-weight:700; letter-spacing:.08em; box-shadow:0 4px 10px rgba(0,0,0,.12)
     }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
+    .bigLetters{font-size: clamp(22px,4.5vw,32px)}
+    .display{
+      display:grid; gap:10px; margin-top:6px
+    }
+    .label{opacity:.9; font-weight:600}
+    .definition{
+      font-size: clamp(18px,2.6vw,22px); line-height:1.35; background:#ffffff; color:var(--ink);
+      border-radius:14px; padding:16px; box-shadow:inset 0 0 0 rgba(0,0,0,0)
+    }
+    #answer{
+      font-size: clamp(18px,2.8vw,24px);
+      padding:16px; border-radius:12px; border:none; width:100%;
+      margin-top:6px; background-color:#fff; color:#333; outline:none;
+      box-shadow:inset 0 0 0 rgba(0,0,0,0); transition: box-shadow .25s ease, transform .06s ease;
+    }
+    #answer:focus{box-shadow:0 0 10px var(--bg2); caret-color:var(--bg2)}
+    .gridBtns{display:grid; grid-template-columns:repeat(6,1fr); gap:10px}
+    button{
+      padding:12px 10px; font-size:1rem; font-weight:700; border-radius:10px; border:none; cursor:pointer;
+      background:#fff; color:var(--bg2); transition:.2s ease; box-shadow:0 4px 10px rgba(0,0,0,.1)
+    }
+    button:hover{background:var(--bg2); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    #message{min-height:28px; font-size:1.1rem; font-weight:700; margin-top:4px; text-shadow:0 0 8px rgba(0,0,0,.1)}
+    .footer{
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px
+    }
+    .initials{
+      display:flex; flex-wrap:wrap; gap:8px; margin-top:6px
+    }
+    .chip{
+      border:2px solid #ffffffaa; color:#fff; background:transparent; padding:8px 10px; border-radius:999px; font-weight:800;
+      letter-spacing:.06em; cursor:pointer; transition:.2s ease
+    }
+    .chip:hover{background:#ffffff22}
+    .chip.active{background:#fff; color:var(--bg2); border-color:#fff}
+    .progress{
+      width:100%; height:8px; background:#ffffff33; border-radius:999px; overflow:hidden
+    }
+    .bar{height:100%; width:0%; background:#fff}
+    .mini{
+      opacity:.9; font-size:.95rem
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#ffffff; color:var(--bg2); padding:2px 8px; border-radius:6px; font-weight:800
     }
   </style>
 </head>
 <body>
-  <h1>🧠 Jeu de Mémoire</h1>
-  <div id="game"></div>
-  <div id="message"></div>
-  <button onclick="initGame()">Rejouer</button>
+  <div class="app">
+    <div class="card">
+      <h1>Champs Lexicaux — Jeu Vocal</h1>
+      <div class="subtitle">L’IA annonce les initiales, lit une définition, tu tapes le mot qui commence par ces lettres.</div>
+      <div class="row">
+        <div class="pill bigLetters" id="currentInitials">—</div>
+        <div class="pill" id="stepInfo">1 / 1</div>
+        <div class="pill" id="speedInfo">🔊 x1.00</div>
+      </div>
+
+      <div class="display">
+        <div class="label">Définition à deviner :</div>
+        <div class="definition" id="definition">—</div>
+        <input id="answer" type="text" placeholder="Tape ta réponse et presse Entrée…" autocomplete="off" />
+        <div id="message"></div>
+        <div class="progress"><div class="bar" id="progressBar"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="gridBtns">
+        <button id="btnPlay">▶️ Jouer</button>
+        <button id="btnSlow">🐢 Ralentir</button>
+        <button id="btnFast">🐇 Accélérer</button>
+        <button id="btnRepeat">🔁 Répéter</button>
+        <button id="btnSkip">⏭ Passer</button>
+        <button id="btnBack">⬅️ Retour</button>
+      </div>
+      <div class="mini" style="margin-top:10px">
+        Astuces : presse <span class="kbd">Entrée</span> pour valider · <span class="kbd">↑</span>/<span class="kbd">↓</span> pour naviguer · <span class="kbd">R</span> pour répéter
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="footer">
+        <div class="label">Initiales disponibles :</div>
+        <div class="initials" id="initialsList"></div>
+      </div>
+      <div class="mini" style="margin-top:6px">
+        Clique une pastille pour choisir un champ lexical, ou suis l’ordre proposé.
+      </div>
+    </div>
+  </div>
 
   <script>
-    const emojis = ['🍎', '🍌', '🍇', '🍓', '🍑', '🍍', '🥝', '🍒'];
-    let cards = [];
-    let firstCard = null;
-    let secondCard = null;
-    let lockBoard = false;
-    let matchedPairs = 0;
+    // ——— Données EXACTES fournies (sans modification) ———
+    const DATA = [
+      {
+        initials: "Pr",
+        entries: [
+          { mot: "Précision", definition: "le fait de donner des détails exacts et précis sur quelque chose." },
+          { mot: "Profond", definition: "qui se rapporte à la profondeur ou à une intensité importante." },
+          { mot: "Profession", definition: "domaine d'activité ou métier dans lequel une personne travaille." },
+          { mot: "Progrès", definition: "avancement ou amélioration dans une situation ou un domaine." },
+          { mot: "Promesse", definition: "engagement ou parole donnée de faire quelque chose." },
+          { mot: "Proverbe", definition: "expression populaire qui contient une sagesse ou un conseil." },
+          { mot: "Précieux", definition: "qui a une grande valeur ou importance." },
+          { mot: "Préparation", definition: "action de se préparer ou de s'organiser en vue d'une certaine activité." },
+          { mot: "Précaution", definition: "mesure prise pour éviter un danger ou un problème." },
+          { mot: "Privilège", definition: "avantage ou droit spécial accordé à certaines personnes." }
+        ]
+      },
+      {
+        initials: "Se",
+        entries: [
+          { mot: "Sensation", definition: "perception ou ressenti d'un stimulus par les sens." },
+          { mot: "Séduction", definition: "charme ou pouvoir d'attraction envers quelqu'un." },
+          { mot: "Sérénité", definition: "état de calme et de tranquillité." },
+          { mot: "Secret", definition: "quelque chose qui est caché ou inconnu du public." },
+          { mot: "Séparation", definition: "acte de se séparer ou de se diviser." },
+          { mot: "Sérieux", definition: "état de responsabilité et de gravité." },
+          { mot: "Sentiment", definition: "émotion ou affection ressentie envers quelqu'un ou quelque chose." },
+          { mot: "Service", definition: "action d'aider ou d'assister quelqu'un." },
+          { mot: "Seconde", definition: "unité de temps ou rang après la première." },
+          { mot: "Septième", definition: "ordre ou position dans une série après le sixième." }
+        ]
+      },
+      {
+        initials: "Tr",
+        entries: [
+          { mot: "Transformation", definition: "changement ou métamorphose d'une chose en une autre." },
+          { mot: "Tristesse", definition: "état de chagrin ou de mélancolie." },
+          { mot: "Travail", definition: "c’est un emploi ou activité professionnelle." },
+          { mot: "Traitement", definition: "c’est une action de soigner ou de procéder à une procédure médicale." },
+          { mot: "Tradition", definition: "coutume ou héritage culturel transmis de génération en génération." },
+          { mot: "Tragédie", definition: "drame ou catastrophe qui provoque de la tristesse ou du désespoir." },
+          { mot: "Trentième", definition: "ordre ou position dans une série après le vingt-neuvième." },
+          { mot: "Triomphe", definition: "Victoire éclatante à l'issue d'une lutte, d'une rivalité." },
+          { mot: "Transparence", definition: "clarté ou lisibilité d'une substance ou d'une situation." },
+          { mot: "Trésor", definition: "richesse ou bien précieux à valeur sentimentale ou matérielle." }
+        ]
+      },
+      {
+        initials: "Ac",
+        entries: [
+          { mot: "Accompagnement", definition: "soutien ou aide fournie à quelqu'un." },
+          { mot: "Accès", definition: "moyen ou possibilité d'entrer dans un lieu ou d'obtenir quelque chose." },
+          { mot: "Action", definition: "acte de faire quelque chose ou mouvement." },
+          { mot: "Activité", definition: "occupation ou exercice d'une activité." },
+          { mot: "Achat", definition: "acquisition ou action d'acheter un bien." },
+          { mot: "Accident", definition: "incident ou événement imprévu et souvent tragique." },
+          { mot: "Accord", definition: "entente ou consensus entre plusieurs personnes." },
+          { mot: "Acquisition", definition: "gain ou obtention d'une chose." },
+          { mot: "Acteur", definition: "personne qui joue un rôle dans une pièce de théâtre, un film, etc." },
+          { mot: "Acclamation", definition: "applaudissements ou éloges enthousiastes envers quelqu'un ou quelque chose." },
+          { mot: "Acrimonie", definition: "Mauvaise humeur qui s'exprime par des propos acerbes ou hargneux." }
+        ]
+      },
+      {
+        initials: "Ca",
+        entries: [
+          { mot: "Caractère", definition: "Ensemble de traits distinctifs qui définissent une personne ou une chose." },
+          { mot: "Carte", definition: "Document représentant une région ou un territoire avec ses caractéristiques géographiques." },
+          { mot: "Cascade", definition: "Chute d'eau qui s'écoule sur une pente." },
+          { mot: "Cadeau", definition: "Objet offert à quelqu'un pour marquer une occasion spéciale ou pour témoigner de l'affection." },
+          { mot: "Caisse", definition: "Contenant en bois ou en métal pour transporter des objets." },
+          { mot: "Caméra", definition: "Appareil qui permet de prendre des photos ou de filmer des images en mouvement." },
+          { mot: "Campagne", definition: "Région rurale ou périurbaine, éloignée de la ville." },
+          { mot: "Canal", definition: "Voie d'eau artificielle utilisée pour le transport de marchandises." },
+          { mot: "Capacité", definition: "Aptitude à faire quelque chose, à comprendre ou à apprendre." },
+          { mot: "Capitale", definition: "Ville principale d'un pays ou d'une région." },
+          { mot: "Carrière", definition: "Ensemble des emplois successifs qu'une personne a occupés." },
+          { mot: "Carton", definition: "Matériau rigide et léger utilisé pour la fabrication d'emballages." },
+          { mot: "Casquette", definition: "Coiffure légère en forme de calotte, avec une visière à l'avant." }
+        ]
+      },
+      {
+        initials: "Me",
+        entries: [
+          { mot: "Mémoire", definition: "la capacité de se souvenir et de rappeler des informations." },
+          { mot: "Méthode", definition: "une manière spécifique d'effectuer une tâche ou de résoudre un problème." },
+          { mot: "Mélodie", definition: "une séquence agréable de notes musicales." },
+          { mot: "Menu", definition: "une liste des plats disponibles dans un restaurant ou d'options dans un programme informatique." },
+          { mot: "Mécontentement", definition: "le sentiment de ne pas être satisfait ou de ne pas être heureux avec quelque chose." },
+          { mot: "Mesure", definition: "une quantité ou une échelle utilisée pour évaluer ou quantifier quelque chose." },
+          { mot: "Merveille", definition: "quelque chose de très impressionnant ou étonnant." },
+          { mot: "Méditation", definition: "une pratique de relaxation et de concentration de l'esprit." },
+          { mot: "Messagerie", definition: "le système de communication électronique qui permet l'envoi et la réception de messages." },
+          { mot: "Mémorable", definition: "qui mérite d'être rappelé ou mémorisé." },
+          { mot: "Météo", definition: "les conditions atmosphériques à un moment précis." },
+          { mot: "Menuisier", definition: "" } // (texte original sans définition)
+        ]
+      },
+      {
+        initials: "Di",
+        entries: [
+          { mot: "Direction", definition: "la position ou la trajectoire vers laquelle quelqu'un ou quelque chose se déplace." },
+          { mot: "Difficulté", definition: "un obstacle ou un défi qui rend quelque chose difficile ou compliqué." },
+          { mot: "Discipline", definition: "l'obéissance à des règles ou des normes pour atteindre un objectif." },
+          { mot: "Dialogue", definition: "une conversation entre deux personnes ou plus." },
+          { mot: "Diversité", definition: "la variété ou la différence dans un groupe ou une société." },
+          { mot: "Diplomatie", definition: "l'art de négocier et de résoudre les conflits de manière pacifique." },
+          { mot: "Dictionnaire", definition: "un livre qui répertorie les mots et leurs définitions dans une langue donnée." },
+          { mot: "Disparition", definition: "le fait de ne plus être présent ou visible." },
+          { mot: "Dimension", definition: "une mesure de la taille, de l'étendue ou de la portée d'un objet ou d'un concept." },
+          { mot: "Directionnel", definition: "qui se rapporte à la direction ou à l'orientation." },
+          { mot: "Divertissement", definition: "quelque chose qui fournit du plaisir, de l'amusement ou de la détente." },
+          { mot: "Diamant", definition: "" }, // (texte original sans définition)
+          { mot: "Diamètre", definition: "Ligne droite qui va d'un point de la circonférence d'un cercle (ou d'une sphère) à un autre point en passant par le centre." },
+          { mot: "Discothèque", definition: "Lieu de réunion où l'on peut danser au son d'une musique enregistrée." }
+        ]
+      },
+      {
+        initials: "Em",
+        entries: [
+          { mot: "Emotion", definition: "une réaction affective intense envers quelque chose ou quelqu'un." },
+          { mot: "Empathie", definition: "la capacité de comprendre et de partager les sentiments des autres." },
+          { mot: "Emploi", definition: "un travail ou une occupation rémunéré." },
+          { mot: "Empreinte", definition: "une marque laissée par un objet ou une personne." },
+          { mot: "Émotionnel", definition: "qui est lié aux émotions ou qui les provoque." },
+          { mot: "Empire", definition: "un vaste territoire gouverné par un seul souverain." },
+          { mot: "Emblème", definition: "un symbole qui représente une idée, une organisation ou un pays." },
+          { mot: "Empoisonnement", definition: "l'état d'avoir été intoxiqué ou empoisonné." },
+          { mot: "Émérite", definition: "qui a acquis une reconnaissance et un respect particuliers dans un domaine." },
+          { mot: "Empressement", definition: "l'enthousiasme et la volonté de faire quelque chose rapidement ou immédiatement." },
+          { mot: "Émergence", definition: "le processus par lequel quelque chose devient visible, apparaît ou se manifeste pour la première fois." },
+          { mot: "Émancipation", definition: "le fait de se libérer ou d'être libéré de contraintes, de restrictions ou d'oppressions, généralement pour atteindre une plus grande autonomie ou liberté." }
+        ]
+      },
+      {
+        initials: "No",
+        entries: [
+          { mot: "Nourriture", definition: "les substances consommées pour se nourrir et se sustenter." },
+          { mot: "Nouvelle", definition: "une information ou un rapport sur des événements récents." },
+          { mot: "Nostalgie", definition: "le sentiment de désir ou de tristesse envers le passé." },
+          { mot: "Normalité", definition: "l'état ou la condition d'être normal ou conforme aux normes." },
+          { mot: "Notoriété", definition: "la renommée ou la célébrité d'une personne ou d'une chose." },
+          { mot: "Notre", definition: "utilisé pour indiquer que quelque chose appartient à \"nous\"." },
+          { mot: "Nocif", definition: "qui peut causer des dommages à la santé ou à l'environnement." },
+          { mot: "Novice", definition: "une personne qui est inexpérimentée ou peu familière avec quelque chose." },
+          { mot: "Nourrir", definition: "donner de la nourriture à quelqu'un ou à quelque chose." },
+          { mot: "Nomade", definition: "une personne ou un groupe qui se déplace souvent sans domicile fixe." }
+        ]
+      }
+    ];
 
-    function shuffle(array) {
-      return array.sort(() => Math.random() - 0.5);
+    // ——— État & éléments UI ———
+    const answerInput = document.getElementById("answer");
+    const defEl = document.getElementById("definition");
+    const msgEl = document.getElementById("message");
+    const initEl = document.getElementById("currentInitials");
+    const stepEl = document.getElementById("stepInfo");
+    const speedEl = document.getElementById("speedInfo");
+    const initialsListEl = document.getElementById("initialsList");
+    const barEl = document.getElementById("progressBar");
+
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+
+    let currentFieldIdx = 0;
+    let currentEntryIdx = 0;
+    let speechRate = 1;
+
+    // ——— Utilitaires ———
+    const hasSpeech = () => 'speechSynthesis' in window;
+    function speak(text, rate = speechRate){
+      if(!hasSpeech()) { return; }
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "fr-FR";
+      u.rate = rate;
+      window.speechSynthesis.speak(u);
     }
 
-    function initGame() {
-      const game = document.getElementById('game');
-      const message = document.getElementById('message');
-      game.innerHTML = '';
-      message.textContent = '';
-      firstCard = null;
-      secondCard = null;
-      lockBoard = false;
-      matchedPairs = 0;
+    function norm(s){
+      return s
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .toLowerCase()
+        .trim();
+    }
 
-      const cardValues = shuffle([...emojis, ...emojis]); // 8 paires
+    function updateProgress(){
+      const total = DATA.reduce((acc, f)=> acc + f.entries.length, 0);
+      const before = DATA.slice(0, currentFieldIdx).reduce((acc, f)=> acc + f.entries.length, 0);
+      const done = before + currentEntryIdx;
+      const pct = Math.round((done / total) * 100);
+      barEl.style.width = pct + "%";
+      stepEl.textContent = `${done + 1} / ${total}`;
+    }
 
-      cardValues.forEach((emoji, index) => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.dataset.emoji = emoji;
-        card.dataset.index = index;
-        card.innerText = '';
-        card.addEventListener('click', handleCardClick);
-        game.appendChild(card);
+    function refreshInitialsChips(){
+      initialsListEl.innerHTML = "";
+      DATA.forEach((f, i)=>{
+        const chip = document.createElement("button");
+        chip.className = "chip" + (i===currentFieldIdx ? " active" : "");
+        chip.textContent = f.initials.toUpperCase();
+        chip.addEventListener("click", ()=>{
+          currentFieldIdx = i;
+          currentEntryIdx = 0;
+          loadStep(true);
+        });
+        initialsListEl.appendChild(chip);
       });
-
-      cards = document.querySelectorAll('.card');
     }
 
-    function handleCardClick(e) {
-      if (lockBoard) return;
+    function currentEntry(){
+      return DATA[currentFieldIdx].entries[currentEntryIdx];
+    }
 
-      const card = e.target;
-      if (card.classList.contains('flipped')) return;
+    function announce(){
+      const init = DATA[currentFieldIdx].initials.toUpperCase();
+      const def = currentEntry().definition || "";
+      // 1) Dire les lettres, 2) Lire la définition fournie telle quelle (si vide, la voix reste silencieuse)
+      speak(`Toutes les bonnes réponses commencent par les lettres : ${init}.`);
+      if(def.trim()){
+        speak(def);
+      }
+    }
 
-      card.innerText = card.dataset.emoji;
-      card.classList.add('flipped');
+    function loadStep(announceNow=false){
+      const field = DATA[currentFieldIdx];
+      const entry = currentEntryIdx < field.entries.length ? field.entries[currentEntryIdx] : null;
 
-      if (!firstCard) {
-        firstCard = card;
+      initEl.textContent = field.initials.toUpperCase();
+      msgEl.textContent = "";
+      msgEl.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.disabled = !entry;
+      btnPlay.disabled = !entry;
+
+      updateProgress();
+      refreshInitialsChips();
+
+      if(!entry){
+        defEl.textContent = "🎉 Bravo, tu as terminé ce champ lexical. Choisis une autre pastille pour continuer.";
         return;
       }
 
-      secondCard = card;
-      lockBoard = true;
+      defEl.textContent = entry.definition || "—"; // Affiche tel quel (vide si non fourni)
+      if(announceNow){ announce(); }
+      answerInput.focus();
+    }
 
-      if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
-        matchedPairs++;
-        firstCard.removeEventListener('click', handleCardClick);
-        secondCard.removeEventListener('click', handleCardClick);
-        resetTurn();
-
-        if (matchedPairs === emojis.length) {
-          document.getElementById('message').textContent = '🎉 Bien joué ! Toutes les paires sont trouvées !';
+    function next(){
+      const field = DATA[currentFieldIdx];
+      currentEntryIdx++;
+      if(currentEntryIdx >= field.entries.length){
+        // Fin de ce champ — passer au suivant si possible
+        if(currentFieldIdx < DATA.length - 1){
+          currentFieldIdx++;
+          currentEntryIdx = 0;
+        }else{
+          // Fin globale
+          defEl.textContent = "🎉 Bravo, vous avez complété la liste !";
+          answerInput.value = "";
+          answerInput.disabled = true;
+          [btnPlay, btnSlow, btnFast, btnRepeat, btnSkip, btnBack].forEach(b=> b.disabled = true);
         }
+      }
+      loadStep(true);
+    }
+
+    function back(){
+      if(currentEntryIdx > 0){
+        currentEntryIdx--;
+      } else if(currentFieldIdx > 0){
+        currentFieldIdx--;
+        currentEntryIdx = DATA[currentFieldIdx].entries.length - 1;
+      }
+      loadStep(true);
+    }
+
+    function play(){ announce(); msgEl.textContent = "🗣️ Écoute, puis tape ta réponse." }
+
+    function slower(){
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      speedEl.textContent = `🔊 x${speechRate.toFixed(2)}`;
+      play();
+    }
+    function faster(){
+      speechRate = Math.min(2, speechRate + 0.25);
+      speedEl.textContent = `🔊 x${speechRate.toFixed(2)}`;
+      play();
+    }
+    function repeat(){ play(); }
+
+    function check(){
+      const entry = currentEntry();
+      if(!entry) return;
+
+      const user = norm(answerInput.value);
+      const expected = norm(entry.mot);
+
+      const startsWithInitials = norm(answerInput.value).startsWith(norm(DATA[currentFieldIdx].initials));
+
+      if(user === expected && startsWithInitials){
+        msgEl.textContent = "✅ Correct ! Bien joué.";
+        msgEl.style.color = "#00e676";
+        setTimeout(next, 900);
       } else {
-        setTimeout(() => {
-          firstCard.classList.remove('flipped');
-          secondCard.classList.remove('flipped');
-          firstCard.innerText = '';
-          secondCard.innerText = '';
-          resetTurn();
-        }, 1000);
+        msgEl.textContent = "❌ Incorrect. Il fallait penser à : " + entry.mot;
+        msgEl.style.color = "#ff5252";
+        // Lecture de la bonne réponse
+        speak(`Il fallait penser à : ${entry.mot}.`);
       }
     }
 
-    function resetTurn() {
-      [firstCard, secondCard] = [null, null];
-      lockBoard = false;
-    }
+    // ——— Raccourcis clavier ———
+    window.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){ check(); }
+      if(e.key.toLowerCase() === "r"){ repeat(); }
+      if(e.key === "ArrowUp"){ back(); }
+      if(e.key === "ArrowDown"){ next(); }
+    });
 
-    // Lancer le jeu au chargement
-    window.onload = initGame;
+    // ——— Boutons ———
+    btnPlay.addEventListener("click", play);
+    btnSlow.addEventListener("click", slower);
+    btnFast.addEventListener("click", faster);
+    btnRepeat.addEventListener("click", repeat);
+    btnSkip.addEventListener("click", next);
+    btnBack.addEventListener("click", back);
+
+    // ——— Démarrage ———
+    window.addEventListener("load", ()=>{
+      loadStep(true);
+      if(!hasSpeech()){
+        msgEl.textContent = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
+      }
+    });
   </script>
 </body>
 </html>
