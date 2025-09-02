@@ -2,507 +2,833 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Espace des Champions</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0a0f1e" />
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anagramme Vocal</title>
   <style>
-    :root{
-      --bg:#05070f;
-      --bg-grad: radial-gradient(1200px 800px at 50% -10%, #0e1530 0%, rgba(5,7,15,0) 60%), radial-gradient(800px 600px at 120% 120%, #0a162a 0%, rgba(5,7,15,0) 55%);
-      --text:#eaf2ff;
-      --muted:#a5b7d6;
-      --primary:#00f5ff;
-      --primary-2:#8af2ff;
-      --accent:#ffb86b;
-      --glass: rgba(255,255,255,0.06);
-      --glass-2: rgba(255,255,255,0.10);
-      --border: rgba(255,255,255,0.14);
-      --shadow: 0 10px 40px rgba(0, 255, 255, .15), inset 0 1px 0 rgba(255,255,255,.06);
-      --radius: 16px;
-      --radius-sm: 12px;
-      --focus: 0 0 0 3px rgba(0,245,255,.35), 0 0 0 1px rgba(0,245,255,.6) inset;
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
     }
-
-    *{box-sizing:border-box}
-    html,body{
-      margin:0; padding:0;
-      height:100%;
-      color:var(--text);
-      background:var(--bg);
-      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-      overflow:hidden;
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
-
-    /* Scene & overlay */
-    #scene, #overlay, #scanlines { position:absolute; inset:0 }
-    #scene{ z-index:1 }
-    #scanlines{
-      pointer-events:none; z-index:2;
-      background-image: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,.045) 0px,
-        rgba(255,255,255,.045) 1px,
-        transparent 2px,
-        transparent 4px
-      );
-      mix-blend-mode: soft-light;
-      opacity:.15;
-      will-change: opacity, transform;
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
     }
-    #overlay{
-      z-index:3; display:grid; place-items:center; text-align:center;
-      padding:clamp(16px, 4vw, 48px);
-      background:linear-gradient(180deg, rgba(5,7,15,.85) 0%, rgba(5,7,15,.75) 60%, rgba(5,7,15,0) 100%);
+    @keyframes fadeIn { from {opacity: 0; transform: translateY(15px);} to {opacity: 1; transform: translateY(0);} }
+    h1 { font-weight: 800; margin-bottom: 12px; font-size: 2rem; text-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+    .subtitle { opacity: 0.9; font-size: 0.95rem; margin-bottom: 18px; }
+    #wordDisplay { font-size: 2.2rem; font-weight: bold; letter-spacing: 0.15em; margin: 14px 0 18px; min-height: 50px; }
+    #progress { font-size: 0.95rem; margin-bottom: 12px; opacity: 0.95; }
+    .page-controls {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 10px 0 18px;
     }
-    .headline{
-      font-family:'Orbitron', sans-serif;
-      font-size:clamp(28px, 5vw, 56px);
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      background:linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 40%, #fff 60%, var(--accent) 100%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      filter: drop-shadow(0 0 12px rgba(0,245,255,.25));
-      animation: sheen 4s linear infinite;
+    .page-controls button, .page-controls select, .page-controls input {
+      padding: 10px; border-radius: 10px; border: none; font-size: 1rem; background:#fff; color:#2575fc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
     }
-    @keyframes sheen { 
-      0%{background-position:0% 50%} 
-      100%{background-position:200% 50%}
+    .page-controls select, .page-controls input { cursor: default; }
+    .page-controls button:hover { background:#2575fc; color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa; }
+    input[type="text"] {
+      font-size: 1.2rem; padding: 14px; border-radius: 10px; border: none; width: 100%; margin: 10px 0 16px;
+      background-color:#fff; color:#333; outline:none; transition: all 0.3s ease;
     }
-
-    /* Laser scanner */
-    .scanner{
-      position:absolute; left:0; right:0; top:-6px; height:6px;
-      background: radial-gradient(12px 20px at 20% 50%, rgba(255,255,255,.9), rgba(255,255,255,0) 60%) ,
-                  linear-gradient(90deg, transparent, rgba(0,245,255,.8), rgba(255,255,255,.95), rgba(0,245,255,.8), transparent);
-      box-shadow: 0 0 24px rgba(0,245,255,.7), 0 0 60px rgba(0,245,255,.35);
-      z-index:4;
-      animation: scan 3.2s ease-in-out forwards;
+    input[type="text"]:focus { box-shadow: 0 0 10px #2575fc; caret-color:#2575fc; }
+    .buttons { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top: 6px; }
+    button {
+      flex:1 1 40%; padding:12px; font-size:1.05rem; font-weight:600; border-radius:10px; border:none; cursor:pointer;
+      background:#fff; color:#2575fc; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    @keyframes scan { 
-      0%{ transform: translateY(0) } 
-      100%{ transform: translateY(100vh) } 
-    }
-
-    /* Main room container */
-    #mainRoom{
-      position:absolute; inset:0; z-index:5; display:none;
-      background: var(--bg-grad), radial-gradient(60% 80% at 50% 120%, #000 0%, #0000 70%);
-      overflow:auto; /* allow scroll if small screens */
-    }
-    .container{
-      max-width:min(1100px, 92vw);
-      margin: clamp(32px, 6vh, 72px) auto;
-      padding: clamp(16px, 3vw, 24px);
-    }
-
-    .titleWrap{
-      display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px;
-    }
-    .titleIcon{
-      width:16px; height:16px; border-radius:50%;
-      box-shadow:0 0 16px rgba(0,245,255,.75), inset 0 0 6px rgba(255,255,255,.8);
-      background: radial-gradient(circle at 50% 50%, #fff, var(--primary));
-      animation: pulse 2.8s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{transform:scale(.9)} 50%{transform:scale(1.12)} }
-
-    .typewriter{
-      font-family:'Orbitron',sans-serif;
-      font-size: clamp(20px, 3.2vw, 34px);
-      letter-spacing:.03em;
-      white-space:nowrap; overflow:hidden; border-right: .12em solid var(--accent);
-      animation: typing 2.4s steps(30,end), caret .75s step-end infinite;
-    }
-    @keyframes typing { from{ width:0 } to{ width:100% } }
-    @keyframes caret { 50%{ border-color: transparent } }
-
-    /* Options grid (glass/neon) */
-    .grid{
-      display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px;
-      margin-top: 22px;
-    }
-    .card{
-      position:relative; padding:22px 20px; border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border:1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      transform: translateZ(0); will-change: transform, box-shadow, background;
-      transition: transform .28s ease, box-shadow .28s ease, background .28s ease;
-      cursor:pointer; outline:none;
-    }
-    .card:hover{ transform: translateY(-4px) scale(1.02) }
-    .card:focus-visible{ box-shadow: var(--focus) }
-    .card::after{
-      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-      background: conic-gradient(from 180deg at 50% 50%, rgba(0,245,255,.35), transparent 25%, rgba(255,255,255,.18) 45%, transparent 60%, rgba(255,184,107,.25) 85%, transparent);
-      opacity:.0; transition: opacity .35s ease;
-      filter: blur(14px);
-    }
-    .card:hover::after{ opacity:.85 }
-
-    .card h4{
-      margin:0 0 6px; font-family:'Orbitron'; font-weight:700; letter-spacing:.04em;
-      display:flex; align-items:center; gap:8px; font-size:18px;
-    }
-    .card p{ margin:0; color:var(--muted); font-size:14px; line-height:1.35 }
-
-    .tag{
-      font-size:12px; font-weight:600; padding:4px 8px; border-radius:999px;
-      background: rgba(0,245,255,.12); border:1px solid rgba(0,245,255,.45);
-      display:inline-block; margin-top:10px;
-    }
-
-    /* Sub-options (collapsible) */
-    details{ background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      border:1px dashed rgba(255,255,255,.2); border-radius: var(--radius-sm); padding:14px 14px 6px; }
-    details summary{
-      list-style:none; cursor:pointer; outline:none; user-select:none; padding:6px 2px;
-      font-weight:600; display:flex; align-items:center; gap:10px;
-    }
-    details[open]{ animation: pop .25s ease }
-    @keyframes pop { from{ transform:scale(.98); opacity:.8 } to{ transform:scale(1); opacity:1 } }
-    details summary::-webkit-details-marker{ display:none }
-    .subGrid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px; }
-    .pill{
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      padding:12px 14px; border-radius:12px; border:1px dashed rgba(255,255,255,.25);
-      background: rgba(255,255,255,.04);
-      box-shadow: 0 2px 10px rgba(255,255,255,.06);
-      font-weight:600; font-size:14px; cursor:pointer; transition: transform .25s ease, background .25s ease;
-      outline:none;
-    }
-    .pill:hover{ transform: translateY(-2px); background: rgba(255,255,255,.07) }
-    .pill:focus-visible{ box-shadow: var(--focus) }
-
-    /* HUD / Controls */
-    .hud{
-      position:fixed; right:16px; top:16px; z-index:10; display:flex; gap:10px;
-    }
-    .btn{
-      appearance:none; border:none; padding:10px 14px; border-radius:12px; font-weight:700;
-      background: rgba(0,0,0,.35); color:var(--text); border:1px solid rgba(255,255,255,.25);
-      backdrop-filter: blur(6px); cursor:pointer; transition: transform .25s ease, background .25s ease;
-    }
-    .btn:hover{ transform: translateY(-1px) }
-    .btn:active{ transform: translateY(0) scale(.98) }
-    .btn:focus-visible{ box-shadow: var(--focus) }
-
-    /* Footer */
-    .footer{
-      margin-top: 26px; opacity:.65; font-size:12px; text-align:center
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important; }
-      .scanner{ display:none }
-      #scanlines{ opacity:.06 }
-    }
-
-    /* Small screens tweak */
-    @media (max-width:420px){
-      .card{ padding:18px 16px }
-      .pill{ padding:10px 12px }
-    }
+    button:hover { background:#2575fc; color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa; }
+    #message { margin-top: 18px; font-size: 1.05rem; font-weight: 600; min-height: 32px; transition: color 0.3s ease; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Anagramme Vocal</h1>
+    <div class="subtitle">10 questions par page — choisissez librement votre page</div>
 
-  <!-- 3D starfield -->
-  <canvas id="scene" aria-hidden="true"></canvas>
-  <div id="scanlines" aria-hidden="true"></div>
-
-  <!-- Overlay intro -->
-  <div id="overlay" role="dialog" aria-modal="true" aria-label="Écran d’accueil">
-    <div>
-      <div class="headline">Bienvenue dans l’espace des Champions</div>
-      <div class="titleWrap" style="margin-top:14px;">
-        <span class="titleIcon" aria-hidden="true"></span>
-        <span class="typewriter">Chargement de votre session...</span>
+    <!-- Contrôles de pagination -->
+    <div class="page-controls">
+      <button id="btnPrevPage" title="Page précédente">⟵ Page</button>
+      <div>
+        Page <select id="pageSelect"></select>
+        <span id="totalPagesLabel"></span>
       </div>
+      <button id="btnNextPage" title="Page suivante">Page ⟶</button>
     </div>
-  </div>
-  <div class="scanner" aria-hidden="true"></div>
 
-  <!-- HUD Controls -->
-  <div class="hud" aria-label="Contrôles">
-    <button id="muteBtn" class="btn" aria-pressed="false" aria-label="Activer ou couper le son">🔊 Son</button>
-    <button id="skipIntro" class="btn" aria-label="Passer l’intro">⏭️ Passer</button>
-  </div>
+    <div id="progress">Question — / 10 (page —)</div>
+    <div id="wordDisplay">Mot mystère</div>
 
-  <!-- Main Room -->
-  <main id="mainRoom" aria-live="polite">
-    <div class="container">
-      <div class="titleWrap">
-        <span class="titleIcon" aria-hidden="true"></span>
-        <h1 class="typewriter" style="border:none">Programme    <br>des Champions</h1>
-      </div>
-
-      <section class="grid" role="menu" aria-label="Menu principal">
-        <article class="card" role="menuitem" tabindex="0" data-href="Dictéevocale.html">
-          <h4>📝 Dictée <span class="tag">Vocale</span></h4>
-          <p>Entraîne-toi à la dictée avec un retour audio dynamique.</p>
-        </article>
-
-        <article class="card" role="menuitem" tabindex="0">
-          <h4>🔤 Épellation</h4>
-          <p>Du niveau initiation aux corpus avancés (Bible, Dico).</p>
-          <details>
-            <summary aria-label="Ouvrir les sous-options d’épellation">Sous-options</summary>
-            <div class="subGrid" role="group" aria-label="Sous-options épellation">
-              <button class="pill" data-href="inivocale.html">Initiation</button>
-              <button class="pill" data-href="Epebible.html">Bible</button>
-              <button class="pill" data-href="Epedico.html">Dictionnaire</button>
-            </div>
-          </details>
-        </article>
-
-        <article class="card" role="menuitem" tabindex="0" data-href="Anagrammevocale.html">
-          <h4>🔀 Anagramme</h4>
-          <p>Remue les lettres, trouve les mots. Chrono et audio intégrés.</p>
-        </article>
-
-        <article class="card" role="menuitem" tabindex="0" data-href="Mathvocal.html">
-          <h4>➕ Mathématiques</h4>
-          <p>Calcul mental vocal et défis de progression.</p>
-        </article>
-
-        <article class="card" role="menuitem" tabindex="0">
-          <h4>🧠 Champ lexical</h4>
-          <p>Explore les familles de mots et leurs variations.</p>
-          <details>
-            <summary aria-label="Ouvrir les sous-options du champ lexical">Sous-options</summary>
-            <div class="subGrid" role="group" aria-label="Sous-options champ lexical">
-              <button class="pill">Autour de…</button>
-              <button class="pill">Commencent par (2 lettres)</button>
-              <button class="pill">Commencent par (3 lettres)</button>
-              <button class="pill">Commencent par (4 lettres)</button>
-              <button class="pill">Se terminent par…</button>
-            </div>
-          </details>
-        </article>
-      </section>
-
-      <p class="footer">© <span id="year"></span> Espace des Champions — Interface néon & glass, animations optimisées, accessibilité clavier & ARIA.</p>
+    <input type="text" id="answer" placeholder="Entre une anagramme..." />
+    <div class="buttons">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
     </div>
-  </main>
-
-  <!-- libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <div id="message"></div>
+  </div>
 
   <script>
-    // =========================
-    // Utils
-    // =========================
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ==============================
+   Données (inchangées)
+================================ */
+const words = [
+  { mot: "Sinistre", anagrammes: ["Insister"] },
+  { mot: "Givre", anagrammes: ["Grive"] },
+  { mot: "Hectare", anagrammes: ["Acheter", "Châtrée", "Trachée", "Rachète"] },
+  { mot: "Brute", anagrammes: ["Buter", "Tuber", "Turbe", "Rebut"] },
+  { mot: "Margarine", anagrammes: ["Marginera"] },
+  { mot: "Oracles", anagrammes: ["Recolas", "Scarole", "Racoles", "Écloras"] },
+  { mot: "Chantage", anagrammes: ["Changeât"] },
+  { mot: "Nos", anagrammes: ["Son"] },
+  { mot: "Sec", anagrammes: ["Ces"] },
+  { mot: "Casque", anagrammes: ["Caques", "Sacqué"] },
+  { mot: "Cirque", anagrammes: ["Crique"] },
+  { mot: "Glisser", anagrammes: ["Grésils"] }, 
+  { mot: "Aube", anagrammes: ["Beau"] },
+  { mot: "Arme", anagrammes: ["Amer", "Rame"] },
+  { mot: "Rester", anagrammes: ["Terres", "Tenser", "Stérer"] },
+  { mot: "Partie", anagrammes: ["Parité", "Tipera", "Pirate", "Paître", "Prêtait"] },
+  { mot: "Granit", anagrammes: ["Garnit", "Gratin", "Grinta", "Ingrat", "Rating"] },
+  { mot: "Écrit", anagrammes: ["Récit", "Citer"] },
+  { mot: "Détour", anagrammes: ["Douter", "Tordue", "Tourde"] },
+  { mot: "Agent", anagrammes: ["Étang", "Hanté", "Géant", "Gênât"] },
+  { mot: "Sauver", anagrammes: ["Saveur"] },
+  { mot: "Ouvert", anagrammes: ["Trouvé", "Voûter", "Rouvet"] },
+  { mot: "Éclats", anagrammes: ["Caltés", "Castel", "Lacets", "Lactés", "Tacles"] },
+  { mot: "Détenu", anagrammes: ["Denture", "Étendu", "Tendre"] },
+  { mot: "Ombres", anagrammes: ["Sombres"] },
+  { mot: "Grêle", anagrammes: ["Léger", "Geler", "Règle", "Gerle"] },
+  { mot: "Suer", anagrammes: ["Rues", "Ruse", "Sure", "Ures", "User"] },
+  { mot: "Star", anagrammes: ["Arts", "Rats", "Sart", "Tars", "Tsar"] },
+  { mot: "Tige", anagrammes: ["Gîte"] },
+  { mot: "Paveur", anagrammes: ["Vapeur", "Pauvre"] },
+  { mot: "Ancre", anagrammes: ["Crâne", "Caner", "Cerna", "Écran", "Rance", "Nacre"] },
+  { mot: "Verbe", anagrammes: ["Brève"] },
+  { mot: "Rage", anagrammes: ["Gare", "Areg", "Fera", "Grea"] },
+  { mot: "Coursier", anagrammes: ["Croiseur", "Croisure", "Secourir", "Sourcier"] },
+  { mot: "Départ", anagrammes: ["Pétard"] },
+  { mot: "Stable", anagrammes: ["Tables"] },
+  { mot: "Virage", anagrammes: ["Rivage", "Viager", "Vaigre", "Gravie"] },
+  { mot: "Quatre", anagrammes: ["Quater", "Taquer", "Traque"] },
+  { mot: "Langue", anagrammes: ["Englua", "Gnaule", "Lagune"] },
+  { mot: "Crabe", anagrammes: ["Berça"] },
+  { mot: "Juste", anagrammes: ["Sujet"] },
+  { mot: "Copieur", anagrammes: ["Croupie", "Poucier"] },
+  { mot: "Baliste", anagrammes: ["Bétails", "Établis", "Bestial"] },
+  { mot: "Soigneur", anagrammes: ["Guérison"] },
+  { mot: "Neo", anagrammes: ["Noe", "Eon", "Zeno"] },
+  { mot: "Empirer", anagrammes: ["Premier", "Périmer"] },
+  { mot: "Crainte", anagrammes: ["Certain"] },
+  { mot: "Semaine", anagrammes: ["Animées"] },
+  { mot: "Réalité", anagrammes: ["Atelier"] },
+  { mot: "Argent", anagrammes: ["Gérant", "Grenat", "Garent", "Ragent", "Ranger", "Greant", "Régnât", "Ganter"] },
+  { mot: "Adonner", anagrammes: ["Redonna", "Donnera"] },
+  { mot: "Carte", anagrammes: ["Trace", "Écart", "Carte", "Cérat", "Recta", "Créât"] },
+  { mot: "Destiner", anagrammes: ["Dentiers"] },
+  { mot: "Ministre", anagrammes: ["Intérims"] },
+  { mot: "Création", anagrammes: ["Canotier"] },
+  { mot: "Robinet", anagrammes: ["Obtenir"] },
+  { mot: "Résultat", anagrammes: ["Lutteras"] },
+  { mot: "Service", anagrammes: ["Viscère"] },
+  { mot: "Prendre", anagrammes: ["Reprend"] },
+  { mot: "Mienne", anagrammes: ["Ennemi"] },
+  { mot: "Secret", anagrammes: ["Crêtes", "Certes", "Terces"] },
+  { mot: "Plié", anagrammes: ["Pile"] },
+  { mot: "Rap", anagrammes: ["Par"] },
+  { mot: "Miel", anagrammes: ["Mile", "Lime"] },
+  { mot: "Manoir", anagrammes: ["Romain", "Minora", "Romani"] },
+  { mot: "Poutres", anagrammes: ["Posture", "Troupes"] },
+  { mot: "Clientèle", anagrammes: ["Étincelle"] },
+  { mot: "Alimenter", anagrammes: ["Terminale"] },
+  { mot: "Anticiper", anagrammes: ["Patricien", "Pincerait", "Praticien"] },
+  { mot: "Présenter", anagrammes: ["Serpenter"] },
+  { mot: "President", anagrammes: ["Prédisent", "Déprisent", "Prétendis"] },
+  { mot: "Pointure", anagrammes: ["Éruption", "Pointeur", "Toupiner"] },
+  { mot: "Canard", anagrammes: ["Cadran"] },
+  { mot: "Sac", anagrammes: ["Cas"] },
+  { mot: "Marche", anagrammes: ["Macher", "Charme"] },
+  { mot: "Port", anagrammes: ["Trop"] },
+  { mot: "Marie", anagrammes: ["Aimer", "Maire", "Ramie"] },
+  { mot: "Voisin", anagrammes: ["Vision"] },
+  { mot: "Cogne", anagrammes: ["Congé"] },
+  { mot: "Crime", anagrammes: ["Merci"] },
+  { mot: "Face", anagrammes: ["Café"] },
+  { mot: "Neige", anagrammes: ["Génie"] },
+  { mot: "Obéir", anagrammes: ["Boire"] },
+  { mot: "Rouge", anagrammes: ["Orgue", "Goure", "Rogue"] },
+  { mot: "Laide", anagrammes: ["Idéal", "Délai"] },
+  { mot: "Voter", anagrammes: ["Votre"] },
+  { mot: "Après", anagrammes: ["Repas"] },
+  { mot: "Fois", anagrammes: ["Soif"] },
+  { mot: "Ami", anagrammes: ["Mai"] },
+  { mot: "Amie", anagrammes: ["Aime"] },
+  { mot: "Orange", anagrammes: ["Organe"] },
+  { mot: "Août", anagrammes: ["Auto"] },
+  { mot: "Sœur", anagrammes: ["Ourse"] },
+  { mot: "Art", anagrammes: ["Rat"] },
+  { mot: "Courte", anagrammes: ["Croûte"] },
+  { mot: "Contre", anagrammes: ["Cornet", "Conter"] },
+  { mot: "Tirer", anagrammes: ["Trier"] },
+  { mot: "Course", anagrammes: ["Source"] },
+  { mot: "Ange", anagrammes: ["Nage", "Gêna"] },
+  { mot: "Poule", anagrammes: ["Loupe"] },
+  { mot: "Avec", anagrammes: ["Cave"] },
+  { mot: "Douce", anagrammes: ["Coude"] },
+  { mot: "Baignade", anagrammes: ["Badinage"] },
+  { mot: "Cuisson", anagrammes: ["Cousins", "Coussin", "Sucions"] },
+  { mot: "Céréale", anagrammes: ["Recalée", "Lacérée", "Relacée"] },
+  { mot: "Région", anagrammes: ["Ignore"] },
+  { mot: "Creuser", anagrammes: ["Recrues", "Recures", "Récuser"] },
+  { mot: "Devenu", anagrammes: ["Vendue"] },
+  { mot: "Ordure", anagrammes: ["Rôdeur", "Doreur", "Dorure"] },
+  { mot: "Monstre", anagrammes: ["Mentors", "Montres"] },
+  { mot: "Reprise", anagrammes: ["Pierres", "Prières", "Respire"] },
+  { mot: "Bientôt", anagrammes: ["Obtient", "Bottine", "Boitent"] },
+  { mot: "Croiser", anagrammes: ["Sorcier", "Recrois"] },
+  { mot: "Démon", anagrammes: ["Monde"] },
+  { mot: "Lecteur", anagrammes: ["Lecture"] },
+  { mot: "Cerveau", anagrammes: ["Évacuer"] },
+  { mot: "Facile", anagrammes: ["Fécial", "Ficela", "Calife"] },
+  { mot: "Ressort", anagrammes: ["Trésors", "Rostres"] },
+  { mot: "Sauce", anagrammes: ["Sceau", "Cause"] },
+  { mot: "Singe", anagrammes: ["Signe"] },
+  { mot: "Concert", anagrammes: ["Concret"] },
+  { mot: "Lion", anagrammes: ["Loin"] },
+  { mot: "Pari", anagrammes: ["Pair", "Pria", "Ripa"] },
+  { mot: "Rive", anagrammes: ["Vire", "Ivre"] },
+  { mot: "Pure", anagrammes: ["Puer", "Peur", "Repu", "Rupe"] },
+  { mot: "Info", anagrammes: ["Foin", "Fion"] },
+  { mot: "Tour", anagrammes: ["Trou"] },
+  { mot: "Lire", anagrammes: ["Lier", "Riel"] },
+  { mot: "Malice", anagrammes: ["Limace"] },
+  { mot: "Carie", anagrammes: ["Acier", "Craie", "Écria", "Créai"] },
+  { mot: "Dirige", anagrammes: ["Rigide"] },
+  { mot: "Carnet", anagrammes: ["Nectar", "Cranté", "Centra", "Canter", "Cantre", "Créant", "Encart", "Trance"] },
+  { mot: "Prière", anagrammes: ["Pierre"] }, 
+  { mot: "Aube", anagrammes: ["Beau"] },
+  { mot: "Récital", anagrammes: ["Clairet"] },
+  { mot: "Imposer", anagrammes: ["Promise"] },
+  { mot: "Soigner", anagrammes: ["Régions", "ignores"] },
+  { mot: "Idole", anagrammes: ["iodle"] },
+  { mot: "Forêt", anagrammes: ["Forte"] },
+  { mot: "Danger", anagrammes: ["Grande"] },
+  { mot: "Tenter", anagrammes: ["Trente"] },
+  { mot: "Pastel", anagrammes: ["Palets", "Plaste", "Plates", "septal", "peltas"] },
+  { mot: "Dicter", anagrammes: ["Direct", "Crédit", "décrit"] },
+  { mot: "Misère", anagrammes: ["Remise", "Émeris", "Mirées", "Rimées"] },
+  { mot: "Leçon", anagrammes: ["Oncle", "clone"] },
+  { mot: "Toupie", anagrammes: ["Utopie", "Epouti"] },
+  { mot: "Oublier", anagrammes: ["boulier", "éblouir", "riboule"] },
+  { mot: "Sucre", anagrammes: ["Sucer", "Reçus", "écrus", "curés", "Crues"] },
+  { mot: "Arpent", anagrammes: ["Parent"] },
+  { mot: "Entier", anagrammes: ["Inerte", "Rétine", "Nitrée", "Terrie"] },
+  { mot: "Graduer", anagrammes: ["Draguer", "gardeur"] },
+  { mot: "Barre", anagrammes: ["Arbre"] },
+  { mot: "Manioc", anagrammes: ["Camion"] },
+  { mot: "Poser", anagrammes: ["Perso", "pores", "prose", "repos"] },
+  { mot: "Jeune", anagrammes: ["enjeu"] },
+  { mot: "Manège", anagrammes: ["Mangée", "Ménage", "Magnée", "engame"] },
+  { mot: "Lampe", anagrammes: ["Ample", "Palme"] },
+  { mot: "Triste", anagrammes: ["Titres", "tirets", "sertit"] },
+  { mot: "Achète", anagrammes: ["Tachée"] },
+  { mot: "Couler", anagrammes: ["Clouer"] },
+  { mot: "Tomber", anagrammes: ["Trombe"] },
+  { mot: "Blouse", anagrammes: ["Boules"] }, 
+  { mot: "Aigle", anagrammes: ["Agile", "gelai", "algie", "liage"] },
+  { mot: "Facteur", anagrammes: ["Facture", "Cafteur"] },
+  { mot: "Mesurer", anagrammes: ["Résumer"] },
+  { mot: "Inviter", anagrammes: ["Vitrine", "Inverti"] },
+  { mot: "Étire", anagrammes: ["Tirée", "triée", "etier"] },
+  { mot: "Reussite", anagrammes: ["Tireuses", "Trieuses", "restitués"] },
+  { mot: "Réussi", anagrammes: ["Suries", "sieurs", "Russie"] },
+  { mot: "Jouets", anagrammes: ["joutes"] },
+  { mot: "Boules", anagrammes: ["Blouse"] },
+  { mot: "Festin", anagrammes: ["Feints"] },
+  { mot: "Regime", anagrammes: ["Emigre", "Rémige", "Migrée"] },
+  { mot: "Noirs", anagrammes: ["Rions", "irons", "noris"] },
+  { mot: "Senior", anagrammes: ["Noires", "Réions", "Irones"] },
+  { mot: "Aporie", anagrammes: ["opérai"] },
+  { mot: "Phoniatres", anagrammes: ["Anthropise"] },
+  { mot: "Sieste", anagrammes: ["Tissée"] },
+  { mot: "Vitesse", anagrammes: ["Vêtisse", "servîtes", "estives"] },
+  { mot: "Harpe", anagrammes: ["Phare", "Raphe"] },
+  { mot: "Anglais", anagrammes: ["Alignas", "signala", "sanglai", "glanais"] },
+  { mot: "Traffic", anagrammes: ["Farcît"] },
+  { mot: "Galerie", anagrammes: ["Élargie", "gèlerai", "liègera", "reliage", "Algérie"] },
+  { mot: "Ralenti", anagrammes: ["Alentir", "reliant", "Retinal", "trenail"] },
+  { mot: "Laveur", anagrammes: ["valeur", "lavure", "Revalu", "Levura"] },
+  { mot: "Demane", anagrammes: ["Amende", "Ménade", "Mandée", "Damnée"] },
+  { mot: "Scénariste", anagrammes: ["Cartésiens", "sénatrices", "Résistance"] },
+  { mot: "Centre", anagrammes: ["Créent", "Récent"] },
+  { mot: "Étrangère", anagrammes: ["Agréèrent", "enterrage", "Régénérât"] },
+  { mot: "Miracles", anagrammes: ["Carlisme"] },
+  { mot: "Sapin", anagrammes: ["Pains", "Pisan", "Pians"] },
+  { mot: "Rêver", anagrammes: ["Verre"] }, 
+  { mot: "Présent", anagrammes: ["Serpent"] },
+  { mot: "Cigare", anagrammes: ["Cirage", "gracie", "gerçai"] },
+  { mot: "Love", anagrammes: ["Vélo", "volé", "vole"] },
+  { mot: "Stade", anagrammes: ["Dates"] },
+  { mot: "Gars", anagrammes: ["Gras"] },
+  { mot: "Meuf", anagrammes: ["Fume"] },
+  { mot: "Appareil", anagrammes: ["Rappelai", "Palperai"] },
+  { mot: "Sainte", anagrammes: ["Tisane", "Satiné", "tenais", "nastie", "Niâtes"] },
+  { mot: "Encore", anagrammes: ["coréen", "Cornée", "Écorné"] },
+  { mot: "Uriner", anagrammes: ["Ruiner", "Réunir"] },
+  { mot: "Teneur", anagrammes: ["Neutre", "Tenure", "Retenu", "Enture", "Eurent"] },
+  { mot: "Crible", anagrammes: ["Cibler"] },
+  { mot: "Reflet", anagrammes: ["Trèfle"] },
+  { mot: "Hareng", anagrammes: ["Hargne"] },
+  { mot: "Igname", anagrammes: ["Amigne", "Minage", "Gamine", "Gémina"] }, 
+  { mot: "Corbeau", anagrammes: ["Caroube"] },
+  { mot: "Pièce", anagrammes: ["Épice"] },
+  { mot: "Ronde", anagrammes: ["Drone", "Doner", "Norde", "Redon"] },
+  { mot: "Arc", anagrammes: ["Car"] },
+  { mot: "Naturel", anagrammes: ["Laurent"] },
+  { mot: "Haricot", anagrammes: ["Chariot", "Torchai", "Rochait"] },
+  { mot: "Pots", anagrammes: ["Stop"] },
+  { mot: "Casser", anagrammes: ["Césars", "Crasse", "crases", "sacrés", "scares"] },
+  { mot: "Bancaire", anagrammes: ["Carabine", "cabinera"] },
+  { mot: "Entraide", anagrammes: ["Éteindra", "Dentaire", "Étendrai"] },
+  { mot: "Courrier", anagrammes: ["Recourir"] },
+  { mot: "Poudrier", anagrammes: ["Produire"] },
+  { mot: "Paroisse", anagrammes: ["Passoire", "Poserais", "Reposais", "Poissera"] },
+  { mot: "Affermir", anagrammes: ["Affirmer"] },
+  { mot: "Jonction", anagrammes: ["Conjoint"] }, 
+  { mot: "Maternel", anagrammes: ["Lamenter", "Râlement", "lamèrent", "Remelant"] },
+  { mot: "Cavalier", anagrammes: ["Calvaire", "clavaire", "Claverai"] },
+  { mot: "Allonger", anagrammes: ["Rallonge"] },
+  { mot: "Créature", anagrammes: ["Créateur", "écarteur", "réacteur", "curètera"] },
+  { mot: "Seigneur", anagrammes: ["Insurgée", "Rugines", "seringue"] },
+  { mot: "Oriental", anagrammes: ["Relation", "Enrôlait", "laieront"] },
+  { mot: "Migraine", anagrammes: ["Imaginer"] },
+  { mot: "Pastiche", anagrammes: ["Pistache", "Chipates", "scaphite"] },
+  { mot: "Pagode", anagrammes: ["Dopage"] },
+  { mot: "Attirer", anagrammes: ["Atterri", "Traître", "traiter", "titrera"] },
+  { mot: "Désirer", anagrammes: ["Résider", "Sidérer"] },
+  { mot: "Étrange", anagrammes: ["Gérante", "Argenté", "agréent"] },
+  { mot: "Dominer", anagrammes: ["Moindre", "Endormi"] },
+  { mot: "Dentier", anagrammes: ["Teindre", "détenir"] },
+  { mot: "Gorille", anagrammes: ["Girolle"] }, 
+  { mot: "Aplatir", anagrammes: ["Parlait", "Partial", "platrai"] },
+  { mot: "Filtrer", anagrammes: ["Flétrir", "Flirter"] },
+  { mot: "Jeter", anagrammes: ["Rejet"] },
+  { mot: "Perse", anagrammes: ["Peser", "pères", "serpe"] },
+  { mot: "Encre", anagrammes: ["Cerné", "Crene"] },
+  { mot: "Ancre", anagrammes: ["Écran", "crâne", "cerna"] },
+  { mot: "Totem", anagrammes: ["Motte", "Tomte", "Matot"] },
+  { mot: "Maigre", anagrammes: ["Mirage"] },
+  { mot: "Évier", anagrammes: ["Rivée", "virée"] },
+  { mot: "Typhon", anagrammes: ["Python"] },
+  { mot: "Sonder", anagrammes: ["Drones", "Rondes"] },
+  { mot: "Salut", anagrammes: ["Lutas", "Talus"] },
+  { mot: "Amande", anagrammes: ["Amenda", "Menade"] },
+  { mot: "Canotier", anagrammes: ["Création", "conterai", "réaction"] },
+  { mot: "Noix", anagrammes: ["Inox"] }, 
+  { mot: "Utopie", anagrammes: ["Toupie"] },
+  { mot: "Rigolé", anagrammes: ["Gloire"] },
+  { mot: "Olivier", anagrammes: ["Voilier", "Violier"] },
+  { mot: "Part", anagrammes: ["Rapts"] },
+  { mot: "Cause", anagrammes: ["Sauce", "Sceau"] },
+  { mot: "Ouest", anagrammes: ["Ouste", "Toues", "soute"] },
+  { mot: "Brame", anagrammes: ["Ambre"] },
+  { mot: "Peinard", anagrammes: ["Épinard", "peindra", "prendrai"] },
+  { mot: "Rétine", anagrammes: ["Inerte", "Entier"] },
+  { mot: "Subir", anagrammes: ["Rubis", "ubris"] },
+  { mot: "Tarte", anagrammes: ["Ratte", "Taret", "tâter"] },
+  { mot: "Spectre", anagrammes: ["Respect", "sceptre", "percets"] },
+  { mot: "Féconder", anagrammes: ["Défoncer", "défronce"] },
+  { mot: "Avocatier", anagrammes: ["Octaviera"] },
+  { mot: "Sabre", anagrammes: ["Abers", "Brase"] }, 
+  { mot: "Ciel", anagrammes: ["Lice"] },
+  { mot: "Veine", anagrammes: ["Envie", "vinée"] },
+  { mot: "Satin", anagrammes: ["Saint", "Tains", "Tians"] },
+  { mot: "Glaire", anagrammes: ["Argile", "Élargi", "Agrile"] },
+  { mot: "Fourmi", anagrammes: ["Fumoir"] },
+  { mot: "Isabelle", anagrammes: ["Abeilles", "baillées"] },
+  { mot: "Milan", anagrammes: ["Malin", "liman"] },
+  { mot: "Credo", anagrammes: ["Coder", "Corde", "décor"] },
+  { mot: "Fait", anagrammes: ["Fiat"] },
+  { mot: "Béatrice", anagrammes: ["Bactérie", "Acerbite", "Becterai"] },
+  { mot: "Carole", anagrammes: ["Oracle", "Racole"] },
+  { mot: "Laurent", anagrammes: ["Naturel"] },
+  { mot: "Rosalie", anagrammes: ["Solaire", "isolera", "oralise"] },
+  { mot: "Martine", anagrammes: ["Termina", "Mâtiner", "Martien"] },
+  { mot: "Elvire", anagrammes: ["lièvre", "réveil", "livrée"] }, 
+  { mot: "Banque", anagrammes: ["Banqué", "Buquéa"] },
+  { mot: "Clarinette", anagrammes: ["Intercalent", "Relactinente"] },
+  { mot: "Dentelle", anagrammes: ["Tendelle"] },
+  { mot: "Fleur", anagrammes: ["Rufel", "Fluer"] },
+  { mot: "Garage", anagrammes: ["Agager", "Ragage"] },
+  { mot: "Héros", anagrammes: ["Rohes", "Horse"] },
+  { mot: "Igloo", anagrammes: ["Oligo"] },
+  { mot: "Jardin", anagrammes: ["Randji", "Rindja"] },
+  { mot: "Kiosque", anagrammes: ["Koquise"] },
+  { mot: "Lanterne", anagrammes: ["Ennartel", "Reelnant"] },
+  { mot: "Médaille", anagrammes: ["Dilemma", "Médilla"] },
+  { mot: "Noir", anagrammes: ["Rion", "Iron"] },
+  { mot: "Ovale", anagrammes: ["Voléa", "Valéo"] },
+  { mot: "Parole", anagrammes: ["Reopal", "Pareil"] },
+  { mot: "Quatre", anagrammes: ["Traqué", "Quarté"] },
+  { mot: "Rivière", anagrammes: ["Révrier", "Rivérer"] },
+  { mot: "Soleil", anagrammes: ["Oisell", "Lioels"] },
+  { mot: "Tombé", anagrammes: ["Béomt", "Métob"] },
+  { mot: "Utile", anagrammes: ["Lutéi", "Teuil"] },
+  { mot: "Vacance", anagrammes: ["Canvace", "Cavance"] },
+  { mot: "Wagon", anagrammes: ["Gowan", "Angow"] },
+  { mot: "Xylophone", anagrammes: ["Loxhyphone", "Phonelyox"] },
+  { mot: "Yaourt", anagrammes: ["Toyaúr", "Rayout"] },
+  { mot: "Zèbre", anagrammes: ["Bèzer", "Rébez"] },
 
-    // =========================
-    // 3D STARFIELD + PARALLAX
-    // =========================
-    let scene, camera, renderer, stars, stars2;
-    (function init3D(){
-      const canvas = $('#scene');
-      renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
+  { mot: "Avion", anagrammes: ["Navio", "Viano"] },
+  { mot: "Bureau", anagrammes: ["Urbéau", "Rebua"] },
+  { mot: "Chien", anagrammes: ["Niche", "Enchi"] },
+  { mot: "Drapeau", anagrammes: ["Paradeu", "Rapadeu"] },
+  { mot: "Étoile", anagrammes: ["Toéile", "Loéite"] },
+  { mot: "Fleur", anagrammes: ["Reful", "Rufel"] },
+  { mot: "Gomme", anagrammes: ["Mogme", "Gmome"] },
+  { mot: "Hiver", anagrammes: ["Vireh", "Revih"] },
+  { mot: "Idée", anagrammes: ["Déie", "Éide"] },
+  { mot: "Jardin", anagrammes: ["Drajin", "Rijdan"] }, 
+  { mot: "Échos", anagrammes: [] },
+  { mot: "Rouler", anagrammes: ["Lourer"] },
+  { mot: "Grèce", anagrammes: ["Gerce"] },
+  { mot: "Enfant", anagrammes: ["Fanent"] },
+  { mot: "Danser", anagrammes: ["Sandre", "Redans", "Denars", "Darnes"] },
+  { mot: "Poil", anagrammes: ["Poli"] },
+  { mot: "Onze", anagrammes: ["Zone"] },
+  { mot: "Mien", anagrammes: ["Mine"] },
+  { mot: "File", anagrammes: ["Fiel"] },
+  { mot: "Veau", anagrammes: ["Aveu"] },
+  { mot: "Sont", anagrammes: ["Tons"] },
+  { mot: "Vies", anagrammes: ["Vise"] },
+  { mot: "Noce", anagrammes: ["Once"] },
+  { mot: "Cale", anagrammes: ["Cela", "Lace"] },
+  { mot: "Aile", anagrammes: ["Laie"] },
+  { mot: "Apte", anagrammes: ["Tape", "Pâte", "Peta"] },
+  { mot: "Aire", anagrammes: ["Raie", "Réai"] },
+  { mot: "Béni", anagrammes: ["Bien", "Bine"] },
+  { mot: "Cure", anagrammes: ["Crue", "Reçu", "Écru", "Curé"] },
+  { mot: "Dose", anagrammes: ["Odes", "Sode", "Deos"] },
+  { mot: "Tchao", anagrammes: ["Cahot", "Catho"] },
+  { mot: "Mire", anagrammes: ["Émir", "Rime"] },
+  { mot: "Soie", anagrammes: ["Oies"] },
+  { mot: "Huer", anagrammes: ["Hure", "Heur"] },
+  { mot: "Sabre", anagrammes: ["Baser"] },
+  { mot: "Asile", anagrammes: ["Ailes", "Alise", "Laies", "Lésai", "Elias"] },
+  { mot: "Avril", anagrammes: ["Rival", "Viral", "Livra"] },
+  { mot: "Baver", anagrammes: ["Brave"] },
+  { mot: "Bayou", anagrammes: ["Boyau"] },
+  { mot: "Boues", anagrammes: ["Bouse"] },
+  { mot: "Pouce", anagrammes: ["Coupe"] },
+  { mot: "Calme", anagrammes: ["Clame", "Macle"] },
+  { mot: "Gaver", anagrammes: ["Grave", "Greva"] },
+  { mot: "Essor", anagrammes: ["Roses"] },
+  { mot: "Balle", anagrammes: ["Label"] },
+  { mot: "Cruel", anagrammes: ["Culer", "Lucre", "Recul"] },
+  { mot: "Ligne", anagrammes: ["Linge"] },
+  { mot: "Louer", anagrammes: ["Roule", "Relou", "Loure", "Ourle"] },
+  { mot: "Miser", anagrammes: ["Remis", "Rimes", "Mires", "Émirs"] },
+  { mot: "Lasse", anagrammes: ["Sales", "Lésas", "Salse"] },
+  { mot: "Neveu", anagrammes: ["Neuve", "Venue"] },
+  { mot: "Norme", anagrammes: ["Morne", "Renom"] },
+  { mot: "Train", anagrammes: ["Riant", "Tarin", "Nitra"] },
+  { mot: "Varie", anagrammes: ["Ravie", "Vraie", "Vaire", "Rêvai"] },
+  { mot: "Aider", anagrammes: ["Raide", "Radié", "Draie", "Aride", "Adire"] },
+  { mot: "Actes", anagrammes: ["Caste", "Cates"] },
+  { mot: "Corne", anagrammes: ["Ronce", "Nocer", "Nécro", "Encor"] },
+  { mot: "Buste", anagrammes: ["Tubes", "Butes"] },
+  { mot: "Peigne", anagrammes: ["Pignée"] },
+  { mot: "Serrure", anagrammes: ["Erreurs"] },
+  { mot: "Périr", anagrammes: ["Prier", "Riper"] },
+  { mot: "Récré", anagrammes: ["Créer"] },
+  { mot: "Règne", anagrammes: ["Genre", "Gêner", "Grène"] },
+  { mot: "Régie", anagrammes: ["Érige"] },
+  { mot: "Salon", anagrammes: ["Sonal"] },
+  { mot: "Élève", anagrammes: ["Levée"] },
+  { mot: "Égale", anagrammes: ["Eagle"] },
+  { mot: "Ont", anagrammes: ["Ton"] },
+  { mot: "Lieur", anagrammes: ["Liure", "Ruile", "Luire", "Relui"] },
+  { mot: "Rare", anagrammes: ["Erra"] },
+  { mot: "Élire", anagrammes: ["Relie", "Elier"] },
+  { mot: "Gâter", anagrammes: ["Gérât", "Great", "Targe"] },
+  { mot: "Tue", anagrammes: ["Eut"] },
+  { mot: "Tisseur", anagrammes: ["Tissure", "Réussit", "Surites"] },
+  { mot: "Sape", anagrammes: ["Aspe", "Pesa"] },
+  { mot: "Pénaliser", anagrammes: ["Pralinées"] },
+  { mot: "Soulève", anagrammes: ["Évolues", "Voleuse", "Louvées"] },
+  { mot: "Autre", anagrammes: ["Tuera", "Taure", "Urate"] },
+  { mot: "Bière", anagrammes: ["Briée", "Ibère"] },
+  { mot: "Bouchère", anagrammes: ["Rebouche"] },
+  { mot: "Écarter", anagrammes: ["Cratère", "Cretera", "Recréât", "Reterça", "Retrace", "Tercera"] },
+  { mot: "Mater", anagrammes: ["Trame", "Tréma", "Métrа", "Marte"] },
+  { mot: "Acide", anagrammes: ["Cédai"] },
+  { mot: "Prétoire", anagrammes: ["Portière", "Porterie"] },
+  { mot: "Caf", anagrammes: ["Fac"] },
+  { mot: "Invités", anagrammes: ["Investi"] },
+  { mot: "Écraser", anagrammes: ["Recréas", "Recaser", "Créeras"] },
+  { mot: "Parlement", anagrammes: ["Palmèrent", "Lampèrent", "Emperlant"] },
+  { mot: "Vaseline", anagrammes: ["Niveales", "Enlevais", "Avelines", "Alevines"] },
+  { mot: "Élire", anagrammes: ["Elier", "Relie"] },
+  { mot: "Géo", anagrammes: ["Ego"] },
+  { mot: "Recaler", anagrammes: ["Relacer", "Lacérer", "Carrelé"] },
+  { mot: "Cassure", anagrammes: ["Casseur", "Creusas", "Curasse", "Recusas", "Suceras", "Sucrase"] },
+  { mot: "Hanté", anagrammes: ["Aneth", "Thane"] },
+  { mot: "Valable", anagrammes: ["Lavable"] },
+  { mot: "Chères", anagrammes: ["Sécher", "Rêches", "Escher"] },
+  { mot: "Freiner", anagrammes: ["Inférer"] },
+  { mot: "Admire", anagrammes: ["Medira", "Damier", "Merdai", "Redima"] },
+  { mot: "Attiser", anagrammes: ["Artiste", "Attires", "Ratites", "Restait", "Tarites", "Tirates", "Traites", "Triates"] },
+  { mot: "Scénario", anagrammes: ["Acerions", "Aciérons", "Aconiers", "Acoriens", "Coranise", "Écornais"] },
+  { mot: "Poète", anagrammes: ["Potée", "Topée"] },
+  { mot: "Poste", anagrammes: ["Potes", "Optes", "Pesto", "Topes"] },
+  { mot: "Énoncer", anagrammes: ["Cornéen", "Encorné", "Renonce"] },
+  { mot: "Concerte", anagrammes: ["Concrète", "Écorcent", "Cocréent"] },
+  { mot: "Rabattre", anagrammes: ["Baratter"] },
+  { mot: "Créative", anagrammes: ["Réactive"] },
+  { mot: "Titan", anagrammes: ["Tinta", "Tatin"] },
+  { mot: "Terrien", anagrammes: ["Terrine"] },
+  { mot: "Rangement", anagrammes: ["Garnement"] },
+  { mot: "Prime", anagrammes: ["Imper"] },
+  { mot: "Traîner", anagrammes: ["Terrain", "Ternira", "Rentrai", "Ratiner", "Nitrera"] },
+  { mot: "Cacher", anagrammes: ["Crache", "Crecha"] },
+  { mot: "Arche", anagrammes: ["Chera"] },
+  { mot: "Biberon", anagrammes: ["Bobiner"] },
+  { mot: "Torche", anagrammes: ["Troche", "Rochet", "Chérot"] },
+  { mot: "Résurrection", anagrammes: ["Intercourses", "Reconstruise", "SECURISERONT"] },
+  { mot: "Aire", anagrammes: ["Raie"] },
+  { mot: "Bilan", anagrammes: ["Liban"] },
+  { mot: "Népal", anagrammes: ["Panel", "Pénal"] },
+  { mot: "Irlande", anagrammes: ["Landier"] },
+  { mot: "Serbie", anagrammes: ["Bières", "Brisée"] },
+  { mot: "Israël", anagrammes: ["Éliras", "Lieras", "Lisera", "Relais", "Relias"] },
+  { mot: "Malte", anagrammes: ["Métal", "Mêlât"] },
+  { mot: "Mali", anagrammes: ["Lima", "Mail"] },
+  { mot: "Pologne", anagrammes: ["Plonge", "Poêlon"] },
+  { mot: "Venise", anagrammes: ["Veines", "Envies", "Vinées"] },
+  { mot: "Lucien", anagrammes: ["Inclue"] },
+  { mot: "Maître", anagrammes: ["Tamier", "Métrai", "Mérita", "Mitera", "Émirat"] },
+  { mot: "Pêcher", anagrammes: ["Prêché", "Perche"] },
+  { mot: "Sucrerie", anagrammes: ["Sucrière"] },
+  { mot: "Espérer", anagrammes: ["Repères", "Repeser"] },
+  { mot: "Savons", anagrammes: ["Avons"] },
+  { mot: "Crêpe", anagrammes: ["Percé"] },
+  { mot: "Parisien", anagrammes: ["Aspirine"] },
+  { mot: "Connoise", anagrammes: ["Canonise", "Énonçais"] },
+  { mot: "Annécien", anagrammes: ["Ancienne", "Nancéien"] },
+  { mot: "Anlesien", anagrammes: ["Salienne"] },
+  { mot: "Levain", anagrammes: ["Alevin", "Alvine", "Nivale", "Valine"] },
+  { mot: "Graine", anagrammes: ["Ingéra", "Ignare", "Argien", "Régnai", "Genrai"] },
+  { mot: "Tourte", anagrammes: ["Tortue", "Touret", "Trouet", "Tutore"] },
+  { mot: "Saveur", anagrammes: ["Sauver"] },
+  { mot: "Meunier", anagrammes: ["Mineure", "Ruminée"] },
+  { mot: "Céréale", anagrammes: ["Lacérée", "Recalée", "Relacée"] },
+  { mot: "Seigle", anagrammes: ["Église", "Lieges", "Siglée", "Elegis"] },
+  { mot: "Palmier", anagrammes: ["Lampier", "Remplia", "Rempila", "Emplira", "Lempira"] },
+  { mot: "Grenade", anagrammes: ["Agender", "Dérange"] },
+  { mot: "Cerise", anagrammes: ["Cirées", "Écries", "Criées"] },
+  { mot: "Goyave", anagrammes: ["Voyage"] },
+  { mot: "Narcisse", anagrammes: ["Rancisse", "Rinçassent", "Sarcines"] },
+  { mot: "Israel", anagrammes: ["Éliras", "Lieras", "Lisera", "Relais", "Silera", "Serial", "Resali"] },
+  { mot: "Algérie", anagrammes: ["Élargie", "Galerie", "Gèlerai", "Liègera", "Reliage"] },
+  { mot: "Brésil", anagrammes: ["Libres", "Libers", "Ribles"] },
+  { mot: "Arménie", anagrammes: ["Anémier", "Ranimée", "Réanime", "Manière"] },
+  { mot: "Croatie", anagrammes: ["Coterai", "Coïtera", "Cairote"] },
+  { mot: "Chine", anagrammes: ["Chien", "Niche"] },
+  { mot: "Roumanie", anagrammes: ["Aumônier"] },
+  { mot: "Pérou", anagrammes: ["Proue"] },
+  { mot: "Routes", anagrammes: ["Outrés", "Résout", "Toures", "Troues", "Rouste", "Rouets"] },
+  { mot: "Atomes", anagrammes: ["Ôtâmes"] },
+  { mot: "Métro", anagrammes: ["Morte", "Tomer", "Ormet"] },
+  { mot: "Rumine", anagrammes: ["Mineur", "Murine"] },
+  { mot: "Mordue", anagrammes: ["Remoud", "Moudre"] },
+  { mot: "Est", anagrammes: ["Tes", "Set"] },
+  { mot: "Coeur", anagrammes: ["Coure", "Ecro"] },
+  { mot: "Essence", anagrammes: ["Censées"] },
+  { mot: "Silence", anagrammes: ["Enclise"] },
+  { mot: "Scène", anagrammes: ["Cènes", "Censé"] },
+  { mot: "Naniser", anagrammes: ["Narines", "Rennais"] },
+  { mot: "Récolte", anagrammes: ["Electro"] },
+  { mot: "Seul", anagrammes: ["Élus", "Lues", "Leus"] },
+  { mot: "Clos", anagrammes: ["Cols"] },
+  { mot: "Tatoueur", anagrammes: ["Tourteau"] },
+  { mot: "Avent", anagrammes: ["Navet", "Vante", "Venta"] },
+  { mot: "Pièce", anagrammes: ["Épice"] },
+  { mot: "Ceinture", anagrammes: ["Centurie"] },
+  { mot: "Torsader", anagrammes: ["Dartrose"] },
+  { mot: "Vareuse", anagrammes: ["Évasure", "Raveuse", "Verseau"] },
+  { mot: "Étable", anagrammes: ["Batele", "Tablée"] },
+  { mot: "Givre", anagrammes: ["Grive"] },
+  { mot: "Navire", anagrammes: ["Avenir", "Arvine", "Aviner", "Ravine", "Vinera"] },
+  { mot: "Rebord", anagrammes: ["Border", "Broder"] },
+  { mot: "Littoral", anagrammes: ["Tortilla", "Trollait"] },
+  { mot: "Bonté", anagrammes: ["Béton", "Bento"] },
+  { mot: "Frime", anagrammes: ["Fermi", "Firme", "Frémi"] },
+  { mot: "Bruit", anagrammes: ["Tribu"] },
+  { mot: "Plate", anagrammes: ["Palet", "Lepta", "Pelât", "Palet"] },
+  { mot: "Lavande", anagrammes: ["Vandale"] },
+  { mot: "Verseau", anagrammes: ["Vareuse"] },
+  { mot: "Avenir", anagrammes: ["Navire"] },
+  { mot: "Sphère", anagrammes: ["Herpès"] },
+  { mot: "Guide", anagrammes: ["Digue"] },
+  { mot: "Unies", anagrammes: ["Usine", "Nuise", "Sinue"] },
+  { mot: "Notaire", anagrammes: ["Notarié", "Noterai", "Orienta", "Renotai"] },
+  { mot: "Farine", anagrammes: ["Freina", "Inféra"] },
+  { mot: "Muraille", anagrammes: ["Mailleur", "Maillure"] },
+  { mot: "Ampleur", anagrammes: ["Plumera", "Palmure"] },
+  { mot: "Bouchère", anagrammes: ["Rebouche"] },
+  { mot: "Testeur", anagrammes: ["Surette", "Trustée"] },
+  { mot: "Adresse", anagrammes: ["Résédas", "Dérasés", "Dérases"] },
+  { mot: "Tiède", anagrammes: ["Édite", "Déité", "Diète"] },
+  { mot: "Samedi", anagrammes: ["Médias", "Admise", "Amides"] },
+  { mot: "Ténor", anagrammes: ["Trône", "Notre", "Noter", "Étron"] },
+  { mot: "Slogan", anagrammes: ["Lagons", "Galons"] },
+  { mot: "Roussi", anagrammes: ["Souris"] },
+  { mot: "Audace", anagrammes: ["Cadeau"] },
+  { mot: "Césure", anagrammes: ["Céruse", "Creuse", "Curées", "Écures", "Sucrée", "Récuse"] },
+  { mot: "Nantaise", anagrammes: ["Néantisai", "Anisaient"] },
+  { mot: "Lensoise", anagrammes: ["Insolées", "Nolisées"] },
+  { mot: "Viennois", anagrammes: ["Envions", "Innoves", "Venions", "Veinons"] },
+  { mot: "Patine", anagrammes: ["Tapine", "Paient", "Inapte", "Aptien"] },
+  { mot: "Élever", anagrammes: ["Relève", "Révèle"] },
+  { mot: "Dérive", anagrammes: ["Dévier", "Dévire", "Drivée", "Évider", "Verdie"] },
+  { mot: "Grâce", anagrammes: ["Garce", "Gerça"] },
+  { mot: "Éternité", anagrammes: ["Étreinte", "Reinette", "Reteinte"] },
+  { mot: "Angleterre", anagrammes: ["L’Étrangère", "Galérèrent", "Régalèrent"] },
+  { mot: "Modestie", anagrammes: ["Mois d’été"] },
+  { mot: "Divorce", anagrammes: ["Corvidé"] },
+  { mot: "Fragile", anagrammes: ["Giflera"] },
+  { mot: "Tomate", anagrammes: ["Émotta"] },
+  { mot: "Souterrains", anagrammes: ["Restaurions", "Saturerions", "Tonsurerais", "Surnoterais"] },
+  { mot: "Persistante", anagrammes: ["Étripassent", "Patisserent", "Pressentait", "Rapetissent", "Retapissent", "Tapissèrent"] },
+  { mot: "Amuser", anagrammes: ["Amures", "Résuma", "Mesura", "Masure", "Maures", "Mauser", "Mueras", "Remuas"] },
+  { mot: "Libère", anagrammes: ["Riblée", "Belier"] },
+  { mot: "Réduction", anagrammes: ["Reconduit"] },
+  { mot: "Triangle", anagrammes: ["Intégral", "Glairent"] },
+  { mot: "Œil", anagrammes: ["L’oie"] },
+  { mot: "Robe", anagrammes: ["Orbe", "Bore", "Boer"] },
+  { mot: "Alarme", anagrammes: ["Lamera"] },
+  { mot: "Chaise", anagrammes: ["Séchai", "Eschai", "Echais"] },
+  { mot: "Vote", anagrammes: ["Veto"] },
+  { mot: "Valoir", anagrammes: ["L’avoir", "Lavoir"] },
+  { mot: "Véhiculer", anagrammes: ["CHEVREUIL"] },
+  { mot: "Beauté", anagrammes: ["Abutée"] },
+  { mot: "Réaliser", anagrammes: ["Lisérera", "Relieras", "Rééliras"] },
+  { mot: "Puits", anagrammes: ["Tupis"] },
+  { mot: "Garage", anagrammes: ["Ragage", "Gagera"] },
+  { mot: "Balance", anagrammes: ["Bancale"] },
+  { mot: "Histoire", anagrammes: ["Historie"] },
+  { mot: "Français", anagrammes: ["Francisa"] },
+  { mot: "Latin", anagrammes: ["Liant"] },
+  { mot: "Algèbre", anagrammes: ["Alberge", "Brêlage", "Gérable"] },
+  { mot: "Masculin", anagrammes: ["Culminas", "Muscinal"] },
+  { mot: "Scorpion", anagrammes: ["Picorons"] },
+  { mot: "Infirmière", anagrammes: ["Infirmerie"] },
+  { mot: "Patient", anagrammes: ["Piétant"] },
+  { mot: "Couleur", anagrammes: ["Cloueur", "Coulure"] },
+  { mot: "Bras", anagrammes: ["Bars", "Rabs"] },
+  { mot: "Croisade", anagrammes: ["Décorais", "Coderais", "Décroisa", "Sarcoide"] },
+  { mot: "Claire", anagrammes: ["Éclair", "Calier"] },
+  { mot: "Maître", anagrammes: ["Mérita", "Émirat", "Mitera", "Tamier", "Metrai"] }
+];
 
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
-      camera.position.z = 8;
+/* ==============================
+   Éléments et état
+================================ */
+const pageSize = 10;
+let currentPage = 1; // 1-indexed
+let currentWordIndex = 0; // index global
+let speechRate = 1;
 
-      function makeStarField(count, spread, size, color){
-        const geom = new THREE.BufferGeometry();
-        const positions = new Float32Array(count * 3);
-        for(let i=0;i<count;i++){
-          positions[i*3+0] = (Math.random() - .5) * spread;
-          positions[i*3+1] = (Math.random() - .5) * spread;
-          positions[i*3+2] = (Math.random() - .5) * spread;
-        }
-        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const mat = new THREE.PointsMaterial({ color, size, sizeAttenuation:true, transparent:true, opacity:.9 });
-        return new THREE.Points(geom, mat);
-      }
-      stars  = makeStarField(1800, 900, .6, 0x8adfff);
-      stars2 = makeStarField(1200, 1200, 1.0, 0x00f5ff);
-      scene.add(stars, stars2);
+const wordDisplay = document.getElementById("wordDisplay");
+const answerInput = document.getElementById("answer");
+const message = document.getElementById("message");
+const btnPlay = document.getElementById("btnPlay");
+const btnSlow = document.getElementById("btnSlow");
+const btnFast = document.getElementById("btnFast");
+const btnRepeat = document.getElementById("btnRepeat");
+const btnSkip = document.getElementById("btnSkip");
+const btnBack = document.getElementById("btnBack");
 
-      function onResize(){
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      }
-      window.addEventListener('resize', onResize);
+const progress = document.getElementById("progress");
+const pageSelect = document.getElementById("pageSelect");
+const btnPrevPage = document.getElementById("btnPrevPage");
+const btnNextPage = document.getElementById("btnNextPage");
+const totalPagesLabel = document.getElementById("totalPagesLabel");
 
-      let mx = 0, my = 0, tx = 0, ty = 0;
-      window.addEventListener('pointermove', (e)=>{
-        const x = (e.clientX / window.innerWidth) * 2 - 1;
-        const y = (e.clientY / window.innerHeight) * 2 - 1;
-        mx = x * 0.5; my = y * 0.4;
-      });
+const totalPages = Math.ceil(words.length / pageSize);
 
-      function animate(){
-        requestAnimationFrame(animate);
-        tx += (mx - tx) * 0.03;
-        ty += (my - ty) * 0.03;
-        stars.rotation.y += 0.0006;
-        stars2.rotation.x -= 0.0004;
-        camera.position.x = tx;
-        camera.position.y = -ty;
-        renderer.render(scene, camera);
-      }
-      animate();
-    })();
+/* ==============================
+   Helpers
+================================ */
+function normalize(str){
+  return str
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')                // sépare les accents
+    .replace(/[\u0300-\u036f]/g,'') // supprime les diacritiques
+    .replace(/\s+/g,' ');           // espaces multiples -> simple
+}
 
-    // =========================
-    // AUDIO (with Mute toggle)
-    // =========================
-    const introSound = new Howl({
-      src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3?filename=futuristic-intro-ambient-20589.mp3'],
-      volume: 0.35
-    });
-    const cheer = new Howl({
-      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3?filename=small-crowd-cheer-6721.mp3'],
-      volume: 0.25
-    });
+function pageStartIndex(page){ return (page-1)*pageSize; }
+function pageEndIndex(page){ return Math.min(page*pageSize - 1, words.length - 1); }
+function indexInCurrentPage(){ return currentWordIndex - pageStartIndex(currentPage); }
 
-    let muted = false;
-    const muteBtn = $('#muteBtn');
-    muteBtn.addEventListener('click', ()=>{
-      muted = !muted;
-      Howler.mute(muted);
-      muteBtn.setAttribute('aria-pressed', String(!muted));
-      muteBtn.textContent = muted ? '🔇 Muet' : '🔊 Son';
-    });
+function updateProgress(){
+  const pos = indexInCurrentPage() + 1;
+  const end = pageEndIndex(currentPage) - pageStartIndex(currentPage) + 1; // = 10 sauf dernière page
+  progress.textContent = `Question ${pos}/${end} (page ${currentPage}/${totalPages})`;
+}
 
-    // =========================
-    // INTRO TIMELINE + SKIP
-    // =========================
-    const overlay = $('#overlay');
-    const scanlines = $('#scanlines');
-    const mainRoom = $('#mainRoom');
-    const skipIntro = $('#skipIntro');
+function updatePageSelect(){
+  pageSelect.innerHTML = "";
+  for(let p=1; p<=totalPages; p++){
+    const opt = document.createElement("option");
+    opt.value = String(p);
+    opt.textContent = p;
+    if (p === currentPage) opt.selected = true;
+    pageSelect.appendChild(opt);
+  }
+  totalPagesLabel.textContent = ` / ${totalPages}`;
+}
 
-    function enterApp(){
-      overlay.style.pointerEvents = 'none';
-      gsap.to(overlay, { opacity:0, duration:.9, ease:'power2.out' });
-      gsap.to('#scene', { y: -window.innerHeight * .06, duration:1.4, ease:'power3.inOut',
-        onComplete: ()=>{
-          mainRoom.style.display = 'block';
-          gsap.fromTo(mainRoom, { opacity:0, y: 18 }, { opacity:1, y:0, duration:.7, ease:'power2.out' });
-          confettiBurst();
-          if(!muted) cheer.play();
-        }
-      });
-      gsap.to(scanlines, { opacity:.22, duration:1.2, ease:'sine.out' });
-    }
+/* ==============================
+   Voix
+================================ */
+function speakWord(text, rate = speechRate) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "La synthèse vocale n'est pas disponible.";
+    return;
+  }
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.rate = rate;
+  speechSynthesis.speak(utterance);
+}
 
-    let introPlayed = false;
-    function playIntro(){
-      if(introPlayed) return;
-      introPlayed = true;
-      if(!muted) introSound.play();
-      // subtle vibration effect (replaced by a gentle zoom/pulse)
-      if (!prefersReduced) {
-        gsap.fromTo('#scene', { scale:1.005 }, { scale:1, duration:.8, ease:'power1.inOut' });
-      }
-      // auto-continue after 2.8s
-      setTimeout(enterApp, 2800);
-    }
+/* ==============================
+   Logique de jeu
+================================ */
+function playWord() {
+  const current = words[currentWordIndex];
+  wordDisplay.textContent = current.mot;
+  speakWord(`Trouve une anagramme du mot ${current.mot}`);
+  message.textContent = "Écris une anagramme correcte.";
+  message.style.color = "#fff";
+  answerInput.value = "";
+  answerInput.disabled = false;
+  answerInput.focus();
+  updateProgress();
+}
 
-    // Start Intro
-    if (document.visibilityState === 'visible') playIntro();
-    document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') playIntro(); }, { once:true });
+function playWordSlow() { speechRate = Math.max(0.5, speechRate - 0.25); playWord(); }
+function playWordFast() { speechRate = Math.min(2, speechRate + 0.25); playWord(); }
+function repeatWord()   { playWord(); }
 
-    // Skip
-    skipIntro.addEventListener('click', ()=>{
-      enterApp();
-    });
+function checkAnswer() {
+  const userAnswerNorm = normalize(answerInput.value);
+  const anagramListNorm = words[currentWordIndex].anagrammes.map(a => normalize(a));
 
-    // =========================
-    // CONFETTI (GSAP DOM)
-    // =========================
-    function confettiBurst(){
-      if(prefersReduced) return;
-      const n = 36;
-      for(let i=0;i<n;i++){
-        const c = document.createElement('div');
-        const size = 8 + Math.random()*8;
-        c.style.position='fixed';
-        c.style.width = size+'px';
-        c.style.height = size+'px';
-        c.style.left = (Math.random()*100)+'vw';
-        c.style.top = '-20px';
-        c.style.borderRadius = '2px';
-        c.style.background = ['#ffd166','#06d6a0','#118ab2','#ef476f','#8338ec'][i%5];
-        c.style.zIndex = 9;
-        document.body.appendChild(c);
-        gsap.to(c, { y: (window.innerHeight + 80), rotation: (Math.random()*600-300), duration: 1.8 + Math.random()*1.2, ease:'power2.in',
-          onComplete: ()=> c.remove()
-        });
-      }
-    }
+  // Accepte toutes les anagrammes listées (insensible à la casse et aux accents)
+  if (anagramListNorm.includes(userAnswerNorm)) {
+    message.textContent = "✅ Correct ! Bien joué.";
+    message.style.color = "#00e676";
+    setTimeout(() => { nextWord(); }, 800);
+  } else {
+    message.textContent = "❌ Incorrect. Écoute les bonnes réponses.";
+    message.style.color = "#ff5252";
+    const toSpeak = words[currentWordIndex].anagrammes.join(", ");
+    speakWord(`Il fallait penser à : ${toSpeak}`);
+  }
+}
 
-    // =========================
-    // MENU INTERACTIONS
-    // =========================
-    // Clickable cards & pills
-    function go(href){ if(!href) return; window.location.href = href; }
-    $$('.card').forEach(card=>{
-      const href = card.dataset.href;
-      card.addEventListener('click', (e)=>{
-        if(e.target.closest('details')) return; // don't intercept details clicks
-        go(href);
-      });
-      card.addEventListener('keydown', (e)=>{
-        if(e.key==='Enter' || e.key===' '){
-          e.preventDefault(); if(e.target.closest('details')) return; go(href);
-        }
-      });
-      // tilt on move
-      let rx=0, ry=0;
-      card.addEventListener('pointermove', (e)=>{
-        const r = card.getBoundingClientRect();
-        const cx = e.clientX - r.left, cy = e.clientY - r.top;
-        ry = (cx / r.width - .5) * 8;
-        rx = (cy / r.height - .5) * -8;
-        card.style.transform = `translateY(-4px) scale(1.02) rotateX(${rx}deg) rotateY(${ry}deg)`;
-      });
-      card.addEventListener('pointerleave', ()=>{
-        card.style.transform = '';
-      });
-    });
+function nextWord() {
+  const end = pageEndIndex(currentPage);
+  if (currentWordIndex < end) {
+    currentWordIndex++;
+    playWord();
+  } else {
+    message.textContent = `🎉 Fin de la page ${currentPage}. Choisissez une autre page pour continuer.`;
+    answerInput.disabled = true;
+  }
+}
 
-    $$('.pill').forEach(p=>{
-      p.addEventListener('click', ()=> go(p.dataset.href));
-      p.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(p.dataset.href); }});
-    });
+function prevWord() {
+  const start = pageStartIndex(currentPage);
+  if (currentWordIndex > start) {
+    currentWordIndex--;
+    message.textContent = "";
+    playWord();
+  }
+}
 
-    // Open details via keyboard focus on summary
-    $$('details summary').forEach(s=>{
-      s.addEventListener('keydown', (e)=>{
-        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); s.click(); }
-      });
-    });
+/* ==============================
+   Pagination
+================================ */
+function goToPage(p){
+  const page = Math.max(1, Math.min(totalPages, p));
+  currentPage = page;
+  currentWordIndex = pageStartIndex(currentPage);
+  updatePageSelect();
+  message.textContent = "";
+  playWord();
+}
 
-    // =========================
-    // DYNAMIC BITS
-    // =========================
-    $('#year').textContent = new Date().getFullYear();
+btnPrevPage.addEventListener("click", () => {
+  if (currentPage > 1) goToPage(currentPage - 1);
+});
+btnNextPage.addEventListener("click", () => {
+  if (currentPage < totalPages) goToPage(currentPage + 1);
+});
+pageSelect.addEventListener("change", (e) => {
+  const p = parseInt(e.target.value, 10);
+  goToPage(p);
+});
 
-    // Fallback: if user lands with reduced motion, show main instantly
-    if (prefersReduced) {
-      overlay.style.display = 'none';
-      mainRoom.style.display = 'block';
-    }
+/* ==============================
+   Événements UI
+================================ */
+btnBack.addEventListener("click", prevWord);
+btnPlay.addEventListener("click", playWord);
+btnSlow.addEventListener("click", playWordSlow);
+btnFast.addEventListener("click", playWordFast);
+btnRepeat.addEventListener("click", repeatWord);
+btnSkip.addEventListener("click", nextWord);
+
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkAnswer();
+});
+
+/* ==============================
+   Démarrage
+================================ */
+updatePageSelect();
+window.addEventListener("load", () => goToPage(1));
   </script>
 </body>
 </html>
