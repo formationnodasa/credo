@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Anagramme Vocal</title>
+  <title>Module Épellation Vocal du dictionnaire - Liste Complète</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,52 +35,74 @@
       animation: fadeIn 1.2s ease;
     }
     @keyframes fadeIn { from {opacity: 0; transform: translateY(15px);} to {opacity: 1; transform: translateY(0);} }
-    h1 { font-weight: 800; margin-bottom: 12px; font-size: 2rem; text-shadow: 0 3px 8px rgba(0,0,0,0.3); }
-    .subtitle { opacity: 0.9; font-size: 0.95rem; margin-bottom: 18px; }
+
+    h1 { font-weight: 800; margin-bottom: 12px; font-size: 2rem; text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
     #wordDisplay { font-size: 2.2rem; font-weight: bold; letter-spacing: 0.15em; margin: 14px 0 18px; min-height: 50px; }
-    #progress { font-size: 0.95rem; margin-bottom: 12px; opacity: 0.95; }
+
     .page-controls {
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 10px 0 18px;
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 8px 0 16px;
     }
-    .page-controls button, .page-controls select, .page-controls input {
+    .page-controls button, .page-controls select {
       padding: 10px; border-radius: 10px; border: none; font-size: 1rem; background:#fff; color:#2575fc;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
     }
-    .page-controls select, .page-controls input { cursor: default; }
     .page-controls button:hover { background:#2575fc; color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa; }
+
+    #progress { font-size: 0.95rem; margin-bottom: 8px; opacity: 0.95; }
+
     input[type="text"] {
       font-size: 1.2rem; padding: 14px; border-radius: 10px; border: none; width: 100%; margin: 10px 0 16px;
       background-color:#fff; color:#333; outline:none; transition: all 0.3s ease;
     }
-    input[type="text"]:focus { box-shadow: 0 0 10px #2575fc; caret-color:#2575fc; }
-    .buttons { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top: 6px; }
-    button {
-      flex:1 1 40%; padding:12px; font-size:1.05rem; font-weight:600; border-radius:10px; border:none; cursor:pointer;
-      background:#fff; color:#2575fc; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    input[type="text"]:focus { box-shadow: 0 0 10px #2575fc; caret-color: #2575fc; }
+
+    .buttons {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px;
     }
-    button:hover { background:#2575fc; color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa; }
-    #message { margin-top: 18px; font-size: 1.05rem; font-weight: 600; min-height: 32px; transition: color 0.3s ease; }
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #2575fc;
+      color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    }
+    #message {
+      margin-top: 18px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      min-height: 32px;
+      transition: color 0.3s ease;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Anagramme Vocal</h1>
-    <div class="subtitle">10 questions par page — choisissez librement votre page</div>
+    <h1>Épellation vocale des mots du dictionnaire</h1>
 
     <!-- Contrôles de pagination -->
     <div class="page-controls">
       <button id="btnPrevPage" title="Page précédente">⟵ Page</button>
       <div>
-        Page <select id="pageSelect"></select>
-        <span id="totalPagesLabel"></span>
+        Page <select id="pageSelect"></select><span id="totalPagesLabel"></span>
       </div>
       <button id="btnNextPage" title="Page suivante">Page ⟶</button>
     </div>
 
     <div id="progress">Question — / 10 (page —)</div>
-    <div id="wordDisplay">Mot mystère</div>
+    <div id="wordDisplay">Mot à écouter</div>
 
-    <input type="text" id="answer" placeholder="Entre une anagramme..." />
+    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
     <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
@@ -93,742 +115,288 @@
   </div>
 
   <script>
-/* ==============================
-   Données (inchangées)
-================================ */
-const words = [
-  { mot: "Sinistre", anagrammes: ["Insister"] },
-  { mot: "Givre", anagrammes: ["Grive"] },
-  { mot: "Hectare", anagrammes: ["Acheter", "Châtrée", "Trachée", "Rachète"] },
-  { mot: "Brute", anagrammes: ["Buter", "Tuber", "Turbe", "Rebut"] },
-  { mot: "Margarine", anagrammes: ["Marginera"] },
-  { mot: "Oracles", anagrammes: ["Recolas", "Scarole", "Racoles", "Écloras"] },
-  { mot: "Chantage", anagrammes: ["Changeât"] },
-  { mot: "Nos", anagrammes: ["Son"] },
-  { mot: "Sec", anagrammes: ["Ces"] },
-  { mot: "Casque", anagrammes: ["Caques", "Sacqué"] },
-  { mot: "Cirque", anagrammes: ["Crique"] },
-  { mot: "Glisser", anagrammes: ["Grésils"] }, 
-  { mot: "Aube", anagrammes: ["Beau"] },
-  { mot: "Arme", anagrammes: ["Amer", "Rame"] },
-  { mot: "Rester", anagrammes: ["Terres", "Tenser", "Stérer"] },
-  { mot: "Partie", anagrammes: ["Parité", "Tipera", "Pirate", "Paître", "Prêtait"] },
-  { mot: "Granit", anagrammes: ["Garnit", "Gratin", "Grinta", "Ingrat", "Rating"] },
-  { mot: "Écrit", anagrammes: ["Récit", "Citer"] },
-  { mot: "Détour", anagrammes: ["Douter", "Tordue", "Tourde"] },
-  { mot: "Agent", anagrammes: ["Étang", "Hanté", "Géant", "Gênât"] },
-  { mot: "Sauver", anagrammes: ["Saveur"] },
-  { mot: "Ouvert", anagrammes: ["Trouvé", "Voûter", "Rouvet"] },
-  { mot: "Éclats", anagrammes: ["Caltés", "Castel", "Lacets", "Lactés", "Tacles"] },
-  { mot: "Détenu", anagrammes: ["Denture", "Étendu", "Tendre"] },
-  { mot: "Ombres", anagrammes: ["Sombres"] },
-  { mot: "Grêle", anagrammes: ["Léger", "Geler", "Règle", "Gerle"] },
-  { mot: "Suer", anagrammes: ["Rues", "Ruse", "Sure", "Ures", "User"] },
-  { mot: "Star", anagrammes: ["Arts", "Rats", "Sart", "Tars", "Tsar"] },
-  { mot: "Tige", anagrammes: ["Gîte"] },
-  { mot: "Paveur", anagrammes: ["Vapeur", "Pauvre"] },
-  { mot: "Ancre", anagrammes: ["Crâne", "Caner", "Cerna", "Écran", "Rance", "Nacre"] },
-  { mot: "Verbe", anagrammes: ["Brève"] },
-  { mot: "Rage", anagrammes: ["Gare", "Areg", "Fera", "Grea"] },
-  { mot: "Coursier", anagrammes: ["Croiseur", "Croisure", "Secourir", "Sourcier"] },
-  { mot: "Départ", anagrammes: ["Pétard"] },
-  { mot: "Stable", anagrammes: ["Tables"] },
-  { mot: "Virage", anagrammes: ["Rivage", "Viager", "Vaigre", "Gravie"] },
-  { mot: "Quatre", anagrammes: ["Quater", "Taquer", "Traque"] },
-  { mot: "Langue", anagrammes: ["Englua", "Gnaule", "Lagune"] },
-  { mot: "Crabe", anagrammes: ["Berça"] },
-  { mot: "Juste", anagrammes: ["Sujet"] },
-  { mot: "Copieur", anagrammes: ["Croupie", "Poucier"] },
-  { mot: "Baliste", anagrammes: ["Bétails", "Établis", "Bestial"] },
-  { mot: "Soigneur", anagrammes: ["Guérison"] },
-  { mot: "Neo", anagrammes: ["Noe", "Eon", "Zeno"] },
-  { mot: "Empirer", anagrammes: ["Premier", "Périmer"] },
-  { mot: "Crainte", anagrammes: ["Certain"] },
-  { mot: "Semaine", anagrammes: ["Animées"] },
-  { mot: "Réalité", anagrammes: ["Atelier"] },
-  { mot: "Argent", anagrammes: ["Gérant", "Grenat", "Garent", "Ragent", "Ranger", "Greant", "Régnât", "Ganter"] },
-  { mot: "Adonner", anagrammes: ["Redonna", "Donnera"] },
-  { mot: "Carte", anagrammes: ["Trace", "Écart", "Carte", "Cérat", "Recta", "Créât"] },
-  { mot: "Destiner", anagrammes: ["Dentiers"] },
-  { mot: "Ministre", anagrammes: ["Intérims"] },
-  { mot: "Création", anagrammes: ["Canotier"] },
-  { mot: "Robinet", anagrammes: ["Obtenir"] },
-  { mot: "Résultat", anagrammes: ["Lutteras"] },
-  { mot: "Service", anagrammes: ["Viscère"] },
-  { mot: "Prendre", anagrammes: ["Reprend"] },
-  { mot: "Mienne", anagrammes: ["Ennemi"] },
-  { mot: "Secret", anagrammes: ["Crêtes", "Certes", "Terces"] },
-  { mot: "Plié", anagrammes: ["Pile"] },
-  { mot: "Rap", anagrammes: ["Par"] },
-  { mot: "Miel", anagrammes: ["Mile", "Lime"] },
-  { mot: "Manoir", anagrammes: ["Romain", "Minora", "Romani"] },
-  { mot: "Poutres", anagrammes: ["Posture", "Troupes"] },
-  { mot: "Clientèle", anagrammes: ["Étincelle"] },
-  { mot: "Alimenter", anagrammes: ["Terminale"] },
-  { mot: "Anticiper", anagrammes: ["Patricien", "Pincerait", "Praticien"] },
-  { mot: "Présenter", anagrammes: ["Serpenter"] },
-  { mot: "President", anagrammes: ["Prédisent", "Déprisent", "Prétendis"] },
-  { mot: "Pointure", anagrammes: ["Éruption", "Pointeur", "Toupiner"] },
-  { mot: "Canard", anagrammes: ["Cadran"] },
-  { mot: "Sac", anagrammes: ["Cas"] },
-  { mot: "Marche", anagrammes: ["Macher", "Charme"] },
-  { mot: "Port", anagrammes: ["Trop"] },
-  { mot: "Marie", anagrammes: ["Aimer", "Maire", "Ramie"] },
-  { mot: "Voisin", anagrammes: ["Vision"] },
-  { mot: "Cogne", anagrammes: ["Congé"] },
-  { mot: "Crime", anagrammes: ["Merci"] },
-  { mot: "Face", anagrammes: ["Café"] },
-  { mot: "Neige", anagrammes: ["Génie"] },
-  { mot: "Obéir", anagrammes: ["Boire"] },
-  { mot: "Rouge", anagrammes: ["Orgue", "Goure", "Rogue"] },
-  { mot: "Laide", anagrammes: ["Idéal", "Délai"] },
-  { mot: "Voter", anagrammes: ["Votre"] },
-  { mot: "Après", anagrammes: ["Repas"] },
-  { mot: "Fois", anagrammes: ["Soif"] },
-  { mot: "Ami", anagrammes: ["Mai"] },
-  { mot: "Amie", anagrammes: ["Aime"] },
-  { mot: "Orange", anagrammes: ["Organe"] },
-  { mot: "Août", anagrammes: ["Auto"] },
-  { mot: "Sœur", anagrammes: ["Ourse"] },
-  { mot: "Art", anagrammes: ["Rat"] },
-  { mot: "Courte", anagrammes: ["Croûte"] },
-  { mot: "Contre", anagrammes: ["Cornet", "Conter"] },
-  { mot: "Tirer", anagrammes: ["Trier"] },
-  { mot: "Course", anagrammes: ["Source"] },
-  { mot: "Ange", anagrammes: ["Nage", "Gêna"] },
-  { mot: "Poule", anagrammes: ["Loupe"] },
-  { mot: "Avec", anagrammes: ["Cave"] },
-  { mot: "Douce", anagrammes: ["Coude"] },
-  { mot: "Baignade", anagrammes: ["Badinage"] },
-  { mot: "Cuisson", anagrammes: ["Cousins", "Coussin", "Sucions"] },
-  { mot: "Céréale", anagrammes: ["Recalée", "Lacérée", "Relacée"] },
-  { mot: "Région", anagrammes: ["Ignore"] },
-  { mot: "Creuser", anagrammes: ["Recrues", "Recures", "Récuser"] },
-  { mot: "Devenu", anagrammes: ["Vendue"] },
-  { mot: "Ordure", anagrammes: ["Rôdeur", "Doreur", "Dorure"] },
-  { mot: "Monstre", anagrammes: ["Mentors", "Montres"] },
-  { mot: "Reprise", anagrammes: ["Pierres", "Prières", "Respire"] },
-  { mot: "Bientôt", anagrammes: ["Obtient", "Bottine", "Boitent"] },
-  { mot: "Croiser", anagrammes: ["Sorcier", "Recrois"] },
-  { mot: "Démon", anagrammes: ["Monde"] },
-  { mot: "Lecteur", anagrammes: ["Lecture"] },
-  { mot: "Cerveau", anagrammes: ["Évacuer"] },
-  { mot: "Facile", anagrammes: ["Fécial", "Ficela", "Calife"] },
-  { mot: "Ressort", anagrammes: ["Trésors", "Rostres"] },
-  { mot: "Sauce", anagrammes: ["Sceau", "Cause"] },
-  { mot: "Singe", anagrammes: ["Signe"] },
-  { mot: "Concert", anagrammes: ["Concret"] },
-  { mot: "Lion", anagrammes: ["Loin"] },
-  { mot: "Pari", anagrammes: ["Pair", "Pria", "Ripa"] },
-  { mot: "Rive", anagrammes: ["Vire", "Ivre"] },
-  { mot: "Pure", anagrammes: ["Puer", "Peur", "Repu", "Rupe"] },
-  { mot: "Info", anagrammes: ["Foin", "Fion"] },
-  { mot: "Tour", anagrammes: ["Trou"] },
-  { mot: "Lire", anagrammes: ["Lier", "Riel"] },
-  { mot: "Malice", anagrammes: ["Limace"] },
-  { mot: "Carie", anagrammes: ["Acier", "Craie", "Écria", "Créai"] },
-  { mot: "Dirige", anagrammes: ["Rigide"] },
-  { mot: "Carnet", anagrammes: ["Nectar", "Cranté", "Centra", "Canter", "Cantre", "Créant", "Encart", "Trance"] },
-  { mot: "Prière", anagrammes: ["Pierre"] }, 
-  { mot: "Aube", anagrammes: ["Beau"] },
-  { mot: "Récital", anagrammes: ["Clairet"] },
-  { mot: "Imposer", anagrammes: ["Promise"] },
-  { mot: "Soigner", anagrammes: ["Régions", "ignores"] },
-  { mot: "Idole", anagrammes: ["iodle"] },
-  { mot: "Forêt", anagrammes: ["Forte"] },
-  { mot: "Danger", anagrammes: ["Grande"] },
-  { mot: "Tenter", anagrammes: ["Trente"] },
-  { mot: "Pastel", anagrammes: ["Palets", "Plaste", "Plates", "septal", "peltas"] },
-  { mot: "Dicter", anagrammes: ["Direct", "Crédit", "décrit"] },
-  { mot: "Misère", anagrammes: ["Remise", "Émeris", "Mirées", "Rimées"] },
-  { mot: "Leçon", anagrammes: ["Oncle", "clone"] },
-  { mot: "Toupie", anagrammes: ["Utopie", "Epouti"] },
-  { mot: "Oublier", anagrammes: ["boulier", "éblouir", "riboule"] },
-  { mot: "Sucre", anagrammes: ["Sucer", "Reçus", "écrus", "curés", "Crues"] },
-  { mot: "Arpent", anagrammes: ["Parent"] },
-  { mot: "Entier", anagrammes: ["Inerte", "Rétine", "Nitrée", "Terrie"] },
-  { mot: "Graduer", anagrammes: ["Draguer", "gardeur"] },
-  { mot: "Barre", anagrammes: ["Arbre"] },
-  { mot: "Manioc", anagrammes: ["Camion"] },
-  { mot: "Poser", anagrammes: ["Perso", "pores", "prose", "repos"] },
-  { mot: "Jeune", anagrammes: ["enjeu"] },
-  { mot: "Manège", anagrammes: ["Mangée", "Ménage", "Magnée", "engame"] },
-  { mot: "Lampe", anagrammes: ["Ample", "Palme"] },
-  { mot: "Triste", anagrammes: ["Titres", "tirets", "sertit"] },
-  { mot: "Achète", anagrammes: ["Tachée"] },
-  { mot: "Couler", anagrammes: ["Clouer"] },
-  { mot: "Tomber", anagrammes: ["Trombe"] },
-  { mot: "Blouse", anagrammes: ["Boules"] }, 
-  { mot: "Aigle", anagrammes: ["Agile", "gelai", "algie", "liage"] },
-  { mot: "Facteur", anagrammes: ["Facture", "Cafteur"] },
-  { mot: "Mesurer", anagrammes: ["Résumer"] },
-  { mot: "Inviter", anagrammes: ["Vitrine", "Inverti"] },
-  { mot: "Étire", anagrammes: ["Tirée", "triée", "etier"] },
-  { mot: "Reussite", anagrammes: ["Tireuses", "Trieuses", "restitués"] },
-  { mot: "Réussi", anagrammes: ["Suries", "sieurs", "Russie"] },
-  { mot: "Jouets", anagrammes: ["joutes"] },
-  { mot: "Boules", anagrammes: ["Blouse"] },
-  { mot: "Festin", anagrammes: ["Feints"] },
-  { mot: "Regime", anagrammes: ["Emigre", "Rémige", "Migrée"] },
-  { mot: "Noirs", anagrammes: ["Rions", "irons", "noris"] },
-  { mot: "Senior", anagrammes: ["Noires", "Réions", "Irones"] },
-  { mot: "Aporie", anagrammes: ["opérai"] },
-  { mot: "Phoniatres", anagrammes: ["Anthropise"] },
-  { mot: "Sieste", anagrammes: ["Tissée"] },
-  { mot: "Vitesse", anagrammes: ["Vêtisse", "servîtes", "estives"] },
-  { mot: "Harpe", anagrammes: ["Phare", "Raphe"] },
-  { mot: "Anglais", anagrammes: ["Alignas", "signala", "sanglai", "glanais"] },
-  { mot: "Traffic", anagrammes: ["Farcît"] },
-  { mot: "Galerie", anagrammes: ["Élargie", "gèlerai", "liègera", "reliage", "Algérie"] },
-  { mot: "Ralenti", anagrammes: ["Alentir", "reliant", "Retinal", "trenail"] },
-  { mot: "Laveur", anagrammes: ["valeur", "lavure", "Revalu", "Levura"] },
-  { mot: "Demane", anagrammes: ["Amende", "Ménade", "Mandée", "Damnée"] },
-  { mot: "Scénariste", anagrammes: ["Cartésiens", "sénatrices", "Résistance"] },
-  { mot: "Centre", anagrammes: ["Créent", "Récent"] },
-  { mot: "Étrangère", anagrammes: ["Agréèrent", "enterrage", "Régénérât"] },
-  { mot: "Miracles", anagrammes: ["Carlisme"] },
-  { mot: "Sapin", anagrammes: ["Pains", "Pisan", "Pians"] },
-  { mot: "Rêver", anagrammes: ["Verre"] }, 
-  { mot: "Présent", anagrammes: ["Serpent"] },
-  { mot: "Cigare", anagrammes: ["Cirage", "gracie", "gerçai"] },
-  { mot: "Love", anagrammes: ["Vélo", "volé", "vole"] },
-  { mot: "Stade", anagrammes: ["Dates"] },
-  { mot: "Gars", anagrammes: ["Gras"] },
-  { mot: "Meuf", anagrammes: ["Fume"] },
-  { mot: "Appareil", anagrammes: ["Rappelai", "Palperai"] },
-  { mot: "Sainte", anagrammes: ["Tisane", "Satiné", "tenais", "nastie", "Niâtes"] },
-  { mot: "Encore", anagrammes: ["coréen", "Cornée", "Écorné"] },
-  { mot: "Uriner", anagrammes: ["Ruiner", "Réunir"] },
-  { mot: "Teneur", anagrammes: ["Neutre", "Tenure", "Retenu", "Enture", "Eurent"] },
-  { mot: "Crible", anagrammes: ["Cibler"] },
-  { mot: "Reflet", anagrammes: ["Trèfle"] },
-  { mot: "Hareng", anagrammes: ["Hargne"] },
-  { mot: "Igname", anagrammes: ["Amigne", "Minage", "Gamine", "Gémina"] }, 
-  { mot: "Corbeau", anagrammes: ["Caroube"] },
-  { mot: "Pièce", anagrammes: ["Épice"] },
-  { mot: "Ronde", anagrammes: ["Drone", "Doner", "Norde", "Redon"] },
-  { mot: "Arc", anagrammes: ["Car"] },
-  { mot: "Naturel", anagrammes: ["Laurent"] },
-  { mot: "Haricot", anagrammes: ["Chariot", "Torchai", "Rochait"] },
-  { mot: "Pots", anagrammes: ["Stop"] },
-  { mot: "Casser", anagrammes: ["Césars", "Crasse", "crases", "sacrés", "scares"] },
-  { mot: "Bancaire", anagrammes: ["Carabine", "cabinera"] },
-  { mot: "Entraide", anagrammes: ["Éteindra", "Dentaire", "Étendrai"] },
-  { mot: "Courrier", anagrammes: ["Recourir"] },
-  { mot: "Poudrier", anagrammes: ["Produire"] },
-  { mot: "Paroisse", anagrammes: ["Passoire", "Poserais", "Reposais", "Poissera"] },
-  { mot: "Affermir", anagrammes: ["Affirmer"] },
-  { mot: "Jonction", anagrammes: ["Conjoint"] }, 
-  { mot: "Maternel", anagrammes: ["Lamenter", "Râlement", "lamèrent", "Remelant"] },
-  { mot: "Cavalier", anagrammes: ["Calvaire", "clavaire", "Claverai"] },
-  { mot: "Allonger", anagrammes: ["Rallonge"] },
-  { mot: "Créature", anagrammes: ["Créateur", "écarteur", "réacteur", "curètera"] },
-  { mot: "Seigneur", anagrammes: ["Insurgée", "Rugines", "seringue"] },
-  { mot: "Oriental", anagrammes: ["Relation", "Enrôlait", "laieront"] },
-  { mot: "Migraine", anagrammes: ["Imaginer"] },
-  { mot: "Pastiche", anagrammes: ["Pistache", "Chipates", "scaphite"] },
-  { mot: "Pagode", anagrammes: ["Dopage"] },
-  { mot: "Attirer", anagrammes: ["Atterri", "Traître", "traiter", "titrera"] },
-  { mot: "Désirer", anagrammes: ["Résider", "Sidérer"] },
-  { mot: "Étrange", anagrammes: ["Gérante", "Argenté", "agréent"] },
-  { mot: "Dominer", anagrammes: ["Moindre", "Endormi"] },
-  { mot: "Dentier", anagrammes: ["Teindre", "détenir"] },
-  { mot: "Gorille", anagrammes: ["Girolle"] }, 
-  { mot: "Aplatir", anagrammes: ["Parlait", "Partial", "platrai"] },
-  { mot: "Filtrer", anagrammes: ["Flétrir", "Flirter"] },
-  { mot: "Jeter", anagrammes: ["Rejet"] },
-  { mot: "Perse", anagrammes: ["Peser", "pères", "serpe"] },
-  { mot: "Encre", anagrammes: ["Cerné", "Crene"] },
-  { mot: "Ancre", anagrammes: ["Écran", "crâne", "cerna"] },
-  { mot: "Totem", anagrammes: ["Motte", "Tomte", "Matot"] },
-  { mot: "Maigre", anagrammes: ["Mirage"] },
-  { mot: "Évier", anagrammes: ["Rivée", "virée"] },
-  { mot: "Typhon", anagrammes: ["Python"] },
-  { mot: "Sonder", anagrammes: ["Drones", "Rondes"] },
-  { mot: "Salut", anagrammes: ["Lutas", "Talus"] },
-  { mot: "Amande", anagrammes: ["Amenda", "Menade"] },
-  { mot: "Canotier", anagrammes: ["Création", "conterai", "réaction"] },
-  { mot: "Noix", anagrammes: ["Inox"] }, 
-  { mot: "Utopie", anagrammes: ["Toupie"] },
-  { mot: "Rigolé", anagrammes: ["Gloire"] },
-  { mot: "Olivier", anagrammes: ["Voilier", "Violier"] },
-  { mot: "Part", anagrammes: ["Rapts"] },
-  { mot: "Cause", anagrammes: ["Sauce", "Sceau"] },
-  { mot: "Ouest", anagrammes: ["Ouste", "Toues", "soute"] },
-  { mot: "Brame", anagrammes: ["Ambre"] },
-  { mot: "Peinard", anagrammes: ["Épinard", "peindra", "prendrai"] },
-  { mot: "Rétine", anagrammes: ["Inerte", "Entier"] },
-  { mot: "Subir", anagrammes: ["Rubis", "ubris"] },
-  { mot: "Tarte", anagrammes: ["Ratte", "Taret", "tâter"] },
-  { mot: "Spectre", anagrammes: ["Respect", "sceptre", "percets"] },
-  { mot: "Féconder", anagrammes: ["Défoncer", "défronce"] },
-  { mot: "Avocatier", anagrammes: ["Octaviera"] },
-  { mot: "Sabre", anagrammes: ["Abers", "Brase"] }, 
-  { mot: "Ciel", anagrammes: ["Lice"] },
-  { mot: "Veine", anagrammes: ["Envie", "vinée"] },
-  { mot: "Satin", anagrammes: ["Saint", "Tains", "Tians"] },
-  { mot: "Glaire", anagrammes: ["Argile", "Élargi", "Agrile"] },
-  { mot: "Fourmi", anagrammes: ["Fumoir"] },
-  { mot: "Isabelle", anagrammes: ["Abeilles", "baillées"] },
-  { mot: "Milan", anagrammes: ["Malin", "liman"] },
-  { mot: "Credo", anagrammes: ["Coder", "Corde", "décor"] },
-  { mot: "Fait", anagrammes: ["Fiat"] },
-  { mot: "Béatrice", anagrammes: ["Bactérie", "Acerbite", "Becterai"] },
-  { mot: "Carole", anagrammes: ["Oracle", "Racole"] },
-  { mot: "Laurent", anagrammes: ["Naturel"] },
-  { mot: "Rosalie", anagrammes: ["Solaire", "isolera", "oralise"] },
-  { mot: "Martine", anagrammes: ["Termina", "Mâtiner", "Martien"] },
-  { mot: "Elvire", anagrammes: ["lièvre", "réveil", "livrée"] }, 
-  { mot: "Banque", anagrammes: ["Banqué", "Buquéa"] },
-  { mot: "Clarinette", anagrammes: ["Intercalent", "Relactinente"] },
-  { mot: "Dentelle", anagrammes: ["Tendelle"] },
-  { mot: "Fleur", anagrammes: ["Rufel", "Fluer"] },
-  { mot: "Garage", anagrammes: ["Agager", "Ragage"] },
-  { mot: "Héros", anagrammes: ["Rohes", "Horse"] },
-  { mot: "Igloo", anagrammes: ["Oligo"] },
-  { mot: "Jardin", anagrammes: ["Randji", "Rindja"] },
-  { mot: "Kiosque", anagrammes: ["Koquise"] },
-  { mot: "Lanterne", anagrammes: ["Ennartel", "Reelnant"] },
-  { mot: "Médaille", anagrammes: ["Dilemma", "Médilla"] },
-  { mot: "Noir", anagrammes: ["Rion", "Iron"] },
-  { mot: "Ovale", anagrammes: ["Voléa", "Valéo"] },
-  { mot: "Parole", anagrammes: ["Reopal", "Pareil"] },
-  { mot: "Quatre", anagrammes: ["Traqué", "Quarté"] },
-  { mot: "Rivière", anagrammes: ["Révrier", "Rivérer"] },
-  { mot: "Soleil", anagrammes: ["Oisell", "Lioels"] },
-  { mot: "Tombé", anagrammes: ["Béomt", "Métob"] },
-  { mot: "Utile", anagrammes: ["Lutéi", "Teuil"] },
-  { mot: "Vacance", anagrammes: ["Canvace", "Cavance"] },
-  { mot: "Wagon", anagrammes: ["Gowan", "Angow"] },
-  { mot: "Xylophone", anagrammes: ["Loxhyphone", "Phonelyox"] },
-  { mot: "Yaourt", anagrammes: ["Toyaúr", "Rayout"] },
-  { mot: "Zèbre", anagrammes: ["Bèzer", "Rébez"] },
+    const words = [
+      "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
+      "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
+      "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
+      "acide","bourgeon","croquis","délimitation","écart","format","gentiment","harmonieux",
+      "amplitude","bidonville","cylindre","descendre","épaisseur","fonctionnement","gabarit","hypothèse",
+      "analogie","bissectrice","contrebasse","dent","égoïste","frétiller","galanterie","hypermarché",
+      "antécédent","bissextile","cyclope","désoler","équilatéral","faillite","gâchis","humanité",
+      "anaphore","bouillir","cellule","disparaître","expression","facturation","gangrène","hippopotame",
+      "antipathie","botanique","cancer","dollar","esquisse","fluidifier","galipette","hirondelle",
+      "archéologie","bonheur","câble","doigt","emprunt","fœtus","gargouiller","heurter",
+      "anticorps","banquette","chronologie","déesse","enceinte","fanfare","garde-robe","honnêteté",
+      "anatomie","bientôt","compas","devis","électron","fertilité","gencive",
+      "aquatique","bicyclette","calomnie","déduction","éclipse","furieux","généralement","illustrateur",
+      "anecdote","baptême","chorale","développement","euphorie","frayeur","gentillesse","inflation",
+      "abonnement","bégayer","corail","différemment","euphémisme","fugitif","ghetto","impersonnel",
+      "absence","barbecue","concentration","dégradation","extinction","fraiseuse","glaciaire","isoloir",
+      "abréger","bactérie","carambolage","discriminatoire","équerre","fabuleux","index",
+      "abyme","bracelet","concubin","différencier","ébauche","fainéant","harceler","intérieur",
+      "accueil","boulangère","conteneur","délocalisation","ébène","faisable","happer","industrie",
+      "actuellement","brûler","cadenasser","démangeaison","épithète","falsifier","handicap","impression",
+      "adhésion","baroque","chromosome","dilemme","estomac","favoritisme","homogène","insecte",
+      "agenda","boulevard","compas","désarroi","épilogue","humain","information",
+      "affliger","banquise","circonflexe","dinosaure","épicentre","géologue","harpie","indigo",
+      "allégorie","bourgeonner","contraception","dissolution","effigie","gestionnaire","hamster","intolérance",
+      "anesthésie","bain-marie","contemporain","démagogie","emboîter","gouache","humain","infinitif",
+      "antiquaire","bafouer","commettre","douillet","écarquiller","gravitation","hectare","inondation",
+      "apostrophe","barrette","coefficient","droiture","graffiti","hypoténuse","induction",
+      "apparaître","boycotter","confidentialité","dubitatif","fécondation","géant","hauteur","impulsion",
+      "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant",
+      "amertume","bizutage","chronomètre","dyslexie","fossile","génocide","hiérarchie","isocèle",
+      "assiduité","balbutier","cynique","dorénavant","fusain","grammaire","hypocrisie","internet",
+      "allégresse","bouddhisme","claustrophobe","faille","genre","hydratant","illusion",
+      "appendice","biodiversité","crainte","écho","fasciste","gradation","homicide","invention",
+      "adjacent","bioclimatique","couveuse","échapper","fascination","gouvernement","hasard","impair",
+      "antisémitisme","banlieue","couvre-feu","échéance","fresque","grenade","hibiscus","interrogation",
+      "asphyxie","biennale","craquement","emphatique","faisceau","graphisme","hostile","inoubliable",
+      "anonyme","bienfait","entreprise","fédération","grenouillère","harmonie","incorrigible",
+      "anaconda","bifteck","débris","esclavage","famine","griffon","hospitalier","importer",
+      "auparavant","bimestriel","décontracté","endurance","friable","gesticuler","herse","innocent",
+      "accumulation","bistouri","décennie","emploi","fréquence","guitariste","humanisme","ingrédient",
+      "accouplement","biochimie","décès","explicatif","formule","grappe","hiéroglyphe","infraction",
+      "acrobatie","démographie","enthousiasme","fiche","gratte-ciel","hectare","icône",
+      "affranchir","climat","devise","énonciation","fraction","gladiateur","hypoténuse","inversion",
+      "abstention","compassion","discrimination","élection","facteur","gaspillage","hyperbole","instaurer",
+      "abstinence","comparaison","dioxyde","essor","figure","gentilhomme","hommage","immortaliser",
+      "arbrisseau","calendrier","diminution","engagement","flûte","griffer","haut-parleur","intègre",
+      "calculatrice","dénouement","émeraude","fragile","guillemet","hérédité","intention",
+      "bâiller","crayon","démocratie","enzyme","fond","ginseng","homophone","iceberg",
+      "budget","contour","désodorisant","entrepôt","falloir","gymnase","héros","interrupteur",
+      "beaucoup","collectivité","dissoudre","expérience","front","grossesse","habitat","insolent",
+      "ballade","charte","distillation","espace","frapper","goût","hymne","intellectuel",
+      "bâtiment","cercueil","dérivation","étendue","fenêtre","goéland","hystérie","infaisable",
+      "intervalle","loi","marionnette","nausée","pathétique","quadruple","suffixe","travailler",
+      "illégalité","laudatif","maïpouri","navette","papyrus","quereller","syntaxé","toucher",
+      "identification","littoral","magistrat","négligence","plasticien","qualité","syndicat","toile",
+      "igloo","lyrique","mascotte","névrose","perspective","quartier","seigneur","trompette",
+      "idiotie","logique","meilleur","nœud","percussion","quitter","scène","tambourin",
+      "idolâtrer","largeur","monastère","noisette","précipiter","quadrilatère","sympathique","thérapeutique",
+      "liquide","médiatrice","nonchalance","perpendiculaire","scrutin","toupie",
+      "juxtaposition","local","millionnaire","nombril","pollution","reconnaissance","strophe","thermomètre",
+      "juge","logiciels","métamorphose","notamment","polythéiste","résistant","somme","taureau",
+      "journal","lunette","mâcher","nucléaire","poème","rayon","semaine","tyrannie",
+      "journaliste","lumière","monstrueux","nourrisson","problème","république","symphonie","terroriste",
+      "jadis","lentille","misogyne","personne","renaissance","suggestion","trapèze",
+      "jamais","liberté","migrant","orchidée","pathétique","règlement","sérieux","tressaillir",
+      "jeunesse","lieutenant","mutation","orchestration","préfixe","racisme","silencieux","trahison",
+      "justice","louveteau","mâchoire","opticien","psychologique","résultat","science","transsexuel",
+      "joyeux","ludothèque","maigreur","oxygène","président","rivière","seconde","tremplin",
+      "joie","lusophone","magnésium","orientation","prix","record","souffrir","trachée",
+      "jambe","lacérer","maillon","œil","pétrole","rectangle","sembler","transmutation",
+      "journaux","leucémie","maintien","oreille","pape","rassasier","serrer","tromper",
+      "jaunisse","littéral","majestueux","ombre","pharaon","reste","sculpture","tronçonneuse",
+      "joncher","loyer","orthographe","patin","rapporteur","souffle",
+      "jouissance","lucidité","naturel","occasionnellement","processus","relatif","sceptre","veillée",
+      "jonquille","loquace","narrateur","oser","proportion","règle","sédiment","vermeille",
+      "juvénile","labyrinthe","nouveauté","onde","peut-être","ramifier","synchroniser","vieillesse",
+      "justifier","lâcher","nouvelle","orchestre","plutôt","résolution","sceau","vidéoprojecteur",
+      "jubiler","navigateur","ordonnance","purée","ronronner","sédentaire","vainqueur",
+      "joyau","monarchie","nettoyage","opinion","plongée","rituel","sagittaire","vestiaire",
+      "joaillerie","maritime","nécessaire","obésité","polyglotte","rhétorique","sceptique","variable",
+      "jogging","monothéiste","naître","organe","péripétie","restreint","systématique","ventilation",
+      "mourir","nutrition","océan","pourcentage","rhinocéros","souverain","vociférer",
+      "kiwi","médaille","noyau","ouragan","psychopathe","récepteur","synonyme","velours",
+      "kilomètre","mondialisation","nourrir","octet","patrimoine","rayonnement","scintiller","vieillard",
+      "ketchup","musée","nénuphar","organisation","polyphonie","répertoire","subjuguer","vingtaine",
+      "klaxonner","moine","néanmoins","outil","paratexte","rancoeur","sanctuaire","verglas",
+      "kidnapper","ministre","néant","odorat","patiemment","rejoindre","sarcophage","vendange",
+      "kilowatt","mortalité","nuance","ouïe","propagande","réflexion","sonnet",
+      "kiosque","mythe","nymphe","orpaillage","pression","raquette","segment",
+      "kung-fu","médiane","noyau","œuvre","printemps","rabbin","silhouette",
+      "kermesse","mammifère","négatif","oxygène","périphérie","rétroprojecteur","statistique",
+      "métaphore","noblesse","opération","pâtisserie","relique",
+      "landau","mosaïque","natation","orchestre","pitoyable","recueil","technique",
+      "lauréat","mégalopole","naturalisation","oxymore","périlleux","renouement","tiède",
+      "licenciement","métropole","neutre","oreillette","périodique","radioactif","théâtre",
+      "littérature","messagerie","nostalgie","opaque","péremption","référendum","tangente",
+      "lutter","motion","natalité","omniscient","royaume","tolérance",
+      "lettre","molécules","nature","occurrence","quiproquo","renouvelable","thèse",
+      "liberté","mouvement","nombre","œsophage","quotient","théorème",
+      "laïque","mangrove","navire","orthodoxe","quart","sceau","tonalité",
+      "localisation","messager","nuque","obèse","quatuor","scénario","toile",
+      "lexical","méthode","nuisance","quotidien","salaire","thème",
+      "législatif","merveille","numérique","pyramide","qualificatif","syndrome","tourment",
+      "lutte","méchanceté","nuageux","parenthèse","quelconque","stylistique","temps"
+    ];
 
-  { mot: "Avion", anagrammes: ["Navio", "Viano"] },
-  { mot: "Bureau", anagrammes: ["Urbéau", "Rebua"] },
-  { mot: "Chien", anagrammes: ["Niche", "Enchi"] },
-  { mot: "Drapeau", anagrammes: ["Paradeu", "Rapadeu"] },
-  { mot: "Étoile", anagrammes: ["Toéile", "Loéite"] },
-  { mot: "Fleur", anagrammes: ["Reful", "Rufel"] },
-  { mot: "Gomme", anagrammes: ["Mogme", "Gmome"] },
-  { mot: "Hiver", anagrammes: ["Vireh", "Revih"] },
-  { mot: "Idée", anagrammes: ["Déie", "Éide"] },
-  { mot: "Jardin", anagrammes: ["Drajin", "Rijdan"] }, 
-  { mot: "Échos", anagrammes: [] },
-  { mot: "Rouler", anagrammes: ["Lourer"] },
-  { mot: "Grèce", anagrammes: ["Gerce"] },
-  { mot: "Enfant", anagrammes: ["Fanent"] },
-  { mot: "Danser", anagrammes: ["Sandre", "Redans", "Denars", "Darnes"] },
-  { mot: "Poil", anagrammes: ["Poli"] },
-  { mot: "Onze", anagrammes: ["Zone"] },
-  { mot: "Mien", anagrammes: ["Mine"] },
-  { mot: "File", anagrammes: ["Fiel"] },
-  { mot: "Veau", anagrammes: ["Aveu"] },
-  { mot: "Sont", anagrammes: ["Tons"] },
-  { mot: "Vies", anagrammes: ["Vise"] },
-  { mot: "Noce", anagrammes: ["Once"] },
-  { mot: "Cale", anagrammes: ["Cela", "Lace"] },
-  { mot: "Aile", anagrammes: ["Laie"] },
-  { mot: "Apte", anagrammes: ["Tape", "Pâte", "Peta"] },
-  { mot: "Aire", anagrammes: ["Raie", "Réai"] },
-  { mot: "Béni", anagrammes: ["Bien", "Bine"] },
-  { mot: "Cure", anagrammes: ["Crue", "Reçu", "Écru", "Curé"] },
-  { mot: "Dose", anagrammes: ["Odes", "Sode", "Deos"] },
-  { mot: "Tchao", anagrammes: ["Cahot", "Catho"] },
-  { mot: "Mire", anagrammes: ["Émir", "Rime"] },
-  { mot: "Soie", anagrammes: ["Oies"] },
-  { mot: "Huer", anagrammes: ["Hure", "Heur"] },
-  { mot: "Sabre", anagrammes: ["Baser"] },
-  { mot: "Asile", anagrammes: ["Ailes", "Alise", "Laies", "Lésai", "Elias"] },
-  { mot: "Avril", anagrammes: ["Rival", "Viral", "Livra"] },
-  { mot: "Baver", anagrammes: ["Brave"] },
-  { mot: "Bayou", anagrammes: ["Boyau"] },
-  { mot: "Boues", anagrammes: ["Bouse"] },
-  { mot: "Pouce", anagrammes: ["Coupe"] },
-  { mot: "Calme", anagrammes: ["Clame", "Macle"] },
-  { mot: "Gaver", anagrammes: ["Grave", "Greva"] },
-  { mot: "Essor", anagrammes: ["Roses"] },
-  { mot: "Balle", anagrammes: ["Label"] },
-  { mot: "Cruel", anagrammes: ["Culer", "Lucre", "Recul"] },
-  { mot: "Ligne", anagrammes: ["Linge"] },
-  { mot: "Louer", anagrammes: ["Roule", "Relou", "Loure", "Ourle"] },
-  { mot: "Miser", anagrammes: ["Remis", "Rimes", "Mires", "Émirs"] },
-  { mot: "Lasse", anagrammes: ["Sales", "Lésas", "Salse"] },
-  { mot: "Neveu", anagrammes: ["Neuve", "Venue"] },
-  { mot: "Norme", anagrammes: ["Morne", "Renom"] },
-  { mot: "Train", anagrammes: ["Riant", "Tarin", "Nitra"] },
-  { mot: "Varie", anagrammes: ["Ravie", "Vraie", "Vaire", "Rêvai"] },
-  { mot: "Aider", anagrammes: ["Raide", "Radié", "Draie", "Aride", "Adire"] },
-  { mot: "Actes", anagrammes: ["Caste", "Cates"] },
-  { mot: "Corne", anagrammes: ["Ronce", "Nocer", "Nécro", "Encor"] },
-  { mot: "Buste", anagrammes: ["Tubes", "Butes"] },
-  { mot: "Peigne", anagrammes: ["Pignée"] },
-  { mot: "Serrure", anagrammes: ["Erreurs"] },
-  { mot: "Périr", anagrammes: ["Prier", "Riper"] },
-  { mot: "Récré", anagrammes: ["Créer"] },
-  { mot: "Règne", anagrammes: ["Genre", "Gêner", "Grène"] },
-  { mot: "Régie", anagrammes: ["Érige"] },
-  { mot: "Salon", anagrammes: ["Sonal"] },
-  { mot: "Élève", anagrammes: ["Levée"] },
-  { mot: "Égale", anagrammes: ["Eagle"] },
-  { mot: "Ont", anagrammes: ["Ton"] },
-  { mot: "Lieur", anagrammes: ["Liure", "Ruile", "Luire", "Relui"] },
-  { mot: "Rare", anagrammes: ["Erra"] },
-  { mot: "Élire", anagrammes: ["Relie", "Elier"] },
-  { mot: "Gâter", anagrammes: ["Gérât", "Great", "Targe"] },
-  { mot: "Tue", anagrammes: ["Eut"] },
-  { mot: "Tisseur", anagrammes: ["Tissure", "Réussit", "Surites"] },
-  { mot: "Sape", anagrammes: ["Aspe", "Pesa"] },
-  { mot: "Pénaliser", anagrammes: ["Pralinées"] },
-  { mot: "Soulève", anagrammes: ["Évolues", "Voleuse", "Louvées"] },
-  { mot: "Autre", anagrammes: ["Tuera", "Taure", "Urate"] },
-  { mot: "Bière", anagrammes: ["Briée", "Ibère"] },
-  { mot: "Bouchère", anagrammes: ["Rebouche"] },
-  { mot: "Écarter", anagrammes: ["Cratère", "Cretera", "Recréât", "Reterça", "Retrace", "Tercera"] },
-  { mot: "Mater", anagrammes: ["Trame", "Tréma", "Métrа", "Marte"] },
-  { mot: "Acide", anagrammes: ["Cédai"] },
-  { mot: "Prétoire", anagrammes: ["Portière", "Porterie"] },
-  { mot: "Caf", anagrammes: ["Fac"] },
-  { mot: "Invités", anagrammes: ["Investi"] },
-  { mot: "Écraser", anagrammes: ["Recréas", "Recaser", "Créeras"] },
-  { mot: "Parlement", anagrammes: ["Palmèrent", "Lampèrent", "Emperlant"] },
-  { mot: "Vaseline", anagrammes: ["Niveales", "Enlevais", "Avelines", "Alevines"] },
-  { mot: "Élire", anagrammes: ["Elier", "Relie"] },
-  { mot: "Géo", anagrammes: ["Ego"] },
-  { mot: "Recaler", anagrammes: ["Relacer", "Lacérer", "Carrelé"] },
-  { mot: "Cassure", anagrammes: ["Casseur", "Creusas", "Curasse", "Recusas", "Suceras", "Sucrase"] },
-  { mot: "Hanté", anagrammes: ["Aneth", "Thane"] },
-  { mot: "Valable", anagrammes: ["Lavable"] },
-  { mot: "Chères", anagrammes: ["Sécher", "Rêches", "Escher"] },
-  { mot: "Freiner", anagrammes: ["Inférer"] },
-  { mot: "Admire", anagrammes: ["Medira", "Damier", "Merdai", "Redima"] },
-  { mot: "Attiser", anagrammes: ["Artiste", "Attires", "Ratites", "Restait", "Tarites", "Tirates", "Traites", "Triates"] },
-  { mot: "Scénario", anagrammes: ["Acerions", "Aciérons", "Aconiers", "Acoriens", "Coranise", "Écornais"] },
-  { mot: "Poète", anagrammes: ["Potée", "Topée"] },
-  { mot: "Poste", anagrammes: ["Potes", "Optes", "Pesto", "Topes"] },
-  { mot: "Énoncer", anagrammes: ["Cornéen", "Encorné", "Renonce"] },
-  { mot: "Concerte", anagrammes: ["Concrète", "Écorcent", "Cocréent"] },
-  { mot: "Rabattre", anagrammes: ["Baratter"] },
-  { mot: "Créative", anagrammes: ["Réactive"] },
-  { mot: "Titan", anagrammes: ["Tinta", "Tatin"] },
-  { mot: "Terrien", anagrammes: ["Terrine"] },
-  { mot: "Rangement", anagrammes: ["Garnement"] },
-  { mot: "Prime", anagrammes: ["Imper"] },
-  { mot: "Traîner", anagrammes: ["Terrain", "Ternira", "Rentrai", "Ratiner", "Nitrera"] },
-  { mot: "Cacher", anagrammes: ["Crache", "Crecha"] },
-  { mot: "Arche", anagrammes: ["Chera"] },
-  { mot: "Biberon", anagrammes: ["Bobiner"] },
-  { mot: "Torche", anagrammes: ["Troche", "Rochet", "Chérot"] },
-  { mot: "Résurrection", anagrammes: ["Intercourses", "Reconstruise", "SECURISERONT"] },
-  { mot: "Aire", anagrammes: ["Raie"] },
-  { mot: "Bilan", anagrammes: ["Liban"] },
-  { mot: "Népal", anagrammes: ["Panel", "Pénal"] },
-  { mot: "Irlande", anagrammes: ["Landier"] },
-  { mot: "Serbie", anagrammes: ["Bières", "Brisée"] },
-  { mot: "Israël", anagrammes: ["Éliras", "Lieras", "Lisera", "Relais", "Relias"] },
-  { mot: "Malte", anagrammes: ["Métal", "Mêlât"] },
-  { mot: "Mali", anagrammes: ["Lima", "Mail"] },
-  { mot: "Pologne", anagrammes: ["Plonge", "Poêlon"] },
-  { mot: "Venise", anagrammes: ["Veines", "Envies", "Vinées"] },
-  { mot: "Lucien", anagrammes: ["Inclue"] },
-  { mot: "Maître", anagrammes: ["Tamier", "Métrai", "Mérita", "Mitera", "Émirat"] },
-  { mot: "Pêcher", anagrammes: ["Prêché", "Perche"] },
-  { mot: "Sucrerie", anagrammes: ["Sucrière"] },
-  { mot: "Espérer", anagrammes: ["Repères", "Repeser"] },
-  { mot: "Savons", anagrammes: ["Avons"] },
-  { mot: "Crêpe", anagrammes: ["Percé"] },
-  { mot: "Parisien", anagrammes: ["Aspirine"] },
-  { mot: "Connoise", anagrammes: ["Canonise", "Énonçais"] },
-  { mot: "Annécien", anagrammes: ["Ancienne", "Nancéien"] },
-  { mot: "Anlesien", anagrammes: ["Salienne"] },
-  { mot: "Levain", anagrammes: ["Alevin", "Alvine", "Nivale", "Valine"] },
-  { mot: "Graine", anagrammes: ["Ingéra", "Ignare", "Argien", "Régnai", "Genrai"] },
-  { mot: "Tourte", anagrammes: ["Tortue", "Touret", "Trouet", "Tutore"] },
-  { mot: "Saveur", anagrammes: ["Sauver"] },
-  { mot: "Meunier", anagrammes: ["Mineure", "Ruminée"] },
-  { mot: "Céréale", anagrammes: ["Lacérée", "Recalée", "Relacée"] },
-  { mot: "Seigle", anagrammes: ["Église", "Lieges", "Siglée", "Elegis"] },
-  { mot: "Palmier", anagrammes: ["Lampier", "Remplia", "Rempila", "Emplira", "Lempira"] },
-  { mot: "Grenade", anagrammes: ["Agender", "Dérange"] },
-  { mot: "Cerise", anagrammes: ["Cirées", "Écries", "Criées"] },
-  { mot: "Goyave", anagrammes: ["Voyage"] },
-  { mot: "Narcisse", anagrammes: ["Rancisse", "Rinçassent", "Sarcines"] },
-  { mot: "Israel", anagrammes: ["Éliras", "Lieras", "Lisera", "Relais", "Silera", "Serial", "Resali"] },
-  { mot: "Algérie", anagrammes: ["Élargie", "Galerie", "Gèlerai", "Liègera", "Reliage"] },
-  { mot: "Brésil", anagrammes: ["Libres", "Libers", "Ribles"] },
-  { mot: "Arménie", anagrammes: ["Anémier", "Ranimée", "Réanime", "Manière"] },
-  { mot: "Croatie", anagrammes: ["Coterai", "Coïtera", "Cairote"] },
-  { mot: "Chine", anagrammes: ["Chien", "Niche"] },
-  { mot: "Roumanie", anagrammes: ["Aumônier"] },
-  { mot: "Pérou", anagrammes: ["Proue"] },
-  { mot: "Routes", anagrammes: ["Outrés", "Résout", "Toures", "Troues", "Rouste", "Rouets"] },
-  { mot: "Atomes", anagrammes: ["Ôtâmes"] },
-  { mot: "Métro", anagrammes: ["Morte", "Tomer", "Ormet"] },
-  { mot: "Rumine", anagrammes: ["Mineur", "Murine"] },
-  { mot: "Mordue", anagrammes: ["Remoud", "Moudre"] },
-  { mot: "Est", anagrammes: ["Tes", "Set"] },
-  { mot: "Coeur", anagrammes: ["Coure", "Ecro"] },
-  { mot: "Essence", anagrammes: ["Censées"] },
-  { mot: "Silence", anagrammes: ["Enclise"] },
-  { mot: "Scène", anagrammes: ["Cènes", "Censé"] },
-  { mot: "Naniser", anagrammes: ["Narines", "Rennais"] },
-  { mot: "Récolte", anagrammes: ["Electro"] },
-  { mot: "Seul", anagrammes: ["Élus", "Lues", "Leus"] },
-  { mot: "Clos", anagrammes: ["Cols"] },
-  { mot: "Tatoueur", anagrammes: ["Tourteau"] },
-  { mot: "Avent", anagrammes: ["Navet", "Vante", "Venta"] },
-  { mot: "Pièce", anagrammes: ["Épice"] },
-  { mot: "Ceinture", anagrammes: ["Centurie"] },
-  { mot: "Torsader", anagrammes: ["Dartrose"] },
-  { mot: "Vareuse", anagrammes: ["Évasure", "Raveuse", "Verseau"] },
-  { mot: "Étable", anagrammes: ["Batele", "Tablée"] },
-  { mot: "Givre", anagrammes: ["Grive"] },
-  { mot: "Navire", anagrammes: ["Avenir", "Arvine", "Aviner", "Ravine", "Vinera"] },
-  { mot: "Rebord", anagrammes: ["Border", "Broder"] },
-  { mot: "Littoral", anagrammes: ["Tortilla", "Trollait"] },
-  { mot: "Bonté", anagrammes: ["Béton", "Bento"] },
-  { mot: "Frime", anagrammes: ["Fermi", "Firme", "Frémi"] },
-  { mot: "Bruit", anagrammes: ["Tribu"] },
-  { mot: "Plate", anagrammes: ["Palet", "Lepta", "Pelât", "Palet"] },
-  { mot: "Lavande", anagrammes: ["Vandale"] },
-  { mot: "Verseau", anagrammes: ["Vareuse"] },
-  { mot: "Avenir", anagrammes: ["Navire"] },
-  { mot: "Sphère", anagrammes: ["Herpès"] },
-  { mot: "Guide", anagrammes: ["Digue"] },
-  { mot: "Unies", anagrammes: ["Usine", "Nuise", "Sinue"] },
-  { mot: "Notaire", anagrammes: ["Notarié", "Noterai", "Orienta", "Renotai"] },
-  { mot: "Farine", anagrammes: ["Freina", "Inféra"] },
-  { mot: "Muraille", anagrammes: ["Mailleur", "Maillure"] },
-  { mot: "Ampleur", anagrammes: ["Plumera", "Palmure"] },
-  { mot: "Bouchère", anagrammes: ["Rebouche"] },
-  { mot: "Testeur", anagrammes: ["Surette", "Trustée"] },
-  { mot: "Adresse", anagrammes: ["Résédas", "Dérasés", "Dérases"] },
-  { mot: "Tiède", anagrammes: ["Édite", "Déité", "Diète"] },
-  { mot: "Samedi", anagrammes: ["Médias", "Admise", "Amides"] },
-  { mot: "Ténor", anagrammes: ["Trône", "Notre", "Noter", "Étron"] },
-  { mot: "Slogan", anagrammes: ["Lagons", "Galons"] },
-  { mot: "Roussi", anagrammes: ["Souris"] },
-  { mot: "Audace", anagrammes: ["Cadeau"] },
-  { mot: "Césure", anagrammes: ["Céruse", "Creuse", "Curées", "Écures", "Sucrée", "Récuse"] },
-  { mot: "Nantaise", anagrammes: ["Néantisai", "Anisaient"] },
-  { mot: "Lensoise", anagrammes: ["Insolées", "Nolisées"] },
-  { mot: "Viennois", anagrammes: ["Envions", "Innoves", "Venions", "Veinons"] },
-  { mot: "Patine", anagrammes: ["Tapine", "Paient", "Inapte", "Aptien"] },
-  { mot: "Élever", anagrammes: ["Relève", "Révèle"] },
-  { mot: "Dérive", anagrammes: ["Dévier", "Dévire", "Drivée", "Évider", "Verdie"] },
-  { mot: "Grâce", anagrammes: ["Garce", "Gerça"] },
-  { mot: "Éternité", anagrammes: ["Étreinte", "Reinette", "Reteinte"] },
-  { mot: "Angleterre", anagrammes: ["L’Étrangère", "Galérèrent", "Régalèrent"] },
-  { mot: "Modestie", anagrammes: ["Mois d’été"] },
-  { mot: "Divorce", anagrammes: ["Corvidé"] },
-  { mot: "Fragile", anagrammes: ["Giflera"] },
-  { mot: "Tomate", anagrammes: ["Émotta"] },
-  { mot: "Souterrains", anagrammes: ["Restaurions", "Saturerions", "Tonsurerais", "Surnoterais"] },
-  { mot: "Persistante", anagrammes: ["Étripassent", "Patisserent", "Pressentait", "Rapetissent", "Retapissent", "Tapissèrent"] },
-  { mot: "Amuser", anagrammes: ["Amures", "Résuma", "Mesura", "Masure", "Maures", "Mauser", "Mueras", "Remuas"] },
-  { mot: "Libère", anagrammes: ["Riblée", "Belier"] },
-  { mot: "Réduction", anagrammes: ["Reconduit"] },
-  { mot: "Triangle", anagrammes: ["Intégral", "Glairent"] },
-  { mot: "Œil", anagrammes: ["L’oie"] },
-  { mot: "Robe", anagrammes: ["Orbe", "Bore", "Boer"] },
-  { mot: "Alarme", anagrammes: ["Lamera"] },
-  { mot: "Chaise", anagrammes: ["Séchai", "Eschai", "Echais"] },
-  { mot: "Vote", anagrammes: ["Veto"] },
-  { mot: "Valoir", anagrammes: ["L’avoir", "Lavoir"] },
-  { mot: "Véhiculer", anagrammes: ["CHEVREUIL"] },
-  { mot: "Beauté", anagrammes: ["Abutée"] },
-  { mot: "Réaliser", anagrammes: ["Lisérera", "Relieras", "Rééliras"] },
-  { mot: "Puits", anagrammes: ["Tupis"] },
-  { mot: "Garage", anagrammes: ["Ragage", "Gagera"] },
-  { mot: "Balance", anagrammes: ["Bancale"] },
-  { mot: "Histoire", anagrammes: ["Historie"] },
-  { mot: "Français", anagrammes: ["Francisa"] },
-  { mot: "Latin", anagrammes: ["Liant"] },
-  { mot: "Algèbre", anagrammes: ["Alberge", "Brêlage", "Gérable"] },
-  { mot: "Masculin", anagrammes: ["Culminas", "Muscinal"] },
-  { mot: "Scorpion", anagrammes: ["Picorons"] },
-  { mot: "Infirmière", anagrammes: ["Infirmerie"] },
-  { mot: "Patient", anagrammes: ["Piétant"] },
-  { mot: "Couleur", anagrammes: ["Cloueur", "Coulure"] },
-  { mot: "Bras", anagrammes: ["Bars", "Rabs"] },
-  { mot: "Croisade", anagrammes: ["Décorais", "Coderais", "Décroisa", "Sarcoide"] },
-  { mot: "Claire", anagrammes: ["Éclair", "Calier"] },
-  { mot: "Maître", anagrammes: ["Mérita", "Émirat", "Mitera", "Tamier", "Metrai"] }
-];
+    /* === Pagination === */
+    const pageSize = 10;
+    const totalPages = Math.ceil(words.length / pageSize);
+    let currentPage = 1;         // 1-indexed
+    let currentWordIndex = 0;    // index global dans words
+    let speechRate = 1;
 
-/* ==============================
-   Éléments et état
-================================ */
-const pageSize = 10;
-let currentPage = 1; // 1-indexed
-let currentWordIndex = 0; // index global
-let speechRate = 1;
+    /* === DOM === */
+    const wordDisplay = document.getElementById("wordDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+    const progress = document.getElementById("progress");
+    const pageSelect = document.getElementById("pageSelect");
+    const btnPrevPage = document.getElementById("btnPrevPage");
+    const btnNextPage = document.getElementById("btnNextPage");
+    const totalPagesLabel = document.getElementById("totalPagesLabel");
 
-const wordDisplay = document.getElementById("wordDisplay");
-const answerInput = document.getElementById("answer");
-const message = document.getElementById("message");
-const btnPlay = document.getElementById("btnPlay");
-const btnSlow = document.getElementById("btnSlow");
-const btnFast = document.getElementById("btnFast");
-const btnRepeat = document.getElementById("btnRepeat");
-const btnSkip = document.getElementById("btnSkip");
-const btnBack = document.getElementById("btnBack");
+    /* === Helpers pagination === */
+    function pageStartIndex(page){ return (page-1)*pageSize; }
+    function pageEndIndex(page){ return Math.min(page*pageSize - 1, words.length - 1); }
+    function indexInCurrentPage(){ return currentWordIndex - pageStartIndex(currentPage); }
 
-const progress = document.getElementById("progress");
-const pageSelect = document.getElementById("pageSelect");
-const btnPrevPage = document.getElementById("btnPrevPage");
-const btnNextPage = document.getElementById("btnNextPage");
-const totalPagesLabel = document.getElementById("totalPagesLabel");
+    function updateProgress(){
+      const pos = indexInCurrentPage() + 1;
+      const end = pageEndIndex(currentPage) - pageStartIndex(currentPage) + 1; // 10 sauf dernière page
+      progress.textContent = `Question ${pos}/${end} (page ${currentPage}/${totalPages})`;
+    }
 
-const totalPages = Math.ceil(words.length / pageSize);
+    function updatePageSelect(){
+      pageSelect.innerHTML = "";
+      for(let p=1; p<=totalPages; p++){
+        const opt = document.createElement("option");
+        opt.value = String(p);
+        opt.textContent = p;
+        if (p === currentPage) opt.selected = true;
+        pageSelect.appendChild(opt);
+      }
+      totalPagesLabel.textContent = ` / ${totalPages}`;
+    }
 
-/* ==============================
-   Helpers
-================================ */
-function normalize(str){
-  return str
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')                // sépare les accents
-    .replace(/[\u0300-\u036f]/g,'') // supprime les diacritiques
-    .replace(/\s+/g,' ');           // espaces multiples -> simple
-}
+    /* === Synthèse vocale === */
+    function speakWord(word, rate = speechRate) {
+      if (!('speechSynthesis' in window)) {
+        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+        return;
+      }
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "fr-FR";
+      utterance.rate = rate;
+      speechSynthesis.speak(utterance);
+    }
 
-function pageStartIndex(page){ return (page-1)*pageSize; }
-function pageEndIndex(page){ return Math.min(page*pageSize - 1, words.length - 1); }
-function indexInCurrentPage(){ return currentWordIndex - pageStartIndex(currentPage); }
+    /* === Jeu === */
+    function playWord() {
+      const word = words[currentWordIndex];
+      wordDisplay.textContent = "";
+      speakWord(word);
+      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.disabled = false;
+      answerInput.focus();
+      updateProgress();
+    }
 
-function updateProgress(){
-  const pos = indexInCurrentPage() + 1;
-  const end = pageEndIndex(currentPage) - pageStartIndex(currentPage) + 1; // = 10 sauf dernière page
-  progress.textContent = `Question ${pos}/${end} (page ${currentPage}/${totalPages})`;
-}
+    function playWordSlow() { speechRate = Math.max(0.5, speechRate - 0.25); playWord(); }
+    function playWordFast() { speechRate = Math.min(2, speechRate + 0.25); playWord(); }
+    function repeatWord()   { playWord(); }
 
-function updatePageSelect(){
-  pageSelect.innerHTML = "";
-  for(let p=1; p<=totalPages; p++){
-    const opt = document.createElement("option");
-    opt.value = String(p);
-    opt.textContent = p;
-    if (p === currentPage) opt.selected = true;
-    pageSelect.appendChild(opt);
-  }
-  totalPagesLabel.textContent = ` / ${totalPages}`;
-}
+    function normalize(str){
+      return str.trim().toLowerCase();
+    }
 
-/* ==============================
-   Voix
-================================ */
-function speakWord(text, rate = speechRate) {
-  if (!('speechSynthesis' in window)) {
-    message.textContent = "La synthèse vocale n'est pas disponible.";
-    return;
-  }
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "fr-FR";
-  utterance.rate = rate;
-  speechSynthesis.speak(utterance);
-}
+    function checkAnswer() {
+      const userAnswer = normalize(answerInput.value);
+      const correctAnswer = normalize(words[currentWordIndex]);
+      if (userAnswer === correctAnswer) {
+        message.textContent = "✅ Correct !";
+        message.style.color = "#00e676";
+        wordDisplay.textContent = correctAnswer;
+        setTimeout(() => { nextWord(); }, 900);
+      } else {
+        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
+        message.style.color = "#ff5252";
+        spellWord(correctAnswer);
+      }
+    }
 
-/* ==============================
-   Logique de jeu
-================================ */
-function playWord() {
-  const current = words[currentWordIndex];
-  wordDisplay.textContent = current.mot;
-  speakWord(`Trouve une anagramme du mot ${current.mot}`);
-  message.textContent = "Écris une anagramme correcte.";
-  message.style.color = "#fff";
-  answerInput.value = "";
-  answerInput.disabled = false;
-  answerInput.focus();
-  updateProgress();
-}
+    function spellWord(word) {
+      speechSynthesis.cancel();
+      let letters = [...word.replace(/[-\s]/g, "")];
+      let i = 0;
+      function spellNext() {
+        if (i < letters.length) {
+          const utterance = new SpeechSynthesisUtterance(letters[i]);
+          utterance.lang = "fr-FR";
+          utterance.rate = 0.6;
+          utterance.onend = () => {
+            i++;
+            setTimeout(spellNext, 350);
+          };
+          speechSynthesis.speak(utterance);
+        } else {
+          message.textContent = "Réessayez d'écrire le mot.";
+          message.style.color = "#fff";
+          answerInput.value = "";
+          answerInput.focus();
+        }
+      }
+      spellNext();
+    }
 
-function playWordSlow() { speechRate = Math.max(0.5, speechRate - 0.25); playWord(); }
-function playWordFast() { speechRate = Math.min(2, speechRate + 0.25); playWord(); }
-function repeatWord()   { playWord(); }
+    function nextWord() {
+      const end = pageEndIndex(currentPage);
+      if (currentWordIndex < end) {
+        currentWordIndex++;
+        playWord();
+      } else {
+        message.textContent = `🎉 Fin de la page ${currentPage}. Choisissez une autre page pour continuer.`;
+        answerInput.disabled = true;
+      }
+    }
 
-function checkAnswer() {
-  const userAnswerNorm = normalize(answerInput.value);
-  const anagramListNorm = words[currentWordIndex].anagrammes.map(a => normalize(a));
+    function prevWord() {
+      const start = pageStartIndex(currentPage);
+      if (currentWordIndex > start) {
+        currentWordIndex--;
+        message.textContent = "";
+        playWord();
+      }
+    }
 
-  // Accepte toutes les anagrammes listées (insensible à la casse et aux accents)
-  if (anagramListNorm.includes(userAnswerNorm)) {
-    message.textContent = "✅ Correct ! Bien joué.";
-    message.style.color = "#00e676";
-    setTimeout(() => { nextWord(); }, 800);
-  } else {
-    message.textContent = "❌ Incorrect. Écoute les bonnes réponses.";
-    message.style.color = "#ff5252";
-    const toSpeak = words[currentWordIndex].anagrammes.join(", ");
-    speakWord(`Il fallait penser à : ${toSpeak}`);
-  }
-}
+    /* === Navigation de pages === */
+    function goToPage(p){
+      const page = Math.max(1, Math.min(totalPages, p));
+      currentPage = page;
+      currentWordIndex = pageStartIndex(currentPage);
+      updatePageSelect();
+      message.textContent = "";
+      playWord();
+    }
 
-function nextWord() {
-  const end = pageEndIndex(currentPage);
-  if (currentWordIndex < end) {
-    currentWordIndex++;
-    playWord();
-  } else {
-    message.textContent = `🎉 Fin de la page ${currentPage}. Choisissez une autre page pour continuer.`;
-    answerInput.disabled = true;
-  }
-}
+    btnPrevPage.addEventListener("click", () => {
+      if (currentPage > 1) goToPage(currentPage - 1);
+    });
+    btnNextPage.addEventListener("click", () => {
+      if (currentPage < totalPages) goToPage(currentPage + 1);
+    });
+    pageSelect.addEventListener("change", (e) => {
+      const p = parseInt(e.target.value, 10);
+      goToPage(p);
+    });
 
-function prevWord() {
-  const start = pageStartIndex(currentPage);
-  if (currentWordIndex > start) {
-    currentWordIndex--;
-    message.textContent = "";
-    playWord();
-  }
-}
+    /* === Boutons === */
+    btnBack.addEventListener("click", prevWord);
+    btnPlay.addEventListener("click", playWord);
+    btnSlow.addEventListener("click", playWordSlow);
+    btnFast.addEventListener("click", playWordFast);
+    btnRepeat.addEventListener("click", repeatWord);
+    btnSkip.addEventListener("click", nextWord);
 
-/* ==============================
-   Pagination
-================================ */
-function goToPage(p){
-  const page = Math.max(1, Math.min(totalPages, p));
-  currentPage = page;
-  currentWordIndex = pageStartIndex(currentPage);
-  updatePageSelect();
-  message.textContent = "";
-  playWord();
-}
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkAnswer();
+    });
 
-btnPrevPage.addEventListener("click", () => {
-  if (currentPage > 1) goToPage(currentPage - 1);
-});
-btnNextPage.addEventListener("click", () => {
-  if (currentPage < totalPages) goToPage(currentPage + 1);
-});
-pageSelect.addEventListener("change", (e) => {
-  const p = parseInt(e.target.value, 10);
-  goToPage(p);
-});
-
-/* ==============================
-   Événements UI
-================================ */
-btnBack.addEventListener("click", prevWord);
-btnPlay.addEventListener("click", playWord);
-btnSlow.addEventListener("click", playWordSlow);
-btnFast.addEventListener("click", playWordFast);
-btnRepeat.addEventListener("click", repeatWord);
-btnSkip.addEventListener("click", nextWord);
-
-answerInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkAnswer();
-});
-
-/* ==============================
-   Démarrage
-================================ */
-updatePageSelect();
-window.addEventListener("load", () => goToPage(1));
+    /* === Démarrage === */
+    updatePageSelect();
+    window.addEventListener("load", () => goToPage(1));
   </script>
 </body>
 </html>
