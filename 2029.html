@@ -1,5 +1,7 @@
 
 
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -25,7 +27,7 @@
       margin: 0;
       display: grid;
       place-items: center;
-      padding: 24px;
+      padding: 12px;
     }
     @keyframes gradientAnimation{
       0%{background-position:0% 50%}
@@ -37,7 +39,7 @@
       backdrop-filter: var(--glass);
       width: min(1200px, 94vw);
       border-radius: 20px;
-      padding: 28px;
+      padding: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,.25);
       animation: fadeIn .9s ease;
     }
@@ -55,7 +57,7 @@
       opacity:.95;
     }
     .pill{
-      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.16);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
       font-size:.95rem
     }
@@ -115,64 +117,31 @@
       </div>
     </header>
 
-<!-- Toolbar remplaçant .controls -->
-<div class="toolbar" role="toolbar" aria-label="Commandes">
-  <div class="btn-group media-group" aria-label="Lecture">
-    <button id="btnBack"    title="Retour (←)">⬅️ Retour</button>
-    <button id="btnPlay"    class="primary" title="Jouer/Pause (Espace)">▶️ Jouer</button>
-    <button id="btnRepeat"  title="Répéter (R)">🔁 Répéter</button>
-    <button id="btnSkip"    title="Passer (→)">⏭ Passer</button>
-  </div>
-
-  <div class="btn-group speed-group" aria-label="Vitesse">
-    <span class="group-label sr-only">Vitesse</span>
-    <div class="segmented" role="group" aria-label="Contrôle de la vitesse">
-      <button id="btnSlow" title="Ralentir (–)">−</button>
-      <button id="btnFast" title="Accélérer (+)">+</button>
+    <div class="display">
+      <div id="prefixDisplay">– –</div>
+      <div id="definitionDisplay">Clique une initiale ci-dessous ou appuie sur ▶️ Jouer.</div>
     </div>
+
+    <input type="text" id="answer" placeholder="Écris le mot correct (même initiales) et appuie sur Entrée…" autocomplete="off" />
+
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste d’initiales (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
   </div>
-</div>
 
-/* --- Toolbar classique --- */
-.toolbar{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:14px; flex-wrap:wrap; margin:12px 0 6px;
-}
-
-/* Groupes de boutons */
-.btn-group{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
-.media-group{ flex: 1 1 420px }   /* occupe l’espace au centre sur desktop */
-.speed-group{ flex: 0 0 auto }
-
-/* Boutons généraux (reprend ton style existant) */
-button{
-  padding:12px 14px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
-  cursor:pointer; background:#fff; color:var(--brand);
-  transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
-}
-button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
-button:disabled{opacity:.55; cursor:not-allowed}
-button.primary{ font-weight:800; }
-
-/* Contrôle segmenté pour la vitesse */
-.segmented{ display:flex; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,.1) }
-.segmented > button{
-  border-radius:0; padding:12px 16px; background:#fff; color:var(--brand);
-  border-right:1px solid rgba(0,0,0,.06);
-}
-.segmented > button:last-child{ border-right:none }
-.segmented > button:hover{ background:var(--brand); color:#fff }
-
-/* Petites améliorations d’accessibilité */
-[role="toolbar"] button:focus{ outline:2px solid #fff5; outline-offset:2px }
-
-/* Responsive : sur petits écrans, 2 lignes propres */
-@media (max-width: 560px){
-  .media-group{ order:1; flex:1 1 100%; justify-content:center }
-  .speed-group{ order:2; flex:1 1 100%; justify-content:center }
-  .toolbar{ justify-content:center }
-}
-
+  <script>
     // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
     // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
     const FIELDS = {
