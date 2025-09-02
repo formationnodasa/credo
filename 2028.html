@@ -115,24 +115,31 @@
       </div>
     </header>
 
-<!-- Toolbar remplaçant .controls -->
-<div class="toolbar" role="toolbar" aria-label="Commandes">
-  <div class="btn-group media-group" aria-label="Lecture">
-    <button id="btnBack"    title="Retour (←)">⬅️ Retour</button>
-    <button id="btnPlay"    class="primary" title="Jouer/Pause (Espace)">▶️ Jouer</button>
-    <button id="btnRepeat"  title="Répéter (R)">🔁 Répéter</button>
-    <button id="btnSkip"    title="Passer (→)">⏭ Passer</button>
-  </div>
-
-  <div class="btn-group speed-group" aria-label="Vitesse">
-    <span class="group-label sr-only">Vitesse</span>
-    <div class="segmented" role="group" aria-label="Contrôle de la vitesse">
-      <button id="btnSlow" title="Ralentir (–)">−</button>
-      <button id="btnFast" title="Accélérer (+)">+</button>
+    <div class="display">
+      <div id="prefixDisplay">– –</div>
+      <div id="definitionDisplay">Clique une initiale ci-dessous ou appuie sur ▶️ Jouer.</div>
     </div>
-  </div>
-</div>
 
+    <input type="text" id="answer" placeholder="Écris le mot correct (même initiales) et appuie sur Entrée…" autocomplete="off" />
+
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste d’initiales (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
+  </div>
+
+  <script>
     // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
     // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
     const FIELDS = {
