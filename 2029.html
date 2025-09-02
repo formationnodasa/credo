@@ -1,166 +1,145 @@
 
 
-Code champ lexical 
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Champs Lexicaux – Jeu Vocal</title>
-
-<script>
-/* ============= GRAND TABLEAU – Regroupement de tous les champs =============
-   ➜ Suppose qu'un objet global FIELDS existe (version "Champs lexicaux").
-   ➜ Si FIELDS est absent, un message s'affiche et l'overlay reste accessible
-      (mais vide) pour ne pas casser ta page.
-============================================================================= */
-
-(function(){
-  // ---- helpers
-  const qs =(sel,root=document)=> root.querySelector(sel);
-  const qsa=(sel,root=document)=> Array.from(root.querySelectorAll(sel));
-
-  // ---- 1) Bouton pour ouvrir le tableau
-  const btn = document.createElement('button');
-  btn.className = 'bigtable-trigger';
-  btn.type = 'button';
-  btn.textContent = '🗂 Afficher le grand tableau';
-  const container = qs('.container') || document.body;
-  container.appendChild(btn);
-
-  // ---- 2) Overlay structure
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay-wrap';
-  overlay.innerHTML = `
-    <div class="overlay-card" role="dialog" aria-modal="true" aria-label="Grand tableau des champs lexicaux">
-      <div class="overlay-head">
-        <h2>Grand tableau des champs lexicaux</h2>
-        <span class="spacer"></span>
-        <label class="mute">Filtrer initiales&nbsp;</label>
-        <select id="btPrefix"><option value="">(Toutes)</option></select>
-        <label class="mute" style="margin-left:8px;">Recherche&nbsp;</label>
-        <input id="btSearch" placeholder="Mot ou définition… (recherche instantanée)" />
-        <button id="btExport" class="btn">⬇️ Export CSV</button>
-        <button id="btClose" class="close-x">✖ Fermer</button>
+  <style>
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --card: rgba(255,255,255,.12);
+      --glass: blur(12px);
+      --txt:#fff; --accent:#fff; --brand:#2575fc;
+      --ok:#00e676; --ko:#ff5252;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: var(--txt);
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    @keyframes gradientAnimation{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .container{
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      width: min(1200px, 94vw);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: fadeIn .9s ease;
+    }
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
+    }
+    h1{
+      font-weight:800; margin:0; font-size: clamp(26px, 3.4vw, 40px);
+      text-shadow: 0 3px 8px rgba(0,0,0,.3);
+      letter-spacing:.3px;
+    }
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+      opacity:.95;
+    }
+    .pill{
+      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size:.95rem
+    }
+    .display{
+      margin:24px 0 10px; display:grid; gap:10px;
+    }
+    #prefixDisplay{
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight:900; letter-spacing:.18em; text-align:center;
+      text-shadow: 0 3px 8px rgba(0,0,0,.28);
+    }
+    #definitionDisplay{
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height:1.6; text-align:center;
+      background: rgba(0,0,0,.16);
+      border-radius:14px; padding:16px 18px;
+    }
+    .controls{
+      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+    }
+    button{
+      padding:12px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
+      cursor:pointer; background:#fff; color:var(--brand);
+      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+    }
+    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+    button:disabled{opacity:.55; cursor:not-allowed}
+    input[type="text"]{
+      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
+      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
+    }
+    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
+    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
+    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    }
+    .bank button{
+      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .bank button.active{ background:#fff; color:var(--brand) }
+    .footnote{
+      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
+    }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Champs lexicaux – Jeu vocal</h1>
+      <div class="status">
+        <span class="pill" id="progressPill">0 / 0</span>
+        <span class="pill" id="speedPill">Vitesse ×1.00</span>
+        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">– –</b></span>
       </div>
-      <div class="table-wrap">
-        <table class="bigtable" id="bigTable">
-          <thead>
-            <tr>
-              <th style="width:120px">Initiales</th>
-              <th style="width:260px">Mot</th>
-              <th>Définition</th>
-            </tr>
-          </thead>
-          <tbody id="btBody">
-            <tr><td colspan="3" class="mute">Chargement…</td></tr>
-          </tbody>
-        </table>
-      </div>
+    </header>
+
+    <div class="display">
+      <div id="prefixDisplay">– –</div>
+      <div id="definitionDisplay">Clique une initiale ci-dessous ou appuie sur ▶️ Jouer.</div>
     </div>
-  `;
-  document.body.appendChild(overlay);
 
-  // ---- 3) ouverture/fermeture
-  btn.addEventListener('click', ()=> {
-    overlay.style.display = 'block';
-    buildOnce();
-  });
-  overlay.addEventListener('click', (e)=>{
-    if(e.target === overlay) overlay.style.display = 'none';
-  });
-  overlay.querySelector('#btClose').addEventListener('click', ()=> overlay.style.display = 'none');
+    <input type="text" id="answer" placeholder="Écris le mot correct (même initiales) et appuie sur Entrée…" autocomplete="off" />
 
-  // ---- 4) construction du tableau à partir de FIELDS
-  let built = false;
-  function buildOnce(){
-    if(built) return;
-    const body = overlay.querySelector('#btBody');
-    const sel  = overlay.querySelector('#btPrefix');
-    const search = overlay.querySelector('#btSearch');
-    const exportBtn = overlay.querySelector('#btExport');
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
 
-    if(typeof FIELDS === 'undefined'){
-      body.innerHTML = `<tr><td colspan="3" class="mute">Avertissement : le jeu “Champs lexicaux” n’est pas chargé (FIELDS indisponible).<br>Le tableau restera vide tant que FIELDS n’est pas présent.</td></tr>`;
-      built = true; return;
-    }
+    <div id="message" aria-live="polite"></div>
 
-    // a) construire la liste brute
-    const rows = [];
-    const keys = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'));
-    const options = ['<option value="">(Toutes)</option>'];
-    for(const k of keys){
-      options.push(`<option value="${k}">${k}</option>`);
-      for(const it of FIELDS[k]){
-        rows.push({prefix:k, mot: it.mot, def: it.def});
-      }
-    }
-    sel.innerHTML = options.join('');
+    <div class="divider"></div>
 
-    // b) rendu des lignes
-    function render(filterPrefix='', q=''){
-      const qn = q.trim().toLowerCase();
-      const filtered = rows.filter(r=>{
-        const okP = !filterPrefix || r.prefix === filterPrefix;
-        if(!okP) return false;
-        if(!qn) return true;
-        return r.mot.toLowerCase().includes(qn) || (r.def||'').toLowerCase().includes(qn);
-      });
-      body.innerHTML = filtered.length
-        ? filtered.map(r => `
-            <tr>
-              <td><span class="tag">${r.prefix}</span></td>
-              <td><strong>${escapeHtml(r.mot)}</strong></td>
-              <td>${escapeHtml(r.def||'')}</td>
-            </tr>
-          `).join('')
-        : `<tr><td colspan="3" class="mute">Aucun résultat.</td></tr>`;
-    }
+    <div class="bank" id="initialBank" aria-label="Liste d’initiales (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
+  </div>
 
-    // c) export CSV
-    exportBtn.addEventListener('click', ()=>{
-      const pf = sel.value; const q = search.value || '';
-      const qn = q.trim().toLowerCase();
-      const out = [['Initiales','Mot','Définition']];
-      for(const r of rows){
-        const okP = !pf || r.prefix === pf;
-        if(!okP) continue;
-        if(qn && !(r.mot.toLowerCase().includes(qn) || (r.def||'').toLowerCase().includes(qn))) continue;
-        out.push([r.prefix, r.mot, (r.def||'')]);
-      }
-      const csv = out.map(line => line.map(csvCell).join(',')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'champs-lexicaux.csv';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
-    });
-
-    // d) filtres live
-    sel.addEventListener('change', ()=> render(sel.value, search.value));
-    search.addEventListener('input', ()=> render(sel.value, search.value));
-
-    // initial
-    render('', '');
-    built = true;
-  }
-
-  // ---- 5) utils sûrs pour texte/CSV
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-  function csvCell(s){
-    const v = String(s).replace(/"/g,'""');
-    return `"${v}"`;
-  }
-})();
-</script>
-
+  <script>
     // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
     // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
     const FIELDS = {
