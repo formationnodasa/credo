@@ -1,251 +1,508 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Espace des Champions</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: 'Orbitron', sans-serif;
-      background-color: black;
-      color: white;
+    :root{
+      --bg:#05070f;
+      --bg-grad: radial-gradient(1200px 800px at 50% -10%, #0e1530 0%, rgba(5,7,15,0) 60%), radial-gradient(800px 600px at 120% 120%, #0a162a 0%, rgba(5,7,15,0) 55%);
+      --text:#eaf2ff;
+      --muted:#a5b7d6;
+      --primary:#00f5ff;
+      --primary-2:#8af2ff;
+      --accent:#ffb86b;
+      --glass: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.14);
+      --shadow: 0 10px 40px rgba(0, 255, 255, .15), inset 0 1px 0 rgba(255,255,255,.06);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --focus: 0 0 0 3px rgba(0,245,255,.35), 0 0 0 1px rgba(0,245,255,.6) inset;
     }
 
-    #scene, #overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; padding:0;
+      height:100%;
+      color:var(--text);
+      background:var(--bg);
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+      overflow:hidden;
     }
 
-    #overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-      pointer-events: none;
-      font-size: 2.5em;
+    /* Scene & overlay */
+    #scene, #overlay, #scanlines { position:absolute; inset:0 }
+    #scene{ z-index:1 }
+    #scanlines{
+      pointer-events:none; z-index:2;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.045) 0px,
+        rgba(255,255,255,.045) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      mix-blend-mode: soft-light;
+      opacity:.15;
+      will-change: opacity, transform;
+    }
+    #overlay{
+      z-index:3; display:grid; place-items:center; text-align:center;
+      padding:clamp(16px, 4vw, 48px);
+      background:linear-gradient(180deg, rgba(5,7,15,.85) 0%, rgba(5,7,15,.75) 60%, rgba(5,7,15,0) 100%);
+    }
+    .headline{
+      font-family:'Orbitron', sans-serif;
+      font-size:clamp(28px, 5vw, 56px);
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      background:linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 40%, #fff 60%, var(--accent) 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      filter: drop-shadow(0 0 12px rgba(0,245,255,.25));
+      animation: sheen 4s linear infinite;
+    }
+    @keyframes sheen { 
+      0%{background-position:0% 50%} 
+      100%{background-position:200% 50%}
     }
 
-    .scanner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: rgba(0,255,255,0.6);
-      animation: scan 2s linear forwards;
+    /* Laser scanner */
+    .scanner{
+      position:absolute; left:0; right:0; top:-6px; height:6px;
+      background: radial-gradient(12px 20px at 20% 50%, rgba(255,255,255,.9), rgba(255,255,255,0) 60%) ,
+                  linear-gradient(90deg, transparent, rgba(0,245,255,.8), rgba(255,255,255,.95), rgba(0,245,255,.8), transparent);
+      box-shadow: 0 0 24px rgba(0,245,255,.7), 0 0 60px rgba(0,245,255,.35);
+      z-index:4;
+      animation: scan 3.2s ease-in-out forwards;
+    }
+    @keyframes scan { 
+      0%{ transform: translateY(0) } 
+      100%{ transform: translateY(100vh) } 
     }
 
-    @keyframes scan {
-      0% { top: 0; }
-      100% { top: 100%; }
+    /* Main room container */
+    #mainRoom{
+      position:absolute; inset:0; z-index:5; display:none;
+      background: var(--bg-grad), radial-gradient(60% 80% at 50% 120%, #000 0%, #0000 70%);
+      overflow:auto; /* allow scroll if small screens */
+    }
+    .container{
+      max-width:min(1100px, 92vw);
+      margin: clamp(32px, 6vh, 72px) auto;
+      padding: clamp(16px, 3vw, 24px);
     }
 
-    .vibration {
-      animation: shake 0.5s;
+    .titleWrap{
+      display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px;
+    }
+    .titleIcon{
+      width:16px; height:16px; border-radius:50%;
+      box-shadow:0 0 16px rgba(0,245,255,.75), inset 0 0 6px rgba(255,255,255,.8);
+      background: radial-gradient(circle at 50% 50%, #fff, var(--primary));
+      animation: pulse 2.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(.9)} 50%{transform:scale(1.12)} }
+
+    .typewriter{
+      font-family:'Orbitron',sans-serif;
+      font-size: clamp(20px, 3.2vw, 34px);
+      letter-spacing:.03em;
+      white-space:nowrap; overflow:hidden; border-right: .12em solid var(--accent);
+      animation: typing 2.4s steps(30,end), caret .75s step-end infinite;
+    }
+    @keyframes typing { from{ width:0 } to{ width:100% } }
+    @keyframes caret { 50%{ border-color: transparent } }
+
+    /* Options grid (glass/neon) */
+    .grid{
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px;
+      margin-top: 22px;
+    }
+    .card{
+      position:relative; padding:22px 20px; border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transform: translateZ(0); will-change: transform, box-shadow, background;
+      transition: transform .28s ease, box-shadow .28s ease, background .28s ease;
+      cursor:pointer; outline:none;
+    }
+    .card:hover{ transform: translateY(-4px) scale(1.02) }
+    .card:focus-visible{ box-shadow: var(--focus) }
+    .card::after{
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      background: conic-gradient(from 180deg at 50% 50%, rgba(0,245,255,.35), transparent 25%, rgba(255,255,255,.18) 45%, transparent 60%, rgba(255,184,107,.25) 85%, transparent);
+      opacity:.0; transition: opacity .35s ease;
+      filter: blur(14px);
+    }
+    .card:hover::after{ opacity:.85 }
+
+    .card h4{
+      margin:0 0 6px; font-family:'Orbitron'; font-weight:700; letter-spacing:.04em;
+      display:flex; align-items:center; gap:8px; font-size:18px;
+    }
+    .card p{ margin:0; color:var(--muted); font-size:14px; line-height:1.35 }
+
+    .tag{
+      font-size:12px; font-weight:600; padding:4px 8px; border-radius:999px;
+      background: rgba(0,245,255,.12); border:1px solid rgba(0,245,255,.45);
+      display:inline-block; margin-top:10px;
     }
 
-    @keyframes shake {
-      0% { transform: translate(1px, 1px); }
-      20% { transform: translate(-1px, -2px); }
-      40% { transform: translate(-3px, 1px); }
-      60% { transform: translate(3px, 2px); }
-      80% { transform: translate(1px, -1px); }
-      100% { transform: translate(1px, 1px); }
+    /* Sub-options (collapsible) */
+    details{ background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border:1px dashed rgba(255,255,255,.2); border-radius: var(--radius-sm); padding:14px 14px 6px; }
+    details summary{
+      list-style:none; cursor:pointer; outline:none; user-select:none; padding:6px 2px;
+      font-weight:600; display:flex; align-items:center; gap:10px;
+    }
+    details[open]{ animation: pop .25s ease }
+    @keyframes pop { from{ transform:scale(.98); opacity:.8 } to{ transform:scale(1); opacity:1 } }
+    details summary::-webkit-details-marker{ display:none }
+    .subGrid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px; }
+    .pill{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:12px 14px; border-radius:12px; border:1px dashed rgba(255,255,255,.25);
+      background: rgba(255,255,255,.04);
+      box-shadow: 0 2px 10px rgba(255,255,255,.06);
+      font-weight:600; font-size:14px; cursor:pointer; transition: transform .25s ease, background .25s ease;
+      outline:none;
+    }
+    .pill:hover{ transform: translateY(-2px); background: rgba(255,255,255,.07) }
+    .pill:focus-visible{ box-shadow: var(--focus) }
+
+    /* HUD / Controls */
+    .hud{
+      position:fixed; right:16px; top:16px; z-index:10; display:flex; gap:10px;
+    }
+    .btn{
+      appearance:none; border:none; padding:10px 14px; border-radius:12px; font-weight:700;
+      background: rgba(0,0,0,.35); color:var(--text); border:1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(6px); cursor:pointer; transition: transform .25s ease, background .25s ease;
+    }
+    .btn:hover{ transform: translateY(-1px) }
+    .btn:active{ transform: translateY(0) scale(.98) }
+    .btn:focus-visible{ box-shadow: var(--focus) }
+
+    /* Footer */
+    .footer{
+      margin-top: 26px; opacity:.65; font-size:12px; text-align:center
     }
 
-    #mainRoom {
-      display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(#111, #000);
-      z-index: 3;
-      text-align: center;
-      padding-top: 5%;
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .scanner{ display:none }
+      #scanlines{ opacity:.06 }
     }
 
-    .typewriter-text {
-      display: inline-block;
-      overflow: hidden;
-      border-right: .15em solid orange;
-      white-space: nowrap;
-      animation: typing 3s steps(30, end), blink .75s step-end infinite;
-      font-size: 3em;
-    }
-
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent }
-    }
-
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: gold;
-      animation: fall 3s linear infinite;
-    }
-
-    @keyframes fall {
-      0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(100vh); opacity: 0; }
-    }
-
-    /* Encadrements principaux avec embellissements */
-    #options > div {
-      margin: 20px auto;
-      padding: 20px 40px;
-      border: 2px solid #fff;
-      border-radius: 15px;
-      width: fit-content;
-      cursor: pointer;
-      font-size: 2em;
-      background: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-      transition: transform 0.3s, background 0.3s;
-    }
-
-    #options > div:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .sub-options {
-      display: none;
-      margin-top: 15px;
-    }
-
-    .sub-options div {
-      margin: 10px auto;
-      padding: 15px 30px;
-      border: 2px dashed #ccc;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.5em;
-      width: fit-content;
-      background: rgba(255, 255, 255, 0.04);
-      box-shadow: 0 3px 10px rgba(255, 255, 255, 0.1);
-      transition: transform 0.3s, background 0.3s;
-    }
-
-    .sub-options div:hover {
-      transform: scale(1.04);
-      background: rgba(255, 255, 255, 0.08);
+    /* Small screens tweak */
+    @media (max-width:420px){
+      .card{ padding:18px 16px }
+      .pill{ padding:10px 12px }
     }
   </style>
 </head>
 <body>
 
-<canvas id="scene"></canvas>
-<div id="overlay">Bienvenue dans l’espace des Champions</div>
-<div class="scanner"></div>
+  <!-- 3D starfield -->
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div id="scanlines" aria-hidden="true"></div>
 
-<div id="mainRoom">
-  <h3><span class="typewriter-text">Programme des Champions</span></h3>
-  <div id="options">
-    <div onclick="location.href='Dictéevocale.html'">📝 Dictée</div>
-
-    <div onclick="toggleSub('epellationSub')">🔤 Épellation</div>
-    <div id="epellationSub" class="sub-options">
-      <div onclick="location.href='inivocale.html'">Initiation</div>
-      <div onclick="location.href='Epebible.html'">Bible</div>
-      <div onclick="location.href='Epedico.html'">Dictionnaire</div>
-    </div>
-
-    <div onclick="location.href='Anagrammevocale.html'">🔀 Anagramme</div>
-    <div onclick="location.href='Mathvocal.html'">➕ Mathématiques</div>
-
-    <div onclick="toggleSub('lexicalSub')">🧠 Champ lexical</div>
-    <div id="lexicalSub" class="sub-options">
-      <div>Toutes les bonnes réponses tournent autour de</div>
-      <div>Toutes les bonnes réponses commencent avec deux lettres</div>
-      <div>Toutes les bonnes réponses commencent avec de trois lettres</div>
-      <div>Toutes les bonnes réponses commencent avec quatre lettres</div>
-      <div>Toutes les bonnes réponses se terminent par</div>
+  <!-- Overlay intro -->
+  <div id="overlay" role="dialog" aria-modal="true" aria-label="Écran d’accueil">
+    <div>
+      <div class="headline">Bienvenue dans l’espace des Champions</div>
+      <div class="titleWrap" style="margin-top:14px;">
+        <span class="titleIcon" aria-hidden="true"></span>
+        <span class="typewriter">Chargement de votre session...</span>
+      </div>
     </div>
   </div>
-</div>
+  <div class="scanner" aria-hidden="true"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <!-- HUD Controls -->
+  <div class="hud" aria-label="Contrôles">
+    <button id="muteBtn" class="btn" aria-pressed="false" aria-label="Activer ou couper le son">🔊 Son</button>
+    <button id="skipIntro" class="btn" aria-label="Passer l’intro">⏭️ Passer</button>
+  </div>
 
-<script>
-  // 🌌 Fond spatial
-  let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene') });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  <!-- Main Room -->
+  <main id="mainRoom" aria-live="polite">
+    <div class="container">
+      <div class="titleWrap">
+        <span class="titleIcon" aria-hidden="true"></span>
+        <h1 class="typewriter" style="border:none">Programme    <br>des Champions</h1>
+      </div>
 
-  let starsGeometry = new THREE.BufferGeometry();
-  let positions = [];
-  for (let i = 0; i < 2000; i++) {
-    positions.push((Math.random() - 0.5) * 1000);
-    positions.push((Math.random() - 0.5) * 1000);
-    positions.push((Math.random() - 0.5) * 1000);
-  }
+      <section class="grid" role="menu" aria-label="Menu principal">
+        <article class="card" role="menuitem" tabindex="0" data-href="Dictéevocale.html">
+          <h4>📝 Dictée <span class="tag">Vocale</span></h4>
+          <p>Entraîne-toi à la dictée avec un retour audio dynamique.</p>
+        </article>
 
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  let starsMaterial = new THREE.PointsMaterial({ color: 0x8888ff });
-  let stars = new THREE.Points(starsGeometry, starsMaterial);
-  scene.add(stars);
-  camera.position.z = 5;
+        <article class="card" role="menuitem" tabindex="0">
+          <h4>🔤 Épellation</h4>
+          <p>Du niveau initiation aux corpus avancés (Bible, Dico).</p>
+          <details>
+            <summary aria-label="Ouvrir les sous-options d’épellation">Sous-options</summary>
+            <div class="subGrid" role="group" aria-label="Sous-options épellation">
+              <button class="pill" data-href="inivocale.html">Initiation</button>
+              <button class="pill" data-href="Epebible.html">Bible</button>
+              <button class="pill" data-href="Epedico.html">Dictionnaire</button>
+            </div>
+          </details>
+        </article>
 
-  function animate() {
-    requestAnimationFrame(animate);
-    stars.rotation.y += 0.0005;
-    renderer.render(scene, camera);
-  }
-  animate();
+        <article class="card" role="menuitem" tabindex="0" data-href="Anagrammevocale.html">
+          <h4>🔀 Anagramme</h4>
+          <p>Remue les lettres, trouve les mots. Chrono et audio intégrés.</p>
+        </article>
 
-  // Accueil audio
-  const sound = new Howl({
-    src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3'],
-    volume: 0.5
-  });
-  sound.play();
+        <article class="card" role="menuitem" tabindex="0" data-href="Mathvocal.html">
+          <h4>➕ Mathématiques</h4>
+          <p>Calcul mental vocal et défis de progression.</p>
+        </article>
 
-  setTimeout(() => document.body.classList.add("vibration"), 2000);
+        <article class="card" role="menuitem" tabindex="0">
+          <h4>🧠 Champ lexical</h4>
+          <p>Explore les familles de mots et leurs variations.</p>
+          <details>
+            <summary aria-label="Ouvrir les sous-options du champ lexical">Sous-options</summary>
+            <div class="subGrid" role="group" aria-label="Sous-options champ lexical">
+              <button class="pill">Autour de…</button>
+              <button class="pill">Commencent par (2 lettres)</button>
+              <button class="pill">Commencent par (3 lettres)</button>
+              <button class="pill">Commencent par (4 lettres)</button>
+              <button class="pill">Se terminent par…</button>
+            </div>
+          </details>
+        </article>
+      </section>
 
-  setTimeout(() => {
-    gsap.to("#overlay", { opacity: 0, duration: 1 });
-    gsap.to("#scene", { y: -window.innerHeight, duration: 2, ease: "power3.inOut", onComplete: showMainRoom });
-  }, 3000);
+      <p class="footer">© <span id="year"></span> Espace des Champions — Interface néon & glass, animations optimisées, accessibilité clavier & ARIA.</p>
+    </div>
+  </main>
 
-  function showMainRoom() {
-    document.getElementById("mainRoom").style.display = "block";
-    launchConfetti();
-  }
+  <!-- libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
-  function launchConfetti() {
-    for (let i = 0; i < 30; i++) {
-      let confetti = document.createElement('div');
-      confetti.classList.add('confetti');
-      confetti.style.left = Math.random() * window.innerWidth + 'px';
-      document.body.appendChild(confetti);
-      setTimeout(() => confetti.remove(), 3000);
+  <script>
+    // =========================
+    // Utils
+    // =========================
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // =========================
+    // 3D STARFIELD + PARALLAX
+    // =========================
+    let scene, camera, renderer, stars, stars2;
+    (function init3D(){
+      const canvas = $('#scene');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
+      camera.position.z = 8;
+
+      function makeStarField(count, spread, size, color){
+        const geom = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        for(let i=0;i<count;i++){
+          positions[i*3+0] = (Math.random() - .5) * spread;
+          positions[i*3+1] = (Math.random() - .5) * spread;
+          positions[i*3+2] = (Math.random() - .5) * spread;
+        }
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const mat = new THREE.PointsMaterial({ color, size, sizeAttenuation:true, transparent:true, opacity:.9 });
+        return new THREE.Points(geom, mat);
+      }
+      stars  = makeStarField(1800, 900, .6, 0x8adfff);
+      stars2 = makeStarField(1200, 1200, 1.0, 0x00f5ff);
+      scene.add(stars, stars2);
+
+      function onResize(){
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', onResize);
+
+      let mx = 0, my = 0, tx = 0, ty = 0;
+      window.addEventListener('pointermove', (e)=>{
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = (e.clientY / window.innerHeight) * 2 - 1;
+        mx = x * 0.5; my = y * 0.4;
+      });
+
+      function animate(){
+        requestAnimationFrame(animate);
+        tx += (mx - tx) * 0.03;
+        ty += (my - ty) * 0.03;
+        stars.rotation.y += 0.0006;
+        stars2.rotation.x -= 0.0004;
+        camera.position.x = tx;
+        camera.position.y = -ty;
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    // =========================
+    // AUDIO (with Mute toggle)
+    // =========================
+    const introSound = new Howl({
+      src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1e5640a74.mp3?filename=futuristic-intro-ambient-20589.mp3'],
+      volume: 0.35
+    });
+    const cheer = new Howl({
+      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3?filename=small-crowd-cheer-6721.mp3'],
+      volume: 0.25
+    });
+
+    let muted = false;
+    const muteBtn = $('#muteBtn');
+    muteBtn.addEventListener('click', ()=>{
+      muted = !muted;
+      Howler.mute(muted);
+      muteBtn.setAttribute('aria-pressed', String(!muted));
+      muteBtn.textContent = muted ? '🔇 Muet' : '🔊 Son';
+    });
+
+    // =========================
+    // INTRO TIMELINE + SKIP
+    // =========================
+    const overlay = $('#overlay');
+    const scanlines = $('#scanlines');
+    const mainRoom = $('#mainRoom');
+    const skipIntro = $('#skipIntro');
+
+    function enterApp(){
+      overlay.style.pointerEvents = 'none';
+      gsap.to(overlay, { opacity:0, duration:.9, ease:'power2.out' });
+      gsap.to('#scene', { y: -window.innerHeight * .06, duration:1.4, ease:'power3.inOut',
+        onComplete: ()=>{
+          mainRoom.style.display = 'block';
+          gsap.fromTo(mainRoom, { opacity:0, y: 18 }, { opacity:1, y:0, duration:.7, ease:'power2.out' });
+          confettiBurst();
+          if(!muted) cheer.play();
+        }
+      });
+      gsap.to(scanlines, { opacity:.22, duration:1.2, ease:'sine.out' });
     }
 
-    const cheer = new Howl({
-      src: ['https://cdn.pixabay.com/download/audio/2021/09/06/audio_6db83ac1f1.mp3'],
-      volume: 0.3
+    let introPlayed = false;
+    function playIntro(){
+      if(introPlayed) return;
+      introPlayed = true;
+      if(!muted) introSound.play();
+      // subtle vibration effect (replaced by a gentle zoom/pulse)
+      if (!prefersReduced) {
+        gsap.fromTo('#scene', { scale:1.005 }, { scale:1, duration:.8, ease:'power1.inOut' });
+      }
+      // auto-continue after 2.8s
+      setTimeout(enterApp, 2800);
+    }
+
+    // Start Intro
+    if (document.visibilityState === 'visible') playIntro();
+    document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') playIntro(); }, { once:true });
+
+    // Skip
+    skipIntro.addEventListener('click', ()=>{
+      enterApp();
     });
-    cheer.play();
-  }
 
-  function toggleSub(id) {
-    const el = document.getElementById(id);
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-</script>
+    // =========================
+    // CONFETTI (GSAP DOM)
+    // =========================
+    function confettiBurst(){
+      if(prefersReduced) return;
+      const n = 36;
+      for(let i=0;i<n;i++){
+        const c = document.createElement('div');
+        const size = 8 + Math.random()*8;
+        c.style.position='fixed';
+        c.style.width = size+'px';
+        c.style.height = size+'px';
+        c.style.left = (Math.random()*100)+'vw';
+        c.style.top = '-20px';
+        c.style.borderRadius = '2px';
+        c.style.background = ['#ffd166','#06d6a0','#118ab2','#ef476f','#8338ec'][i%5];
+        c.style.zIndex = 9;
+        document.body.appendChild(c);
+        gsap.to(c, { y: (window.innerHeight + 80), rotation: (Math.random()*600-300), duration: 1.8 + Math.random()*1.2, ease:'power2.in',
+          onComplete: ()=> c.remove()
+        });
+      }
+    }
 
+    // =========================
+    // MENU INTERACTIONS
+    // =========================
+    // Clickable cards & pills
+    function go(href){ if(!href) return; window.location.href = href; }
+    $$('.card').forEach(card=>{
+      const href = card.dataset.href;
+      card.addEventListener('click', (e)=>{
+        if(e.target.closest('details')) return; // don't intercept details clicks
+        go(href);
+      });
+      card.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault(); if(e.target.closest('details')) return; go(href);
+        }
+      });
+      // tilt on move
+      let rx=0, ry=0;
+      card.addEventListener('pointermove', (e)=>{
+        const r = card.getBoundingClientRect();
+        const cx = e.clientX - r.left, cy = e.clientY - r.top;
+        ry = (cx / r.width - .5) * 8;
+        rx = (cy / r.height - .5) * -8;
+        card.style.transform = `translateY(-4px) scale(1.02) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      });
+      card.addEventListener('pointerleave', ()=>{
+        card.style.transform = '';
+      });
+    });
+
+    $$('.pill').forEach(p=>{
+      p.addEventListener('click', ()=> go(p.dataset.href));
+      p.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(p.dataset.href); }});
+    });
+
+    // Open details via keyboard focus on summary
+    $$('details summary').forEach(s=>{
+      s.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); s.click(); }
+      });
+    });
+
+    // =========================
+    // DYNAMIC BITS
+    // =========================
+    $('#year').textContent = new Date().getFullYear();
+
+    // Fallback: if user lands with reduced motion, show main instantly
+    if (prefersReduced) {
+      overlay.style.display = 'none';
+      mainRoom.style.display = 'block';
+    }
+  </script>
 </body>
 </html>
