@@ -133,6 +133,46 @@
   </div>
 </div>
 
+/* --- Toolbar classique --- */
+.toolbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px; flex-wrap:wrap; margin:12px 0 6px;
+}
+
+/* Groupes de boutons */
+.btn-group{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+.media-group{ flex: 1 1 420px }   /* occupe l’espace au centre sur desktop */
+.speed-group{ flex: 0 0 auto }
+
+/* Boutons généraux (reprend ton style existant) */
+button{
+  padding:12px 14px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
+  cursor:pointer; background:#fff; color:var(--brand);
+  transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+button:disabled{opacity:.55; cursor:not-allowed}
+button.primary{ font-weight:800; }
+
+/* Contrôle segmenté pour la vitesse */
+.segmented{ display:flex; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,.1) }
+.segmented > button{
+  border-radius:0; padding:12px 16px; background:#fff; color:var(--brand);
+  border-right:1px solid rgba(0,0,0,.06);
+}
+.segmented > button:last-child{ border-right:none }
+.segmented > button:hover{ background:var(--brand); color:#fff }
+
+/* Petites améliorations d’accessibilité */
+[role="toolbar"] button:focus{ outline:2px solid #fff5; outline-offset:2px }
+
+/* Responsive : sur petits écrans, 2 lignes propres */
+@media (max-width: 560px){
+  .media-group{ order:1; flex:1 1 100%; justify-content:center }
+  .speed-group{ order:2; flex:1 1 100%; justify-content:center }
+  .toolbar{ justify-content:center }
+}
+
     // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
     // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
     const FIELDS = {
