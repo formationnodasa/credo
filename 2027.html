@@ -1,125 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Témoignages</title>
+  <meta charset="UTF-8">
+  <title>Épellation biblique — Spéciale diocèse</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-
-    section#temoignages {
-      padding: 50px 20px;
-      background-color: #fff;
-      text-align: center;
-    }
-
-    section#temoignages h2 {
-      font-size: 2em;
-      margin-bottom: 30px;
-    }
-
-    .carousel {
-      position: relative;
-      width: 90%;
-      max-width: 700px;
-      margin: auto;
-      overflow: hidden;
-    }
-
-    .carousel-inner {
-      display: flex;
-      transition: transform 0.5s ease-in-out;
-    }
-
-    .temoignage {
-      min-width: 100%;
-      box-sizing: border-box;
-      padding: 20px;
-    }
-
-    .temoignage p {
-      font-style: italic;
-      font-size: 1.2em;
-    }
-
-    .temoignage h4 {
-      margin-top: 10px;
-      color: #555;
-    }
-
-    .carousel-controls {
-      margin-top: 20px;
-    }
-
-    .carousel-button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 0 10px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 1em;
-    }
-
-    .carousel-button:hover {
-      background-color: #0056b3;
-    }
+    body {margin:0;font-family:sans-serif;background:#0b0b10;color:#eee;}
+    header{text-align:center;padding:20px;}
+    h1{color:#b99cff;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:20px;}
+    .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;}
+    .card h2{margin:0 0 8px;}
+    .tile{background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:10px;margin:6px 0;}
+    .btn{cursor:pointer;border:none;padding:6px 10px;border-radius:6px;background:#333;color:#fff;}
+    .verses span{display:inline-block;margin:2px;padding:4px 8px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;}
   </style>
 </head>
 <body>
+  <header>
+    <h1>Épellation biblique — Spéciale diocèse</h1>
+    <input id="q" type="search" placeholder="Rechercher un nom…">
+  </header>
 
-<section id="temoignages">
-  <h2>Témoignages</h2>
-  <div class="carousel">
-    <div class="carousel-inner" id="carouselInner">
-      <div class="temoignage">
-        <p>"Grâce à Orissia, j’ai développé ma passion pour la science."</p>
-        <h4>— Amina, participante au concours 2024</h4>
-      </div>
-      <div class="temoignage">
-        <p>"Une expérience inoubliable, riche en apprentissages et en rencontres."</p>
-        <h4>— Marc, intervenant en 2023</h4>
-      </div>
-      <div class="temoignage">
-        <p>"Faire partie de cette équipe m’a permis de gagner en confiance."</p>
-        <h4>— Léa, ancienne membre du comité</h4>
-      </div>
-    </div>
-  </div>
-  <div class="carousel-controls">
-    <button class="carousel-button" onclick="prevSlide()">◀</button>
-    <button class="carousel-button" onclick="nextSlide()">▶</button>
-  </div>
-</section>
+  <main class="grid" id="grid"></main>
 
-<script>
-  let currentIndex = 0;
-  const carouselInner = document.getElementById('carouselInner');
-  const totalSlides = carouselInner.children.length;
+  <script>
+    // Données de base (tu peux en ajouter autant que tu veux)
+    const NOMS = [
+      { name:"Abraham", pron:"a-bra-ham", tts:"Abraham",
+        verses:["Genèse 12:1-3","Genèse 15:5-6"], 
+        story:"Père des croyants; Dieu conclut une alliance avec lui." },
+      { name:"Moïse", pron:"mo-ïz", tts:"Moïse",
+        verses:["Exode 3:1-14","Exode 20:1-17"], 
+        story:"Libérateur d'Israël; reçoit la Loi au Sinaï." },
+      { name:"Rachel", pron:"ra-chèl", tts:"Rachel",
+        verses:["Genèse 29:18-20","Genèse 35:16-19"], 
+        story:"Épouse aimée de Jacob; mère de Joseph et Benjamin." }
+    ];
 
-  function updateCarousel() {
-    carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
-  }
+    const grid=document.getElementById('grid');
+    const search=document.getElementById('q');
+    let VOICE_FR=null;
+    function loadVoices(){
+      const v=speechSynthesis.getVoices();
+      VOICE_FR=v.find(x=>x.lang.startsWith('fr'))||null;
+    }
+    speechSynthesis.onvoiceschanged=loadVoices; loadVoices();
 
-  function nextSlide() {
-    currentIndex = (currentIndex + 1) % totalSlides;
-    updateCarousel();
-  }
+    function speak(txt){
+      if(!speechSynthesis) return;
+      const u=new SpeechSynthesisUtterance(txt);
+      if(VOICE_FR) u.voice=VOICE_FR; u.lang="fr-FR";
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
 
-  function prevSlide() {
-    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-    updateCarousel();
-  }
+    function render(list){
+      grid.innerHTML='';
+      list.forEach(x=>{
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
+          <h2>${x.name}</h2>
+          <div class="tile"><b>Prononciation:</b> ${x.pron} <button class="btn">▶︎</button></div>
+          <div class="tile"><b>Versets:</b><div class="verses">${x.verses.map(v=>`<span>${v}</span>`).join('')}</div></div>
+          <div class="tile"><b>Histoire:</b> ${x.story}</div>
+        `;
+        card.querySelector('.btn').onclick=()=>speak(x.tts||x.name);
+        grid.appendChild(card);
+      });
+    }
+    render(NOMS);
 
-  // Auto slide every 5 seconds
-  setInterval(nextSlide, 5000);
-</script>
-
+    search.addEventListener('input',()=>{
+      const t=search.value.toLowerCase();
+      render(NOMS.filter(x=>x.name.toLowerCase().includes(t)));
+    });
+  </script>
 </body>
 </html>
