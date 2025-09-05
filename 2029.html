@@ -1,109 +1,127 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Module Épellation Vocal du dictionnaire - Liste Complète</title>
+  <title>Champs Lexicaux (3 lettres) – Jeu Vocal</title>
   <style>
-    body {
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --card: rgba(255,255,255,.12);
+      --glass: blur(12px);
+      --txt:#fff; --accent:#fff; --brand:#2575fc;
+      --ok:#00e676; --ko:#ff5252;
+    }
+    *{box-sizing:border-box}
+    body{
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      color: var(--txt);
       min-height: 100vh;
       margin: 0;
+      display: grid;
+      place-items: center;
       padding: 24px;
     }
-    @keyframes gradientAnimation {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    @keyframes gradientAnimation{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 32px;
+    .container{
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      width: min(920px, 94vw);
       border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(12px);
-      max-width: 560px;
-      width: 100%;
-      text-align: center;
-      animation: fadeIn 1.2s ease;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: fadeIn .9s ease;
     }
-    @keyframes fadeIn { from {opacity: 0; transform: translateY(15px);} to {opacity: 1; transform: translateY(0);} }
-
-    h1 { font-weight: 800; margin-bottom: 12px; font-size: 2rem; text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
-    #wordDisplay { font-size: 2.2rem; font-weight: bold; letter-spacing: 0.15em; margin: 14px 0 18px; min-height: 50px; }
-
-    .page-controls {
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 8px 0 16px;
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
     }
-    .page-controls button, .page-controls select {
-      padding: 10px; border-radius: 10px; border: none; font-size: 1rem; background:#fff; color:#2575fc;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
+    h1{
+      font-weight:800; margin:0; font-size: clamp(22px, 3.2vw, 34px);
+      text-shadow: 0 3px 8px rgba(0,0,0,.3);
+      letter-spacing:.3px;
     }
-    .page-controls button:hover { background:#2575fc; color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa; }
-
-    #progress { font-size: 0.95rem; margin-bottom: 8px; opacity: 0.95; }
-
-    input[type="text"] {
-      font-size: 1.2rem; padding: 14px; border-radius: 10px; border: none; width: 100%; margin: 10px 0 16px;
-      background-color:#fff; color:#333; outline:none; transition: all 0.3s ease;
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+      opacity:.95;
     }
-    input[type="text"]:focus { box-shadow: 0 0 10px #2575fc; caret-color: #2575fc; }
-
-    .buttons {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px;
+    .pill{
+      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size:.95rem
     }
-    button {
-      flex: 1 1 40%;
-      padding: 12px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      background: #fff;
-      color: #2575fc;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    .display{
+      margin:24px 0 10px; display:grid; gap:10px;
     }
-    button:hover {
-      background: #2575fc;
-      color: #fff;
-      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+    #prefixDisplay{
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight:900; letter-spacing:.18em; text-align:center;
+      text-shadow: 0 3px 8px rgba(0,0,0,.28);
     }
-    #message {
-      margin-top: 18px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      min-height: 32px;
-      transition: color 0.3s ease;
+    #definitionDisplay{
+      font-size: clamp(16px, 2vw, 20px);
+      line-height:1.6; text-align:center;
+      background: rgba(0,0,0,.16);
+      border-radius:14px; padding:16px 18px;
     }
+    .controls{
+      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+    }
+    button{
+      padding:12px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
+      cursor:pointer; background:#fff; color:var(--brand);
+      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+    }
+    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+    button:disabled{opacity:.55; cursor:not-allowed}
+    input[type="text"]{
+      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
+      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
+    }
+    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
+    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
+    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    }
+    .bank button{
+      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .bank button.active{ background:#fff; color:var(--brand) }
+    .footnote{
+      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
+    }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Épellation vocale des mots du dictionnaire</h1>
-
-    <!-- Contrôles de pagination -->
-    <div class="page-controls">
-      <button id="btnPrevPage" title="Page précédente">⟵ Page</button>
-      <div>
-        Page <select id="pageSelect"></select><span id="totalPagesLabel"></span>
+    <header>
+      <h1>Champs lexicaux (3 lettres) – Jeu vocal</h1>
+      <div class="status">
+        <span class="pill" id="progressPill">0 / 0</span>
+        <span class="pill" id="speedPill">Vitesse ×1.00</span>
+        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">– – –</b></span>
       </div>
-      <button id="btnNextPage" title="Page suivante">Page ⟶</button>
+    </header>
+
+    <div class="display">
+      <div id="prefixDisplay">– – –</div>
+      <div id="definitionDisplay">Clique un préfixe ci-dessous ou appuie sur ▶️ Jouer.</div>
     </div>
 
-    <div id="progress">Question — / 10 (page —)</div>
-    <div id="wordDisplay">Mot à écouter</div>
+    <input type="text" id="answer" placeholder="Écris le mot correct (mêmes 3 lettres) et appuie sur Entrée…" autocomplete="off" />
 
-    <input type="text" id="answer" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-    <div class="buttons">
+    <div class="controls" role="group" aria-label="Commandes">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
@@ -111,126 +129,2710 @@
       <button id="btnSkip">⏭ Passer</button>
       <button id="btnBack">⬅️ Retour</button>
     </div>
-    <div id="message"></div>
+
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste de préfixes (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
   </div>
 
   <script>
-    const words = [
-      "autel","bataille","chômage","documentaire","étang","force","gazouiller","hache",
-      "atome","bibliographie","crustacé","documentaliste","érosion","fantastique","gamète","hormone",
-      "altercation","bipède","conductible","dictionnaire","étiquette","fantôme","gynécologue","herbivore",
-      "acide","bourgeon","croquis","délimitation","écart","format","gentiment","harmonieux",
-      "amplitude","bidonville","cylindre","descendre","épaisseur","fonctionnement","gabarit","hypothèse",
-      "analogie","bissectrice","contrebasse","dent","égoïste","frétiller","galanterie","hypermarché",
-      "antécédent","bissextile","cyclope","désoler","équilatéral","faillite","gâchis","humanité",
-      "anaphore","bouillir","cellule","disparaître","expression","facturation","gangrène","hippopotame",
-      "antipathie","botanique","cancer","dollar","esquisse","fluidifier","galipette","hirondelle",
-      "archéologie","bonheur","câble","doigt","emprunt","fœtus","gargouiller","heurter",
-      "anticorps","banquette","chronologie","déesse","enceinte","fanfare","garde-robe","honnêteté",
-      "anatomie","bientôt","compas","devis","électron","fertilité","gencive",
-      "aquatique","bicyclette","calomnie","déduction","éclipse","furieux","généralement","illustrateur",
-      "anecdote","baptême","chorale","développement","euphorie","frayeur","gentillesse","inflation",
-      "abonnement","bégayer","corail","différemment","euphémisme","fugitif","ghetto","impersonnel",
-      "absence","barbecue","concentration","dégradation","extinction","fraiseuse","glaciaire","isoloir",
-      "abréger","bactérie","carambolage","discriminatoire","équerre","fabuleux","index",
-      "abyme","bracelet","concubin","différencier","ébauche","fainéant","harceler","intérieur",
-      "accueil","boulangère","conteneur","délocalisation","ébène","faisable","happer","industrie",
-      "actuellement","brûler","cadenasser","démangeaison","épithète","falsifier","handicap","impression",
-      "adhésion","baroque","chromosome","dilemme","estomac","favoritisme","homogène","insecte",
-      "agenda","boulevard","compas","désarroi","épilogue","humain","information",
-      "affliger","banquise","circonflexe","dinosaure","épicentre","géologue","harpie","indigo",
-      "allégorie","bourgeonner","contraception","dissolution","effigie","gestionnaire","hamster","intolérance",
-      "anesthésie","bain-marie","contemporain","démagogie","emboîter","gouache","humain","infinitif",
-      "antiquaire","bafouer","commettre","douillet","écarquiller","gravitation","hectare","inondation",
-      "apostrophe","barrette","coefficient","droiture","graffiti","hypoténuse","induction",
-      "apparaître","boycotter","confidentialité","dubitatif","fécondation","géant","hauteur","impulsion",
-      "agglomération","bouilloire","caoutchouc","durablement","fréquence","gestion","horticulture","intéressant",
-      "amertume","bizutage","chronomètre","dyslexie","fossile","génocide","hiérarchie","isocèle",
-      "assiduité","balbutier","cynique","dorénavant","fusain","grammaire","hypocrisie","internet",
-      "allégresse","bouddhisme","claustrophobe","faille","genre","hydratant","illusion",
-      "appendice","biodiversité","crainte","écho","fasciste","gradation","homicide","invention",
-      "adjacent","bioclimatique","couveuse","échapper","fascination","gouvernement","hasard","impair",
-      "antisémitisme","banlieue","couvre-feu","échéance","fresque","grenade","hibiscus","interrogation",
-      "asphyxie","biennale","craquement","emphatique","faisceau","graphisme","hostile","inoubliable",
-      "anonyme","bienfait","entreprise","fédération","grenouillère","harmonie","incorrigible",
-      "anaconda","bifteck","débris","esclavage","famine","griffon","hospitalier","importer",
-      "auparavant","bimestriel","décontracté","endurance","friable","gesticuler","herse","innocent",
-      "accumulation","bistouri","décennie","emploi","fréquence","guitariste","humanisme","ingrédient",
-      "accouplement","biochimie","décès","explicatif","formule","grappe","hiéroglyphe","infraction",
-      "acrobatie","démographie","enthousiasme","fiche","gratte-ciel","hectare","icône",
-      "affranchir","climat","devise","énonciation","fraction","gladiateur","hypoténuse","inversion",
-      "abstention","compassion","discrimination","élection","facteur","gaspillage","hyperbole","instaurer",
-      "abstinence","comparaison","dioxyde","essor","figure","gentilhomme","hommage","immortaliser",
-      "arbrisseau","calendrier","diminution","engagement","flûte","griffer","haut-parleur","intègre",
-      "calculatrice","dénouement","émeraude","fragile","guillemet","hérédité","intention",
-      "bâiller","crayon","démocratie","enzyme","fond","ginseng","homophone","iceberg",
-      "budget","contour","désodorisant","entrepôt","falloir","gymnase","héros","interrupteur",
-      "beaucoup","collectivité","dissoudre","expérience","front","grossesse","habitat","insolent",
-      "ballade","charte","distillation","espace","frapper","goût","hymne","intellectuel",
-      "bâtiment","cercueil","dérivation","étendue","fenêtre","goéland","hystérie","infaisable",
-      "intervalle","loi","marionnette","nausée","pathétique","quadruple","suffixe","travailler",
-      "illégalité","laudatif","maïpouri","navette","papyrus","quereller","syntaxé","toucher",
-      "identification","littoral","magistrat","négligence","plasticien","qualité","syndicat","toile",
-      "igloo","lyrique","mascotte","névrose","perspective","quartier","seigneur","trompette",
-      "idiotie","logique","meilleur","nœud","percussion","quitter","scène","tambourin",
-      "idolâtrer","largeur","monastère","noisette","précipiter","quadrilatère","sympathique","thérapeutique",
-      "liquide","médiatrice","nonchalance","perpendiculaire","scrutin","toupie",
-      "juxtaposition","local","millionnaire","nombril","pollution","reconnaissance","strophe","thermomètre",
-      "juge","logiciels","métamorphose","notamment","polythéiste","résistant","somme","taureau",
-      "journal","lunette","mâcher","nucléaire","poème","rayon","semaine","tyrannie",
-      "journaliste","lumière","monstrueux","nourrisson","problème","république","symphonie","terroriste",
-      "jadis","lentille","misogyne","personne","renaissance","suggestion","trapèze",
-      "jamais","liberté","migrant","orchidée","pathétique","règlement","sérieux","tressaillir",
-      "jeunesse","lieutenant","mutation","orchestration","préfixe","racisme","silencieux","trahison",
-      "justice","louveteau","mâchoire","opticien","psychologique","résultat","science","transsexuel",
-      "joyeux","ludothèque","maigreur","oxygène","président","rivière","seconde","tremplin",
-      "joie","lusophone","magnésium","orientation","prix","record","souffrir","trachée",
-      "jambe","lacérer","maillon","œil","pétrole","rectangle","sembler","transmutation",
-      "journaux","leucémie","maintien","oreille","pape","rassasier","serrer","tromper",
-      "jaunisse","littéral","majestueux","ombre","pharaon","reste","sculpture","tronçonneuse",
-      "joncher","loyer","orthographe","patin","rapporteur","souffle",
-      "jouissance","lucidité","naturel","occasionnellement","processus","relatif","sceptre","veillée",
-      "jonquille","loquace","narrateur","oser","proportion","règle","sédiment","vermeille",
-      "juvénile","labyrinthe","nouveauté","onde","peut-être","ramifier","synchroniser","vieillesse",
-      "justifier","lâcher","nouvelle","orchestre","plutôt","résolution","sceau","vidéoprojecteur",
-      "jubiler","navigateur","ordonnance","purée","ronronner","sédentaire","vainqueur",
-      "joyau","monarchie","nettoyage","opinion","plongée","rituel","sagittaire","vestiaire",
-      "joaillerie","maritime","nécessaire","obésité","polyglotte","rhétorique","sceptique","variable",
-      "jogging","monothéiste","naître","organe","péripétie","restreint","systématique","ventilation",
-      "mourir","nutrition","océan","pourcentage","rhinocéros","souverain","vociférer",
-      "kiwi","médaille","noyau","ouragan","psychopathe","récepteur","synonyme","velours",
-      "kilomètre","mondialisation","nourrir","octet","patrimoine","rayonnement","scintiller","vieillard",
-      "ketchup","musée","nénuphar","organisation","polyphonie","répertoire","subjuguer","vingtaine",
-      "klaxonner","moine","néanmoins","outil","paratexte","rancoeur","sanctuaire","verglas",
-      "kidnapper","ministre","néant","odorat","patiemment","rejoindre","sarcophage","vendange",
-      "kilowatt","mortalité","nuance","ouïe","propagande","réflexion","sonnet",
-      "kiosque","mythe","nymphe","orpaillage","pression","raquette","segment",
-      "kung-fu","médiane","noyau","œuvre","printemps","rabbin","silhouette",
-      "kermesse","mammifère","négatif","oxygène","périphérie","rétroprojecteur","statistique",
-      "métaphore","noblesse","opération","pâtisserie","relique",
-      "landau","mosaïque","natation","orchestre","pitoyable","recueil","technique",
-      "lauréat","mégalopole","naturalisation","oxymore","périlleux","renouement","tiède",
-      "licenciement","métropole","neutre","oreillette","périodique","radioactif","théâtre",
-      "littérature","messagerie","nostalgie","opaque","péremption","référendum","tangente",
-      "lutter","motion","natalité","omniscient","royaume","tolérance",
-      "lettre","molécules","nature","occurrence","quiproquo","renouvelable","thèse",
-      "liberté","mouvement","nombre","œsophage","quotient","théorème",
-      "laïque","mangrove","navire","orthodoxe","quart","sceau","tonalité",
-      "localisation","messager","nuque","obèse","quatuor","scénario","toile",
-      "lexical","méthode","nuisance","quotidien","salaire","thème",
-      "législatif","merveille","numérique","pyramide","qualificatif","syndrome","tourment",
-      "lutte","méchanceté","nuageux","parenthèse","quelconque","stylistique","temps"
-    ];
+    // --- Données : champs lexicaux à TROIS lettres (corrigés, sans doublons ni hors-sujet) ---
+    // Chaque item = { mot: "Mot", def: "Définition" } ; la réponse doit commencer par les 3 lettres du champ.
+    const FIELDS = {
+      "Cha": [
+        {mot:"Chat", def:"Animal domestique qui miaule."},
+        {mot:"Chaussette", def:"Vêtement porté sur le pied et la cheville."},
+        {mot:"Chambre", def:"Pièce d’une maison où l’on dort."},
+        {mot:"Chausson", def:"Chaussure légère portée à la maison ou pour la danse."},
+        {mot:"Chaudron", def:"Grand récipient métallique pour faire chauffer des aliments."},
+        {mot:"Chaud", def:"Qui a une température élevée."},
+        {mot:"Chauffeur", def:"Personne qui conduit professionnellement un véhicule."},
+        {mot:"Champ", def:"Terrain cultivé ou espace dégagé."},
+        {mot:"Chaise", def:"Meuble sur lequel on s’assoit."},
+        {mot:"Chaland", def:"Bateau à fond plat pour transporter des marchandises."},
+        {mot:"Char", def:"Véhicule antique à deux roues tiré par des chevaux."},
+        {mot:"Chasseur", def:"Personne qui pratique la chasse."}
+      ],
+      "Chr": [
+        {mot:"Christ", def:"Figure centrale du christianisme."},
+        {mot:"Chrétien", def:"Personne qui suit les enseignements du Christ."},
+        {mot:"Chrétienté", def:"Ensemble des peuples chrétiens ; monde chrétien."},
+        {mot:"Christianisme", def:"Religion fondée sur la personne et le message du Christ."},
+        {mot:"Christologie", def:"Étude théologique de la personne du Christ."},
+        {mot:"Christogramme", def:"Monogramme sacré (par ex. le chrisme ☧)."},
+        {mot:"Chrême", def:"Huile consacrée utilisée dans certains sacrements."},
+        {mot:"Christophe", def:"Prénom masculin courant commençant par « Chr »."},
+        {mot:"Chromosome", def:"Structure cellulaire portant l'information génétique."},
+        {mot:"Chronologie", def:"Ordre des événements dans le temps."},
+        {mot:"Chronique", def:"Récit suivi des faits ; ou rubrique régulière."}
+      ],
+      "Cai": [
+        {mot:"Caille", def:"Petit oiseau dont on consomme aussi les œufs."},
+        {mot:"Cairn", def:"Monceau de pierres servant de repère."},
+        {mot:"Caique", def:"Petit bateau traditionnel de Méditerranée."},
+        {mot:"Caissette", def:"Petite boîte ou petit contenant."},
+        {mot:"Caillou", def:"Petit fragment de pierre."},
+        {mot:"Caisse", def:"Grand contenant ; ou service de paiement d’un magasin."},
+        {mot:"Caïman", def:"Reptile proche du crocodile (ï compté comme i)."},
+        {mot:"Caillebotis", def:"Treillis de lattes de bois ou métal pour le sol."}
+      ],
+      "Cal": [
+        {mot:"Calanque", def:"Anse étroite et rocheuse en bord de mer."},
+        {mot:"Calcaire", def:"Roche ou dépôt riche en carbonate de calcium."},
+        {mot:"Calotte", def:"Petite coiffe ; partie supérieure de la tête."},
+        {mot:"Calice", def:"Coupe sacrée ; aussi enveloppe externe de la fleur."},
+        {mot:"Calculatrice", def:"Appareil permettant d’effectuer des opérations."},
+        {mot:"Calcul", def:"Opération ou ensemble d’opérations mathématiques."},
+        {mot:"Calao", def:"Grand oiseau tropical au long bec."},
+        {mot:"Calament", def:"Plante aromatique proche de la menthe."},
+        {mot:"Calme", def:"État de tranquillité, sans agitation."},
+        {mot:"Calibre", def:"Diamètre intérieur d’un canon ; format ; taille."},
+        {mot:"Calendrier", def:"Système de mesure et d’organisation du temps."}
+      ],
+      "Cam": [
+        {mot:"Caméra", def:"Appareil pour filmer ou enregistrer des images."},
+        {mot:"Caméléon", def:"Reptile changeant de couleur."},
+        {mot:"Camomille", def:"Plante aux usages médicinaux."},
+        {mot:"Camembert", def:"Fromage mou à croûte fleurie."},
+        {mot:"Camion", def:"Véhicule moteur destiné au transport de marchandises."},
+        {mot:"Camp", def:"Lieu organisé pour séjourner temporairement."},
+        {mot:"Camping", def:"Activité consistant à loger sous tente ou en plein air."},
+        {mot:"Campement", def:"Installation provisoire d’un camp."},
+        {mot:"Camée", def:"Bijou gravé en relief (coquillage, pierre)."},
+        {mot:"Camarade", def:"Compagnon d’études, de travail ou de combat."},
+        {mot:"Cambriolage", def:"Vol commis par effraction dans un lieu."},
+        {mot:"Camphre", def:"Substance aromatique utilisée en pharmacie/parfumerie."}
+      ],
+      "Cap": [
+        {mot:"Cape", def:"Vêtement sans manches porté sur les épaules."},
+        {mot:"Cap", def:"Direction suivie par un navire ; pointe de terre."},
+        {mot:"Caprice", def:"Changement brusque d’humeur ou de désir."},
+        {mot:"Capuchon", def:"Pièce couvrant la tête ; petit couvercle."},
+        {mot:"Capitaine", def:"Chef militaire ou commandant d’un navire/équipe."},
+        {mot:"Capuche", def:"Partie d’un vêtement couvrant la tête."},
+        {mot:"Capable", def:"Qui a la capacité de faire quelque chose."},
+        {mot:"Captivant", def:"Qui retient fortement l’attention."},
+        {mot:"Capital", def:"Très important ; ou ensemble de biens financiers."},
+        {mot:"Capsule", def:"Petit contenant scellé ; enveloppe d’un médicament."}
+      ],
+      "Ced": [
+        {mot:"Cèdre", def:"Conifère majestueux au bois odorant."},
+        {mot:"Cédric", def:"Prénom masculin commençant par « Céd »."},
+        {mot:"Céder", def:"Abandonner, vendre ou renoncer à quelque chose."},
+        {mot:"Cédille", def:"Signe sous la lettre c (ç)."},
+        {mot:"Cédant", def:"Personne qui cède un bien ou un droit."},
+        {mot:"Cédule", def:"Document ou billet officiel (emploi spécialisé)."},
+        {mot:"Cédulaire", def:"Relatif à une cédule ; impôt cédulaire (terme fisc.)."}
+      ],
+      "Chi": [
+        {mot:"Chinchilla", def:"Petit rongeur au pelage très doux."},
+        {mot:"Chili", def:"Piment fort ; aussi nom d’un plat épicé."},
+        {mot:"Chiffre", def:"Symbole numérique (0–9)."},
+        {mot:"Chihuahua", def:"Race de chien de très petite taille."},
+        {mot:"Chiffon", def:"Morceau de tissu pour essuyer ou nettoyer."},
+        {mot:"Chuintement", def:"Bruit sourd ou sifflant (sons « ch »)."},
+        {mot:"Chine", def:"Grand pays d’Asie à la Grande Muraille."},
+        {mot:"Chicorée", def:"Plante utilisée en boisson ou comme salade."},
+        {mot:"Chic", def:"Qui est élégant ; bon goût."},
+        {mot:"Chimie", def:"Science de la matière et de ses transformations."}
+      ],
+      "Cir": [
+        {mot:"Cirque", def:"Lieu/spectacle avec acrobates et clowns."},
+        {mot:"Circuit", def:"Trajet fermé ; réseau électrique."},
+        {mot:"Circulation", def:"Déplacement de véhicules, personnes ou fluides."},
+        {mot:"Circonscription", def:"Division administrative/électorale."},
+        {mot:"Circuler", def:"Se déplacer ; avancer."},
+        {mot:"Circonférence", def:"Ligne qui fait le tour d’un cercle."},
+        {mot:"Circonscrit", def:"Qui est limité, délimité."},
+        {mot:"Circulaire", def:"Qui a la forme d’un cercle ; note diffusée à tous."},
+        {mot:"Cire", def:"Substance malléable produite par les abeilles."}
+      ],
+      "Cli": [
+        {mot:"Clique", def:"Petit groupe fermé de personnes."},
+        {mot:"Clic", def:"Bruit sec d’un mécanisme ; action sur un bouton."},
+        {mot:"Cliquer", def:"Appuyer sur un bouton (souris, interface)."},
+        {mot:"Cliché", def:"Lieu commun ; ou tirage photographique."},
+        {mot:"Cliquet", def:"Mécanisme denté permettant un mouvement unidirectionnel."},
+        {mot:"Cliquetis", def:"Suite de petits bruits secs."},
+        {mot:"Client", def:"Personne qui achète un bien ou service."},
+        {mot:"Climat", def:"Conditions météorologiques d’une région sur la durée."},
+        {mot:"Climatiser", def:"Équiper d’un système de refroidissement de l’air."}
+      ],
+      "Cod": [
+        {mot:"Code", def:"Ensemble de règles ; suite de symboles."},
+        {mot:"Codeur", def:"Personne qui écrit du code informatique."},
+        {mot:"Coder", def:"Écrire en code ; chiffrer un message."},
+        {mot:"Codage", def:"Action de coder ; système de représentation."},
+        {mot:"Codétenu", def:"Personne détenue avec une autre."},
+        {mot:"Codirecteur", def:"Personne dirigeant un projet à deux."},
+        {mot:"Codisciple", def:"Camarade de classe ; élève du même cours."},
+        {mot:"Codomaine", def:"Ensemble d’arrivée d’une fonction (math.)."},
+        {mot:"Codifier", def:"Mettre en code ; organiser en règles écrites."},
+        {mot:"Codex", def:"Manuscrit antique relié en cahiers."}
+      ],
+      "Col": [
+        {mot:"Colonie", def:"Territoire administré par une puissance ; groupe d’animaux."},
+        {mot:"Colombe", def:"Oiseau symbole de paix."},
+        {mot:"Colonel", def:"Grade supérieur d’officier."},
+        {mot:"Colonisateur", def:"État ou personne qui colonise un territoire."},
+        {mot:"Coloriage", def:"Action de colorier un dessin."},
+        {mot:"Coller", def:"Fixer avec une colle ; adhérer."},
+        {mot:"Colère", def:"Forte irritation ; emportement."},
+        {mot:"Colis", def:"Paquet destiné à l’envoi."},
+        {mot:"Collier", def:"Bijou porté autour du cou."},
+        {mot:"Colline", def:"Élévation de terrain de faible altitude."}
+      ],
+      "Com": [
+        {mot:"Commune", def:"Collectivité territoriale ; localité."},
+        {mot:"Communion", def:"Rite chrétien commémorant la Cène."},
+        {mot:"Communication", def:"Action d’échanger des informations."},
+        {mot:"Commerce", def:"Activité d’achat et de vente."},
+        {mot:"Comique", def:"Qui fait rire ; humoriste."},
+        {mot:"Comédie", def:"Œuvre dramatique destinée à faire rire."},
+        {mot:"Commandant", def:"Titre d’un responsable militaire/aérien."},
+        {mot:"Commande", def:"Action d’ordonner ; aussi l’instruction envoyée à un système."},
+        {mot:"Commémoration", def:"Célébration du souvenir d’un événement."},
+        {mot:"Combinaison", def:"Assemblage d’éléments ; vêtement une pièce."}
+      ],
+      "Con": [
+        {mot:"Contrat", def:"Accord de droit entre plusieurs parties."},
+        {mot:"Congrès", def:"Grande assemblée/Salon de professionnels."},
+        {mot:"Constitution", def:"Texte fondamental fixant l’organisation d’un État."},
+        {mot:"Conduite", def:"Action de diriger un véhicule ; comportement."},
+        {mot:"Construction", def:"Action d’assembler pour édifier ; bâtiment."},
+        {mot:"Confession", def:"Aveu d’un fait ; appartenance religieuse."},
+        {mot:"Confusion", def:"Trouble, mélange d’idées ; gêne."},
+        {mot:"Connaissance", def:"Savoirs possédés ; personne connue."},
+        {mot:"Conjoint", def:"Époux ou épouse."},
+        {mot:"Conférence", def:"Réunion/Exposé sur un sujet donné."},
+        {mot:"Conflit", def:"Opposition entre personnes ou groupes."},
+        {mot:"Conteneur", def:"Grande caisse normalisée pour le transport."}
+      ],
+      "Cor": [
+        {mot:"Corne", def:"Partie dure sur la tête de certains animaux."},
+        {mot:"Corps", def:"Partie matérielle d’un être vivant ; ensemble."},
+        {mot:"Corail", def:"Squelette calcaire d’animaux marins ; bijou rouge/orange."},
+        {mot:"Correction", def:"Action de rectifier ; qualité d’un comportement poli."},
+        {mot:"Corriger", def:"Apporter des corrections, rectifier des erreurs."},
+        {mot:"Corridor", def:"Long passage étroit à l’intérieur d’un bâtiment."}
+      ],
+      "Cou": [
+        {mot:"Cour", def:"Espace découvert attenant à un bâtiment ; tribunal."},
+        {mot:"Coussin", def:"Objet moelleux pour s’asseoir ou s’adosser."},
+        {mot:"Couette", def:"Couverture épaisse garnie de duvet ou fibre."},
+        {mot:"Couple", def:"Deux personnes unies par amour ; ensemble de deux éléments."},
+        {mot:"Couloir", def:"Passage étroit dans un bâtiment."},
+        {mot:"Courage", def:"Force morale face au danger ou à la peur."},
+        {mot:"Couper", def:"Sectionner ; interrompre."},
+        {mot:"Couture", def:"Action d’assembler des pièces de tissu."},
+        {mot:"Couvercle", def:"Pièce qui ferme un récipient."},
+        {mot:"Couinement", def:"Petit bruit aigu et bref."},
+        {mot:"Coudrier", def:"Autre nom du noisetier."}
+      ],
+      // Le bloc initial « Cru » était en fait un ensemble de mots en « Cur » : on corrige le préfixe.
+      "Cur": [
+        {mot:"Curiosité", def:"Désir de savoir ou de découvrir quelque chose."},
+        {mot:"Curateur", def:"Personne chargée d’administrer les biens d’autrui ; conservateur d’expo."},
+        {mot:"Curieux", def:"Qui aime apprendre ou poser des questions."},
+        {mot:"Curé", def:"Prêtre catholique responsable d’une paroisse."},
+        {mot:"Curatelle", def:"Régime de protection juridique d’une personne."},
+        {mot:"Cure", def:"Traitement suivi pendant une période ; station thermale."},
+        {mot:"Curial", def:"Relatif à la cour ou au curé (emploi spécialisé)."},
+        {mot:"Curatif", def:"Qui guérit ou vise à guérir."}
+      ],
+      "The": [
+        {mot:"Théâtre", def:"Lieu ou art où l’on joue des pièces."},
+        {mot:"Théologie", def:"Étude des doctrines et croyances religieuses."},
+        {mot:"Théologien", def:"Spécialiste de la théologie."},
+        {mot:"Théorie", def:"Ensemble d’idées expliquant un phénomène."},
+        {mot:"Thermomètre", def:"Appareil qui mesure la température."},
+        {mot:"Thermothérapie", def:"Traitement médical par la chaleur."},
+        {mot:"Thérapie", def:"Traitement d’une maladie."},
+        {mot:"Thermique", def:"Relatif à la chaleur."},
+        {mot:"Thermodynamique", def:"Science des relations entre chaleur et énergie."},
+        {mot:"Thermostat", def:"Appareil qui régule la température."}
+      ],
+      "Bar": [
+        {mot:"Barre", def:"Tige longue et rigide ; poids en musculation."},
+        {mot:"Bar", def:"Établissement où l’on consomme des boissons."},
+        {mot:"Baraque", def:"Habitation rudimentaire ; petite maison."},
+        {mot:"Baraquement", def:"Ensemble de constructions provisoires."},
+        {mot:"Barjot", def:"Fou, déséquilibré (familier)."},
+        {mot:"Barboteuse", def:"Vêtement une pièce pour bébé."},
+        {mot:"Barboter", def:"Se tremper et remuer dans l’eau."},
+        {mot:"Barbe", def:"Poils du menton et des joues."},
+        {mot:"Baril", def:"Gros contenant cylindrique pour liquides."},
+        {mot:"Barbelé", def:"Fil de fer muni de pointes."}
+      ],
+      "Bic": [
+        {mot:"Bic", def:"Stylo à bille de marque devenue nom commun."},
+        {mot:"Bicarbonate", def:"Sel servant notamment à neutraliser des acides."},
+        {mot:"Bicaméral", def:"Qui comporte deux chambres (parlement)."},
+        {mot:"Bicéphale", def:"Qui possède deux têtes."},
+        {mot:"Biceps", def:"Muscle du bras à deux chefs."},
+        {mot:"Bichonner", def:"Soigner avec beaucoup d’attention."},
+        {mot:"Bichon", def:"Petit chien à poil soyeux."},
+        {mot:"Bicolore", def:"Qui a deux couleurs."},
+        {mot:"Bicyclette", def:"Véhicule à deux roues propulsé par pédalage."},
+        {mot:"Bicentenaire", def:"Qui a deux cents ans ; 200e anniversaire."}
+      ], 
+      
 
-    /* === Pagination === */
-    const pageSize = 10;
-    const totalPages = Math.ceil(words.length / pageSize);
-    let currentPage = 1;         // 1-indexed
-    let currentWordIndex = 0;    // index global dans words
-    let speechRate = 1;
+  "Bra": [
+    {mot:"Bras", def:"Membre supérieur de l’être humain, de l’épaule à la main."},
+    {mot:"Brassière", def:"Sous-vêtement couvrant la poitrine."},
+    {mot:"Brame", def:"Cri du cerf en rut."},
+    {mot:"Bramer", def:"Pousser le cri du cerf."},
+    {mot:"Brachial", def:"Relatif au bras."},
+    {mot:"Braquage", def:"Vol avec menace, souvent dans une banque ou un magasin."},
+    {mot:"Braquer", def:"Pointer une arme ; ou tourner violemment (un volant)."},
+    {mot:"Braillard", def:"Qui crie ou se plaint très fort."},
+    {mot:"Braderie", def:"Grande vente à bas prix dans les rues."},
+    {mot:"Bracelet", def:"Bijou porté au poignet."},
+    {mot:"Branchage", def:"Ensemble de branches d’un arbre (souvent coupées)."}
+  ],
 
-    /* === DOM === */
-    const wordDisplay = document.getElementById("wordDisplay");
+  "Bou": [
+    {mot:"Boule", def:"Objet de forme ronde ; petit pain rond."},
+    {mot:"Boucan", def:"Bruit fort, vacarme."},
+    {mot:"Boucher", def:"Personne qui prépare et vend de la viande."},
+    {mot:"Bouteille", def:"Récipient pour liquides, à goulot étroit."},
+    {mot:"Bousculade", def:"Mouvement de foule où l’on se pousse."},
+    {mot:"Boutique", def:"Petit magasin de vente au détail."},
+    {mot:"Boulangerie", def:"Magasin où l’on vend du pain et des pâtisseries."},
+    {mot:"Bouton", def:"Petite pièce servant à fermer un vêtement ; excroissance de peau."},
+    {mot:"Bouilloire", def:"Récipient pour porter de l’eau à ébullition."},
+    {mot:"Bouger", def:"Se déplacer, se mouvoir."},
+    {mot:"Bougie", def:"Bâton de cire avec une mèche pour éclairer."}
+  ],
+
+  "Bon": [
+    {mot:"Bonbon", def:"Petite sucrerie."},
+    {mot:"Bonnet", def:"Couvre-chef en laine, sans bord."},
+    {mot:"Bonhomme", def:"Petite figure d’homme ; façon familière de dire « homme »."},
+    {mot:"Bonheur", def:"État de satisfaction durable et de joie."},
+    {mot:"Bondé", def:"Très rempli, surchargé de monde."},
+    {mot:"Bonsaï", def:"Arbre nain cultivé en pot."},
+    {mot:"Bonification", def:"Amélioration ; augmentation accordée (ex. points, salaire)."},
+    {mot:"Bonsoir", def:"Formule de salutation en fin de journée."},
+    {mot:"Bonifier", def:"Rendre meilleur, améliorer."}
+  ],
+
+  "Ben": [
+    {mot:"Bénéfice", def:"Gain ou avantage tiré d’une action."},
+    {mot:"Bénédiction", def:"Action de bénir ; souhait de protection divine."},
+    {mot:"Bénévolat", def:"Activité faite gratuitement pour aider."},
+    {mot:"Bénin", def:"Sans gravité (maladie, situation)."},
+    {mot:"Bénir", def:"Donner une bénédiction ; consacrer."},
+    {mot:"Benêt", def:"Personne naïve ou simple d’esprit."},
+    {mot:"Benne", def:"Grand récipient pour transporter des matériaux."},
+    {mot:"Benzoïque", def:"Relatif à l’acide benzoïque (chimie)."},
+    {mot:"Bénéfique", def:"Qui fait du bien, avantageux."}
+  ],
+
+  "Bru": [
+    {mot:"Brun", def:"De couleur marron."},
+    {mot:"Bruine", def:"Pluie très fine."},
+    {mot:"Brusque", def:"Vif, soudain, sans ménagement."},
+    {mot:"Brunir", def:"Devenir brun ; rendre plus brun."},
+    {mot:"Brut", def:"À l’état naturel ; sans être adouci."},
+    {mot:"Brunette", def:"Femme aux cheveux bruns."},
+    {mot:"Brusquerie", def:"Manière rude, sans douceur."},
+    {mot:"Brutalité", def:"Caractère de ce qui est violent, sans douceur."},
+    {mot:"Bruissement", def:"Bruit léger (feuilles, eau, soie…)."},
+    {mot:"Bruit", def:"Son fort ou indésirable."}
+  ],
+
+  "Bri": [
+    {mot:"Brioche", def:"Pain sucré et moelleux."},
+    {mot:"Brique", def:"Bloc de construction en argile cuite."},
+    {mot:"Brillant", def:"Qui brille ; remarquable."},
+    {mot:"Brise", def:"Vent léger."},
+    {mot:"Brièvement", def:"En peu de mots, en peu de temps."},
+    {mot:"Briquet", def:"Petit appareil pour faire du feu."},
+    {mot:"Briser", def:"Casser, mettre en morceaux."},
+    {mot:"Briard", def:"Chien de berger originaire de Brie."},
+    {mot:"Brigade", def:"Unité de travail (armée, police, cuisine…)."},
+    {mot:"Brindille", def:"Très petite branche."}
+  ],
+
+  "Dec": [
+    {mot:"Décision", def:"Choix arrêté après réflexion."},
+    {mot:"Décent", def:"Conforme à la bienséance."},
+    {mot:"Déclencher", def:"Mettre en marche, provoquer."},
+    {mot:"Découvrir", def:"Trouver ce qui était caché."},
+    {mot:"Décor", def:"Ensemble des éléments qui forment un cadre."},
+    {mot:"Décrypter", def:"Rendre compréhensible ; déchiffrer."},
+    {mot:"Déclasser", def:"Changer de classe à la baisse."},
+    {mot:"Déclaration", def:"Affirmation officielle."},
+    {mot:"Décade", def:"Période de dix jours."},
+    {mot:"Découper", def:"Couper en parties."},
+    {mot:"Décembre", def:"Douzième mois de l’année."},
+    {mot:"Décennie", def:"Période de dix ans."}
+  ],
+
+  "Dep": [
+    {mot:"Départ", def:"Action de partir."},
+    {mot:"Dépêche", def:"Message urgent transmis rapidement."},
+    {mot:"Dépendre", def:"Être sous l’influence/autorité de."},
+    {mot:"Déposer", def:"Poser ; remettre officiellement."},
+    {mot:"Déprimé", def:"Dans un état de grande tristesse."},
+    {mot:"Dépouiller", def:"Enlever ; examiner minutieusement."},
+    {mot:"Déplacement", def:"Action de changer de lieu."},
+    {mot:"Dépenses", def:"Sommes d’argent utilisées."},
+    {mot:"Dépannage", def:"Aide rapide pour réparer un problème."},
+    {mot:"Dépôt", def:"Lieu ou action de déposer pour stocker."}
+  ],
+
+  "Dou": [
+    {mot:"Double", def:"Deux fois ; qui apparaît deux fois."},
+    {mot:"Douter", def:"Être incertain ; ne pas être sûr."},
+    {mot:"Doublure", def:"Tissu intérieur ; personne qui remplace."},
+    {mot:"Doux", def:"Agréable au toucher/à l’oreille ; peu intense."},
+    {mot:"Doute", def:"État d’incertitude."},
+    {mot:"Doudou", def:"Objet affectif d’un enfant."},
+    {mot:"Douleur", def:"Sensation pénible physique ou morale."},
+    {mot:"Douanier", def:"Agent chargé des frontières et des marchandises."},
+    {mot:"Douceur", def:"Qualité de ce qui est doux."},
+    {mot:"Doucher", def:"Laver sous une douche ; refroidir l’enthousiasme (fig.)."}
+  ],
+
+  "Doc": [
+    {mot:"Document", def:"Support d’information écrit/visuel."},
+    {mot:"Docteur", def:"Médecin ; ou titulaire d’un doctorat."},
+    {mot:"Doctrine", def:"Ensemble cohérent d’idées/enseignements."},
+    {mot:"Documentation", def:"Ensemble de documents explicatifs."},
+    {mot:"Docile", def:"Facile à diriger, obéissant."},
+    {mot:"Doctrinaire", def:"Attaché avec rigidité à une doctrine."},
+    {mot:"Doctoresse", def:"Médecin femme ; titulaire d’un doctorat (vieilli/usuel)."},
+    {mot:"Docudrame", def:"Œuvre mêlant documentaire et fiction."},
+    {mot:"Documentaire", def:"Film/émission à visée informative."}
+  ],
+
+  "Dis": [
+    {mot:"Distributeur", def:"Appareil qui délivre des produits."},
+    {mot:"Discipline", def:"Règle de conduite ; domaine d’étude."},
+    {mot:"Disparaître", def:"Cesser d’être visible/exister."},
+    {mot:"Discuter", def:"Échanger des idées, débattre."},
+    {mot:"Disposition", def:"Organisation ; tendance ; arrangement."},
+    {mot:"Distraction", def:"Divertissement ; manque d’attention."},
+    {mot:"Dispenser", def:"Fournir ; exempter ; enseigner."},
+    {mot:"Dissertation", def:"Texte argumenté sur un sujet."},
+    {mot:"Disparité", def:"Différence marquée, inégalité."},
+    {mot:"Discret", def:"Réservé ; peu visible."}
+  ],
+
+  "Des": [
+    {mot:"Dessin", def:"Représentation graphique tracée à la main."},
+    {mot:"Dessert", def:"Plat sucré servi en fin de repas."},
+    {mot:"Destruction", def:"Action d’anéantir."},
+    {mot:"Destin", def:"Sort des événements de la vie."},
+    {mot:"Dessein", def:"Projet, intention."},
+    {mot:"Désir", def:"Envie intense d’obtenir quelque chose."},
+    {mot:"Désert", def:"Région aride et peu peuplée."},
+    {mot:"Déséquilibre", def:"Manque d’équilibre."},
+    {mot:"Désavouer", def:"Désapprouver publiquement ; nier."},
+    {mot:"Désiré", def:"Souhaité ardemment."}
+  ],
+
+  "Dia": [
+    {mot:"Dialogue", def:"Conversation entre deux ou plusieurs personnes."},
+    {mot:"Diagramme", def:"Représentation graphique de données."},
+    {mot:"Diagnostic", def:"Identification d’un problème (souvent médical)."},
+    {mot:"Diabète", def:"Maladie de régulation du sucre sanguin."},
+    {mot:"Diamant", def:"Pierre précieuse très dure."},
+    {mot:"Diaspora", def:"Dispersion d’un peuple hors de sa région d’origine."},
+    {mot:"Dialyse", def:"Technique d’épuration du sang (médecine)."},
+    {mot:"Diatomée", def:"Algue microscopique unicellulaire."},
+    {mot:"Diapason", def:"Instrument donnant une note de référence."}
+  ],
+
+  "Far": [
+    {mot:"Fardeau", def:"Charge lourde, réelle ou morale."},
+    {mot:"Farfelu", def:"Bizarre, un peu fou."},
+    {mot:"Farfadet", def:"Petit être des légendes."},
+    {mot:"Farine", def:"Poudre issue du broyage de céréales."},
+    {mot:"Farfouiller", def:"Chercher en remuant dans le désordre."},
+    {mot:"Farniente", def:"Oisiveté, art de ne rien faire."},
+    {mot:"Farce", def:"Blague ; pièce comique courte."},
+    {mot:"Farandole", def:"Ronde/danse provençale."},
+    {mot:"Fard", def:"Maquillage appliqué sur le visage."},
+    {mot:"Fargue", def:"Bordage d’un pont de bateau (marine)."},
+    {mot:"Fartage", def:"Application de fart (ski)."}
+  ],
+
+  "Fla": [
+    {mot:"Flamme", def:"Langue de feu ; ardeur."},
+    {mot:"Flâner", def:"Se promener sans but, en prenant son temps."},
+    {mot:"Flacon", def:"Petit récipient, souvent en verre."},
+    {mot:"Flamme-rouge", def:"Signal du dernier kilomètre (cyclisme)."},
+    {mot:"Flageolet", def:"Petit instrument à vent."},
+    {mot:"Flan", def:"Dessert aux œufs et au lait."},
+    {mot:"Flancher", def:"Faiblir, céder."},
+    {mot:"Flatter", def:"Louer excessivement pour plaire."},
+    {mot:"Flagrant", def:"Évident, manifeste."},
+    {mot:"Flatterie", def:"Compliment excessif et intéressé."}
+  ],
+
+  "Fou": [
+    {mot:"Fou", def:"Personne mentalement déséquilibrée (par ext. très imprudent)."},
+    {mot:"Fouetter", def:"Frapper avec un fouet."},
+    {mot:"Fouine", def:"Petit carnivore ; personne indiscrète (fam.)."},
+    {mot:"Fougue", def:"Élan, ardeur vive."},
+    {mot:"Fouler", def:"Écraser en marchant ; se faire une entorse."},
+    {mot:"Fouet", def:"Instrument formé de lanières pour frapper."},
+    {mot:"Fouillis", def:"Désordre, amas confus."},
+    {mot:"Fouineur", def:"Personne indiscrète qui cherche partout."},
+    {mot:"Fouillé", def:"Examiné en détail ; détaillé."}
+  ],
+
+  "Fre": [
+    {mot:"Frère", def:"Fils des mêmes parents qu’une autre personne."},
+    {mot:"Fréquence", def:"Nombre d’occurrences par unité de temps."},
+    {mot:"Frémir", def:"Tressaillir légèrement ; frissonner."},
+    {mot:"Frénésie", def:"Excitation intense et désordonnée."},
+    {mot:"Frein", def:"Dispositif pour ralentir/arrêter ; obstacle."},
+    {mot:"Frêle", def:"Délicat, peu robuste."},
+    {mot:"Frégate", def:"Navire de guerre."},
+    {mot:"Fréquent", def:"Qui se produit souvent."},
+    {mot:"Fret", def:"Transport de marchandises."},
+    {mot:"Fréon", def:"Gaz utilisé dans d’anciens systèmes frigorifiques."}
+  ],
+
+  "Fum": [
+    {mot:"Fumer", def:"Inhaler la fumée du tabac ; dégager de la fumée."},
+    {mot:"Fumée", def:"Vapeur/gaz produit par une combustion."},
+    {mot:"Fumeur", def:"Personne qui fume."},
+    {mot:"Fumoir", def:"Lieu où l’on fume des aliments."},
+    {mot:"Fumisterie", def:"Tromperie, supercherie (fam.)."},
+    {mot:"Fumet", def:"Arôme agréable (cuisine)."},
+    {mot:"Fumerole", def:"Ouverture volcanique émettant des gaz."}
+  ],
+
+  "Gra": [
+    {mot:"Gravité", def:"Force d’attraction ; caractère sérieux d’une situation."},
+    {mot:"Grand", def:"De grande taille ; important."},
+    {mot:"Gratitude", def:"Reconnaissance pour un bienfait."},
+    {mot:"Grammaire", def:"Règles d’une langue."},
+    {mot:"Granit", def:"Roche magmatique très dure."},
+    {mot:"Gratuit", def:"Sans paiement ; sans raison (fig.)."},
+    {mot:"Grange", def:"Bâtiment agricole de stockage."},
+    {mot:"Gras", def:"Riche en graisse ; typographie épaisse."},
+    {mot:"Gravier", def:"Petits cailloux pour allées, béton…"},
+    {mot:"Gracieux", def:"Plein d’élégance ; aimable."}
+  ],
+
+  "Gri": [
+    {mot:"Grillage", def:"Treillis de fils métalliques ; clôture."},
+    {mot:"Gris", def:"Couleur entre blanc et noir."},
+    {mot:"Griffer", def:"Lacérer avec les griffes/ongles."},
+    {mot:"Grille", def:"Structure de barres ; tableau d’organisation."},
+    {mot:"Grivois", def:"Légèrement osé, licencieux."},
+    {mot:"Grimper", def:"Monter avec effort."},
+    {mot:"Grille-pain", def:"Appareil pour griller le pain."},
+    {mot:"Grief", def:"Sujet de plainte, reproche (jur.)."},
+    {mot:"Grisaille", def:"Temps gris ; monotonie."},
+    {mot:"Grimoire", def:"Livre de magie ; par ext. écrit incompréhensible."}
+  ],
+
+  "Gar": [
+    {mot:"Garde", def:"Action de surveiller ; personne chargée de surveiller."},
+    {mot:"Garçon", def:"Jeune homme ; serveur (vieux)."},
+    {mot:"Garniture", def:"Ce qui orne ; accompagnement d’un plat."},
+    {mot:"Garder", def:"Conserver ; surveiller."},
+    {mot:"Garer", def:"Stationner un véhicule."},
+    {mot:"Garantie", def:"Engagement de réparation/remplacement."},
+    {mot:"Garnison", def:"Troupes stationnées dans une place forte."},
+    {mot:"Garde-robe", def:"Armoire/pièce pour vêtements ; ensemble des vêtements."},
+    {mot:"Garrot", def:"Lien serré pour arrêter une hémorragie."},
+    {mot:"Garçonnière", def:"Logement d’un homme célibataire."}
+  ],
+
+  "Joi": [
+    {mot:"Joie", def:"Sentiment de bonheur."},
+    {mot:"Joindre", def:"Relier, unir ; contacter."},
+    {mot:"Joignant", def:"Qui est contigu, attenant."},
+    {mot:"Joint", def:"Pièce permettant l’assemblage/étanchéité."},
+    {mot:"Joignable", def:"Que l’on peut contacter."},
+    {mot:"Jointure", def:"Endroit où deux pièces se rejoignent."},
+    {mot:"Joindrement", def:"Action de joindre ; réunion (rare/litt.)."}
+  ],
+
+  "Jou": [
+    {mot:"Joueur", def:"Personne qui joue ; sportif."},
+    {mot:"Jouet", def:"Objet pour s’amuser."},
+    {mot:"Jouir", def:"Avoir du plaisir ; bénéficier de."},
+    {mot:"Jouissance", def:"Plaisir intense ; fait de bénéficier."},
+    {mot:"Joufflu", def:"Aux joues rondes et pleines."},
+    {mot:"Joual", def:"Variété du français parlé au Québec."},
+    {mot:"Jouvence", def:"Jeunesse retrouvée."},
+    {mot:"Journée", def:"Durée comprise entre deux matins ; ensemble des activités du jour."},
+    {mot:"Journal", def:"Publication périodique ; carnet personnel."},
+    {mot:"Joute", def:"Combat/compétition ; joute oratoire."}
+  ],
+
+  "Lan": [
+    {mot:"Lancer", def:"Projeter quelque chose."},
+    {mot:"Languir", def:"Souffrir d’attente ; dépérir."},
+    {mot:"Lanterne", def:"Éclairage portatif."},
+    {mot:"Lance", def:"Arme longue et pointue."},
+    {mot:"Lamenter", def:"Se plaindre, gémir."},
+    {mot:"Langue", def:"Organe ; système de communication."},
+    {mot:"Lanière", def:"Bande de cuir ou de tissu."},
+    {mot:"Lancement", def:"Mise en route officielle (produit, projet)."},
+    {mot:"Langage", def:"Système de signes pour communiquer."}
+  ],
+
+  "Dor": [
+    {mot:"Dortoir", def:"Salle commune pour dormir."},
+    {mot:"Dorer", def:"Recouvrir d’or ; colorer en doré."},
+    {mot:"Dort", def:"Forme du verbe dormir (il/elle)."},
+    {mot:"Doryphore", def:"Insecte ravageur de la pomme de terre."},
+    {mot:"Doré", def:"Qui a l’éclat/la couleur de l’or."},
+    {mot:"Dorique", def:"Ordre architectural grec."},
+    {mot:"Dorsale", def:"Relatif au dos ; crête sous-marine."},
+    {mot:"Dorsal", def:"Qui se situe au dos."},
+    {mot:"Dorure", def:"Couche d’or ; action de dorer."},
+    {mot:"Dorloter", def:"Gâter, cajoler avec tendresse."}
+  ],
+
+  "Maj": [
+    {mot:"Majesté", def:"Grandeur, dignité ; titre royal."},
+    {mot:"Majorité", def:"Part la plus nombreuse ; âge légal."},
+    {mot:"Major", def:"Grade militaire ; élève premier de promotion."},
+    {mot:"Majoration", def:"Augmentation d’une somme/valeur."},
+    {mot:"Majordome", def:"Intendant d’une grande maison."},
+    {mot:"Majorette", def:"Majorettes des parades."},
+    {mot:"Majuscule", def:"Lettre capitale."},
+    {mot:"Majestueux", def:"Qui a de la majesté."},
+    {mot:"Majorer", def:"Augmenter un tarif/une valeur."},
+    {mot:"Majeur", def:"Adulte en droit ; plus important ; doigt."}
+  ],
+
+  "Mai": [
+    {mot:"Mai", def:"Cinquième mois de l’année."},
+    {mot:"Maillot", def:"Vêtement de bain/sport."},
+    {mot:"Maître", def:"Personne qui enseigne ; qui domine un art."},
+    {mot:"Main", def:"Extrémité du bras, pour saisir."},
+    {mot:"Maison", def:"Lieu d’habitation."},
+    {mot:"Maïs", def:"Céréale cultivée pour ses grains."},
+    {mot:"Maille", def:"Boucle de fil ; unité de tricot."},
+    {mot:"Mairie", def:"Bâtiment de l’administration municipale."},
+    {mot:"Maigreur", def:"État de ce qui est trop maigre."}
+  ],
+
+  "Min": [
+    {mot:"Minimum", def:"Plus petite quantité possible."},
+    {mot:"Ministre", def:"Membre du gouvernement ; responsable d’un ministère."},
+    {mot:"Minéral", def:"Substance inorganique naturelle."},
+    {mot:"Minerai", def:"Roche contenant des minéraux exploitables."},
+    {mot:"Minutieux", def:"Très attentif aux détails."},
+    {mot:"Minable", def:"Très médiocre (fam.)."},
+    {mot:"Mince", def:"Peu épais ; maigre."},
+    {mot:"Minorer", def:"Diminuer la valeur de quelque chose."},
+    {mot:"Minuet", def:"Ancienne danse à trois temps."},
+    {mot:"Minuté", def:"Réglé avec précision dans le temps."},
+    {mot:"Mineur", def:"Personne de moins de 18 ans ; secondaire ; en musique."},
+    {mot:"Ministère", def:"Département administratif dirigé par un ministre."}
+  ],
+
+  "Mat": [
+    {mot:"Matière", def:"Ce qui compose les corps ; discipline scolaire."},
+    {mot:"Matin", def:"Début de la journée."},
+    {mot:"Matelot", def:"Marin d’équipage."},
+    {mot:"Matrice", def:"Moule ; structure d’origine ; en maths, tableau."},
+    {mot:"Matelas", def:"Couchage rembourré."},
+    {mot:"Matériel", def:"Ensemble d’objets/outils nécessaires."},
+    {mot:"Matraque", def:"Bâton de défense."},
+    {mot:"Matricule", def:"Numéro d’identification."},
+    {mot:"Maturité", def:"Pleine croissance ; état d’équilibre."},
+    {mot:"Matité", def:"Caractère de ce qui n’est pas brillant."}
+  ],
+
+  "Mar": [
+    {mot:"Marche", def:"Action d’avancer à pied ; degré d’escalier."},
+    {mot:"Marge", def:"Espace libre en bord de page ; différence."},
+    {mot:"Marché", def:"Lieu d’échanges ; ensemble de l’offre et de la demande."},
+    {mot:"Marron", def:"Couleur brune ; châtaigne."},
+    {mot:"Marée", def:"Mouvement périodique des eaux."},
+    {mot:"Marmite", def:"Grand récipient de cuisson."},
+    {mot:"Marrant", def:"Drôle, amusant (fam.)."},
+    {mot:"Marquer", def:"Laisser une trace ; noter un point."},
+    {mot:"Marine", def:"Qui concerne la mer ; forces navales."},
+    {mot:"Marionnette", def:"Poupée animée par des fils/tiges."},
+    {mot:"Mariage", def:"Union légale de deux personnes."},
+    {mot:"Maréchal", def:"Haut grade militaire ; artisan maréchal-ferrant."}
+  ],
+
+  "Med": [
+    {mot:"Médaille", def:"Distinction honorifique."},
+    {mot:"Médecin", def:"Professionnel de santé."},
+    {mot:"Média", def:"Moyen de diffusion de l’information."},
+    {mot:"Méditer", def:"Réfléchir profondément ; pratiquer la méditation."},
+    {mot:"Médicament", def:"Substance qui soigne ou soulage."},
+    {mot:"Médical", def:"Relatif à la médecine."},
+    {mot:"Médian", def:"Situé au milieu."},
+    {mot:"Médusé", def:"Stupéfait, pétrifié de surprise."},
+    {mot:"Méditerranéen", def:"Relatif à la Méditerranée et ses pays."}
+  ],
+
+  "Mer": [
+    {mot:"Mère", def:"Femme ayant un enfant."},
+    {mot:"Merveille", def:"Chose admirable."},
+    {mot:"Mer", def:"Vaste étendue d’eau salée."},
+    {mot:"Méridien", def:"Demi-cercle passant par les pôles (géogr.)."},
+    {mot:"Mérite", def:"Qualité donnant droit à récompense/estime."},
+    {mot:"Mers", def:"Pluriel de mer."},
+    {mot:"Merlot", def:"Cépage et vin rouge."},
+    {mot:"Merlu", def:"Poisson de mer."},
+    {mot:"Merise", def:"Petite cerise acide ; son arbre : merisier."},
+    {mot:"Merlan", def:"Poisson de mer ; (fam.) coiffeur."}
+  ],
+
+  "Mut": [
+    {mot:"Muter", def:"Changer d’affectation ; se transformer (bio.)."},
+    {mot:"Mutation", def:"Transformation ; changement génétique."},
+    {mot:"Mutuel", def:"Réciproque ; organisme d’assurance."},
+    {mot:"Mutisme", def:"Absence de parole."},
+    {mot:"Mutinerie", def:"Révolte de subordonnés (armée, prison…)."},
+    {mot:"Mutant", def:"Organisme présentant une mutation."},
+    {mot:"Mutiler", def:"Amputer ou endommager gravement."},
+    {mot:"Mutage", def:"Ajout d’alcool au moût (vinification)."},
+    {mot:"Mutabilité", def:"Caractère de ce qui peut changer."}
+  ],
+
+  "Mor": [
+    {mot:"Moral", def:"Relatif aux règles de conduite ; état psychique."},
+    {mot:"Morale", def:"Ensemble de principes éthiques."},
+    {mot:"Moribond", def:"Près de mourir."},
+    {mot:"Morne", def:"Triste, terne."},
+    {mot:"Mortel", def:"Qui cause la mort ; qui peut mourir."},
+    {mot:"Mors", def:"Pièce du harnais placée dans la bouche du cheval."},
+    {mot:"Morbide", def:"Relatif à la maladie ; malsain."},
+    {mot:"Morceler", def:"Diviser en petits morceaux/terrains."},
+    {mot:"Moratoire", def:"Suspension temporaire d’une obligation."},
+    {mot:"Moraine", def:"Amas de débris laissés par un glacier."}
+  ],
+
+  "Mon": [
+    {mot:"Monde", def:"La Terre et ses habitants ; univers."},
+    {mot:"Monnaie", def:"Moyen d’échange (pièces/billets)."},
+    {mot:"Monter", def:"S’élever ; assembler ; organiser."},
+    {mot:"Monstre", def:"Être effrayant ; chose énorme."},
+    {mot:"Monogamie", def:"Fait d’avoir un seul conjoint."},
+    {mot:"Monarque", def:"Souverain (roi, reine…)."},
+    {mot:"Monologue", def:"Discours d’une seule personne."},
+    {mot:"Monastère", def:"Lieu de vie de moines/moniales."},
+    {mot:"Monument", def:"Édifice remarquable."},
+    {mot:"Montagne", def:"Grande élévation naturelle du sol."}
+  ],
+
+  "Met": [
+    {mot:"Mètre", def:"Unité de longueur SI."},
+    {mot:"Métier", def:"Profession ; outil à tisser."},
+    {mot:"Métal", def:"Matériau conducteur, souvent solide."},
+    {mot:"Météo", def:"État de l’atmosphère à un moment donné."},
+    {mot:"Méthode", def:"Façon organisée de procéder."},
+    {mot:"Métaphysique", def:"Branche de la philosophie sur l’être."},
+    {mot:"Métronome", def:"Appareil donnant un rythme régulier."},
+    {mot:"Métropole", def:"Grande ville centrale ; État principal vis-à-vis de ses colonies."},
+    {mot:"Métrique", def:"Système de mesure ; règles de versification."},
+    {mot:"Météorite", def:"Corps céleste tombé sur Terre."}
+  ],
+
+  "Mil": [
+    {mot:"Milieu", def:"Partie centrale ; environnement."},
+    {mot:"Militaire", def:"Relatif à l’armée."},
+    {mot:"Millier", def:"Ensemble de mille unités."},
+    {mot:"Millimètre", def:"Millième de mètre."},
+    {mot:"Millésime", def:"Année de récolte (vin)."},
+    {mot:"Militant", def:"Personne engagée dans une cause."},
+    {mot:"Milice", def:"Groupe armé civil."},
+    {mot:"Millefeuille", def:"Pâtisserie en couches."},
+    {mot:"Miladiou", def:"Juron méridional (fam.)."},
+    {mot:"Milord", def:"Titre donné à un noble anglais (ou par plaisanterie)."}
+  ],
+
+  "Man": [
+    {mot:"Manuel", def:"Qui se fait avec la main ; petit livre d’instructions."},
+    {mot:"Manie", def:"Habitude excessive ; toc."},
+    {mot:"Manipuler", def:"Manœuvrer avec les mains ; influencer."},
+    {mot:"Manquer", def:"Faire défaut ; rater."},
+    {mot:"Manoir", def:"Grande demeure ancienne."},
+    {mot:"Manège", def:"Lieu pour l’entraînement des chevaux ; attraction."},
+    {mot:"Manœuvre", def:"Action de diriger ; ouvrier non qualifié."},
+    {mot:"Manquant", def:"Qui fait défaut ; absent."},
+    {mot:"Manchette", def:"Extrémité de manche ; grand titre de journal."},
+    {mot:"Manifester", def:"Exprimer publiquement ; défiler."}
+  ],
+
+  "Num": [
+    {mot:"Numéro", def:"Chiffre/code d’identification."},
+    {mot:"Numéral", def:"Qui exprime un nombre."},
+    {mot:"Numéroteur", def:"Personne/appareil qui numérote."},
+    {mot:"Numérotation", def:"Action/résultat de numéroter."},
+    {mot:"Numérique", def:"Qui utilise des nombres/technologies digitales."},
+    {mot:"Numismate", def:"Collectionneur/étudiant des monnaies."},
+    {mot:"Numismatique", def:"Étude des monnaies."},
+    {mot:"Numériser", def:"Transformer en format numérique."},
+    {mot:"Numérisation", def:"Processus de passage au numérique."}
+  ],
+
+  "Nom": [
+    {mot:"Nom", def:"Désignation d’une personne, d’une chose ou d’un concept."},
+    {mot:"Nommer", def:"Attribuer un nom ; désigner à une fonction."},
+    {mot:"Nommé", def:"Qui a été désigné pour un poste."},
+    {mot:"Nominal", def:"Qui se rapporte au nom ; de valeur indiquée."},
+    {mot:"Nomination", def:"Action de nommer quelqu’un à une fonction."},
+    {mot:"Nominatif", def:"Qui indique le nom d’une personne."},
+    {mot:"Nominativement", def:"De manière nominative, en citant les noms."},
+    {mot:"Nomenclature", def:"Système/liste de noms propres à un domaine."},
+    {mot:"Nomenclateur", def:"Personne/ouvrage qui dresse une nomenclature."},
+    {mot:"Nomogramme", def:"Abaque graphique permettant des calculs."}
+  ],
+
+  "Org": [
+    {mot:"Organe", def:"Partie d’un être vivant remplissant une fonction."},
+    {mot:"Organique", def:"Relatif aux organes ; à la chimie du carbone."},
+    {mot:"Organisme", def:"Être vivant ; structure organisée."},
+    {mot:"Organisation", def:"Action de structurer ; groupe structuré."},
+    {mot:"Organiser", def:"Mettre en ordre, planifier."},
+    {mot:"Organigramme", def:"Schéma de la structure d’une organisation."},
+    {mot:"Organiste", def:"Musicien qui joue de l’orgue."},
+    {mot:"Orgue", def:"Instrument à tuyaux des églises/salles."},
+    {mot:"Orgueil", def:"Estime excessive de soi."},
+    {mot:"Organdi", def:"Mousseline de coton très apprêtée (tissu)."}
+  ],
+
+  "Pal": [
+    {mot:"Palais", def:"Résidence somptueuse ; cavité buccale supérieure."},
+    {mot:"Palme", def:"Feuille de palmier ; récompense honorifique."},
+    {mot:"Palper", def:"Examiner en touchant avec les mains."},
+    {mot:"Palpitant", def:"Qui bat vite ; très passionnant (fam.)."},
+    {mot:"Palier", def:"Repos d’escalier ; niveau atteint."},
+    {mot:"Paluche", def:"Grande main (fam.)."},
+    {mot:"Palefrenier", def:"Personne qui soigne les chevaux."},
+    {mot:"Palissade", def:"Clôture de pieux/planches."},
+    {mot:"Palmarès", def:"Liste des récompenses/lauréats."},
+    {mot:"Paléontologie", def:"Étude des fossiles et êtres du passé."}
+  ],
+
+  "Par": [
+    {mot:"Parole", def:"Faculté de parler ; propos tenus."},
+    {mot:"Parfum", def:"Substance odorante pour se parfumer."},
+    {mot:"Parcours", def:"Itinéraire ; trajectoire personnelle."},
+    {mot:"Parvenir", def:"Arriver à ; réussir à atteindre un but."},
+    {mot:"Parapluie", def:"Objet protégeant de la pluie."},
+    {mot:"Paradis", def:"Lieu de bonheur parfait."},
+    {mot:"Paroi", def:"Face intérieure d’un mur ; cloison."},
+    {mot:"Paradoxe", def:"Idée contraire à l’opinion commune."},
+    {mot:"Paralyser", def:"Rendre immobile/inefficace."},
+    {mot:"Parcellaire", def:"Relatif au découpage en parcelles."}
+  ],
+
+  "Pat": [
+    {mot:"Patience", def:"Aptitude à supporter l’attente."},
+    {mot:"Paternité", def:"Qualité/état d’être père."},
+    {mot:"Patrimoine", def:"Biens hérités ; ensemble culturel."},
+    {mot:"Patrie", def:"Pays auquel on appartient."},
+    {mot:"Patron", def:"Chef d’entreprise ; modèle."},
+    {mot:"Patinage", def:"Action de glisser avec des patins."},
+    {mot:"Patrouille", def:"Groupe chargé de surveiller."},
+    {mot:"Patte", def:"Membre d’un animal."},
+    {mot:"Patois", def:"Dialecte régional."},
+    {mot:"Patient", def:"Personne soignée ; qui fait preuve de patience."}
+  ],
+
+  "Pel": [
+    {mot:"Pelage", def:"Ensemble des poils d’un animal."},
+    {mot:"Peler", def:"Ôter la peau ; desquamer."},
+    {mot:"Pellicule", def:"Fine couche ; film photographique."},
+    {mot:"Pélican", def:"Grand oiseau à poche gulaire."},
+    {mot:"Pèlerin", def:"Voyageur vers un lieu saint."},
+    {mot:"Pèlerine", def:"Court manteau sans manches."},
+    {mot:"Peloton", def:"Groupe serré ; groupe de tête (cyclisme)."},
+    {mot:"Pelouse", def:"Surface herbeuse entretenue."},
+    {mot:"Pelisse", def:"Vêtement doublé de fourrure."},
+    {mot:"Pelotonner", def:"Se blottir en boule."}
+  ],
+
+  "Per": [
+    {mot:"Perdre", def:"Être privé de ; ne plus posséder."},
+    {mot:"Permettre", def:"Donner l’autorisation/la possibilité."},
+    {mot:"Perception", def:"Action de percevoir ; recouvrement d’impôts."},
+    {mot:"Perfection", def:"Qualité d’être sans défaut."},
+    {mot:"Période", def:"Intervalle de temps déterminé."},
+    {mot:"Persévérer", def:"Continuer malgré les difficultés."},
+    {mot:"Perroquet", def:"Oiseau pouvant imiter la parole."},
+    {mot:"Persil", def:"Plante aromatique."},
+    {mot:"Perquisition", def:"Recherche officielle dans un lieu privé."},
+    {mot:"Perforer", def:"Percer en faisant un trou."}
+  ],
+
+  "Pic": [
+    {mot:"Pic", def:"Sommet pointu ; outil à pointe."},
+    {mot:"Picorer", def:"Manger en petites quantités ; becqueter."},
+    {mot:"Pique", def:"Perche/arme pointue ; carte."},
+    {mot:"Picoler", def:"Boire de l’alcool (fam.)."},
+    {mot:"Picot", def:"Petit relief/point."},
+    {mot:"Pichet", def:"Récipient à bec verseur."},
+    {mot:"Picard", def:"Relatif à la Picardie ; habitant."},
+    {mot:"Pique-assiette", def:"Personne qui profite des autres pour manger."},
+    {mot:"Picotement", def:"Sensation de petites piqûres."},
+    {mot:"Picoreur", def:"Oiseau/personne qui picore."}
+  ],
+
+  "Pir": [
+    {mot:"Pirater", def:"Accéder/voler illégalement (mer, numérique)."},
+    {mot:"Pirate", def:"Auteur de piraterie."},
+    {mot:"Pirouette", def:"Rotation rapide élégante."},
+    {mot:"Pirée", def:"Port d’Athènes (Le Pirée)."},
+    {mot:"Pire", def:"Comparatif de « mauvais »."},
+    {mot:"Pirouetter", def:"Faire une pirouette."},
+    {mot:"Piratage", def:"Action de pirater."},
+    {mot:"Piriforme", def:"En forme de poire (anatomie)."},
+    {mot:"Piraterie", def:"Activité des pirates."},
+    {mot:"Pirogue", def:"Embarcation étroite et légère."}
+  ],
+
+  "Por": [
+    {mot:"Porcelaine", def:"Céramique fine et translucide."},
+    {mot:"Porter", def:"Transporter ; avoir sur soi."},
+    {mot:"Portefeuille", def:"Étui pour argent et papiers."},
+    {mot:"Porc", def:"Mammifère domestique élevé pour sa viande."},
+    {mot:"Porche", def:"Espace couvert à l’entrée d’un bâtiment."},
+    {mot:"Port", def:"Lieu d’accostage des navires."},
+    {mot:"Portion", def:"Partie d’un tout ; ration."},
+    {mot:"Porte", def:"Vantail mobile fermant une ouverture."},
+    {mot:"Porosité", def:"Caractère de ce qui est poreux."},
+    {mot:"Porc-épic", def:"Mammifère muni de piquants."}
+  ],
+
+  "Pla": [
+    {mot:"Plage", def:"Bande de sable/galets au bord de l’eau."},
+    {mot:"Plafond", def:"Partie supérieure d’une pièce."},
+    {mot:"Plaque", def:"Surface plane rigide ; plaque signalétique."},
+    {mot:"Plante", def:"Organisme végétal."},
+    {mot:"Plateau", def:"Surface plane ; support de service."},
+    {mot:"Plaider", def:"Défendre une cause en justice."},
+    {mot:"Plafonner", def:"Atteindre une limite ; limiter."},
+    {mot:"Plaisanterie", def:"Propos/acte destiné à faire rire."},
+    {mot:"Placer", def:"Mettre à un endroit ; investir (fin.)."},
+    {mot:"Plan", def:"Représentation ; projet ; surface plane."}
+  ],
+
+  "Pre": [
+    {mot:"Prévoir", def:"Anticiper ce qui va se passer."},
+    {mot:"Préférence", def:"Goût marqué pour quelque chose."},
+    {mot:"Préparation", def:"Action de préparer ; chose préparée."},
+    {mot:"Prénom", def:"Nom individuel précédant le nom de famille."},
+    {mot:"Prendre", def:"Saisir ; se saisir de."},
+    {mot:"Prénommer", def:"Donner un prénom."},
+    {mot:"Préoccupation", def:"Sujet d’inquiétude/occupation de l’esprit."},
+    {mot:"Prévenir", def:"Avertir ; empêcher en amont."},
+    {mot:"Préjudice", def:"Tort causé à quelqu’un."},
+    {mot:"Préposition", def:"Mot invariable introduisant un complément."}
+  ],
+
+  "Pri": [
+    {mot:"Prix", def:"Somme demandée/attribuée."},
+    {mot:"Prison", def:"Lieu de détention."},
+    {mot:"Privilège", def:"Avantage réservé."},
+    {mot:"Prime", def:"Somme supplémentaire ; première."},
+    {mot:"Prisonnier", def:"Personne incarcérée."},
+    {mot:"Primate", def:"Mammifère de l’ordre des primates."},
+    {mot:"Prise", def:"Action de saisir ; prise électrique."},
+    {mot:"Priant", def:"Qui prie."},
+    {mot:"Prisme", def:"Solide géométrique ; objet dispersant la lumière."},
+    {mot:"Prières", def:"Paroles adressées à une divinité."}
+  ],
+
+  "Pro": [
+    {mot:"Progrès", def:"Amélioration, avancée."},
+    {mot:"Projet", def:"Plan d’action pour l’avenir."},
+    {mot:"Profession", def:"Métier exercé."},
+    {mot:"Problème", def:"Question difficile à résoudre."},
+    {mot:"Production", def:"Action de produire ; résultat."},
+    {mot:"Promesse", def:"Engagement à faire/ne pas faire."},
+    {mot:"Propriétaire", def:"Personne possédant un bien."},
+    {mot:"Protéger", def:"Mettre à l’abri d’un danger."},
+    {mot:"Procédure", def:"Ensemble d’étapes/démarches."},
+    {mot:"Pronostic", def:"Prévision sur l’évolution d’une situation."},
+    {mot:"Professeur", def:"Enseignant d’un établissement."},
+    {mot:"Produit", def:"Chose fabriquée ou résultant d’une opération."}
+  ],
+
+  "Rap": [
+    {mot:"Rapide", def:"Qui se fait très vite."},
+    {mot:"Rappel", def:"Action de rappeler ; convocation ; retrait de produit."},
+    {mot:"Rapiécer", def:"Réparer en recousant des pièces."},
+    {mot:"Rapport", def:"Lien ; compte rendu."},
+    {mot:"Rapprocher", def:"Mettre plus près ; rendre plus proches."},
+    {mot:"Rapt", def:"Enlèvement d’une personne."},
+    {mot:"Rappeler", def:"Faire revenir en mémoire ; convoquer."},
+    {mot:"Raptus", def:"Impulsion brusque conduisant à agir."},
+    {mot:"Rapace", def:"Oiseau prédateur ; personne avide (fig.)."},
+    {mot:"Rapacité", def:"Avidité excessive."}
+  ],
+
+  "Ras": [
+    {mot:"Rasoir", def:"Outil/appareil pour se raser."},
+    {mot:"Rassembler", def:"Réunir en un même lieu."},
+    {mot:"Rasé", def:"Coupe très courte ; surface sans végétation."},
+    {mot:"Raison", def:"Faculté de juger ; motif."},
+    {mot:"Rasant", def:"Qui passe très près de la surface."},
+    {mot:"Ras-le-bol", def:"Exaspération, saturation."},
+    {mot:"Rassurer", def:"Apaiser, redonner confiance."},
+    {mot:"Rasade", def:"Grande quantité bue d’un trait (fam.)."},
+    {mot:"Rasante", def:"Qui frôle la surface (trajectoire)."},
+    {mot:"Rassasié", def:"Qui a assez mangé ; comblé."}
+  ],
+
+  "Rat": [
+    {mot:"Râteau", def:"Outil de jardinage à dents."},
+    {mot:"Ration", def:"Quantité de nourriture attribuée."},
+    {mot:"Rater", def:"Manquer, échouer."},
+    {mot:"Ravage", def:"Dégât considérable."},
+    {mot:"Ratifier", def:"Approuver officiellement (traité, accord)."},
+    {mot:"Ratisser", def:"Ramasser au râteau ; fouiller largement (fig.)."},
+    {mot:"Rationaliser", def:"Rendre plus logique/efficace."},
+    {mot:"Rationner", def:"Distribuer en quantités limitées."},
+    {mot:"Ratel", def:"Mammifère carnivore appelé « blaireau à miel »."},
+    {mot:"Ratelier", def:"Support pour ranger outils/armes/fourrages."}
+  ],
+
+  "Rep": [
+    {mot:"Réponse", def:"Ce qu’on répond ; solution à une question."},
+    {mot:"Repli", def:"Action de se replier ; recul."},
+    {mot:"Réputation", def:"Opinion répandue sur quelqu’un/quelque chose."},
+    {mot:"Représentation", def:"Action de représenter ; spectacle donné."},
+    {mot:"Réplique", def:"Réponse vive ; copie exacte."},
+    {mot:"Repenser", def:"Penser de nouveau ; revoir."},
+    {mot:"Réprimander", def:"Adresser un blâme, des reproches."},
+    {mot:"Repaire", def:"Refuge d’animaux ou de malfaiteurs."},
+    {mot:"Repas", def:"Prise alimentaire à heure donnée."},
+    {mot:"Répartition", def:"Action de répartir, de partager."}
+  ],
+
+  "Ret": [
+    {mot:"Retour", def:"Action de revenir ; renvoi."},
+    {mot:"Retraite", def:"Fin d’activité professionnelle ; retrait."},
+    {mot:"Retirer", def:"Enlever ; soustraire ; prendre de l’argent."},
+    {mot:"Rétablir", def:"Remettre en bon état/en vigueur."},
+    {mot:"Retouche", def:"Modification/ajustement d’un objet/une image."},
+    {mot:"Retenir", def:"Garder ; mémoriser ; empêcher de partir."},
+    {mot:"Rétribution", def:"Rémunération pour un service."},
+    {mot:"Réticence", def:"Hésitation/ réserve à parler/agir."},
+    {mot:"Rétrospective", def:"Regard/exposition sur le passé."},
+    {mot:"Réticulaire", def:"En forme de réseau."}
+  ],
+
+  "Rou": [
+    {mot:"Roue", def:"Pièce circulaire tournant autour d’un axe."},
+    {mot:"Routier", def:"Relatif à la route ; chauffeur poids lourd."},
+    {mot:"Rousseur", def:"Teinte rousse des cheveux/peau."},
+    {mot:"Rouspéter", def:"Protester, râler (fam.)."},
+    {mot:"Rouleau", def:"Objet cylindrique servant à enrouler."},
+    {mot:"Royaume", def:"État dirigé par un roi/une reine."},
+    {mot:"Routage", def:"Détermination d’un itinéraire (transports, réseaux)."},
+    {mot:"Roulade", def:"Rotation sur soi ; figure de gymnastique."},
+    {mot:"Roussir", def:"Brunir légèrement par la chaleur."},
+    {mot:"Roupiller", def:"Dormir un peu (fam.)."}
+  ],
+
+  "Rhi": [
+    {mot:"Rhinocéros", def:"Grand mammifère à une/deux cornes."},
+    {mot:"Rhizome", def:"Tige souterraine porteuse de réserves."},
+    {mot:"Rhinite", def:"Inflammation de la muqueuse nasale."},
+    {mot:"Rhinologie", def:"Étude/traitement des affections du nez."},
+    {mot:"Rhipicephalus", def:"Genre de tiques (acariens)."},
+    {mot:"Rhinestone", def:"Strass, faux diamant décoratif."},
+    {mot:"Rhinocérotidé", def:"Relatif à la famille des rhinocéros."},
+    {mot:"Rhinopharyngite", def:"Inflammation du nez et du pharynx."},
+    {mot:"Rhizosphère", def:"Zone du sol autour des racines."},
+    {mot:"Rhizaria", def:"Groupe d’eucaryotes (protistes)."}
+  ],
+
+  "Sol": [
+    {mot:"Soleil", def:"Astre du système solaire."},
+    {mot:"Solidarité", def:"Aide mutuelle entre personnes/groupes."},
+    {mot:"Solide", def:"À l’état solide ; robuste."},
+    {mot:"Solution", def:"Réponse à un problème ; mélange homogène."},
+    {mot:"Solfège", def:"Enseignement de la lecture musicale."},
+    {mot:"Sols", def:"Couches superficielles de la terre (plur.)."},
+    {mot:"Solennel", def:"Fait avec gravité et éclat."},
+    {mot:"Solitude", def:"État d’être seul."},
+    {mot:"Solvant", def:"Liquide qui dissout une substance."},
+    {mot:"Solstice", def:"Moment où le Soleil atteint sa déclinaison extrême."}
+  ],
+
+  "Sai": [
+    {mot:"Sain", def:"En bonne santé ; exempt de défaut."},
+    {mot:"Sainte", def:"Féminin de saint ; femme canonisée."},
+    {mot:"Saint", def:"Homme canonisé ; très vertueux."},
+    {mot:"Saigner", def:"Perdre du sang ; saigner une viande."},
+    {mot:"Saisie", def:"Prise par autorité ; capture informatique."},
+    {mot:"Saisir", def:"Prendre vivement ; comprendre ; entrer des données."},
+    {mot:"Saillant", def:"Qui ressort, en relief ; marquant."},
+    {mot:"Saison", def:"Période de l’année au climat caractéristique."},
+    {mot:"Saisonnier", def:"Relatif à une saison ; emploi temporaire."},
+    {mot:"Saisissable", def:"Qui peut être saisi (juridique ou phys.)."}
+  ],
+
+  "Sal": [
+    {mot:"Salade", def:"Plante/mets ; mélange d’aliments froids."},
+    {mot:"Sale", def:"Malpropre."},
+    {mot:"Salive", def:"Liquide buccal sécrété par les glandes salivaires."},
+    {mot:"Saluer", def:"Adresser un salut ; rendre hommage."},
+    {mot:"Salmigondis", def:"Mélange confus ; plat hétéroclite."},
+    {mot:"Salaire", def:"Rémunération d’un travail."},
+    {mot:"Salubre", def:"Bon pour la santé."},
+    {mot:"Saleté", def:"État de ce qui est sale ; malpropreté."},
+    {mot:"Salin", def:"Relatif au sel."},
+    {mot:"Salivation", def:"Sécrétion de salive."}
+  ],
+
+  "Spe": [
+    {mot:"Spécial", def:"Différent de l’ordinaire."},
+    {mot:"Spécialiste", def:"Expert d’un domaine."},
+    {mot:"Spécifique", def:"Propre à ; particulier."},
+    {mot:"Spécimen", def:"Exemplaire représentatif."},
+    {mot:"Spectacle", def:"Représentation destinée au public."},
+    {mot:"Spectateur", def:"Personne qui assiste/observe."},
+    {mot:"Spectre", def:"Apparition ; ensemble de fréquences."},
+    {mot:"Spéculation", def:"Réflexion abstraite ; opération d’achat-revente."},
+    {mot:"Spéléologie", def:"Étude/exploration des grottes."},
+    {mot:"Spécularité", def:"Propriété de réflexion brillante d’une surface."}
+  ],
+
+  "Sor": [
+    {mot:"Sorcier", def:"Personne censée pratiquer la sorcellerie."},
+    {mot:"Sorcellerie", def:"Pratiques magiques."},
+    {mot:"Sortilège", def:"Enchantement, charme magique."},
+    {mot:"Sortie", def:"Action de sortir ; issue."},
+    {mot:"Sortir", def:"Aller dehors ; extraire."},
+    {mot:"Sordide", def:"Très sale ; moralement bas."},
+    {mot:"Sorbet", def:"Dessert glacé à l’eau et au fruit."},
+    {mot:"Sornettes", def:"Balivernes, absurdités."},
+    {mot:"Sororal", def:"Relatif aux sœurs (fratrie)."},
+    {mot:"Sorite", def:"Raisonnement par enchaînement de syllogismes."}
+  ],
+
+  "Sta": [
+    {mot:"Stabilité", def:"Caractère de ce qui demeure constant."},
+    {mot:"Station", def:"Lieu d’arrêt ; complexe (ski, balnéaire…)."},
+    {mot:"Statue", def:"Représentation en volume."},
+    {mot:"Standard", def:"Norme ; de qualité moyenne/usuelle."},
+    {mot:"Statut", def:"Situation légale/administrative."},
+    {mot:"Stature", def:"Taille ; importance morale."},
+    {mot:"Stagiaire", def:"Personne en formation pratique."},
+    {mot:"Stage", def:"Période de formation pratique."},
+    {mot:"Statique", def:"Qui ne bouge pas ; branche de la mécanique."},
+    {mot:"Staphylocoque", def:"Bactérie responsable d’infections."}
+  ],
+
+  "Sou": [
+    {mot:"Souci", def:"Inquiétude ; aussi fleur (calendula)."},
+    {mot:"Soulever", def:"Lever ; susciter."},
+    {mot:"Soutien", def:"Appui, support."},
+    {mot:"Souvenir", def:"Ce qui reste en mémoire."},
+    {mot:"Soumettre", def:"Faire accepter son autorité ; proposer."},
+    {mot:"Souffrir", def:"Endurer une douleur."},
+    {mot:"Soulager", def:"Diminuer la douleur/le fardeau."},
+    {mot:"Soudain", def:"Brusque, imprévu."},
+    {mot:"Soupçon", def:"Doute sans preuve."},
+    {mot:"Soutenir", def:"Maintenir ; défendre ; appuyer."}
+  ],
+
+  "Tir": [
+    {mot:"Tirer", def:"Amener vers soi ; faire feu."},
+    {mot:"Tirade", def:"Long développement de paroles."},
+    {mot:"Tirailleur", def:"Soldat léger d’infanterie."},
+    {mot:"Tirelire", def:"Objet pour économiser de l’argent."},
+    {mot:"Tireur", def:"Personne qui tire (arme, sport)."},
+    {mot:"Tirage", def:"Action de tirer ; impression ; tirage au sort."},
+    {mot:"Tire-bouchon", def:"Outil pour ôter un bouchon."},
+    {mot:"Tirette", def:"Petite poignée ; glissière (BE)."},
+    {mot:"Tire-fesses", def:"Remontée mécanique de ski."},
+    {mot:"Tirant", def:"Élément en tension (mécanique, charpente)."}
+  ],
+
+  "Tor": [
+    {mot:"Torse", def:"Partie du corps entre cou et abdomen."},
+    {mot:"Torrent", def:"Cours d’eau rapide."},
+    {mot:"Tordre", def:"Déformer par torsion."},
+    {mot:"Tort", def:"Erreur, faute, injustice."},
+    {mot:"Tortue", def:"Reptile à carapace."},
+    {mot:"Tortionnaire", def:"Personne infligeant des tortures."},
+    {mot:"Torsion", def:"Action de tordre ; déformation."},
+    {mot:"Torseur", def:"Objet math./mécanique représentant forces/couples."},
+    {mot:"Torticolis", def:"Contracture douloureuse du cou."},
+    {mot:"Tortueux", def:"Sinueux ; compliqué."}
+  ],
+
+  "Tra": [
+    {mot:"Trafic", def:"Circulation intensive ; commerce illicite."},
+    {mot:"Tramway", def:"Transport urbain sur rails."},
+    {mot:"Tragédie", def:"Genre dramatique aux issues funestes."},
+    {mot:"Travailler", def:"Exécuter une activité ; exercer un emploi."},
+    {mot:"Tradition", def:"Usages transmis de génération en génération."},
+    {mot:"Tranche", def:"Morceau plat coupé dans un tout."},
+    {mot:"Trajectoire", def:"Chemin suivi par un mobile."},
+    {mot:"Tranquille", def:"Calme, sans agitation."},
+    {mot:"Transparence", def:"Qualité de ce qui laisse passer la lumière ; clarté d’information."},
+    {mot:"Traduction", def:"Rendre un texte dans une autre langue."}
+  ],
+
+  "Tro": [
+    {mot:"Trogne", def:"Visage (fam.) ; tête."},
+    {mot:"Trombone", def:"Instrument à coulisse ; pince de papier."},
+    {mot:"Tromper", def:"Induire en erreur ; trahir."},
+    {mot:"Trompette", def:"Instrument à vent en cuivre."},
+    {mot:"Tronc", def:"Partie principale d’un arbre ; torse."},
+    {mot:"Trop", def:"Indique l’excès ; trop-plein."},
+    {mot:"Trophée", def:"Objet remis en récompense."},
+    {mot:"Tropical", def:"Relatif aux tropiques."},
+    {mot:"Trotinette", def:"(orth. corr.) Trottinette : engin à deux roues sans pédales."},
+    {mot:"Trousse", def:"Petit nécessaire pour ranger des objets."}
+  ],
+
+  "Tan": [
+    {mot:"Tanière", def:"Refuge d’un animal sauvage."},
+    {mot:"Tandem", def:"Vélo pour deux personnes."},
+    {mot:"Tanguer", def:"Osciller (bateau)."},
+    {mot:"Tannage", def:"Traitement des peaux en cuir."},
+    {mot:"Tangible", def:"Qu’on peut toucher ; évident."},
+    {mot:"Tanin", def:"Substance végétale astringente."},
+    {mot:"Tansad", def:"Siège arrière ajouté (moto/vélo)."},
+    {mot:"Tanqué", def:"Immobilisé, coincé (fam.)."},
+    {mot:"Tanzanite", def:"Pierre précieuse bleue/violette."},
+    {mot:"Tandoori", def:"Préparation indienne au four tandoor."}
+  ],
+
+  "Tam": [
+    {mot:"Tamis", def:"Instrument pour filtrer/tamiser."},
+    {mot:"Tamia", def:"Petit rongeur proche de l’écureuil."},
+    {mot:"Tampon", def:"Objet pour imprimer/absorber."},
+    {mot:"Tamiser", def:"Passer au tamis ; atténuer (lumière)."},
+    {mot:"Tam-tam", def:"Tambour africain ; vacarme (fam.)."},
+    {mot:"Tamoul", def:"Relatif au peuple/langue tamoule."},
+    {mot:"Tamarin", def:"Fruit tropical acidulé ; arbre."},
+    {mot:"Tamise", def:"Nom français de la rivière Thames."},
+    {mot:"Tamal", def:"Plat mexicain de pâte de maïs cuite en feuille."},
+    {mot:"Tamisage", def:"Action de tamiser/trier par taille."}
+  ],
+
+  "Var": [
+    {mot:"Var", def:"Département français de PACA."},
+    {mot:"Varan", def:"Grand lézard d’Asie/Afrique."},
+    {mot:"Varice", def:"Dilatation permanente d’une veine."},
+    {mot:"Varicelle", def:"Maladie virale infantile."},
+    {mot:"Variante", def:"Version légèrement différente."},
+    {mot:"Varlope", def:"Rabot long de menuisier."},
+    {mot:"Varappe", def:"Escalade sur rocher (vieilli)."},
+    {mot:"Varier", def:"Changer, modifier."},
+    {mot:"Variété", def:"Genre musical populaire ; sous-espèce."},
+    {mot:"VAR", def:"Voltampère réactif (électricité)."}
+  ],
+
+  "Ver": [
+    {mot:"Véracité", def:"Caractère de ce qui est vrai."},
+    {mot:"Vérité", def:"Ce qui est conforme à la réalité."},
+    {mot:"Vérifier", def:"Contrôler la conformité/l’exactitude."},
+    {mot:"Véranda", def:"Pièce vitrée attenante à une maison."},
+    {mot:"Verdure", def:"Végétation verte."},
+    {mot:"Verre", def:"Matière/vase pour boire."},
+    {mot:"Vernis", def:"Couche protectrice brillante."},
+    {mot:"Verseau", def:"Signe astrologique."},
+    {mot:"Versement", def:"Action de payer une somme."},
+    {mot:"Vertige", def:"Sensation de tournis ; perte d’équilibre."}
+  ],
+
+  "Vic": [
+    {mot:"Vicaire", def:"Clerc assistant un curé/évêque."},
+    {mot:"Vicariat", def:"Charge/fonction de vicaire."},
+    {mot:"Vicariance", def:"Remplacement d’espèces proches selon les zones."},
+    {mot:"Vicinal", def:"Relatif à un chemin local."},
+    {mot:"Vicissitude", def:"Aléa, changement souvent fâcheux."},
+    {mot:"Vicomte", def:"Titre de noblesse."},
+    {mot:"Victime", def:"Personne subissant un préjudice."},
+    {mot:"Victimiser", def:"Traiter comme victime ; faire une victime."},
+    {mot:"Victuaille", def:"Provisions de bouche."},
+    {mot:"Victorieux", def:"Qui a remporté la victoire."}
+  ],
+
+  "Vir": [
+    {mot:"Virage", def:"Changement de direction ; courbe."},
+    {mot:"Virer", def:"Changer de direction ; licencier ; virement bancaire."},
+    {mot:"Virgule", def:"Signe de ponctuation (,)."},
+    {mot:"Virago", def:"Femme aux manières viriles (péj.)."},
+    {mot:"Viril", def:"Relatif aux qualités masculines."},
+    {mot:"Virevolter", def:"Tourner rapidement/changer souvent."},
+    {mot:"Virement", def:"Transfert d’argent entre comptes."},
+    {mot:"Virulent", def:"Agressif ; très actif (maladie/critique)."},
+    {mot:"Virginal", def:"Relatif à la virginité ; candide."},
+    {mot:"Virelai", def:"Forme poétique médiévale à refrain."}
+  ],
+
+  "Vol": [
+    {mot:"Vol", def:"Action de se déplacer dans l’air ; délit de voler."},
+    {mot:"Voler", def:"Se déplacer en l’air ; dérober."},
+    {mot:"Volant", def:"Roue de direction ; pièce d’habillement."},
+    {mot:"Volaille", def:"Oiseaux domestiques de basse-cour."},
+    {mot:"Volcan", def:"Montagne émettant lave, gaz, cendres."},
+    {mot:"Volupté", def:"Plaisir intense, raffiné."},
+    {mot:"Volubile", def:"Qui parle beaucoup et vite."},
+    {mot:"Volée", def:"Groupe en vol ; série de coups."},
+    {mot:"Volière", def:"Grande cage pour oiseaux."},
+    {mot:"Volition", def:"Acte de volonté."}
+  ],
+
+  "Glo": [
+    {mot:"Gloire", def:"Renommée ou prestige obtenu par des actions remarquables."},
+    {mot:"Glorieux", def:"Qui apporte ou possède de la gloire."},
+    {mot:"Glorifier", def:"Célébrer, louer avec enthousiasme."},
+    {mot:"Gloriole", def:"Fierté excessive pour des choses minimes."},
+    {mot:"Glorieusement", def:"D’une manière qui apporte de la gloire."},
+    {mot:"Glorification", def:"Action de rendre gloire."},
+    {mot:"Glorifiant", def:"Qui honore ou élève."},
+    {mot:"Glottique", def:"Relatif à la glotte (anatomie)."},
+    {mot:"Gloriette", def:"Petit pavillon ou kiosque de jardin."},
+    {mot:"Globule", def:"Petite sphère ; cellule sanguine."}
+  ],
+
+  "Con": [
+    {mot:"Confiance", def:"Fait de croire en quelqu’un ou quelque chose."},
+    {mot:"Confier", def:"Remettre une tâche ou un secret."},
+    {mot:"Confidentiel", def:"Réservé à un petit nombre."},
+    {mot:"Connaissance", def:"Savoir acquis ; relation."},
+    {mot:"Connaître", def:"Avoir appris ou reconnu."},
+    {mot:"Connaisseur", def:"Personne experte dans un domaine."},
+    {mot:"Conseil", def:"Avis, recommandation."},
+    {mot:"Conseiller", def:"Personne qui oriente, guide."},
+    {mot:"Conséquent", def:"Qui découle logiquement."},
+    {mot:"Construction", def:"Action de bâtir."},
+    {mot:"Constater", def:"Remarquer objectivement."},
+    {mot:"Constitution", def:"Texte fondamental d’un État."},
+    {mot:"Continuer", def:"Poursuivre sans interruption."},
+    {mot:"Continuité", def:"Caractère de ce qui ne s’arrête pas."},
+    {mot:"Continent", def:"Vaste étendue de terre."},
+    {mot:"Convenir", def:"Être approprié."},
+    {mot:"Convention", def:"Accord formel."},
+    {mot:"Conversation", def:"Échange oral."},
+    {mot:"Conjuguer", def:"Mettre un verbe à une forme."},
+    {mot:"Conjoint", def:"Mari ou épouse."},
+    {mot:"Conjuration", def:"Alliance secrète ; exorcisme."},
+    {mot:"Conduire", def:"Diriger un véhicule ; mener."},
+    {mot:"Conducteur", def:"Personne qui conduit ; matériau qui transmet l’électricité."},
+    {mot:"Conduite", def:"Manière de se comporter."},
+    {mot:"Conclure", def:"Terminer un raisonnement ; conclure un contrat."},
+    {mot:"Conclusion", def:"Fin d’un raisonnement ou d’un écrit."},
+    {mot:"Concluant", def:"Qui prouve efficacement."},
+    {mot:"Confrère", def:"Collègue d’une même profession."},
+    {mot:"Confronter", def:"Mettre face à face ; comparer."},
+    {mot:"Confrérie", def:"Association religieuse ou professionnelle."}
+  ],
+
+  "Ent": [
+    {mot:"Entendre", def:"Percevoir par l’ouïe."},
+    {mot:"Entrer", def:"Pénétrer dans un lieu."},
+    {mot:"Entropie", def:"Mesure du désordre (physique)."},
+    {mot:"Entamer", def:"Commencer quelque chose."},
+    {mot:"Entourer", def:"Mettre autour ; accompagner."},
+    {mot:"Entêtement", def:"Comportement obstiné."},
+    {mot:"Entériner", def:"Approuver officiellement."},
+    {mot:"Entailler", def:"Faire une coupure."},
+    {mot:"Entomologie", def:"Science des insectes."},
+    {mot:"Entrelacer", def:"Croiser, enlacer ensemble."}
+  ],
+
+  "Sup": [
+    {mot:"Superbe", def:"Très beau, impressionnant."},
+    {mot:"Supplément", def:"Ce qu’on ajoute à un tout."},
+    {mot:"Supposer", def:"Admettre sans preuve."},
+    {mot:"Supprimer", def:"Faire disparaître, enlever."},
+    {mot:"Suppurer", def:"Laisser s’écouler du pus."},
+    {mot:"Supposé", def:"Présumé, supposé être."},
+    {mot:"Supin", def:"Ancienne forme verbale ; position couchée sur le dos."},
+    {mot:"Support", def:"Ce qui soutient ou appuie."},
+    {mot:"Supportable", def:"Qu’on peut endurer."},
+    {mot:"Superlatif", def:"Degré de comparaison le plus élevé."}
+  ],
+
+  "Inf": [
+    {mot:"Infant", def:"Jeune enfant (vieilli)."},
+    {mot:"Infecter", def:"Contaminer par des microbes."},
+    {mot:"Influence", def:"Action d’exercer un effet."},
+    {mot:"Informer", def:"Donner une information."},
+    {mot:"Infini", def:"Sans limite ni fin."},
+    {mot:"Inflation", def:"Hausse générale des prix."},
+    {mot:"Infirmerie", def:"Lieu de soins légers."},
+    {mot:"Infraction", def:"Violation de la loi."},
+    {mot:"Infrastructure", def:"Installations de base d’un système."},
+    {mot:"Infertile", def:"Qui ne peut pas engendrer."}
+  ],
+
+  "Com": [
+    {mot:"Commencer", def:"Débuter une action."},
+    {mot:"Commerce", def:"Activité d’échanges de biens."},
+    {mot:"Communication", def:"Transmission d’un message."},
+    {mot:"Communauté", def:"Groupe partageant des intérêts communs."},
+    {mot:"Compagnon", def:"Personne avec qui on partage."},
+    {mot:"Combinaison", def:"Association d’éléments ; vêtement couvrant."},
+    {mot:"Commande", def:"Action de demander un produit/service."},
+    {mot:"Compétition", def:"Rivalité entre concurrents."},
+    {mot:"Commentaire", def:"Remarque, opinion."},
+    {mot:"Compassion", def:"Sentiment de pitié pour autrui."}
+  ],
+
+  "For": [
+    {mot:"Forêt", def:"Grande étendue d’arbres."},
+    {mot:"Force", def:"Puissance physique ou morale."},
+    {mot:"Formation", def:"Action de former ; apprentissage."},
+    {mot:"Formel", def:"Clair, explicite."},
+    {mot:"Formulaire", def:"Document à remplir."},
+    {mot:"Forgeron", def:"Artisan du métal."},
+    {mot:"Fortune", def:"Grande richesse ; hasard."},
+    {mot:"Forfait", def:"Prix global fixé ; abandon."},
+    {mot:"Format", def:"Taille ou dimension."},
+    {mot:"Forteresse", def:"Place fortifiée."}
+  ],
+
+  "App": [
+    {mot:"Appel", def:"Action d’appeler ou de téléphoner."},
+    {mot:"Appareil", def:"Objet technique."},
+    {mot:"Appui", def:"Soutien."},
+    {mot:"Apprentissage", def:"Action d’apprendre."},
+    {mot:"Applaudir", def:"Frapper des mains en signe d’approbation."},
+    {mot:"Application", def:"Mise en pratique ; programme informatique."},
+    {mot:"Appoint", def:"Complément d’une somme d’argent."},
+    {mot:"Apporter", def:"Amener à quelqu’un."},
+    {mot:"Approcher", def:"Venir plus près."},
+    {mot:"Apprécier", def:"Évaluer positivement, aimer."}
+  ],
+
+  "Réa": [
+    {mot:"Réalité", def:"Ce qui existe réellement."},
+    {mot:"Réalisation", def:"Action d’accomplir."},
+    {mot:"Réagir", def:"Agir en réponse."},
+    {mot:"Réaction", def:"Réponse à un stimulus."},
+    {mot:"Réajuster", def:"Corriger légèrement."},
+    {mot:"Réanimation", def:"Soins intensifs pour ranimer."},
+    {mot:"Réaffirmer", def:"Redire avec force."},
+    {mot:"Réarranger", def:"Réorganiser différemment."},
+    {mot:"Réadapter", def:"Adapter de nouveau."},
+    {mot:"Réattribuer", def:"Attribuer à nouveau."}
+  ],
+
+  "Int": [
+    {mot:"Intelligent", def:"Qui fait preuve de compréhension."},
+    {mot:"Intensité", def:"Degré de force."},
+    {mot:"Intention", def:"Projet, volonté."},
+    {mot:"Intégrité", def:"Honnêteté, probité."},
+    {mot:"Interaction", def:"Influence réciproque."},
+    {mot:"Intérieur", def:"Situé dedans."},
+    {mot:"Interruption", def:"Arrêt momentané."},
+    {mot:"Intégrer", def:"Inclure dans un tout."},
+    {mot:"Interview", def:"Entretien pour obtenir des infos."},
+    {mot:"Interdire", def:"Empêcher par règle."}
+  ],
+
+  "Aut": [
+    {mot:"Auteur", def:"Personne qui écrit ou crée une œuvre."},
+    {mot:"Autonomie", def:"Capacité à se gérer seul."},
+    {mot:"Autobus", def:"Véhicule de transport collectif."},
+    {mot:"Automatique", def:"Qui fonctionne sans intervention humaine."},
+    {mot:"Autographe", def:"Signature écrite de la main d’une personne."},
+    {mot:"Autorité", def:"Pouvoir de décider ou de commander."},
+    {mot:"Automobile", def:"Véhicule à moteur routier."},
+    {mot:"Autoportrait", def:"Représentation de soi-même."},
+    {mot:"Autopsie", def:"Examen d’un corps après la mort."},
+    {mot:"Autruche", def:"Grand oiseau coureur incapable de voler."}
+  ],
+
+  "Exp": [
+    {mot:"Expansion", def:"Accroissement en taille ou en volume."},
+    {mot:"Expatrié", def:"Personne vivant hors de son pays."},
+    {mot:"Expédition", def:"Envoi de marchandises ou voyage organisé."},
+    {mot:"Expérience", def:"Connaissance acquise par la pratique."},
+    {mot:"Explicite", def:"Clair, formulé sans ambiguïté."},
+    {mot:"Explosion", def:"Détonation violente."},
+    {mot:"Expliquer", def:"Rendre compréhensible."},
+    {mot:"Expulser", def:"Chasser, faire sortir."},
+    {mot:"Exposer", def:"Présenter au public."},
+    {mot:"Exprimer", def:"Manifester une idée ou un sentiment."}
+  ],
+
+  "Dir": [
+    {mot:"Dire", def:"Exprimer par la parole."},
+    {mot:"Directeur", def:"Personne qui dirige une organisation."},
+    {mot:"Direction", def:"Orientation ou gestion."},
+    {mot:"Diriger", def:"Conduire, orienter."},
+    {mot:"Dirigeant", def:"Personne exerçant une fonction de direction."},
+    {mot:"Directif", def:"Qui impose des instructions."},
+    {mot:"Directrice", def:"Féminin de directeur."},
+    {mot:"Dirham", def:"Unité monétaire dans certains pays arabes."},
+    {mot:"Dirigeable", def:"Aéronef pouvant être dirigé."},
+    {mot:"Dirimant", def:"Qui constitue un obstacle légal."}
+  ],
+
+  "Sou": [
+    {mot:"Soutenir", def:"Apporter de l’aide, du support."},
+    {mot:"Soumettre", def:"Faire accepter une autorité."},
+    {mot:"Souffrir", def:"Ressentir une douleur."},
+    {mot:"Souhaiter", def:"Exprimer un vœu ou un désir."},
+    {mot:"Soupçonner", def:"Avoir des doutes sur quelqu’un."},
+    {mot:"Souvenir", def:"Image gardée en mémoire."},
+    {mot:"Soulever", def:"Lever quelque chose vers le haut."},
+    {mot:"Soudain", def:"Qui arrive brusquement."},
+    {mot:"Soupirer", def:"Respirer profondément avec tristesse ou soulagement."},
+    {mot:"Souiller", def:"Sal ir, rendre impur."}
+  ],
+
+  "Act": [
+    {mot:"Acteur", def:"Personne qui joue un rôle au théâtre ou au cinéma."},
+    {mot:"Action", def:"Fait de faire quelque chose."},
+    {mot:"Actif", def:"Qui agit, en mouvement."},
+    {mot:"Actualiser", def:"Mettre à jour."},
+    {mot:"Activiste", def:"Personne engagée dans une cause."},
+    {mot:"Activité", def:"Ensemble d’actions accomplies."},
+    {mot:"Actualité", def:"Événements récents."},
+    {mot:"Actrice", def:"Femme qui joue un rôle."},
+    {mot:"Activation", def:"Action de rendre actif."},
+    {mot:"Actuel", def:"Qui concerne le présent."}
+  ],
+
+  "Abs": [
+    {mot:"Absence", def:"Fait de ne pas être présent."},
+    {mot:"Absolu", def:"Qui est total, sans limite."},
+    {mot:"Absorber", def:"Faire entrer une substance."},
+    {mot:"Abstinent", def:"Qui s’abstient de certains plaisirs."},
+    {mot:"Abstraction", def:"Idée générale, détachée du concret."},
+    {mot:"Absolution", def:"Pardon religieux des fautes."},
+    {mot:"Abscons", def:"Difficile à comprendre."},
+    {mot:"Abstention", def:"Fait de ne pas participer à un vote."},
+    {mot:"Absorptif", def:"Qui a la capacité d’absorber."},
+    {mot:"Absolvable", def:"Qui peut être pardonné."}
+  ],
+
+  "Aff": [
+    {mot:"Affaire", def:"Activité ou événement important."},
+    {mot:"Afficher", def:"Mettre en évidence publiquement."},
+    {mot:"Affection", def:"Sentiment tendre."},
+    {mot:"Affirmer", def:"Déclarer avec assurance."},
+    {mot:"Afflux", def:"Arrivée massive de personnes ou choses."},
+    {mot:"Affranchir", def:"Libérer de la servitude."},
+    {mot:"Affaiblir", def:"Rendre moins fort."},
+    {mot:"Affliger", def:"Causer du chagrin."},
+    {mot:"Affiner", def:"Rendre plus fin, subtil."},
+    {mot:"Affrètement", def:"Location d’un navire ou véhicule."}
+  ],
+
+  "Car": [
+    {mot:"Carrefour", def:"Endroit où se croisent des routes."},
+    {mot:"Caractère", def:"Traits distinctifs d’une personne."},
+    {mot:"Carrosserie", def:"Partie extérieure d’un véhicule."},
+    {mot:"Carrière", def:"Parcours professionnel ; lieu d’extraction."},
+    {mot:"Carbure", def:"Composé chimique du carbone."},
+    {mot:"Carcasse", def:"Squelette d’un être ou objet."},
+    {mot:"Caravane", def:"Groupe de voyageurs ; véhicule tracté."},
+    {mot:"Cartable", def:"Sac d’écolier."},
+    {mot:"Carence", def:"Manque d’un élément essentiel."},
+    {mot:"Carrelage", def:"Revêtement en carreaux."}
+  ],
+
+  "Ton": [
+    {mot:"Tonalité", def:"Caractère musical ou tonal d’un morceau."},
+    {mot:"Tonnerre", def:"Bruit produit par la foudre."},
+    {mot:"Tonique", def:"Qui donne de l’énergie."},
+    {mot:"Tondeur", def:"Personne qui tond."},
+    {mot:"Tonifiant", def:"Qui redonne de la vigueur."},
+    {mot:"Tonlieu", def:"Ancien droit perçu sur certaines marchandises."},
+    {mot:"Tonsure", def:"Rasage partiel de la tête (religieux)."},
+    {mot:"Tonfa", def:"Bâton de défense articulé (arts martiaux)."},
+    {mot:"Tondre", def:"Couper ras la laine, les cheveux, l’herbe."},
+    {mot:"Tonel", def:"Ancien grand tonneau."}
+  ],
+
+  "Alt": [
+    {mot:"Altitude", def:"Hauteur au-dessus du niveau de la mer."},
+    {mot:"Alterner", def:"Faire succéder tour à tour."},
+    {mot:"Altération", def:"Changement qui dégrade."},
+    {mot:"Altier", def:"Fier, hautain."},
+    {mot:"Altimètre", def:"Instrument qui mesure l’altitude."},
+    {mot:"Altérité", def:"Caractère de ce qui est autre, différent."},
+    {mot:"Altruisme", def:"Disposition à s’occuper des autres."},
+    {mot:"Altération musicale", def:"Signe qui modifie une note."},
+    {mot:"Altiplano", def:"Haut plateau d’Amérique du Sud."},
+    {mot:"Altesse", def:"Titre donné à certains souverains."}
+  ],
+
+  "Bat": [
+    {mot:"Batterie", def:"Ensemble d’instruments de percussion."},
+    {mot:"Battre", def:"Frapper ou vaincre."},
+    {mot:"Battement", def:"Mouvement répété, comme le cœur."},
+    {mot:"Bâtir", def:"Construire un bâtiment."},
+    {mot:"Battant", def:"Partie mobile d’une porte ou fenêtre."},
+    {mot:"Battue", def:"Chasse où l’on rabat le gibier."},
+    {mot:"Bâtisseur", def:"Personne qui construit."},
+    {mot:"Bataillon", def:"Unité militaire."},
+    {mot:"Batelier", def:"Personne qui conduit une barque."},
+    {mot:"Batavia", def:"Variété de salade verte."}
+  ],
+
+  "Cad": [
+    {mot:"Cadre", def:"Structure ou environnement d’une activité."},
+    {mot:"Cadrage", def:"Action de définir des limites."},
+    {mot:"Caddie", def:"Chariot de courses."},
+    {mot:"Caduc", def:"Qui n’est plus valable."},
+    {mot:"Cadavre", def:"Corps d’un être mort."},
+    {mot:"Cadence", def:"Rythme régulier."},
+    {mot:"Cadet", def:"Le plus jeune dans une famille."},
+    {mot:"Caducée", def:"Symbole médical avec serpents."},
+    {mot:"Cadran", def:"Surface d’horloge ou instrument gradué."},
+    {mot:"Cadastre", def:"Registre public des propriétés foncières."}
+  ],
+
+  "Cap": [
+    {mot:"Cap", def:"Direction ou pointe géographique."},
+    {mot:"Capacité", def:"Aptitude à faire quelque chose."},
+    {mot:"Caprice", def:"Envie soudaine et irrationnelle."},
+    {mot:"Capital", def:"Ressource financière principale."},
+    {mot:"Caparaçon", def:"Couverture de protection pour cheval."},
+    {mot:"Capsule", def:"Petit contenant hermétique."},
+    {mot:"Capitaine", def:"Chef d’un navire ou d’une équipe."},
+    {mot:"Capteur", def:"Dispositif qui capte une information."},
+    {mot:"Capricieux", def:"Qui change d’avis ou d’humeur."},
+    {mot:"Capable", def:"Qui a les compétences nécessaires."}
+  ],
+
+  "Emb": [
+    {mot:"Embrasser", def:"Donner un baiser."},
+    {mot:"Emballer", def:"Mettre dans un emballage."},
+    {mot:"Embauche", def:"Engagement pour un travail."},
+    {mot:"Emboutir", def:"Déformer par pression."},
+    {mot:"Embellissement", def:"Action d’améliorer l’apparence."},
+    {mot:"Embouteillage", def:"Accumulation de véhicules."},
+    {mot:"Embrayage", def:"Mécanisme d’un véhicule."},
+    {mot:"Embryon", def:"Début du développement d’un être vivant."},
+    {mot:"Embuscade", def:"Attaque surprise."},
+    {mot:"Embellir", def:"Rendre plus beau."}
+  ],
+
+  "Dur": [
+    {mot:"Durer", def:"Se prolonger dans le temps."},
+    {mot:"Durée", def:"Temps pendant lequel dure quelque chose."},
+    {mot:"Durci", def:"Qui est devenu plus dur."},
+    {mot:"Durabilité", def:"Capacité à durer longtemps."},
+    {mot:"Durillon", def:"Épaississement de la peau."},
+    {mot:"Durcissement", def:"Action de rendre dur."},
+    {mot:"Durcisseur", def:"Produit qui rend une matière plus dure."},
+    {mot:"Durement", def:"De façon sévère."},
+    {mot:"Durée de vie", def:"Temps d’existence d’un être ou objet."},
+    {mot:"Duratif", def:"Qui exprime une durée (linguistique)."}
+  ],
+
+  "Env": [
+    {mot:"Envoyer", def:"Expédier quelque chose à quelqu’un."},
+    {mot:"Enveloppe", def:"Pochette papier pour y glisser une lettre."},
+    {mot:"Environnement", def:"Ensemble des éléments qui nous entourent."},
+    {mot:"Envers", def:"Côté opposé au côté principal."},
+    {mot:"Envie", def:"Désir de posséder ou de faire."},
+    {mot:"Environnemental", def:"Relatif à l’environnement."},
+    {mot:"Envahissement", def:"Occupation excessive d’un espace."},
+    {mot:"Envoi", def:"Action d’envoyer quelque chose."},
+    {mot:"Envoûtant", def:"Qui charme de manière irrésistible."},
+    {mot:"Envahir", def:"Entrer et occuper en grand nombre."}
+  ],
+
+  "Inf": [
+    {mot:"Informer", def:"Donner des renseignements."},
+    {mot:"Infrastructure", def:"Installations de base d’un système."},
+    {mot:"Influence", def:"Action qui modifie un comportement."},
+    {mot:"Infirmier", def:"Professionnel chargé de soins."},
+    {mot:"Informe", def:"Sans forme définie."},
+    {mot:"Infirmer", def:"Réfuter, contredire officiellement."},
+    {mot:"Infinitif", def:"Forme de base d’un verbe."},
+    {mot:"Infusion", def:"Boisson obtenue par macération dans l’eau chaude."},
+    {mot:"Inflammable", def:"Qui s’enflamme facilement."},
+    {mot:"Infertile", def:"Qui ne peut pas se reproduire."}
+  ],
+
+  "Lib": [
+    {mot:"Libérer", def:"Rendre libre."},
+    {mot:"Liberté", def:"État d’une personne non contrainte."},
+    {mot:"Librairie", def:"Magasin de vente de livres."},
+    {mot:"Libéral", def:"Qui défend les libertés individuelles."},
+    {mot:"Libellé", def:"Formulation d’un texte ou d’une mention."},
+    {mot:"Libération", def:"Action de rendre libre."},
+    {mot:"Libellule", def:"Insecte volant aux ailes fines."},
+    {mot:"Libre", def:"Sans contrainte, disponible."},
+    {mot:"Libation", def:"Liquide versé lors d’un rite."},
+    {mot:"Libératoire", def:"Qui libère d’une obligation."}
+  ],
+
+  "Loc": [
+    {mot:"Local", def:"Relatif à un lieu précis."},
+    {mot:"Location", def:"Action de louer un bien."},
+    {mot:"Localiser", def:"Repérer dans l’espace."},
+    {mot:"Locataire", def:"Personne qui loue un logement."},
+    {mot:"Locomotion", def:"Déplacement d’un être ou d’un objet."},
+    {mot:"Locatif", def:"Relatif à la location."},
+    {mot:"Locution", def:"Groupe de mots à sens fixe."},
+    {mot:"Locomotive", def:"Véhicule moteur d’un train."},
+    {mot:"Localisme", def:"Attachement aux particularismes locaux."},
+    {mot:"Localité", def:"Lieu habité, commune."}
+  ],
+
+  "Mal": [
+    {mot:"Maladie", def:"Altération de la santé."},
+    {mot:"Malheur", def:"Événement douloureux, infortune."},
+    {mot:"Maltraitance", def:"Mauvais traitements infligés."},
+    {mot:"Malin", def:"Rusé ; parfois cancéreux (méd.)."},
+    {mot:"Maladroit", def:"Qui manque d’adresse."},
+    {mot:"Malchance", def:"Absence de chance."},
+    {mot:"Maladive", def:"Portée à tomber souvent malade."},
+    {mot:"Maléfique", def:"Qui fait le mal."},
+    {mot:"Maladresse", def:"Manque de précision dans les gestes."},
+    {mot:"Malveillance", def:"Volonté de nuire."}
+  ],
+
+  "Mot": [
+    {mot:"Mot", def:"Unité de langue dotée d’un sens."},
+    {mot:"Moteur", def:"Dispositif qui produit un mouvement."},
+    {mot:"Motiver", def:"Donner une raison ou un élan."},
+    {mot:"Motivation", def:"Raisons qui poussent à agir."},
+    {mot:"Motrice", def:"Qui produit le mouvement."},
+    {mot:"Motricité", def:"Capacité de mouvement du corps."},
+    {mot:"Motif", def:"Raison ; ou dessin répétitif."},
+    {mot:"Motocyclette", def:"Deux-roues motorisé."},
+    {mot:"Motorisation", def:"Équipement d’un système en moteur."},
+    {mot:"Motard", def:"Conducteur de moto."}
+  ],
+
+  "Nat": [
+    {mot:"Nature", def:"Ensemble des éléments du monde vivant."},
+    {mot:"National", def:"Relatif à une nation."},
+    {mot:"Naturel", def:"Qui n’est pas artificiel."},
+    {mot:"Natif", def:"Né dans un lieu."},
+    {mot:"Nation", def:"Communauté humaine constituée en État."},
+    {mot:"Natal", def:"Relatif à la naissance."},
+    {mot:"Natation", def:"Sport consistant à nager."},
+    {mot:"Naturelle", def:"Forme féminine de naturel."},
+    {mot:"Natron", def:"Carbonate de sodium naturel."},
+    {mot:"Nativité", def:"Naissance (souvent religieuse)."}
+  ],
+
+  "Obj": [
+    {mot:"Objet", def:"Chose matérielle ou but visé."},
+    {mot:"Objectif", def:"But à atteindre ; lentille d’optique."},
+    {mot:"Objection", def:"Argument d’opposition."},
+    {mot:"Objecter", def:"Opposer un argument."},
+    {mot:"Objectivité", def:"Qualité d’être impartial."},
+    {mot:"Objectiver", def:"Rendre objectif, concrétiser."},
+    {mot:"Objecteur", def:"Personne qui s’oppose pour raison de conscience."},
+    {mot:"Objurgation", def:"Vive remontrance."},
+    {mot:"Objurguer", def:"Exhorter avec insistance."},
+    {mot:"Oblong", def:"Plus long que large (sens anat./bot.)."}
+  ],
+
+  "Ord": [
+    {mot:"Ordre", def:"Arrangement régulier ; injonction."},
+    {mot:"Ordinaire", def:"Commun, habituel."},
+    {mot:"Ordonner", def:"Donner des instructions ; organiser."},
+    {mot:"Ordonnance", def:"Prescription médicale ; décision écrite."},
+    {mot:"Ordonnateur", def:"Autorité qui engage des dépenses."},
+    {mot:"Ordonné", def:"Rangé, méthodique."},
+    {mot:"Ordonnancement", def:"Organisation selon un ordre."},
+    {mot:"Ordinateur", def:"Machine de traitement de l’information."},
+    {mot:"Ordinal", def:"Relatif au rang dans une suite."},
+    {mot:"Ordurier", def:"Grossier, scandaleux dans le langage."}
+  ],
+
+  "Pop": [
+    {mot:"Populaire", def:"Apprécié du grand public."},
+    {mot:"Popcorn", def:"Grains de maïs soufflés."},
+    {mot:"Popeline", def:"Tissu fin à côtes serrées."},
+    {mot:"Population", def:"Ensemble des habitants d’un lieu."},
+    {mot:"Populace", def:"Foule considérée péjorativement."},
+    {mot:"Populisme", def:"Discours flattant le « peuple »."},
+    {mot:"Populiste", def:"Qui pratique le populisme."},
+    {mot:"Popote", def:"Cuisine familière ; vie de caserne."},
+    {mot:"Popotin", def:"Fesses (familier)."},
+    {mot:"Pop-rock", def:"Genre musical entre pop et rock."}
+  ],
+
+  "Ram": [
+    {mot:"Ramener", def:"Faire revenir, rapporter."},
+    {mot:"Rampe", def:"Plan incliné ou garde-corps."},
+    {mot:"Ramasser", def:"Réunir ce qui est dispersé."},
+    {mot:"Ramage", def:"Feuillage ; chant des oiseaux."},
+    {mot:"Rame", def:"Pagaie pour faire avancer une barque."},
+    {mot:"Ramification", def:"Division en branches."},
+    {mot:"Ramollir", def:"Rendre plus mou."},
+    {mot:"Ramure", def:"Ensemble des bois d’un cervidé."},
+    {mot:"Ramen", def:"Nouilles japonaises en bouillon."},
+    {mot:"Ramadan", def:"Mois de jeûne du calendrier musulman."}
+  ],
+
+  "Pos": [
+    {mot:"Poser", def:"Mettre en place ; formuler (une question)."},
+    {mot:"Possible", def:"Qui peut se produire."},
+    {mot:"Position", def:"Place occupée ; point de vue."},
+    {mot:"Positif", def:"Favorable ; supérieur à zéro."},
+    {mot:"Postuler", def:"Candidater à un poste."},
+    {mot:"Poste", def:"Emploi ; service postal ; appareil radio."},
+    {mot:"Positionner", def:"Placer à un endroit précis."},
+    {mot:"Postérité", def:"Générations futures."},
+    {mot:"Positron", def:"Antiparticule de l’électron."},
+    {mot:"Positionnement", def:"Action de se situer sur un marché."}
+  ],
+
+  "Res": [
+    {mot:"Réserver", def:"Mettre de côté pour un usage futur."},
+    {mot:"Respect", def:"Considération envers quelqu’un ou quelque chose."},
+    {mot:"Résoudre", def:"Trouver une solution."},
+    {mot:"Rester", def:"Ne pas partir ; demeurer."},
+    {mot:"Ressources", def:"Moyens disponibles."},
+    {mot:"Résistance", def:"Action de s’opposer ; propriété physique."},
+    {mot:"Résumé", def:"Texte condensé."},
+    {mot:"Résiliation", def:"Annulation d’un contrat."},
+    {mot:"Ressentir", def:"Éprouver une sensation ou une émotion."},
+    {mot:"Restauration", def:"Action de remettre en état ; secteur de repas."}
+  ],
+
+  "Agr": [
+    {mot:"Agréable", def:"Qui procure du plaisir."},
+    {mot:"Agrandir", def:"Rendre plus grand."},
+    {mot:"Agriculture", def:"Culture des terres et élevage."},
+    {mot:"Agrément", def:"Approbation officielle ; charme d’un lieu."},
+    {mot:"Agresseur", def:"Personne qui attaque."},
+    {mot:"Agression", def:"Action d’attaquer."},
+    {mot:"Agrégé", def:"Titulaire du concours de l’agrégation."},
+    {mot:"Agrarien", def:"Relatif aux campagnes et à l’agriculture."},
+    {mot:"Agrarisme", def:"Doctrine valorisant l’agriculture."},
+    {mot:"Agripper", def:"Saisir fortement."}
+  ],
+
+  "Fra": [
+    {mot:"Fracas", def:"Bruit violent et soudain."},
+    {mot:"Frapper", def:"Donner un coup ; impressionner."},
+    {mot:"Franchise", def:"Sincérité ; système commercial."},
+    {mot:"Fraternel", def:"Relatif à la fraternité."},
+    {mot:"Fragile", def:"Qui se casse facilement."},
+    {mot:"Fragrance", def:"Odeur agréable."},
+    {mot:"Fracture", def:"Rupture d’un os."},
+    {mot:"Fraction", def:"Partie d’un tout ; écriture mathématique."},
+    {mot:"Français", def:"Relatif à la France ou à sa langue."},
+    {mot:"Frayeur", def:"Grande peur."}
+  ],
+
+  "Fro": [
+    {mot:"Froid", def:"Température basse."},
+    {mot:"Froideur", def:"Absence de chaleur ; réserve."},
+    {mot:"Froisser", def:"Chiffonner ; vexer."},
+    {mot:"Froissement", def:"Bruit ou action de froisser."},
+    {mot:"Froissé", def:"Chiffonné ; vexé."},
+    {mot:"Frotter", def:"Frictionner une surface."},
+    {mot:"Frottement", def:"Action de frotter ; force de contact."},
+    {mot:"Frottoir", def:"Objet servant à frotter."},
+    {mot:"Froment", def:"Variété de blé."},
+    {mot:"Fromage", def:"Produit laitier fermenté."}
+  ],
+
+  "Fri": [
+    {mot:"Friandise", def:"Petit morceau sucré."},
+    {mot:"Frimer", def:"Se vanter, faire le malin."},
+    {mot:"Frimas", def:"Brouillard givrant, gel léger."},
+    {mot:"Friable", def:"Qui s’effrite facilement."},
+    {mot:"Frisson", def:"Tremblement léger (peur, froid)."},
+    {mot:"Friser", def:"Former des boucles ; frôler."},
+    {mot:"Frisette", def:"Petite boucle de cheveux."},
+    {mot:"Frisquet", def:"Un peu froid."},
+    {mot:"Fripon", def:"Personne malicieuse, espiègle."},
+    {mot:"Friperie", def:"Magasin de vêtements d’occasion."}
+  ],
+
+  "Por": [
+    {mot:"Porc", def:"Animal élevé pour sa viande."},
+    {mot:"Porte", def:"Ouverture permettant d’entrer ou sortir."},
+    {mot:"Portail", def:"Grande entrée monumentale."},
+    {mot:"Portefeuille", def:"Étui pour argent et papiers."},
+    {mot:"Port", def:"Lieu d’accostage des navires."},
+    {mot:"Portable", def:"Facile à transporter ; ordinateur/téléphone."},
+    {mot:"Porosité", def:"Caractère de ce qui est poreux."},
+    {mot:"Porcelaine", def:"Céramique fine et blanche."},
+    {mot:"Porter", def:"Transporter sur soi ; vêtir."},
+    {mot:"Porche", def:"Auvent ou galerie à l’entrée d’un bâtiment."}
+  ],
+
+  "Cir": [
+    {mot:"Circulaire", def:"En forme de cercle ; note diffusée largement."},
+    {mot:"Cirque", def:"Spectacle itinérant ; amphithéâtre naturel."},
+    {mot:"Circonférence", def:"Périmètre d’un cercle."},
+    {mot:"Circulation", def:"Déplacement des personnes, véhicules ou sang."},
+    {mot:"Circonflexe", def:"Accent ^ en français."},
+    {mot:"Circumnavigation", def:"Voyage autour du globe."},
+    {mot:"Circoncision", def:"Ablation du prépuce."},
+    {mot:"Circonstances", def:"Ensemble des faits entourant un événement."},
+    {mot:"Cire", def:"Substance qui sert à lustrer ou protéger."},
+    {mot:"Cireux", def:"Qui a l’aspect de la cire."}
+  ],
+
+  "Mus": [
+    {mot:"Musique", def:"Art des sons."},
+    {mot:"Musicien", def:"Personne qui fait de la musique."},
+    {mot:"Musculaire", def:"Relatif aux muscles."},
+    {mot:"Muselière", def:"Dispositif pour empêcher de mordre."},
+    {mot:"Musée", def:"Lieu d’exposition d’œuvres ou objets."},
+    {mot:"Muscat", def:"Cépage ou vin doux."},
+    {mot:"Musc", def:"Substance odorante pour parfums."},
+    {mot:"Musicienne", def:"Femme qui fait de la musique."},
+    {mot:"Muser", def:"Rêvasser, flâner."},
+    {mot:"Musical", def:"Relatif à la musique ; comédie musicale."}
+  ],
+
+  "Pal": [
+    {mot:"Palais", def:"Grande résidence officielle ou royale."},
+    {mot:"Palpable", def:"Que l’on peut toucher ; évident."},
+    {mot:"Palpitant", def:"Très excitant ; qui fait battre le cœur."},
+    {mot:"Palme", def:"Feuille de palmier ; symbole de victoire."},
+    {mot:"Palier", def:"Plate-forme entre deux escaliers ; niveau."},
+    {mot:"Palissade", def:"Clôture de pieux ou planches."},
+    {mot:"Paladin", def:"Chevalier héroïque des récits médiévaux."},
+    {mot:"Paludisme", def:"Maladie parasitaire transmise par les moustiques."},
+    {mot:"Palanquin", def:"Siège porté par des porteurs."},
+    {mot:"Palpation", def:"Examen médical par le toucher."}
+  ],
+  
+
+  "ACC": [
+    {"mot": "Accident", "def": "Choc sur la route entre deux voitures."},
+    {"mot": "Accord", "def": "Entente formelle entre deux parties."},
+    {"mot": "Accrocher", "def": "Fixer un objet à un support."},
+    {"mot": "Accélérer", "def": "Augmenter sa vitesse."},
+    {"mot": "Accélération", "def": "Augmentation de vitesse."},
+    {"mot": "Accoutumance", "def": "Habitude excessive d’une drogue."},
+    {"mot": "Accroc", "def": "Déchirure dans un vêtement ou défaut dans un plan."},
+    {"mot": "Accomplissement", "def": "Résultat obtenu après un effort."},
+    {"mot": "Accompagnement", "def": "Partie musicale qui soutient le chant principal."},
+    {"mot": "Acompte", "def": "Somme versée d’avance."},
+    {"mot": "Accablement", "def": "État d’une personne accablée par les soucis."},
+    {"mot": "Acculer", "def": "Pousser quelqu’un dans une impasse."},
+    {"mot": "Accès", "def": "Poussée soudaine de fièvre ou de toux."},
+    {"mot": "Accroche", "def": "Ce qui attire l’attention."}
+  ],
+
+  "ADH": [
+    {"mot": "Adhérer", "def": "S’attacher fermement à une surface ou à une idée."},
+    {"mot": "Adhésif", "def": "Substance qui colle."},
+    {"mot": "Adhésion", "def": "Action d’adhérer à un groupe ou à une idée."},
+    {"mot": "Adhérence", "def": "Qualité de ce qui adhère bien."},
+    {"mot": "Adhérent", "def": "Membre d’une association ou d’un parti."}
+  ],
+
+  "AMI": [
+    {"mot": "Ami", "def": "Personne avec qui on entretient une relation affective."},
+    {"mot": "Amitié", "def": "Lien affectif fort entre deux personnes."},
+    {"mot": "Amicalement", "def": "Formule polie pour terminer une lettre."},
+    {"mot": "Amical", "def": "Qui exprime la sympathie."},
+    {"mot": "Amicale", "def": "Association regroupant des passionnés."},
+    {"mot": "Amibe", "def": "Organisme unicellulaire étudié en biologie."}
+  ],
+
+  "ANN": [
+    {"mot": "Année", "def": "Durée de douze mois."},
+    {"mot": "Annuler", "def": "Supprimer ce qui était prévu."},
+    {"mot": "Annexe", "def": "Élément ajouté à un bâtiment ou un texte."},
+    {"mot": "Anniversaire", "def": "Fête qui marque la date de naissance."},
+    {"mot": "Annuaire", "def": "Publication répertoriant des contacts."}
+  ],
+
+  "ANT": [
+    {"mot": "Antidote", "def": "Substance qui neutralise un poison."},
+    {"mot": "Antenne", "def": "Dispositif qui capte ou émet des ondes."},
+    {"mot": "Antique", "def": "Relatif à l’Antiquité, très ancien."},
+    {"mot": "Antiquité", "def": "Époque ancienne ou objet ancien."},
+    {"mot": "Antiquaire", "def": "Marchand d’objets anciens."},
+    {"mot": "Antinazi", "def": "Qui s’oppose au nazisme."},
+    {"mot": "Antimilitariste", "def": "Opposé au militarisme."},
+    {"mot": "Antithèse", "def": "Idée ou proposition opposée à une autre."},
+    {"mot": "Antibiotique", "def": "Substance qui combat une infection."},
+    {"mot": "Anticléricalisme", "def": "Opposition à l’influence du clergé."}
+  ],
+
+  "AQU": [
+    {"mot": "Aquarium", "def": "Bassin où vivent des poissons."},
+    {"mot": "Aquarelle", "def": "Peinture légère à l’eau."},
+    {"mot": "Aquatique", "def": "Relatif à l’eau."},
+    {"mot": "Aqueduc", "def": "Canal ou pont qui transporte de l’eau."},
+    {"mot": "Aquaculture", "def": "Élevage d’organismes aquatiques."}
+  ],
+
+  "ARR": [
+    {"mot": "Arriver", "def": "Parvenir à destination."},
+    {"mot": "Arrêt", "def": "Suspension d’une action ou station de transport."},
+    {"mot": "Arrimer", "def": "Fixer solidement une cargaison."},
+    {"mot": "Arrestation", "def": "Action de saisir un criminel."},
+    {"mot": "Arrêté", "def": "Décision administrative prise par une autorité."},
+    {"mot": "Arrivée", "def": "Action d’atteindre un lieu."},
+    {"mot": "Arrêtoir", "def": "Dispositif servant à bloquer un mouvement."}
+  ],
+
+  "ASS": [
+    {"mot": "Assurer", "def": "Garantir la sécurité ou la protection."},
+    {"mot": "Assez", "def": "Quantité suffisante."},
+    {"mot": "Association", "def": "Groupement de personnes réunies pour un but commun."},
+    {"mot": "Assise", "def": "Base stable ou siège."},
+    {"mot": "Assesseur", "def": "Assistant d’un juge ou d’une assemblée."},
+    {"mot": "Assurance", "def": "Contrat de protection contre des risques."},
+    {"mot": "Rassurer", "def": "Redonner confiance à quelqu’un."}
+  ],
+
+  "BAL": [
+    {"mot": "Balade", "def": "Promenade agréable."},
+    {"mot": "Balise", "def": "Repère servant à guider."},
+    {"mot": "Bal", "def": "Fête où l’on danse."},
+    {"mot": "Balcon", "def": "Terrasse attenante à un logement."},
+    {"mot": "Balai", "def": "Instrument de nettoyage."},
+    {"mot": "Balancer", "def": "Jeter ou remuer de façon oscillante."}
+  ],
+
+  "BAR": [
+    {"mot": "Bar", "def": "Lieu où l’on consomme des boissons."},
+    {"mot": "Barrage", "def": "Construction qui bloque l’eau."},
+    {"mot": "Baril", "def": "Petit récipient cylindrique."},
+    {"mot": "Barque", "def": "Petit bateau à rames."},
+    {"mot": "Barrière", "def": "Obstacle ou limite matérielle."},
+    {"mot": "Barre", "def": "Pièce longue et rigide, souvent en métal."}
+  ],
+
+  "BEL": [
+    {"mot": "Belge", "def": "Habitant de la Belgique."},
+    {"mot": "Belvédère", "def": "Lieu offrant une vue panoramique."},
+    {"mot": "Belle", "def": "Forme féminine de beau."},
+    {"mot": "Beauté", "def": "Qualité de ce qui est beau."},
+    {"mot": "Belgique", "def": "Pays voisin de la France."}
+  ],
+
+  "BER": [
+    {"mot": "Berceau", "def": "Petit lit pour bébé."},
+    {"mot": "Berger", "def": "Celui qui garde les moutons."},
+    {"mot": "Bermudes", "def": "Archipel de l’Atlantique."},
+    {"mot": "Bermuda", "def": "Pantalon court."},
+    {"mot": "Berge", "def": "Rivage d’un cours d’eau."}
+  ],
+
+  "BIL": [
+    {"mot": "Billet", "def": "Ticket ou document d’accès."},
+    {"mot": "Bilan", "def": "Résumé d’une situation."},
+    {"mot": "Bilingue", "def": "Qui parle deux langues."}
+  ],
+
+  "CAL": [
+    {"mot": "Calcul", "def": "Opération mathématique ou plan réfléchi."},
+    {"mot": "Calcaire", "def": "Roche blanche utilisée dans le ciment."},
+    {"mot": "Calme", "def": "État de tranquillité."},
+    {"mot": "Calculer", "def": "Évaluer, prévoir."}
+  ],
+
+  "CAM": [
+    {"mot": "Camion", "def": "Véhicule transportant des marchandises."},
+    {"mot": "Caméra", "def": "Appareil servant à filmer."},
+    {"mot": "Campagne", "def": "Région rurale."},
+    {"mot": "Camping", "def": "Lieu de vacances sous tente."},
+    {"mot": "Camionneur", "def": "Conducteur de camion."},
+    {"mot": "Camarade", "def": "Personne avec qui on partage une activité."},
+    {"mot": "Camouflage", "def": "Action de dissimuler."},
+    {"mot": "Camoufler", "def": "Cacher quelque chose."}
+  ],
+
+  "CAT": [
+    {"mot": "Cathédrale", "def": "Église principale d’un diocèse."},
+    {"mot": "Catalogue", "def": "Liste d’articles en vente."},
+    {"mot": "Catastrophe", "def": "Événement dramatique et dévastateur."},
+    {"mot": "Catéchiste", "def": "Personne qui enseigne le catéchisme."},
+    {"mot": "Catégorie", "def": "Classe ou division d’éléments."},
+    {"mot": "Catéchisme", "def": "Enseignement religieux élémentaire."},
+    {"mot": "Cataclysme", "def": "Catastrophe naturelle destructrice."},
+    {"mot": "Catéchumène", "def": "Personne suivant le catéchisme."}
+  ],
+
+  "CEL": [
+    {"mot": "Cellule", "def": "Plus petite unité vivante ou petite pièce."},
+    {"mot": "Célébrité", "def": "Personne connue du grand public."},
+    {"mot": "Céleste", "def": "Relatif au ciel."}
+  ],
+
+  "CER": [
+    {"mot": "Cerise", "def": "Petit fruit rouge."},
+    {"mot": "Cercueil", "def": "Boîte funéraire."},
+    {"mot": "Cerner", "def": "Entourer ou comprendre clairement."},
+    {"mot": "Cercle", "def": "Figure géométrique ronde."},
+    {"mot": "Cerisier", "def": "Arbre qui donne des cerises."}
+  ],
+
+  "CHA": [
+    {"mot": "Château", "def": "Ancienne demeure fortifiée ou royale."},
+    {"mot": "Chaleur", "def": "Sensation produite par une température élevée."},
+    {"mot": "Chance", "def": "Hasard favorable."},
+    {"mot": "Chat", "def": "Animal domestique qui ronronne."},
+    {"mot": "Chanson", "def": "Œuvre musicale avec paroles."},
+    {"mot": "Charrue", "def": "Outil agricole pour labourer."}
+  ],
+
+  "CHE": [
+    {"mot": "Cheval", "def": "Animal qui hennit et galope."},
+    {"mot": "Chemise", "def": "Vêtement porté sur le haut du corps."},
+    {"mot": "Chemin", "def": "Voie ou passage tracé."},
+    {"mot": "Chevalier", "def": "Cavalier armé du Moyen Âge."}
+  ],
+
+  "CHO": [
+    {"mot": "Chocolat", "def": "Aliment ou boisson à base de cacao."},
+    {"mot": "Choisir", "def": "Prendre une option parmi plusieurs."},
+    {"mot": "Choix", "def": "Action ou résultat de choisir."}
+  ],
+
+  "CLA": [
+    {"mot": "Classe", "def": "Groupe d’élèves ou catégorie."},
+    {"mot": "Clair", "def": "Qui est lumineux, évident."},
+    {"mot": "Clarté", "def": "Qualité de ce qui est clair."}
+  ],
+
+  "COL": [
+    {"mot": "Collègue", "def": "Personne avec qui on travaille."},
+    {"mot": "Colle", "def": "Substance servant à fixer."},
+    {"mot": "Col", "def": "Passage entre deux montagnes."},
+    {"mot": "Colonie", "def": "Groupement d’habitations ou territoire occupé."},
+    {"mot": "Collégien", "def": "Élève de collège."},
+    {"mot": "Couleur", "def": "Aspect visuel lié à la lumière."},
+    {"mot": "Collection", "def": "Ensemble d’objets rassemblés."}
+  ],
+
+  "COU": [
+    {"mot": "Courir", "def": "Se déplacer rapidement avec les jambes."},
+    {"mot": "Couleur", "def": "Aspect visuel d’un objet selon la lumière."},
+    {"mot": "Courage", "def": "Qualité d’une personne brave."},
+    {"mot": "Cours", "def": "Leçon dispensée par un professeur."},
+    {"mot": "Cou", "def": "Partie du corps reliant la tête aux épaules."},
+    {"mot": "Coureur", "def": "Personne qui court."},
+    {"mot": "Couverture", "def": "Pièce de tissu qui sert à couvrir."},
+    {"mot": "Couvrir", "def": "Mettre quelque chose au-dessus pour protéger."},
+    {"mot": "Coup", "def": "Choc, frappe ou événement soudain."},
+    {"mot": "Costume", "def": "Ensemble de vêtements."}
+  ], 
+
+
+  "DAN": [
+    {"mot": "Danse", "def": "Mouvement rythmique du corps sur la musique."},
+    {"mot": "Danser", "def": "Exécuter des mouvements rythmés sur la musique."},
+    {"mot": "Danseur", "def": "Personne qui pratique la danse."},
+    {"mot": "Danseuse", "def": "Femme qui pratique la danse."},
+    {"mot": "Dancing", "def": "Établissement où l’on danse."},
+    {"mot": "Dancehall", "def": "Style musical jamaïcain très rythmé."},
+    {"mot": "Danemark", "def": "Pays scandinave au nord de l’Allemagne."},
+    {"mot": "Danois", "def": "Langue et nationalité du Danemark."},
+    {"mot": "Dandiner", "def": "Balancer son corps en marchant."},
+    {"mot": "Dandy", "def": "Homme très soucieux d’élégance."},
+    {"mot": "Danube", "def": "Grand fleuve d’Europe centrale."},
+    {"mot": "Dantesque", "def": "D’une grandeur tragique et terrible."}
+  ],
+
+  "DEL": [
+    {"mot": "Délai", "def": "Temps accordé pour faire quelque chose."},
+    {"mot": "Délicieux", "def": "Très agréable au goût."},
+    {"mot": "Délier", "def": "Défaire un lien ; libérer."},
+    {"mot": "Délicat", "def": "Qui demande finesse et précaution."},
+    {"mot": "Délice", "def": "Plaisir extrême et raffiné."},
+    {"mot": "Déléguer", "def": "Confier un pouvoir ou une tâche."},
+    {"mot": "Délégué", "def": "Personne chargée de représenter les autres."},
+    {"mot": "Deltoïde", "def": "Muscle de l’épaule ; forme géométrique."},
+    {"mot": "Délester", "def": "Alléger en enlevant une charge."},
+    {"mot": "Délivrer", "def": "Libérer ; remettre officiellement un document."},
+    {"mot": "Délivrance", "def": "Action de libérer ; soulagement."}
+  ],
+
+  "DEM": [
+    {"mot": "Demander", "def": "Poser une question ; solliciter."},
+    {"mot": "Demeure", "def": "Lieu où l’on habite."},
+    {"mot": "Demi", "def": "Moitié d’un tout."},
+    {"mot": "Démarche", "def": "Manière de marcher ; procédure."},
+    {"mot": "Démission", "def": "Renonciation volontaire à une fonction."},
+    {"mot": "Déménager", "def": "Changer de logement."},
+    {"mot": "Démolir", "def": "Détruire un bâtiment."},
+    {"mot": "Démocratie", "def": "Régime politique où le peuple gouverne."},
+    {"mot": "Démographie", "def": "Étude statistique des populations."},
+    {"mot": "Démontrer", "def": "Établir la vérité par un raisonnement."}
+  ],
+
+  "DER": [
+    {"mot": "Dernier", "def": "Qui vient après tous les autres."},
+    {"mot": "Derrière", "def": "Partie située au dos, à l’arrière."},
+    {"mot": "Dériver", "def": "S’écarter de sa trajectoire ; provenir de."},
+    {"mot": "Dérive", "def": "Écart par rapport à une route ou une norme."},
+    {"mot": "Dérivé", "def": "Ce qui provient d’une autre chose."},
+    {"mot": "Dérivation", "def": "Action de dévier un cours ; formation d’un mot."},
+    {"mot": "Déranger", "def": "Troubler ; mettre en désordre."},
+    {"mot": "Dérailler", "def": "Sortir des rails ; divaguer."},
+    {"mot": "Dérober", "def": "Voler ; soustraire à la vue."},
+    {"mot": "Déroger", "def": "S’écarter d’une règle."},
+    {"mot": "Dérouté", "def": "Perdu, déconcerté."},
+    {"mot": "Derrièrement", "def": "Tout récemment (vieilli)."}
+  ],
+
+  "DEV": [
+    {"mot": "Devoir", "def": "Obligation morale ou légale."},
+    {"mot": "Devenir", "def": "Se transformer ; prendre un nouvel état."},
+    {"mot": "Devise", "def": "Maxime ; unité monétaire d’un pays."},
+    {"mot": "Devis", "def": "Estimation détaillée d’un coût."},
+    {"mot": "Deviner", "def": "Découvrir par intuition."},
+    {"mot": "Dévouement", "def": "Attachement désintéressé à une cause ou personne."},
+    {"mot": "Dévotion", "def": "Piété ; attachement fervent."},
+    {"mot": "Développer", "def": "Accroître ; mettre au point."},
+    {"mot": "Développement", "def": "Action de se développer ; résultat."},
+    {"mot": "Développé", "def": "Qui a atteint un haut niveau d’achèvement."},
+    {"mot": "Dévergonder", "def": "Dénaturer la pudeur (fam.)."},
+    {"mot": "Devancier", "def": "Prédécesseur dans une fonction."},
+    {"mot": "Devanture", "def": "Façade d’un magasin."}
+  ],
+
+  "DOM": [
+    {"mot": "Domicile", "def": "Lieu où une personne réside."},
+    {"mot": "Domaine", "def": "Étendue de biens ou de connaissances."},
+    {"mot": "Dominer", "def": "Exercer une autorité ; être au-dessus."},
+    {"mot": "Dominant", "def": "Qui l’emporte sur les autres."},
+    {"mot": "Domination", "def": "Action de dominer ; ascendant."},
+    {"mot": "Dominateur", "def": "Qui aime imposer son autorité."},
+    {"mot": "Domestique", "def": "Relatif à la maison ; employé de maison."},
+    {"mot": "Domicilier", "def": "Établir officiellement un domicile."},
+    {"mot": "Domiciliation", "def": "Fait d’être domicilié."},
+    {"mot": "Dompter", "def": "Rendre un animal obéissant ; maîtriser."},
+    {"mot": "Domptage", "def": "Action de dompter."}
+  ],
+
+  "ÉCL": [
+    {"mot": "Éclair", "def": "Lueur vive et brève lors d’un orage."},
+    {"mot": "Éclat", "def": "Brillance ; fragment."},
+    {"mot": "Éclairer", "def": "Projeter de la lumière ; rendre clair."},
+    {"mot": "Éclatement", "def": "Action d’éclater ; explosion."},
+    {"mot": "Éclore", "def": "S’ouvrir en parlant d’un bourgeon ; naître."},
+    {"mot": "Éclosion", "def": "Ouverture d’un bourgeon ; apparition."},
+    {"mot": "Éclairage", "def": "Action ou dispositif d’éclairer."},
+    {"mot": "Éclaireur", "def": "Personne qui explore en avant ; scout."},
+    {"mot": "Éclisser", "def": "Assembler avec une éclisse (tech.)."},
+    {"mot": "Éclisse", "def": "Pièce servant à joindre deux éléments."},
+    {"mot": "Éclopé", "def": "Estropié, blessé (soutenu)."},
+    {"mot": "Écluser", "def": "Faire passer par une écluse ; boire (fam.)."}
+  ],
+
+  "ÉCR": [
+    {"mot": "Écrire", "def": "Tracer des signes pour communiquer."},
+    {"mot": "Écran", "def": "Surface de projection ou d’affichage."},
+    {"mot": "Écraser", "def": "Aplatir avec force ; accabler."},
+    {"mot": "Écrivain", "def": "Personne qui compose des ouvrages."},
+    {"mot": "Écrit", "def": "Texte rédigé."},
+    {"mot": "Écriture", "def": "Action d’écrire ; manière d’écrire."},
+    {"mot": "Écritoire", "def": "Petit meuble ou nécessaire pour écrire."},
+    {"mot": "Écrin", "def": "Boîte destinée à un bijou."},
+    {"mot": "Écru", "def": "De couleur naturelle, non blanchi."},
+    {"mot": "Écrémer", "def": "Retirer la crème du lait."},
+    {"mot": "Écrêtement", "def": "Réduction d’un excès (tech./fin.)."},
+    {"mot": "Écrasement", "def": "Action d’écraser ; compression."},
+    {"mot": "Écrivaille", "def": "Écrits médiocres (péjoratif)."}
+  ],
+
+  "ÉGA": [
+    {"mot": "Égal", "def": "De même valeur, niveau ou mesure."},
+    {"mot": "Égalité", "def": "État de ce qui est égal."},
+    {"mot": "Également", "def": "De la même manière ; aussi."},
+    {"mot": "Égaliser", "def": "Rendre égal ; niveler."},
+    {"mot": "Égalitaire", "def": "Qui prône l’égalité des droits."},
+    {"mot": "Égalitarisme", "def": "Doctrine de l’égalité absolue."},
+    {"mot": "Égaliseur", "def": "Dispositif qui égalise un signal (audio)."},
+    {"mot": "Égaler", "def": "Être de valeur équivalente."},
+    {"mot": "Égalation", "def": "Action d’égaler (rare)."},
+    {"mot": "Égaux", "def": "Personnes de même rang (nom pluriel)."}
+  ],
+
+  "ÉLO": [
+    {"mot": "Éloigner", "def": "Mettre à distance ; tenir à l’écart."},
+    {"mot": "Éloge", "def": "Discours qui loue une personne."},
+    {"mot": "Élancer", "def": "Projeter vivement ; causer une douleur aiguë."},
+    {"mot": "Élancé", "def": "Grand et mince ; svelte."},
+    {"mot": "Éloignement", "def": "Fait d’être éloigné ; distance."},
+    {"mot": "Élongation", "def": "Allongement ; distension d’un muscle."},
+    {"mot": "Élocution", "def": "Manière d’articuler en parlant."},
+    {"mot": "Élodée", "def": "Plante aquatique."},
+    {"mot": "Élogeable", "def": "Digne d’éloge."}
+  ],
+
+  "ENC": [
+    {"mot": "Encore", "def": "De nouveau ; en plus."},
+    {"mot": "Encadrer", "def": "Mettre dans un cadre ; superviser."},
+    {"mot": "Enceinte", "def": "Qui attend un enfant ; espace clos."},
+    {"mot": "Encadrement", "def": "Action d’encadrer ; équipe de direction."},
+    {"mot": "Enclos", "def": "Espace fermé, clôturé."},
+    {"mot": "Enchère", "def": "Offre de prix supérieure à la précédente."},
+    {"mot": "Encyclopédie", "def": "Ouvrage de connaissances générales."},
+    {"mot": "Encaisser", "def": "Recevoir une somme ; supporter (fam.)."},
+    {"mot": "Enclume", "def": "Masse de métal pour forger."},
+    {"mot": "Enclaver", "def": "Enfermer dans des limites."},
+    {"mot": "Encenser", "def": "Honorer avec de l’encens ; louer excessivement."}
+  ],
+
+  "ENG": [
+    {"mot": "Engager", "def": "Prendre à son service ; commencer ; insérer."},
+    {"mot": "Engagement", "def": "Action de s’engager ; promesse."},
+    {"mot": "Engin", "def": "Appareil, machine ou véhicule."},
+    {"mot": "Englober", "def": "Inclure dans un ensemble."},
+    {"mot": "Engouffrer", "def": "Faire entrer brusquement ; s’engager vivement."},
+    {"mot": "Engendrer", "def": "Procréer ; causer."},
+    {"mot": "Engrais", "def": "Substance fertilisante pour les sols."},
+    {"mot": "Engourdir", "def": "Rendre insensible, moins vif."},
+    {"mot": "Engouement", "def": "Goût vif et passager."},
+    {"mot": "Engrenage", "def": "Ensemble de roues dentées ; enchaînement fatal."},
+    {"mot": "Engranger", "def": "Mettre en grenier ; accumuler."}
+  ],
+
+  "ÉPI": [
+    {"mot": "Épi", "def": "Inflorescence du blé, du seigle, etc."},
+    {"mot": "Épisode", "def": "Partie d’une série ou d’un récit."},
+    {"mot": "Épice", "def": "Substance aromatique qui relève un plat."},
+    {"mot": "Épine", "def": "Pointe rigide de certaines plantes ; difficulté."},
+    {"mot": "Épices", "def": "Mélange d’assaisonnements aromatiques."},
+    {"mot": "Épiderme", "def": "Couche superficielle de la peau."},
+    {"mot": "Épidémie", "def": "Propagation rapide d’une maladie."},
+    {"mot": "Épitaphe", "def": "Inscription funéraire sur une tombe."},
+    {"mot": "Épigramme", "def": "Court poème satirique."},
+    {"mot": "Épiphanie", "def": "Fête chrétienne célébrée le 6 janvier."},
+    {"mot": "Épisode", "def": "Segment d’une narration sérielle."},
+    {"mot": "Épiploon", "def": "Repli du péritoine (anat.)."}
+  ],
+
+  "FAC": [
+    {"mot": "Facile", "def": "Qui ne présente pas de difficulté."},
+    {"mot": "Façon", "def": "Manière de faire."},
+    {"mot": "Facture", "def": "Note détaillant une somme à payer."},
+    {"mot": "Faculté", "def": "Établissement universitaire ; aptitude."},
+    {"mot": "Fabrication", "def": "Action de fabriquer."},
+    {"mot": "Facteur", "def": "Élément déterminant ; agent postal."},
+    {"mot": "Facétie", "def": "Plaisanterie, espièglerie."},
+    {"mot": "Facultatif", "def": "Qui n’est pas obligatoire."},
+    {"mot": "Faciliter", "def": "Rendre plus aisé."},
+    {"mot": "Factice", "def": "Artificiel, simulé."},
+    {"mot": "Fabricant", "def": "Personne ou entreprise qui fabrique."},
+    {"mot": "Faconde", "def": "Grande facilité de parole."}
+  ],
+
+  "FAM": [
+    {"mot": "Famille", "def": "Groupe de personnes apparentées."},
+    {"mot": "Fameux", "def": "Très connu ; remarquable."},
+    {"mot": "Familial", "def": "Relatif à la famille."},
+    {"mot": "Familier", "def": "De la vie courante ; connu, peu formel."},
+    {"mot": "Familiariser", "def": "Rendre familier ; accoutumer."},
+    {"mot": "Familiarité", "def": "Connaissance intime ; manque de cérémonie."},
+    {"mot": "Famine", "def": "Manque extrême de nourriture."},
+    {"mot": "Famélique", "def": "Très maigre, affamé."},
+    {"mot": "Familiarisme", "def": "Organisation sociale centrée sur la famille."},
+    {"mot": "Famulant", "def": "Serviteur (rare)."},
+    {"mot": "Fameuse", "def": "Forme féminine de fameux."}
+  ],
+
+  "FEN": [
+    {"mot": "Fenêtre", "def": "Ouverture vitrée dans un mur."},
+    {"mot": "Fente", "def": "Ouverture étroite et allongée."},
+    {"mot": "Fendre", "def": "Couper en parts ; fissurer."},
+    {"mot": "Fendeur", "def": "Personne ou machine qui fend."},
+    {"mot": "Fenouil", "def": "Plante aromatique à tige creuse."},
+    {"mot": "Fenaison", "def": "Action de faucher et rentrer le foin."},
+    {"mot": "Fenil", "def": "Grenier à foin."},
+    {"mot": "Fennec", "def": "Petit renard du désert."},
+    {"mot": "Fente", "def": "Ouverture étroite (doublon utile sens général)."}
+  ],
+
+  "FER": [
+    {"mot": "Fer", "def": "Métal gris, dur et magnétique."},
+    {"mot": "Ferrer", "def": "Poser des fers aux sabots d’un cheval."},
+    {"mot": "Ferrure", "def": "Ensemble des pièces de fer d’un objet."},
+    {"mot": "Ferraille", "def": "Ensemble de vieux fers."},
+    {"mot": "Ferronnier", "def": "Artisan travaillant le fer."},
+    {"mot": "Ferrite", "def": "Composé du fer ; phase du fer doux."},
+    {"mot": "Ferrugineux", "def": "Qui contient du fer."},
+    {"mot": "Ferment", "def": "Agent actif provoquant une fermentation."},
+    {"mot": "Fermentation", "def": "Transformation due aux ferments."},
+    {"mot": "Ferry", "def": "Bateau transportant des véhicules et passagers."},
+    {"mot": "Ferromagnétique", "def": "Qui présente un fort magnétisme."},
+    {"mot": "Ferroviaire", "def": "Relatif aux chemins de fer."},
+    {"mot": "Ferrailleur", "def": "Commerçant qui achète de la ferraille."}
+  ],
+
+  "FON": [
+    {"mot": "Fond", "def": "Partie la plus basse ; essence d’une chose."},
+    {"mot": "Fontaine", "def": "Source d’eau aménagée."},
+    {"mot": "Fonction", "def": "Rôle ; utilité ; emploi."},
+    {"mot": "Fonctionner", "def": "Marcher, être en état de marche."},
+    {"mot": "Fonds", "def": "Capitaux ; biens ; terrain (nom invariable)."},
+    {"mot": "Fonctionnement", "def": "Action de fonctionner."},
+    {"mot": "Fondre", "def": "Devenir liquide par la chaleur ; se ruiner."},
+    {"mot": "Fondue", "def": "Plat de fromage fondu."},
+    {"mot": "Fondation", "def": "Acte d’établir ; organisme créé."},
+    {"mot": "Fondateur", "def": "Personne qui fonde quelque chose."},
+    {"mot": "Foncier", "def": "Relatif aux biens immeubles et terres."},
+    {"mot": "Fonder", "def": "Établir sur des bases ; créer."}
+  ],
+
+  "GAL": [
+    {"mot": "Galerie", "def": "Passage couvert ; lieu d’exposition."},
+    {"mot": "Galet", "def": "Petit caillou poli par l’eau."},
+    {"mot": "Galop", "def": "Allure la plus rapide du cheval."},
+    {"mot": "Galère", "def": "Ancien navire à rames ; situation pénible (fam.)."},
+    {"mot": "Galanterie", "def": "Politesse courtoise envers les dames."},
+    {"mot": "Galaxie", "def": "Ensemble d’étoiles liées gravitationnellement."},
+    {"mot": "Galopeur", "def": "Cheval qui galope facilement."},
+    {"mot": "Galvaniser", "def": "Stimuler vivement ; recouvrir de zinc."},
+    {"mot": "Galbe", "def": "Courbure harmonieuse."},
+    {"mot": "Gallican", "def": "Relatif à l’Église de France."},
+    {"mot": "Galimatias", "def": "Discours confus et inintelligible."}
+  ],
+
+  "GEN": [
+    {"mot": "Général", "def": "Qui concerne l’ensemble ; grade militaire élevé."},
+    {"mot": "Génération", "def": "Ensemble des personnes d’un même âge."},
+    {"mot": "Gendarme", "def": "Militaire chargé de missions de police."},
+    {"mot": "Génie", "def": "Capacité intellectuelle exceptionnelle ; esprit surnaturel."},
+    {"mot": "Genre", "def": "Catégorie, type ; masculin/féminin."},
+    {"mot": "Génial", "def": "Brillant, remarquable d’invention."},
+    {"mot": "Génétique", "def": "Relatif aux gènes et à l’hérédité."},
+    {"mot": "Généraliser", "def": "Étendre à tous les cas."},
+    {"mot": "Générosité", "def": "Disposition à donner largement."},
+    {"mot": "Généalogie", "def": "Étude de la filiation des familles."},
+    {"mot": "Générateur", "def": "Appareil qui produit de l’énergie."},
+    {"mot": "Génome", "def": "Ensemble du matériel génétique d’un organisme."},
+    {"mot": "Génuflexion", "def": "Action de fléchir le genou par respect."}
+  ],
+
+  "GEO": [
+    {"mot": "Géographie", "def": "Étude de la Terre et des espaces."},
+    {"mot": "Géologie", "def": "Étude de la composition de la Terre."},
+    {"mot": "Géomètre", "def": "Spécialiste des mesures de terrain."},
+    {"mot": "Géométrie", "def": "Branche des mathématiques des figures."},
+    {"mot": "Géoscience", "def": "Ensemble des sciences de la Terre."},
+    {"mot": "Géophysique", "def": "Étude physique de la Terre."},
+    {"mot": "Géopolitique", "def": "Analyse des rapports de force territoriaux."},
+    {"mot": "Géodésie", "def": "Science de la mesure de la Terre."},
+    {"mot": "Géothermie", "def": "Chaleur interne de la Terre et son usage."},
+    {"mot": "Géochimie", "def": "Étude chimique des constituants terrestres."},
+    {"mot": "Géologue", "def": "Spécialiste de la géologie."},
+    {"mot": "Géostationnaire", "def": "Qui reste fixe au-dessus d’un point de l’équateur."}
+  ],
+
+  "GOV": [
+    {"mot": "Gouvernement", "def": "Autorité qui dirige un État."},
+    {"mot": "Gouverneur", "def": "Représentant de l’autorité dans une région."},
+    {"mot": "Gouverner", "def": "Exercer le pouvoir exécutif ; diriger."},
+    {"mot": "Gouvernance", "def": "Manière de gouverner ; pilotage d’une organisation."},
+    {"mot": "Gouvernante", "def": "Personne chargée de l’éducation domestique."},
+    {"mot": "Gouvernail", "def": "Organe directeur d’un navire."},
+    {"mot": "Gouvernable", "def": "Qui peut être gouverné."},
+    {"mot": "Gouvernabilité", "def": "Aptitude d’un système à être gouverné."},
+    {"mot": "Gouvernés", "def": "Personnes soumises au gouvernement."}
+  ],
+
+  "MAG": [
+    {"mot": "Magasin", "def": "Lieu de vente ; dépôt de marchandises."},
+    {"mot": "Magie", "def": "Art supposé d’agir sur la nature par des rites."},
+    {"mot": "Magistrat", "def": "Haut fonctionnaire de la justice."},
+    {"mot": "Magicien", "def": "Personne qui pratique la magie ; illusionniste."},
+    {"mot": "Mage", "def": "Savant ou prêtre de tradition ancienne."},
+    {"mot": "Magazine", "def": "Revue périodique illustrée."},
+    {"mot": "Magasinier", "def": "Employé chargé d’un magasin ou dépôt."},
+    {"mot": "Magistrature", "def": "Corps des magistrats ; fonction."},
+    {"mot": "Magistral", "def": "Qui témoigne d’une grande maîtrise."},
+    {"mot": "Magnanime", "def": "Généreux et indulgent."},
+    {"mot": "Magnésie", "def": "Oxyde ou carbonate de magnésium."},
+    {"mot": "Magnétisme", "def": "Ensemble des phénomènes liés aux aimants."},
+    {"mot": "Magnifier", "def": "Exalter, célébrer."}
+  ],
+
+  "NAV": [
+    {"mot": "Navire", "def": "Grand bateau de mer."},
+    {"mot": "Naviguer", "def": "Se déplacer sur l’eau ou dans l’air."},
+    {"mot": "Navette", "def": "Service faisant des allers-retours réguliers."},
+    {"mot": "Navigation", "def": "Action de naviguer ; discipline associée."},
+    {"mot": "Navigateur", "def": "Personne qui navigue ; logiciel de navigation web."},
+    {"mot": "Naval", "def": "Relatif à la marine et aux navires."},
+    {"mot": "Navigable", "def": "Qui peut être navigué."},
+    {"mot": "Navaja", "def": "Couteau pliant espagnol (lexique)."},
+    {"mot": "Navarrais", "def": "Relatif à la Navarre."},
+    {"mot": "Navicert", "def": "Certificat de navigation (hist.)."},
+    {"mot": "Navigator", "def": "Nom propre de certains produits/logiciels."},
+    {"mot": "Navarin", "def": "Ragoût d’agneau ; bataille navale (toponyme)."}
+  ],
+
+  "NEG": [
+    {"mot": "Négatif", "def": "Qui exprime la négation ; inférieur à zéro."},
+    {"mot": "Négliger", "def": "Ne pas accorder d’attention suffisante."},
+    {"mot": "Négoce", "def": "Commerce d’achat et de revente."},
+    {"mot": "Négation", "def": "Action d’affirmer le contraire ; forme grammaticale du non."},
+    {"mot": "Négligeant", "def": "Qui manque d’application."},
+    {"mot": "Négociant", "def": "Marchand pratiquant le négoce."},
+    {"mot": "Négocier", "def": "Discuter pour parvenir à un accord."},
+    {"mot": "Négligence", "def": "Manque d’attention ; omission fautive."},
+    {"mot": "Négligé", "def": "Peu soigné ; tenue décontractée."}
+  ], 
+
+
+  "PAC": [
+    {"mot": "Pacte", "def": "Accord solennel conclu entre deux parties."},
+    {"mot": "Pacifique", "def": "Qui aime la paix ; paisible."},
+    {"mot": "Pacifiste", "def": "Personne opposée à la guerre."},
+    {"mot": "Pacage", "def": "Terrain où paissent les animaux."},
+    {"mot": "Pacifier", "def": "Rétablir la paix dans un endroit."},
+    {"mot": "Pacificateur", "def": "Personne qui rétablit la paix."},
+    {"mot": "Paquet", "def": "Ensemble d’objets emballés."}
+  ],
+
+  "PAN": [
+    {"mot": "Panier", "def": "Corbeille servant à transporter des objets."},
+    {"mot": "Panneau", "def": "Plaque d’affichage ou de signalisation."},
+    {"mot": "Pantin", "def": "Marionnette articulée."},
+    {"mot": "Pan", "def": "Bruit sec ; partie d’un vêtement."},
+    {"mot": "Pandémie", "def": "Épidémie touchant de nombreux pays."},
+    {"mot": "Panorama", "def": "Large vue d’ensemble d’un paysage."},
+    {"mot": "Panoramique", "def": "Qui offre un très large champ de vision."},
+    {"mot": "Panique", "def": "Crainte subite et collective."},
+    {"mot": "Pangolin", "def": "Mammifère insectivore écailleux."},
+    {"mot": "Panthère", "def": "Grand félin tacheté."},
+    {"mot": "Pantalon", "def": "Vêtement couvrant les jambes."}
+  ],
+
+  "PET": [
+    {"mot": "Petit", "def": "De faible dimension ; jeune."},
+    {"mot": "Pétrole", "def": "Combustible fossile liquide."},
+    {"mot": "Pétale", "def": "Élément coloré d’une fleur."},
+    {"mot": "Pétard", "def": "Petite charge explosive bruyante."},
+    {"mot": "Pétanque", "def": "Jeu de boules provençal."},
+    {"mot": "Pétrin", "def": "Récipient pour pétrir ; situation difficile (fam.)."},
+    {"mot": "Pétrir", "def": "Malaxer une pâte."},
+    {"mot": "Pétiole", "def": "Partie reliant la feuille à la tige."},
+    {"mot": "Pétillant", "def": "Qui fait des bulles ; vif."}
+  ],
+
+  "PIL": [
+    {"mot": "Pilote", "def": "Personne qui dirige un avion, un navire, etc."},
+    {"mot": "Pilier", "def": "Support vertical ; élément essentiel d’un groupe."},
+    {"mot": "Pilule", "def": "Comprimé médicamenteux."},
+    {"mot": "Pilon", "def": "Outil lourd pour broyer ou frapper."},
+    {"mot": "Piller", "def": "Voler en saccageant."},
+    {"mot": "Pilotage", "def": "Action ou art de piloter."},
+    {"mot": "Piloter", "def": "Conduire un véhicule ; diriger un projet."},
+    {"mot": "Pile", "def": "Source d’électricité portative."},
+    {"mot": "Pilori", "def": "Ancien poteau d’exposition des condamnés ; opprobre public."}
+  ],
+
+  "POL": [
+    {"mot": "Police", "def": "Corps chargé du maintien de l’ordre."},
+    {"mot": "Politique", "def": "Art et pratique de gouverner la cité."},
+    {"mot": "Polir", "def": "Rendre lisse et brillant."},
+    {"mot": "Policier", "def": "Agent de la police."},
+    {"mot": "Politesse", "def": "Respect des règles de savoir-vivre."},
+    {"mot": "Polémique", "def": "Débat vif et controversé."},
+    {"mot": "Polygone", "def": "Figure plane à plusieurs côtés."},
+    {"mot": "Polychrome", "def": "Qui présente plusieurs couleurs."},
+    {"mot": "Politologue", "def": "Spécialiste des sciences politiques."},
+    {"mot": "Pollution", "def": "Dégradation de l’environnement par des rejets."},
+    {"mot": "Polariser", "def": "Concentrer autour de pôles ; orienter un champ."}
+  ],
+
+  "POU": [
+    {"mot": "Poule", "def": "Volaille femelle qui pond des œufs."},
+    {"mot": "Pouvoir", "def": "Capacité d’agir ; autorité."},
+    {"mot": "Poussière", "def": "Particules très fines déposées sur les surfaces."},
+    {"mot": "Pou", "def": "Petit insecte parasite de l’homme."},
+    {"mot": "Poulain", "def": "Jeune cheval."},
+    {"mot": "Poumon", "def": "Organe de la respiration."},
+    {"mot": "Pouls", "def": "Battement des artères perceptible au toucher."},
+    {"mot": "Pousser", "def": "Exercer une pression ; croître."},
+    {"mot": "Poutre", "def": "Grosse pièce de charpente."},
+    {"mot": "Poulpe", "def": "Mollusque marin à huit bras."}
+  ],
+
+  "REC": [
+    {"mot": "Recevoir", "def": "Accueillir ; obtenir ce qui est donné."},
+    {"mot": "Recette", "def": "Indications pour préparer un plat ; revenus."},
+    {"mot": "Réception", "def": "Action de recevoir ; accueil officiel."},
+    {"mot": "Récepteur", "def": "Organe/capteur qui reçoit un signal."},
+    {"mot": "Recentrer", "def": "Ramener vers le centre ; réorienter."},
+    {"mot": "Récit", "def": "Narration d’événements réels ou imaginaires."},
+    {"mot": "Recel", "def": "Détention de choses obtenues illicitement."},
+    {"mot": "Rechercher", "def": "Tenter de trouver ; examiner."},
+    {"mot": "Récréation", "def": "Temps de détente ; divertissement."},
+    {"mot": "Recul", "def": "Action de reculer ; diminution."},
+    {"mot": "Récif", "def": "Élévation rocheuse sous-marine."}
+  ],
+
+  "REL": [
+    {"mot": "Relation", "def": "Lien entre personnes ou choses."},
+    {"mot": "Relief", "def": "Inégalités de la surface ; saillie."},
+    {"mot": "Religion", "def": "Système de croyances et de pratiques."},
+    {"mot": "Relater", "def": "Rapporter des faits."},
+    {"mot": "Relais", "def": "Dispositif ou point de transmission."},
+    {"mot": "Reluire", "def": "Briller après nettoyage."},
+    {"mot": "Reléguer", "def": "Écarter à un rang inférieur."},
+    {"mot": "Reliure", "def": "Opération/partie qui assemble les pages d’un livre."},
+    {"mot": "Relique", "def": "Objet vénéré ; vestige du passé."}
+  ],
+
+  "REM": [
+    {"mot": "Remettre", "def": "Rendre ; replacer ; confier de nouveau."},
+    {"mot": "Remarque", "def": "Observation ; commentaire."},
+    {"mot": "Rempart", "def": "Ouvrage de défense ; protection."},
+    {"mot": "Remplacement", "def": "Action de substituer une chose à une autre."},
+    {"mot": "Remonter", "def": "Aller de bas en haut ; dater d’une époque."},
+    {"mot": "Remords", "def": "Vif regret d’une faute commise."},
+    {"mot": "Remous", "def": "Tourbillon d’eau ; agitation."},
+    {"mot": "Remuer", "def": "Mettre en mouvement ; agiter."},
+    {"mot": "Remède", "def": "Moyen de guérir ou d’atténuer un mal."},
+    {"mot": "Remaniement", "def": "Modification d’un ensemble ou d’un texte."}
+  ],
+
+  "REV": [
+    {"mot": "Revenir", "def": "Retourner à un lieu ; reprendre."},
+    {"mot": "Revanche", "def": "Victoire obtenue après une défaite."},
+    {"mot": "Rêve", "def": "Suite d’images et d’idées pendant le sommeil."},
+    {"mot": "Rêver", "def": "Former des images, des projets en esprit."},
+    {"mot": "Révolution", "def": "Changement brusque d’un ordre établi ; rotation complète."},
+    {"mot": "Révolte", "def": "Soulèvement contre l’autorité."},
+    {"mot": "Rêverie", "def": "État d’esprit vagabond et imaginatif."},
+    {"mot": "Revoir", "def": "Voir de nouveau ; réexaminer."},
+    {"mot": "Revêtement", "def": "Couche appliquée à une surface."},
+    {"mot": "Revenu", "def": "Somme d’argent provenant d’une activité ou d’un capital."}
+  ],
+
+  "SAC": [
+    {"mot": "Sac", "def": "Contenant souple pour transporter des objets."},
+    {"mot": "Sacrifice", "def": "Offrande ; renoncement à un bien."},
+    {"mot": "Sacré", "def": "Relatif au sacré ; inviolable."},
+    {"mot": "Sacristie", "def": "Pièce attenante à une église pour préparer le culte."},
+    {"mot": "Sacerdoce", "def": "Fonction et dignité sacerdotales ; mission dévouée."},
+    {"mot": "Sacoche", "def": "Petit sac porté à la main ou à l’épaule."},
+    {"mot": "Sachet", "def": "Petit sac de papier, de tissu ou de plastique."},
+    {"mot": "Saccage", "def": "Destruction violente et désordonnée."},
+    {"mot": "Saccadé", "def": "Qui progresse par à-coups."}
+  ],
+
+  "SAN": [
+    {"mot": "Santé", "def": "Bon état physique et mental."},
+    {"mot": "Sanction", "def": "Punition ou approbation d’une décision."},
+    {"mot": "Sang", "def": "Liquide vital circulant dans les vaisseaux."},
+    {"mot": "Sanctuaire", "def": "Lieu sacré et protégé."},
+    {"mot": "Saint", "def": "Personne reconnue pour sa sainteté ; sacré."},
+    {"mot": "Sanitaire", "def": "Relatif à la santé publique."},
+    {"mot": "Sanctifier", "def": "Rendre saint ; consacrer."},
+    {"mot": "Sanglier", "def": "Cochon sauvage."},
+    {"mot": "Sangsue", "def": "Ver annelé suceur de sang."}
+  ],
+
+  "SEC": [
+    {"mot": "Sec", "def": "Dépourvu d’humidité ; vin non doux."},
+    {"mot": "Secret", "def": "Ce qui est caché ou réservé."},
+    {"mot": "Section", "def": "Partie d’un ensemble ; découpe transversale."},
+    {"mot": "Secteur", "def": "Partie d’un domaine d’activité ou d’un espace."},
+    {"mot": "Sécher", "def": "Devenir sec ; faire sécher."},
+    {"mot": "Sécheresse", "def": "Manque d’eau ; rudesse."},
+    {"mot": "Sécurité", "def": "État d’être à l’abri du danger."},
+    {"mot": "Sécuriser", "def": "Rendre sûr ; protéger."}
+  ],
+
+  "SER": [
+    {"mot": "Serrer", "def": "Presser fortement ; rapprocher."},
+    {"mot": "Serveur", "def": "Personne qui sert ; ordinateur fournissant des services."},
+    {"mot": "Service", "def": "Action de servir ; prestation."},
+    {"mot": "Sérieux", "def": "Qui n’est pas frivole ; important."},
+    {"mot": "Servir", "def": "Rendre un service ; fournir."},
+    {"mot": "Serein", "def": "Calme, paisible."},
+    {"mot": "Sérénité", "def": "Calme profond et durable."},
+    {"mot": "Sérum", "def": "Partie liquide du sang ; préparation médicale."}
+  ],
+
+  "SIM": [
+    {"mot": "Simple", "def": "Non complexe ; modeste."},
+    {"mot": "Simuler", "def": "Feindre ; imiter artificiellement."},
+    {"mot": "Similitude", "def": "Ressemblance entre choses."},
+    {"mot": "Simulation", "def": "Reproduction artificielle d’un phénomène."},
+    {"mot": "Simplicité", "def": "Caractère de ce qui est simple."},
+    {"mot": "Simiesque", "def": "Qui rappelle le singe."},
+    {"mot": "Simili", "def": "Qui imite sans être authentique."},
+    {"mot": "Simultané", "def": "Qui se produit en même temps."}
+  ],
+
+  "SOM": [
+    {"mot": "Sommeil", "def": "État de repos périodique de l’organisme."},
+    {"mot": "Sombre", "def": "Peu éclairé ; mélancolique."},
+    {"mot": "Sommet", "def": "Point le plus élevé ; réunion de dirigeants."},
+    {"mot": "Somme", "def": "Résultat d’une addition ; quantité d’argent."},
+    {"mot": "Somnolence", "def": "Tendance à s’assoupir."},
+    {"mot": "Somnifère", "def": "Substance favorisant le sommeil."},
+    {"mot": "Somnoler", "def": "Dormir d’un sommeil léger."},
+    {"mot": "Somatique", "def": "Relatif au corps."}
+  ],
+
+  "SUR": [
+    {"mot": "Surface", "def": "Partie extérieure d’un corps ; étendue."},
+    {"mot": "Sursaut", "def": "Mouvement brusque de frayeur ou de surprise."},
+    {"mot": "Surprendre", "def": "Étonner ; découvrir à l’improviste."},
+    {"mot": "Sur", "def": "Préposition signifiant « au-dessus de »."},
+    {"mot": "Surveiller", "def": "Observer attentivement ; garder."},
+    {"mot": "Survivre", "def": "Continuer à vivre après un danger."},
+    {"mot": "Survol", "def": "Action de voler au-dessus de."},
+    {"mot": "Surcharge", "def": "Charge excessive ; supplément imposé."},
+    {"mot": "Surnom", "def": "Nom ajouté au nom usuel d’une personne."}
+  ],
+
+  "TAB": [
+    {"mot": "Table", "def": "Meuble avec un plateau."},
+    {"mot": "Tableau", "def": "Surface pour écrire ou peindre ; ensemble de cases."},
+    {"mot": "Tabac", "def": "Plante dont on fume les feuilles."},
+    {"mot": "Tabatière", "def": "Boîte à tabac."},
+    {"mot": "Tablier", "def": "Vêtement de protection porté sur le devant."},
+    {"mot": "Tabler", "def": "Compter sur ; miser sur (fig.)."},
+    {"mot": "Tabulation", "def": "Action d’aligner par tabulateur."}
+  ],
+
+  "TEL": [
+    {"mot": "Téléphone", "def": "Appareil de communication vocale à distance."},
+    {"mot": "Télévision", "def": "Média et appareil de diffusion audiovisuelle."},
+    {"mot": "Télégramme", "def": "Message transmis par télégraphe."},
+    {"mot": "Téléphoniste", "def": "Personne qui gère les communications téléphoniques."},
+    {"mot": "Téléphoner", "def": "Communiquer par téléphone."},
+    {"mot": "Téléjournal", "def": "Journal d’information télévisé."},
+    {"mot": "Télétravail", "def": "Travail effectué à distance par moyens numériques."},
+    {"mot": "Téléski", "def": "Remontée mécanique pour skieurs."},
+    {"mot": "Télécommande", "def": "Appareil qui commande à distance."}
+  ],
+
+  "TEM": [
+    {"mot": "Temple", "def": "Édifice religieux consacré au culte."},
+    {"mot": "Temps", "def": "Durée ; moment ; conditions météorologiques."},
+    {"mot": "Témoin", "def": "Personne attestant un fait ; élément de comparaison."},
+    {"mot": "Tempête", "def": "Perturbation atmosphérique violente."},
+    {"mot": "Tempérer", "def": "Modérer ; adoucir."},
+    {"mot": "Tempérament", "def": "Caractère naturel d’une personne."},
+    {"mot": "Temporel", "def": "Relatif au temps ; non spirituel."},
+    {"mot": "Temporaire", "def": "Qui ne dure pas ; provisoire."},
+    {"mot": "Température", "def": "Grandeur mesurant le degré de chaleur."},
+    {"mot": "Templier", "def": "Membre de l’ordre des Templiers."}
+  ]
+
+    };
+
+    // --- Éléments DOM ---
+    const prefixDisplay = document.getElementById("prefixDisplay");
+    const definitionDisplay = document.getElementById("definitionDisplay");
     const answerInput = document.getElementById("answer");
     const message = document.getElementById("message");
     const btnPlay = document.getElementById("btnPlay");
@@ -239,164 +2841,183 @@
     const btnRepeat = document.getElementById("btnRepeat");
     const btnSkip = document.getElementById("btnSkip");
     const btnBack = document.getElementById("btnBack");
-    const progress = document.getElementById("progress");
-    const pageSelect = document.getElementById("pageSelect");
-    const btnPrevPage = document.getElementById("btnPrevPage");
-    const btnNextPage = document.getElementById("btnNextPage");
-    const totalPagesLabel = document.getElementById("totalPagesLabel");
+    const initialBank = document.getElementById("initialBank");
+    const progressPill = document.getElementById("progressPill");
+    const speedPill = document.getElementById("speedPill");
+    const hintPrefix = document.getElementById("hintPrefix");
 
-    /* === Helpers pagination === */
-    function pageStartIndex(page){ return (page-1)*pageSize; }
-    function pageEndIndex(page){ return Math.min(page*pageSize - 1, words.length - 1); }
-    function indexInCurrentPage(){ return currentWordIndex - pageStartIndex(currentPage); }
+    // --- État du jeu ---
+    let currentPrefix = null;
+    let currentIndex = 0;
+    let speechRate = 1;
 
-    function updateProgress(){
-      const pos = indexInCurrentPage() + 1;
-      const end = pageEndIndex(currentPage) - pageStartIndex(currentPage) + 1; // 10 sauf dernière page
-      progress.textContent = `Question ${pos}/${end} (page ${currentPage}/${totalPages})`;
+    // --- Utilitaires ---
+    const normalize = s => s
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // retire accents
+      .replace(/[^a-z\-’' ]/g,'')                       // garde lettres/espaces/apostrophes
+      .trim();
+
+    function updatePills(){
+      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
+      progressPill.textContent = total ? `${currentIndex+1} / ${total}` : `0 / 0`;
+      speedPill.textContent = `Vitesse ×${speechRate.toFixed(2)}`;
+      hintPrefix.textContent = currentPrefix || "– – –";
     }
 
-    function updatePageSelect(){
-      pageSelect.innerHTML = "";
-      for(let p=1; p<=totalPages; p++){
-        const opt = document.createElement("option");
-        opt.value = String(p);
-        opt.textContent = p;
-        if (p === currentPage) opt.selected = true;
-        pageSelect.appendChild(opt);
-      }
-      totalPagesLabel.textContent = ` / ${totalPages}`;
+    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+    function speak(text, rate=speechRate){
+      if(!('speechSynthesis' in window)) { return; }
+      ttsCancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = rate;
+      speechSynthesis.speak(u);
     }
 
-    /* === Synthèse vocale === */
-    function speakWord(word, rate = speechRate) {
-      if (!('speechSynthesis' in window)) {
-        message.textContent = "La synthèse vocale n'est pas prise en charge sur ce navigateur.";
+    function announce(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
+      const def  = item.def;
+      speak(`${intro} Définition : ${def}`);
+    }
+
+    function renderCard(){
+      if(!currentPrefix){
+        prefixDisplay.textContent = "– – –";
+        definitionDisplay.textContent = "Choisis un champ lexical ci-dessous pour commencer, ou appuie sur ▶️ Jouer pour démarrer au premier.";
+        updatePills();
         return;
       }
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = "fr-FR";
-      utterance.rate = rate;
-      speechSynthesis.speak(utterance);
-    }
-
-    /* === Jeu === */
-    function playWord() {
-      const word = words[currentWordIndex];
-      wordDisplay.textContent = "";
-      speakWord(word);
-      message.textContent = "Écoutez attentivement et écrivez le mot.";
+      const item = FIELDS[currentPrefix][currentIndex];
+      prefixDisplay.textContent = currentPrefix;
+      definitionDisplay.textContent = item.def;
+      message.textContent = "Écris le mot correspondant. (Il doit commencer par " + currentPrefix + ")";
       message.style.color = "#fff";
       answerInput.value = "";
+      answerInput.placeholder = `Un mot qui commence par « ${currentPrefix} »…`;
       answerInput.disabled = false;
+      updatePills();
+    }
+
+    function setPrefix(prefix){
+      if(!FIELDS[prefix]) return;
+      currentPrefix = prefix;
+      currentIndex = 0;
+      highlightBank(prefix);
+      renderCard();
+      announce();
       answerInput.focus();
-      updateProgress();
     }
 
-    function playWordSlow() { speechRate = Math.max(0.5, speechRate - 0.25); playWord(); }
-    function playWordFast() { speechRate = Math.min(2, speechRate + 0.25); playWord(); }
-    function repeatWord()   { playWord(); }
-
-    function normalize(str){
-      return str.trim().toLowerCase();
-    }
-
-    function checkAnswer() {
-      const userAnswer = normalize(answerInput.value);
-      const correctAnswer = normalize(words[currentWordIndex]);
-      if (userAnswer === correctAnswer) {
-        message.textContent = "✅ Correct !";
+    function next(){
+      if(!currentPrefix) return;
+      currentIndex++;
+      const list = FIELDS[currentPrefix];
+      if(currentIndex >= list.length){
+        currentIndex = list.length-1;
+        message.textContent = `🎉 Bravo ! Tu as terminé le champ lexical ${currentPrefix}. Choisis un autre préfixe ci-dessous.`;
         message.style.color = "#00e676";
-        wordDisplay.textContent = correctAnswer;
-        setTimeout(() => { nextWord(); }, 900);
-      } else {
-        message.textContent = "❌ Incorrect, écoutez l'orthographe lettre par lettre.";
-        message.style.color = "#ff5252";
-        spellWord(correctAnswer);
-      }
-    }
-
-    function spellWord(word) {
-      speechSynthesis.cancel();
-      let letters = [...word.replace(/[-\s]/g, "")];
-      let i = 0;
-      function spellNext() {
-        if (i < letters.length) {
-          const utterance = new SpeechSynthesisUtterance(letters[i]);
-          utterance.lang = "fr-FR";
-          utterance.rate = 0.6;
-          utterance.onend = () => {
-            i++;
-            setTimeout(spellNext, 350);
-          };
-          speechSynthesis.speak(utterance);
-        } else {
-          message.textContent = "Réessayez d'écrire le mot.";
-          message.style.color = "#fff";
-          answerInput.value = "";
-          answerInput.focus();
-        }
-      }
-      spellNext();
-    }
-
-    function nextWord() {
-      const end = pageEndIndex(currentPage);
-      if (currentWordIndex < end) {
-        currentWordIndex++;
-        playWord();
-      } else {
-        message.textContent = `🎉 Fin de la page ${currentPage}. Choisissez une autre page pour continuer.`;
         answerInput.disabled = true;
+        ttsCancel();
+        speak(`Bravo ! Tu as terminé le champ lexical ${currentPrefix}.`);
+        return;
+      }
+      renderCard();
+      announce();
+      answerInput.focus();
+    }
+
+    function back(){
+      if(!currentPrefix) return;
+      if(currentIndex > 0){
+        currentIndex--;
+        renderCard();
+        announce();
+        answerInput.focus();
       }
     }
 
-    function prevWord() {
-      const start = pageStartIndex(currentPage);
-      if (currentWordIndex > start) {
-        currentWordIndex--;
-        message.textContent = "";
-        playWord();
+    function repeat(){ announce(); }
+
+    function slower(){
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      updatePills();
+      announce();
+    }
+    function faster(){
+      speechRate = Math.min(2, speechRate + 0.25);
+      updatePills();
+      announce();
+    }
+
+    function check(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const user = normalize(answerInput.value);
+      const target = normalize(item.mot);
+      const need = normalize(currentPrefix);
+
+      // Doit commencer exactement par le préfixe de 3 lettres ET correspondre au mot attendu
+      if(user && user.startsWith(need) && user === target){
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
+        speak("Correct ! Bien joué.");
+        setTimeout(next, 900);
+      }else{
+        message.textContent = `❌ Incorrect. Il fallait : ${item.mot}.`;
+        message.style.color = "#ff5252";
+        speak(`Incorrect. Il fallait : ${item.mot}.`);
       }
     }
 
-    /* === Navigation de pages === */
-    function goToPage(p){
-      const page = Math.max(1, Math.min(totalPages, p));
-      currentPage = page;
-      currentWordIndex = pageStartIndex(currentPage);
-      updatePageSelect();
-      message.textContent = "";
-      playWord();
+    // --- Banque de préfixes cliquables ---
+    function buildBank(){
+      const keys = Object.keys(FIELDS);
+      keys.sort((a,b)=>a.localeCompare(b,'fr'));
+      initialBank.innerHTML = "";
+      for(const k of keys){
+        const btn = document.createElement("button");
+        btn.textContent = k.toUpperCase();
+        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
+        btn.addEventListener("click", ()=> setPrefix(k));
+        initialBank.appendChild(btn);
+      }
+    }
+    function highlightBank(k){
+      [...initialBank.children].forEach(b=>{
+        b.classList.toggle('active', b.textContent === k.toUpperCase());
+      });
     }
 
-    btnPrevPage.addEventListener("click", () => {
-      if (currentPage > 1) goToPage(currentPage - 1);
+    // --- Écouteurs ---
+    btnPlay.addEventListener("click", ()=>{
+      if(!currentPrefix){
+        const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
+        setPrefix(first);
+      }else{
+        announce();
+      }
     });
-    btnNextPage.addEventListener("click", () => {
-      if (currentPage < totalPages) goToPage(currentPage + 1);
-    });
-    pageSelect.addEventListener("change", (e) => {
-      const p = parseInt(e.target.value, 10);
-      goToPage(p);
+    btnSlow.addEventListener("click", slower);
+    btnFast.addEventListener("click", faster);
+    btnRepeat.addEventListener("click", repeat);
+    btnSkip.addEventListener("click", next);
+    btnBack.addEventListener("click", back);
+
+    answerInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") check();
     });
 
-    /* === Boutons === */
-    btnBack.addEventListener("click", prevWord);
-    btnPlay.addEventListener("click", playWord);
-    btnSlow.addEventListener("click", playWordSlow);
-    btnFast.addEventListener("click", playWordFast);
-    btnRepeat.addEventListener("click", repeatWord);
-    btnSkip.addEventListener("click", nextWord);
-
-    answerInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") checkAnswer();
+    // --- Démarrage ---
+    window.addEventListener("load", ()=>{
+      buildBank();
+      renderCard();
+      if(!('speechSynthesis' in window)){
+        message.innerHTML = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
+      }
     });
-
-    /* === Démarrage === */
-    updatePageSelect();
-    window.addEventListener("load", () => goToPage(1));
   </script>
 </body>
 </html>
