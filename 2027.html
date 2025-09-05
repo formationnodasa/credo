@@ -1,79 +1,960 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Épellation biblique — Spéciale diocèse</title>
-  <style>
-    body {margin:0;font-family:sans-serif;background:#0b0b10;color:#eee;}
-    header{text-align:center;padding:20px;}
-    h1{color:#b99cff;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:20px;}
-    .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;}
-    .card h2{margin:0 0 8px;}
-    .tile{background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:10px;margin:6px 0;}
-    .btn{cursor:pointer;border:none;padding:6px 10px;border-radius:6px;background:#333;color:#fff;}
-    .verses span{display:inline-block;margin:2px;padding:4px 8px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;}
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Épellation biblique — Spéciale diocèse</h1>
-    <input id="q" type="search" placeholder="Rechercher un nom…">
-  </header>
+<!-- ÉPELLATION BIBLIQUE SPÉCIALE DIOCÈSE — Composant autonome
+     Auteur: toi :) | Aucune dépendance externe | Fonctionne hors-ligne
+     Conseil: place ce bloc dans ta page là où tu veux le widget. -->
 
-  <main class="grid" id="grid"></main>
+<section id="epellation-biblique" lang="fr" dir="ltr">
+  <style>
+    /* ---------- Design général (glass + gradient animé) ---------- */
+    #epellation-biblique {
+      --bg: #0e0f13;
+      --card: rgba(255, 255, 255, 0.06);
+      --card-hover: rgba(255, 255, 255, 0.10);
+      --text: #e9edf1;
+      --muted: #b8c1cc;
+      --chip: rgba(255, 255, 255, 0.10);
+      --ok: #27d696;
+      --warn: #ffb020;
+      --accent1: #7b5cff;
+      --accent2: #44d1ff;
+      --accent3: #75f3b4;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-lg: 22px;
+      --speed: 260ms;
+      color: var(--text);
+      font: 500 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Color Emoji", "Apple Color Emoji", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #2a1f5b66, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, #0a5d7a55, transparent 60%),
+        radial-gradient(800px 500px at 50% 120%, #0a7a4244, transparent 60%),
+        var(--bg);
+      padding: 48px 20px 64px;
+      position: relative;
+      overflow: clip;
+    }
+
+    /* ruban lumineux animé */
+    #epellation-biblique::before {
+      content: "";
+      position: absolute;
+      inset: -40% -20%;
+      background: conic-gradient(from 180deg,
+        var(--accent1), var(--accent2), var(--accent3), var(--accent1));
+      filter: blur(80px) saturate(140%);
+      opacity: .12;
+      animation: swirl 26s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes swirl { to { transform: rotate(360deg); } }
+
+    .wrap { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .title {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.15;
+      letter-spacing: .3px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.25));
+    }
+    .title p { margin: 0; color: var(--muted) }
+
+    /* barre d’outils */
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+      margin: 22px auto 16px;
+    }
+    .search {
+      position: relative;
+    }
+    .search input {
+      width: 100%;
+      padding: 14px 44px 14px 44px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      outline: none;
+      transition: border var(--speed), background var(--speed), box-shadow var(--speed);
+      box-shadow: var(--shadow);
+    }
+    .search input::placeholder { color: #9fb0bf; opacity: .9 }
+    .search .icon {
+      position: absolute; left: 12px; top: 50%; translate: 0 -50%;
+      font-size: 18px; opacity: .8;
+    }
+    .btn, .file {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 14px; border-radius: var(--radius-sm);
+      background: var(--chip); border: 1px solid rgba(255,255,255,.14);
+      color: var(--text); cursor: pointer; transition: background var(--speed), transform var(--speed);
+      box-shadow: var(--shadow); text-decoration: none; user-select: none;
+    }
+    .btn:active { transform: translateY(1px) }
+    .file input { display: none }
+    .pill {
+      justify-self: start; display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center;
+      padding: 10px 12px; border-radius: 999px; background: var(--chip); border: 1px solid rgba(255,255,255,.14);
+      font-size: 14px; color: var(--muted);
+    }
+
+    /* grille de cartes */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      transition: transform var(--speed), background var(--speed), border var(--speed);
+      position: relative;
+      overflow: clip;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .card:hover { transform: translateY(-3px); background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)); }
+
+    .badge {
+      position: absolute; top: 12px; right: 12px;
+      padding: 6px 10px; border-radius: 999px; font-size: 12px; letter-spacing: .2px;
+      background: rgba(123,92,255,.20); border: 1px solid rgba(123,92,255,.35);
+      color: #dfddff;
+    }
+    .name {
+      font-weight: 800; letter-spacing: .3px;
+      font-size: 20px; margin: 4px 36px 10px 2px;
+    }
+    .aliases {
+      margin: -6px 0 8px 2px; font-size: 12.5px; color: var(--muted);
+    }
+
+    /* onglets */
+    .tabs { display: grid; gap: 8px; }
+    .tab-list {
+      display: grid; grid-auto-flow: column; gap: 8px; align-items: center;
+    }
+    .tab-btn {
+      background: var(--chip); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px; padding: 8px 10px; font-size: 13px; cursor: pointer;
+      color: var(--text); transition: background var(--speed), transform var(--speed), border var(--speed);
+    }
+    .tab-btn[aria-selected="true"] {
+      background: linear-gradient(90deg, rgba(123,92,255,.35), rgba(68,209,255,.35));
+      border-color: rgba(255,255,255,.22);
+    }
+    .panel {
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      padding: 10px 12px; min-height: 70px; position: relative;
+    }
+    .panel p { margin: 0; }
+
+    .meta {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .chip { font-size: 12px; padding: 6px 10px; border-radius: 999px;
+      background: var(--chip); border: 1px solid rgba(255,255,255,.14); color: var(--muted);
+    }
+
+    .actions {
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .edit { border-color: rgba(255,255,255,.25); }
+    .save-ok { color: var(--ok); font-weight: 700; }
+
+    /* état “à compléter” */
+    .todo { color: #ffe7a8; }
+    .todo .panel { border-style: solid; border-color: rgba(255,176,32,.45) }
+
+    /* footer */
+    .foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      margin-top: 16px; color: var(--muted); font-size: 12.5px;
+    }
+
+    /* responsive toolbar */
+    @media (max-width: 740px) {
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="wrap" id="widget-root">
+    <div class="title">
+      <h1>Épellation biblique spéciale diocèse</h1>
+      <p>Noms propres et personnages — prononciation, versets, histoire</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="search" role="search">
+        <span class="icon">🔎</span>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Rechercher un nom (ex. Abraham, Ésaü, Moïse)…" aria-label="Rechercher un nom" />
+      </div>
+
+      <label class="file" title="Importer un fichier JSON de données">
+        📥 Importer JSON
+        <input id="importFile" type="file" accept="application/json" />
+      </label>
+
+      <button class="btn" id="exportBtn" title="Exporter les données (incluant vos modifications)">📤 Exporter JSON</button>
+    </div>
+
+    <div class="pill" id="summaryPill">Chargement…</div>
+
+    <div class="grid" id="cardGrid" aria-live="polite"></div>
+
+    <div class="foot">
+      <span>💡 Astuce : clique sur <strong>✎ Modifier</strong> pour personnaliser textes et versets. Tes changements restent sur l’appareil (localStorage).</span>
+      <span>© Diocèse — composant local, aucune donnée n’est envoyée.</span>
+    </div>
+  </div>
+
+  <template id="cardTemplate">
+    <article class="card" part="card">
+      <span class="badge">Biblique</span>
+      <div class="name"></div>
+      <div class="aliases" hidden></div>
+
+      <div class="tabs" role="tablist" aria-label="Détails">
+        <div class="tab-list">
+          <button class="tab-btn" role="tab" data-tab="pron" aria-selected="true">🗣️ Prononciation</button>
+          <button class="tab-btn" role="tab" data-tab="verses" aria-selected="false">📜 Versets</button>
+          <button class="tab-btn" role="tab" data-tab="story" aria-selected="false">📖 Histoire</button>
+        </div>
+        <section class="panel" role="tabpanel" data-panel="pron"></section>
+        <section class="panel" role="tabpanel" data-panel="verses" hidden></section>
+        <section class="panel" role="tabpanel" data-panel="story" hidden></section>
+      </div>
+
+      <div class="meta"></div>
+
+      <div class="actions">
+        <button class="btn speak" title="Lire la prononciation à voix haute (si disponible)">🔊 Écouter</button>
+        <button class="btn edit" title="Modifier les contenus">✎ Modifier</button>
+        <button class="btn save" hidden>💾 Enregistrer</button>
+        <span class="save-ok" hidden>Enregistré ✓</span>
+      </div>
+    </article>
+  </template>
 
   <script>
-    // Données de base (tu peux en ajouter autant que tu veux)
-    const NOMS = [
-      { name:"Abraham", pron:"a-bra-ham", tts:"Abraham",
-        verses:["Genèse 12:1-3","Genèse 15:5-6"], 
-        story:"Père des croyants; Dieu conclut une alliance avec lui." },
-      { name:"Moïse", pron:"mo-ïz", tts:"Moïse",
-        verses:["Exode 3:1-14","Exode 20:1-17"], 
-        story:"Libérateur d'Israël; reçoit la Loi au Sinaï." },
-      { name:"Rachel", pron:"ra-chèl", tts:"Rachel",
-        verses:["Genèse 29:18-20","Genèse 35:16-19"], 
-        story:"Épouse aimée de Jacob; mère de Joseph et Benjamin." }
-    ];
+    // ================================
+    //   Données — faciles à étendre
+    // ================================
+    // Structure attendue par nom canonique:
+    // {
+    //   pron: "prononciation écrite (approx. FR)",
+    //   verses: ["REF ; REF", ...],  // libre
+    //   story: "Bref résumé (2-4 lignes)",
+    //   aliases: ["synonyme1", "variante2"],
+    //   type: "Personne|Lieu|Peuple|Terme",
+    // }
+    // ⚠️ NB: Les entrées marquées TODO sont des coquilles prêtes à compléter depuis l’UI.
+    const BASE_DATA = {
+      "Abraham": {
+        pron: "a-bra-ham (à-bra-ram) | Hébreu: ʾAvrāhām",
+        verses: ["Genèse 12:1-3", "Genèse 15", "Genèse 17", "Genèse 22:1-18"],
+        story: "Père des croyants, allié par l’alliance : appelé à quitter son pays, reçoit la promesse d’une descendance et d’une terre.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Isaac": {
+        pron: "i-zak (i-za-ak) | Hébreu: Yitsḥāq",
+        verses: ["Genèse 21:1-7", "Genèse 22", "Genèse 26"],
+        story: "Fils de la promesse; presque offert en sacrifice; père d’Ésaü et Jacob.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Jacob": {
+        pron: "ja-kob (ya-kob) | Hébreu: Yaʿaqov",
+        verses: ["Genèse 25:26", "Genèse 28", "Genèse 32:23-32", "Genèse 35"],
+        story: "Renommé Israël après avoir lutté; père des douze tribus.",
+        aliases: ["Israël"],
+        type: "Personne",
+      },
+      "Joseph": {
+        pron: "jo-zèf (jo-zèf) | Hébreu: Yôsēf",
+        verses: ["Genèse 37", "Genèse 39-50"],
+        story: "Vendu par ses frères, devient administrateur en Égypte et sauve sa famille de la famine.",
+        aliases: ["Yosèph"],
+        type: "Personne",
+      },
+      "Moïse": {
+        pron: "mo-ïz | Hébreu: Moshè",
+        verses: ["Exode 2-3", "Exode 12-14", "Exode 19-20", "Deutéronome 34"],
+        story: "Libérateur d’Israël, médiateur de la Loi au Sinaï (Horeb).",
+        aliases: [],
+        type: "Personne",
+      },
+      "Sara": {
+        pron: "sa-ra | Hébreu: Sarāh",
+        verses: ["Genèse 17:15-19", "Genèse 18", "Genèse 21:1-7", "Genèse 23"],
+        story: "Épouse d’Abraham, mère d’Isaac; symbole de la promesse.",
+        aliases: ["Sarah"],
+        type: "Personne",
+      },
+      "Rébecca": {
+        pron: "ré-bé-ka | Hébreu: Rivqah",
+        verses: ["Genèse 24", "Genèse 27"],
+        story: "Épouse d’Isaac; mère de Jacob et Ésaü.",
+        aliases: ["Ribqa (translit.)"],
+        type: "Personne",
+      },
+      "Rachel": {
+        pron: "ra-chèl | Hébreu: Raḥel",
+        verses: ["Genèse 29", "Genèse 30", "Genèse 35:16-19"],
+        story: "Épouse aimée de Jacob; mère de Joseph et Benjamin.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Léa": {
+        pron: "lé-a | Hébreu: Le’ah",
+        verses: ["Genèse 29", "Genèse 30"],
+        story: "Première épouse de Jacob; mère de plusieurs tribus.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Juda": {
+        pron: "ju-da | Hébreu: Yehouda",
+        verses: ["Genèse 29:35", "Genèse 38", "Genèse 49:8-12"],
+        story: "Un des fils de Jacob; lignée royale (David).",
+        aliases: [],
+        type: "Personne",
+      },
+      "Benjamin": {
+        pron: "ben-ja-min | Hébreu: Binyamîn",
+        verses: ["Genèse 35:18", "Genèse 43-45"],
+        story: "Plus jeune fils de Jacob; tribu de Benjamin.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Ésaü": {
+        pron: "é-za-u | Hébreu: ʿEsav",
+        verses: ["Genèse 25:29-34", "Genèse 27", "Genèse 33"],
+        story: "Frère jumeau de Jacob; ancêtre d’Édom.",
+        aliases: ["Esau"],
+        type: "Personne",
+      },
+      "Aaron": {
+        pron: "a-ron | Hébreu: Aharon",
+        verses: ["Exode 4:14-16", "Exode 28", "Nombres 12", "Nombres 20:22-29"],
+        story: "Frère de Moïse; premier grand-prêtre.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Myriam": {
+        pron: "mi-riam | Hébreu: Miryam",
+        verses: ["Exode 15:20-21", "Nombres 12"],
+        story: "Sœur de Moïse et Aaron; prophétesse.",
+        aliases: ["Mériam"],
+        type: "Personne",
+      },
+      "Lévi": {
+        pron: "lé-vi | Hébreu: Lewi",
+        verses: ["Genèse 29:34", "Genèse 49:5-7"],
+        story: "Fils de Jacob; ancêtre des Lévites (service du sanctuaire).",
+        aliases: [],
+        type: "Personne",
+      },
+      "Éphraïm": {
+        pron: "é-fra-im | Hébreu: Efrayim",
+        verses: ["Genèse 48:17-20"],
+        story: "Fils de Joseph; tribu importante du Nord.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Manassé": {
+        pron: "ma-na-sé | Hébreu: Menashè",
+        verses: ["Genèse 48:13-19"],
+        story: "Fils premier-né de Joseph; tribu de Manassé.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Josué": {
+        pron: "jo-zou-é | Hébreu: Yehoshoua",
+        verses: ["Josué 1:1-9", "Josué 6"],
+        story: "Successeur de Moïse; conduit l’entrée dans le pays.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Balaam": {
+        pron: "ba-la-am | Hébreu: Bilʿam",
+        verses: ["Nombres 22-24"],
+        story: "Deviner voyant; bénit Israël malgré Balaq.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Balaq": {
+        pron: "ba-lak | Hébreu: Balaq",
+        verses: ["Nombres 22:2-6"],
+        story: "Roi de Moab qui convoque Balaam.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Coré": {
+        pron: "ko-ré | Hébreu: Qorah",
+        verses: ["Nombres 16"],
+        story: "Mène une révolte contre Moïse et Aaron.",
+        aliases: ["Qorah", "Qoré"],
+        type: "Personne",
+      },
+      "Datan": {
+        pron: "da-tan",
+        verses: ["Nombres 16"],
+        story: "Associé à la révolte de Coré.",
+        aliases: ["Dathan"],
+        type: "Personne",
+      },
+      "Abiram": {
+        pron: "a-bi-ram",
+        verses: ["Nombres 16"],
+        story: "Associé à la révolte de Coré.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Beçaléel": {
+        pron: "bé-tsa-lé-el | Hébreu: Betsalel",
+        verses: ["Exode 31:1-6", "Exode 35:30-35"],
+        story: "Artisan principal du Tabernacle.",
+        aliases: ["Bezalel"],
+        type: "Personne",
+      },
+      "Oholiab": {
+        pron: "o-ho-li-ab",
+        verses: ["Exode 31:6", "Exode 35:34"],
+        story: "Assistant de Beçaléel, artisan habile.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Pinhas": {
+        pron: "pin-has | Hébreu: Pinḥas",
+        verses: ["Nombres 25:7-13"],
+        story: "Zèle pour l’alliance; reçoit une alliance de paix.",
+        aliases: ["Phinéès (fr hist.)"],
+        type: "Personne",
+      },
+      "Ithamar": {
+        pron: "i-ta-mar",
+        verses: ["Exode 6:23", "Nombres 4"],
+        story: "Fils d’Aaron; service sacerdotal.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Éléazar": {
+        pron: "é-lé-a-zar",
+        verses: ["Nombres 3:32", "Nombres 20:26-28"],
+        story: "Fils d’Aaron; succède comme grand-prêtre.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Jéthro": {
+        pron: "jé-tro | Hébreu: Yitro",
+        verses: ["Exode 2:16-22", "Exode 18"],
+        story: "Beau-père de Moïse; conseille sur l’organisation.",
+        aliases: ["Réuel (var.)"],
+        type: "Personne",
+      },
+      "Cippora": {
+        pron: "tsi-po-ra | Hébreu: Tsipporah",
+        verses: ["Exode 2:21", "Exode 4:24-26"],
+        story: "Épouse de Moïse.",
+        aliases: ["Tsipporah", "Séphora (trad.)"],
+        type: "Personne",
+      },
+      "Laban": {
+        pron: "la-ban",
+        verses: ["Genèse 24:29", "Genèse 29-31"],
+        story: "Oncle de Jacob, père de Rachel et Léa.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Réuel": {
+        pron: "ré-u-èl",
+        verses: ["Exode 2:18"],
+        story: "Nom associé au prêtre madianite (Jéthro).",
+        aliases: ["Réhouel", "Réouel"],
+        type: "Personne",
+      },
+      "Amalec": {
+        pron: "a-ma-lèk",
+        verses: ["Exode 17:8-16", "1 Samuel 15"],
+        story: "Peuple ennemi d’Israël; vaincu par Josué/Moïse (Ex 17).",
+        aliases: [],
+        type: "Peuple",
+      },
+      "Aggag": {
+        pron: "ag-gag",
+        verses: ["1 Samuel 15"],
+        story: "Roi des Amalécites au temps de Saül.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Hadad": {
+        pron: "a-dad",
+        verses: ["Genèse 36:35-39"],
+        story: "Nom d’édomites/rois dans les généalogies.",
+        aliases: [],
+        type: "Personne",
+      },
+      "Béthel": {
+        pron: "bé-tel",
+        verses: ["Genèse 28:10-22", "Genèse 35:1-7"],
+        story: "Lieu où Jacob voit l’échelle et consacre le lieu.",
+        aliases: ["Bethel"],
+        type: "Lieu",
+      },
+      "Horeb": {
+        pron: "o-rèb (Hôreb)",
+        verses: ["Exode 3", "Exode 17:6", "1 Rois 19"],
+        story: "Mont de Dieu; autre nom du Sinaï.",
+        aliases: ["Hôreb"],
+        type: "Lieu",
+      },
+      "Édom": {
+        pron: "é-dom",
+        verses: ["Genèse 36", "Nombres 20:14-21"],
+        story: "Descendance d’Ésaü; voisin d’Israël.",
+        aliases: [],
+        type: "Peuple",
+      },
+      "Pharaon": {
+        pron: "fa-ra-on",
+        verses: ["Exode 1-14"],
+        story: "Titre des rois d’Égypte; s’oppose à la sortie d’Égypte.",
+        aliases: [],
+        type: "Titre",
+      },
 
-    const grid=document.getElementById('grid');
-    const search=document.getElementById('q');
-    let VOICE_FR=null;
-    function loadVoices(){
-      const v=speechSynthesis.getVoices();
-      VOICE_FR=v.find(x=>x.lang.startsWith('fr'))||null;
+      /* ---------- Coquilles (présentes dans ta liste) à compléter facilement depuis l'UI ---------- */
+      "Abel-Misraïm": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Abiasaph": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Abihu": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Abihou": { pron: "", verses: [], story: "", aliases: ["Abihu"], type: "Personne" },
+      "Abimélek": { pron: "", verses: [], story: "", aliases: ["Abimélec"], type: "Personne" },
+      "Abisamac": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Abiram (autre)": { pron: "", verses: [], story: "", aliases: ["Abiram"], type: "Personne" },
+      "Abraham, Isaac et Jacob": { pron: "", verses: [], story: "", aliases: [], type: "Groupe" },
+      "Ada": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Adullam": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Aggag (var.)": { pron: "", verses: [], story: "", aliases: ["Aggag"], type: "Personne" },
+      "Ahira": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ahuzzat": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ahiézer": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Akbor": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Alva": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Amminadab": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ammiel": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ammishaddaï": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ana": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Arau": { pron: "", verses: [], story: "", aliases: [], type: "Non listé" },
+      "Asnat": { pron: "", verses: [], story: "", aliases: ["Asnath"], type: "Personne" },
+      "Asher": { pron: "", verses: [], story: "", aliases: ["Aser"], type: "Personne" },
+      "Aser": { pron: "", verses: [], story: "", aliases: ["Asher"], type: "Personne" },
+      "Baal-Hanan": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Basmat": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Béeri": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Bilha": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Cippora": {}, /* déjà renseignée ci-dessus */
+      "Dan": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Déborah": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Deuel": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Dishân": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Dishôn": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Dina": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Éli-phaz (Éliphas)": { pron: "", verses: [], story: "", aliases: ["Élifaz", "Éliphaz"], type: "Personne" },
+      "Élim": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Éloné": { pron: "", verses: [], story: "", aliases: [], type: "Lieu/Arbre" },
+      "Éphron": { pron: "", verses: [], story: "", aliases: ["Héphron"], type: "Personne" },
+      "Gad": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Galaad": { pron: "", verses: [], story: "", aliases: [], type: "Lieu/Peuple" },
+      "Gatam": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Gédéoni": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Geuel": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Guershom": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Guershôn": { pron: "", verses: [], story: "", aliases: ["Gershon"], type: "Personne" },
+      "Hamor": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Hanok": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Hébér": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Héman": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Hittite (Héthite)": { pron: "", verses: [], story: "", aliases: ["Héthite"], type: "Peuple" },
+      "Hogla": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Issachar": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Ishvi (Yishvi)": { pron: "", verses: [], story: "", aliases: ["Yishvi"], type: "Personne" },
+      "Ithamar (déjà)": {},
+      "Jamin": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Jéthro (déjà)": {},
+      "Jemuel": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Jokin (Yakîn)": { pron: "", verses: [], story: "", aliases: ["Yakîn", "Jakin"], type: "Personne" },
+      "Kozbi": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Laban (déjà)": {},
+      "Ladanum": { pron: "", verses: [], story: "", aliases: [], type: "Terme" },
+      "Libni": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Lotan": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Makir": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Makpéla": { pron: "", verses: [], story: "", aliases: [], type: "Tombe/Lieu" },
+      "Malchiel (Malkiel)": { pron: "", verses: [], story: "", aliases: ["Malkiel"], type: "Personne" },
+      "Mambré": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Mé-Zahab (Me-Zahab)": { pron: "", verses: [], story: "", aliases: ["Me-Zahab"], type: "Personne" },
+      "Merari": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Mishaël": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Milka": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Nahbi": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Nahshôn": { pron: "", verses: [], story: "", aliases: ["Nahshon"], type: "Personne" },
+      "Naphtali (Nephtali)": { pron: "", verses: [], story: "", aliases: ["Nephtali"], type: "Personne" },
+      "Nemuël": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Noa": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Nûn (Nun)": { pron: "", verses: [], story: "", aliases: ["Nun"], type: "Personne" },
+      "Oholibama": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "On (Héliopolis)": { pron: "", verses: [], story: "", aliases: ["Héliopolis"], type: "Lieu" },
+      "Ozni": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Pagiel": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Palti": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Paï": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Poti-Phéra": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Qenaz": { pron: "", verses: [], story: "", aliases: ["Kénaz"], type: "Personne" },
+      "Qehat": { pron: "", verses: [], story: "", aliases: ["Kehath", "Qeath"], type: "Personne" },
+      "Qehatites": { pron: "", verses: [], story: "", aliases: ["Kehathites"], type: "Groupe" },
+      "Ramsès": { pron: "", verses: [], story: "", aliases: [], type: "Lieu/Pharaon" },
+      "Rébecca (déjà)": {},
+      "Réhouel (Réouel)": { pron: "", verses: [], story: "", aliases: ["Réouel", "Réuel"], type: "Personne" },
+      "Réouel (déjà)": {},
+      "Ruben": { pron: "", verses: [], story: "", aliases: ["Roubën"], type: "Personne" },
+      "Salu": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Samla": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Scepte (terme)": { pron: "", verses: [], story: "", aliases: ["Sceptre"], type: "Terme" },
+      "Séïr": { pron: "", verses: [], story: "", aliases: [], type: "Lieu" },
+      "Seth": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Shaül": { pron: "", verses: [], story: "", aliases: ["Saül"], type: "Personne" },
+      "Shammua": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Shaphat (Shafat)": { pron: "", verses: [], story: "", aliases: ["Shafat"], type: "Personne" },
+      "Shillem": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Shimeï": { pron: "", verses: [], story: "", aliases: ["Shiméi"], type: "Personne" },
+      "Shobal": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Shouni": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Siméon": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Sithreï": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Susi": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Timna": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Tirscha (Tirtsa)": { pron: "", verses: [], story: "", aliases: ["Tirtsa"], type: "Lieu" },
+      "Tsephon": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Tsurishaddaï": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Uzziël": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Yakîn": { pron: "", verses: [], story: "", aliases: ["Jakin"], type: "Personne" },
+      "Yehudit": { pron: "", verses: [], story: "", aliases: ["Judith"], type: "Personne" },
+      "Yalam": { pron: "", verses: [], story: "", aliases: [], type: "Personne" },
+      "Yéush": { pron: "", verses: [], story: "", aliases: ["Jeush"], type: "Personne" },
+      "Yokébed": { pron: "", verses: [], story: "", aliases: ["Jochebed"], type: "Personne" },
+      // "Jésus", "Agar", "Jasher" explicitement “non” dans ta liste
+    };
+
+    // Synonymes supplémentaires -> nom canonique
+    const SYNONYMS = {
+      "Esau": "Ésaü",
+      "Qorah": "Coré",
+      "Qoré": "Coré",
+      "Éliphas": "Éli-phaz (Éliphas)",
+      "Eliphaz": "Éli-phaz (Éliphas)",
+      "Horeb": "Horeb",
+      "Bethel": "Béthel",
+      "Sephora": "Cippora",
+      "Tsipporah": "Cippora",
+      "Yosèph": "Joseph",
+      "Nephtali": "Naphtali (Nephtali)",
+      "Judith": "Yehudit",
+    };
+
+    // ================================
+    //     Helper UI / fonctionnalités
+    // ================================
+    const root = document.getElementById("widget-root");
+    const grid = document.getElementById("cardGrid");
+    const searchInput = document.getElementById("searchInput");
+    const exportBtn = document.getElementById("exportBtn");
+    const importFile = document.getElementById("importFile");
+    const summaryPill = document.getElementById("summaryPill");
+    const cardTpl = document.getElementById("cardTemplate");
+
+    // Chargement des éventuelles personnalisations
+    function loadCustomData() {
+      try { return JSON.parse(localStorage.getItem("epellation-data") || "{}"); }
+      catch { return {}; }
     }
-    speechSynthesis.onvoiceschanged=loadVoices; loadVoices();
-
-    function speak(txt){
-      if(!speechSynthesis) return;
-      const u=new SpeechSynthesisUtterance(txt);
-      if(VOICE_FR) u.voice=VOICE_FR; u.lang="fr-FR";
-      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    function saveCustomData(data) {
+      localStorage.setItem("epellation-data", JSON.stringify(data));
     }
 
-    function render(list){
-      grid.innerHTML='';
-      list.forEach(x=>{
-        const card=document.createElement('div');
-        card.className='card';
-        card.innerHTML=`
-          <h2>${x.name}</h2>
-          <div class="tile"><b>Prononciation:</b> ${x.pron} <button class="btn">▶︎</button></div>
-          <div class="tile"><b>Versets:</b><div class="verses">${x.verses.map(v=>`<span>${v}</span>`).join('')}</div></div>
-          <div class="tile"><b>Histoire:</b> ${x.story}</div>
-        `;
-        card.querySelector('.btn').onclick=()=>speak(x.tts||x.name);
+    // Fusion avec priorités aux données personnalisées
+    function getData() {
+      const custom = loadCustomData();
+      return Object.fromEntries(
+        Object.entries(BASE_DATA).map(([k, v]) => {
+          const merged = { ...v, ...(custom[k] || {}) };
+          // normaliser champs vides
+          merged.pron ??= "";
+          merged.verses ??= [];
+          merged.story ??= "";
+          merged.aliases ??= v?.aliases || [];
+          merged.type ??= v?.type || "Personne";
+          return [k, merged];
+        })
+      );
+    }
+
+    // Normalisation de recherche (sans accents / casse)
+    const fold = (s) => (s || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    // Rendu d’un item
+    function renderCard(name, entry) {
+      const node = cardTpl.content.firstElementChild.cloneNode(true);
+
+      node.querySelector(".name").textContent = name;
+      const aliasEl = node.querySelector(".aliases");
+      const aliases = (entry.aliases || []).filter(a => a && a !== name);
+      if (aliases.length) {
+        aliasEl.textContent = "Aussi : " + aliases.join(" · ");
+        aliasEl.hidden = false;
+      }
+
+      const meta = node.querySelector(".meta");
+      const typeChip = document.createElement("span");
+      typeChip.className = "chip";
+      typeChip.textContent = entry.type || "—";
+      meta.appendChild(typeChip);
+
+      // Statut “à compléter” si vide
+      const needs = (!entry.pron?.trim()) + (!entry.verses?.length) + (!entry.story?.trim());
+      if (needs) node.classList.add("todo");
+
+      // Panneaux
+      const pnlPron = node.querySelector('[data-panel="pron"]');
+      const pnlVers = node.querySelector('[data-panel="verses"]');
+      const pnlStory = node.querySelector('[data-panel="story"]');
+
+      pnlPron.innerHTML = entry.pron?.trim()
+        ? `<p>${escapeHtml(entry.pron)}</p>`
+        : `<p><em>À compléter : ajouter la prononciation écrite (ex. “a-bra-ham”).</em></p>`;
+
+      pnlVers.innerHTML = (entry.verses?.length)
+        ? `<ul>${entry.verses.map(v => `<li>${escapeHtml(v)}</li>`).join("")}</ul>`
+        : `<p><em>À compléter : ajouter des références (ex. “Genèse 12:1-3”).</em></p>`;
+
+      pnlStory.innerHTML = entry.story?.trim()
+        ? `<p>${escapeHtml(entry.story)}</p>`
+        : `<p><em>À compléter : bref résumé (2-4 lignes).</em></p>`;
+
+      // Onglets
+      node.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tab = btn.dataset.tab;
+          node.querySelectorAll(".tab-btn").forEach(b => b.setAttribute("aria-selected", String(b === btn)));
+          node.querySelectorAll(".panel").forEach(p => p.hidden = (p.dataset.panel !== tab));
+        });
+      });
+
+      // Lecture prononciation
+      node.querySelector(".speak").addEventListener("click", () => {
+        const text = (entry.pron?.replace(/\|.*$/, "") || name);
+        if ("speechSynthesis" in window) {
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "fr-FR";
+          u.rate = 0.92;
+          speechSynthesis.speak(u);
+        } else {
+          alert("Synthèse vocale non disponible dans ce navigateur.");
+        }
+      });
+
+      // Edition
+      const btnEdit = node.querySelector(".edit");
+      const btnSave = node.querySelector(".save");
+      const saved = node.querySelector(".save-ok");
+
+      btnEdit.addEventListener("click", () => {
+        toEditable(pnlPron, "Texte de prononciation…");
+        toEditable(pnlVers, "Une référence par ligne…", true);
+        toEditable(pnlStory, "Rédige un court résumé…");
+        btnSave.hidden = false;
+        btnEdit.hidden = true;
+      });
+
+      btnSave.addEventListener("click", () => {
+        const newPron = fromEditable(pnlPron, false);
+        const newVers = fromEditable(pnlVers, true);
+        const newStory = fromEditable(pnlStory, false);
+
+        const custom = loadCustomData();
+        custom[name] = {
+          ...(custom[name] || {}),
+          pron: newPron,
+          verses: newVers,
+          story: newStory,
+          aliases: entry.aliases || [],
+          type: entry.type || "Personne",
+        };
+        saveCustomData(custom);
+        saved.hidden = false;
+        setTimeout(() => { saved.hidden = true; }, 1500);
+        // Remettre en lecture
+        pnlPron.innerHTML = newPron ? `<p>${escapeHtml(newPron)}</p>` : `<p><em>À compléter…</em></p>`;
+        pnlVers.innerHTML = newVers.length ? `<ul>${newVers.map(v => `<li>${escapeHtml(v)}</li>`).join("")}</ul>` : `<p><em>À compléter…</em></p>`;
+        pnlStory.innerHTML = newStory ? `<p>${escapeHtml(newStory)}</p>` : `<p><em>À compléter…</em></p>`;
+        btnSave.hidden = true;
+        btnEdit.hidden = false;
+        node.classList.toggle("todo", (!newPron) || (!newVers.length) || (!newStory));
+      });
+
+      return node;
+    }
+
+    // Edition helpers
+    function toEditable(panel, isMultiHint = "Texte…", listMode = false) {
+      const text = panel.textContent.trim().startsWith("À compléter") ? "" : panel.textContent.trim();
+      panel.innerHTML = "";
+      if (listMode) {
+        const ta = document.createElement("textarea");
+        ta.value = (Array.from(panel.querySelectorAll("li")).map(li => li.textContent.trim()).join("\n")) || text || "";
+        ta.placeholder = isMultiHint;
+        ta.rows = 4;
+        ta.style.width = "100%";
+        ta.style.background = "transparent";
+        ta.style.border = "0";
+        ta.style.color = "inherit";
+        panel.appendChild(ta);
+      } else {
+        const input = document.createElement("textarea");
+        input.value = text || "";
+        input.placeholder = isMultiHint;
+        input.rows = 3;
+        input.style.width = "100%";
+        input.style.background = "transparent";
+        input.style.border = "0";
+        input.style.color = "inherit";
+        panel.appendChild(input);
+      }
+    }
+    function fromEditable(panel, listMode = false) {
+      const ta = panel.querySelector("textarea");
+      if (!ta) return listMode ? [] : "";
+      const val = ta.value.trim();
+      if (!listMode) return val;
+      return val ? val.split(/\n+/).map(s => s.trim()).filter(Boolean) : [];
+    }
+
+    // Sécurité simple
+    function escapeHtml(s) {
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    // Liste triée par ordre alphabétique (sans accents)
+    function sortedNames(data) {
+      return Object.keys(data)
+        .filter(k => Object.keys(data[k] || {}).length) // ignorer placeholders vides
+        .sort((a,b) => fold(a).localeCompare(fold(b)));
+    }
+
+    // Rendu complet
+    function render(filter = "") {
+      const data = getData();
+      const names = sortedNames(data)
+        .filter(n => {
+          const canon = fold(n);
+          const f = fold(filter);
+          if (!f) return true;
+          if (canon.includes(f)) return true;
+          const aliases = (data[n].aliases || []).map(fold);
+          return aliases.some(a => a.includes(f));
+        });
+
+      grid.innerHTML = "";
+      names.forEach(n => {
+        const card = renderCard(n, data[n]);
         grid.appendChild(card);
       });
-    }
-    render(NOMS);
 
-    search.addEventListener('input',()=>{
-      const t=search.value.toLowerCase();
-      render(NOMS.filter(x=>x.name.toLowerCase().includes(t)));
+      // résumé
+      const total = names.length;
+      const all = sortedNames(data);
+      const todoCount = all.filter(n => {
+        const e = data[n];
+        return (!e.pron?.trim()) || (!(e.verses?.length)) || (!e.story?.trim());
+      }).length;
+      summaryPill.textContent = `${total} nom(s) affiché(s) • ${all.length} total • ${todoCount} à compléter`;
+    }
+
+    // Recherche instantanée
+    searchInput.addEventListener("input", (e) => render(e.target.value));
+
+    // Export JSON
+    exportBtn.addEventListener("click", () => {
+      const all = getData();
+      const blob = new Blob([JSON.stringify(all, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "epellation-biblique-data.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
     });
+
+    // Import JSON
+    importFile.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const obj = JSON.parse(reader.result);
+          const prev = loadCustomData();
+          saveCustomData({ ...prev, ...obj });
+          render(searchInput.value);
+          alert("Import réussi ✓");
+        } catch {
+          alert("Le fichier n’est pas un JSON valide.");
+        }
+      };
+      reader.readAsText(file);
+      importFile.value = "";
+    });
+
+    // Redirection des synonymes (si on tape un alias dans la recherche)
+    function tryAliasRedirect(q) {
+      const target = SYNONYMS[q]?.trim();
+      if (!target) return;
+      searchInput.value = target;
+      render(target);
+    }
+
+    // Première peinture
+    render("");
+
+    // ---------------- Extra: si on arrive avec un hash #Nom, le sélectionner ----------------
+    if (location.hash) {
+      const q = decodeURIComponent(location.hash.slice(1));
+      searchInput.value = q;
+      tryAliasRedirect(q);
+      render(q);
+    }
   </script>
-</body>
-</html>
+</section>
