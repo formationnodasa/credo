@@ -1,4 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Champs Lexicaux – Jeu Vocal (4 lettres)</title>
+  <style>
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --card: rgba(255,255,255,.12);
+      --glass: blur(12px);
+      --txt:#fff; --accent:#fff; --brand:#2575fc;
+      --ok:#00e676; --ko:#ff5252;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: var(--txt);
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    @keyframes gradientAnimation{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .container{
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      width: min(920px, 94vw);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: fadeIn .9s ease;
+    }
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
+    }
+    h1{
+      font-weight:800; margin:0; font-size: clamp(22px, 3.2vw, 34px);
+      text-shadow: 0 3px 8px rgba(0,0,0,.3);
+      letter-spacing:.3px;
+    }
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+      opacity:.95;
+    }
+    .pill{
+      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size:.95rem
+    }
+    .display{
+      margin:24px 0 10px; display:grid; gap:10px;
+    }
+    #prefixDisplay{
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight:900; letter-spacing:.18em; text-align:center;
+      text-shadow: 0 3px 8px rgba(0,0,0,.28);
+    }
+    #definitionDisplay{
+      font-size: clamp(16px, 2vw, 20px);
+      line-height:1.6; text-align:center;
+      background: rgba(0,0,0,.16);
+      border-radius:14px; padding:16px 18px;
+    }
+    .controls{
+      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+    }
+    button{
+      padding:12px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
+      cursor:pointer; background:#fff; color:var(--brand);
+      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+    }
+    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+    button:disabled{opacity:.55; cursor:not-allowed}
+    input[type="text"]{
+      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
+      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
+    }
+    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
+    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
+    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    }
+    .bank button{
+      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .bank button.active{ background:#fff; color:var(--brand) }
+    .footnote{
+      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
+    }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Champs lexicaux – Jeu vocal (4 lettres)</h1>
+      <div class="status">
+        <span class="pill" id="progressPill">0 / 0</span>
+        <span class="pill" id="speedPill">Vitesse ×1.00</span>
+        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">— — — —</b></span>
+      </div>
+    </header>
 
+    <div class="display">
+      <div id="prefixDisplay">— — — —</div>
+      <div id="definitionDisplay">Clique un préfixe ci-dessous ou appuie sur ▶️ Jouer.</div>
+    </div>
+
+    <input type="text" id="answer" placeholder="Écris le mot correct (même 4 lettres initiales) et appuie sur Entrée…" autocomplete="off" />
+
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste de préfixes (sélection rapide)"></div>
+    <div class="footnote">Astuce : change la vitesse et répète la définition à volonté.</div>
+  </div>
+
+  <script>
+    // ================================
+    // Données : CHAMPS LEXICAUX (4 lettres)
+    // Règles: mots simples (pas d'expressions composées), sans doublons, orthographe corrigée.
+    // Chaque réponse doit commencer par le préfixe de 4 lettres (clé du champ).
+    // ================================
+    const FIELDS = {
+      "CART": [
+        {mot:"Carton", def:"Papier rigide utilisé notamment pour emballer."},
+        {mot:"Cartable", def:"Sac d’écolier pour transporter cahiers et livres."},
+        {mot:"Carte", def:"Document figurant des informations (géographiques, etc.)."},
+        {mot:"Cartouche", def:"Recharge d’encre ou munitions."},
+        {mot:"Cartographe", def:"Spécialiste de la réalisation de cartes."},
+        {mot:"Cartographie", def:"Science/technique de la représentation des territoires."},
+        {mot:"Cartonner", def:"Obtenir un grand succès (familier)."},
+        {mot:"Cartel", def:"Entente d’entreprises visant à limiter la concurrence."},
+        {mot:"Cartomancie", def:"Art divinatoire utilisant des cartes."},
+        {mot:"Cartomancien", def:"Personne qui pratique la cartomancie."},
+        {mot:"Cartulaire", def:"Recueil de chartes et de documents (histoire)."}
+      ],
+
+      "PLAN": [
+        {mot:"Plante", def:"Être vivant du règne végétal."},
+        {mot:"Planter", def:"Mettre une graine ou un végétal en terre."},
+        {mot:"Plantation", def:"Terrain cultivé de végétaux."},
+        {mot:"Planteur", def:"Personne qui exploite une plantation."},
+        {mot:"Plantule", def:"Jeune pousse végétale."},
+        {mot:"Plantain", def:"Plante herbacée courante."},
+        {mot:"Plantigrade", def:"Animal marchant sur la plante des pieds."},
+        {mot:"Plantoir", def:"Outil servant à planter."},
+        {mot:"Plantureux", def:"Abondant, généreux."},
+        {mot:"Plantin", def:"Petit plant destiné à être replanté."}
+      ],
+
+      "CHAN": [
+        {mot:"Chant", def:"Mélodie vocale."},
+        {mot:"Chanter", def:"Produire des sons musicaux avec la voix."},
+        {mot:"Chanteur", def:"Personne qui chante."},
+        {mot:"Chanson", def:"Pièce vocale avec couplets et refrain."},
+        {mot:"Chantonner", def:"Chanter doucement, à mi-voix."},
+        {mot:"Chantonnement", def:"Fait de fredonner à voix basse."},
+        {mot:"Chanterelle", def:"Petite corde aiguë d’un instrument à cordes."},
+        {mot:"Chantre", def:"Personne qui célèbre ou défend une idée."},
+        {mot:"Chanté", def:"Interprété vocalement."}
+      ],
+
+      "PORT": [
+        {mot:"Port", def:"Lieu d’accostage des bateaux."},
+        {mot:"Porter", def:"Tenir, transporter sur soi."},
+        {mot:"Portable", def:"Qu’on peut transporter facilement."},
+        {mot:"Porteur", def:"Personne ou chose qui porte."},
+        {mot:"Portail", def:"Grande porte monumentale."},
+        {mot:"Portuaire", def:"Relatif aux ports."},
+        {mot:"Portance", def:"Force de soutien d’un profil en fluide."},
+        {mot:"Portier", def:"Personne chargée d’une entrée."},
+        {mot:"Portillon", def:"Petite porte d’accès."}
+      ],
+
+      "MONT": [
+        {mot:"Montagne", def:"Relief naturel élevé."},
+        {mot:"Monter", def:"Aller vers le haut ; grimper."},
+        {mot:"Montant", def:"Somme due ; pièce verticale."},
+        {mot:"Monture", def:"Support d’un objet ; animal qu’on monte."},
+        {mot:"Monticule", def:"Petite élévation de terrain."},
+        {mot:"Montée", def:"Action de grimper ; pente."},
+        {mot:"Montagnard", def:"Habitant des régions de montagne."},
+        {mot:"Monteur", def:"Personne qui assemble (films, machines…)."},
+        {mot:"Montreur", def:"Personne qui présente (d’animaux, marionnettes…)."}
+      ],
+
+      "LUMI": [
+        {mot:"Lumière", def:"Ce qui rend les objets visibles."},
+        {mot:"Lumineux", def:"Qui émet ou réfléchit la lumière."},
+        {mot:"Luminaire", def:"Appareil d’éclairage."},
+        {mot:"Luminescence", def:"Émission de lumière sans chaleur."},
+        {mot:"Lumignon", def:"Petite bougie mince."},
+        {mot:"Luminance", def:"Intensité lumineuse perçue d’une surface."},
+        {mot:"Luminothérapie", def:"Traitement par la lumière."},
+        {mot:"Luminophore", def:"Substance qui émet de la lumière."}
+      ],
+
+      "VENT": [
+        {mot:"Vent", def:"Mouvement d’air naturel."},
+        {mot:"Venteux", def:"Où il y a beaucoup de vent."},
+        {mot:"Ventiler", def:"Faire circuler l’air."},
+        {mot:"Ventilation", def:"Renouvellement de l’air."},
+        {mot:"Ventilateur", def:"Appareil qui brasse l’air."},
+        {mot:"Ventouse", def:"Dispositif d’aspiration par succion."},
+        {mot:"Ventail", def:"Battant (ancien) de casque ou de porte."}
+      ],
+
+      "ECLA": [
+        {mot:"Éclair", def:"Lueur brève d’un orage ; pâtisserie allongée."},
+        {mot:"Éclat", def:"Brillance vive ; fragment projeté."},
+        {mot:"Éclater", def:"Se briser violemment ; éclore au grand jour."},
+        {mot:"Éclaircir", def:"Rendre plus clair ou compréhensible."},
+        {mot:"Éclairage", def:"Action d’éclairer ; dispositif lumineux."},
+        {mot:"Éclaireur", def:"Personne qui explore et guide."},
+        {mot:"Éclabousser", def:"Projeter un liquide par éclats."},
+        {mot:"Éclaboussure", def:"Trace laissée par un liquide projeté."},
+        {mot:"Éclatant", def:"Très lumineux ; remarquable."}
+      ],
+
+      "JOUR": [
+        {mot:"Jour", def:"Espace de temps de 24 heures ; clarté du jour."},
+        {mot:"Journal", def:"Publication périodique d’actualités."},
+        {mot:"Journée", def:"Durée du jour ; période d’activité."},
+        {mot:"Journalier", def:"Quotidien ; ouvrier payé à la journée."},
+        {mot:"Journaliste", def:"Professionnel de l’information."},
+        {mot:"Journaux", def:"Pluriel de journal (publications)."}
+      ],
+
+      "COMM": [
+        {mot:"Commencer", def:"Entamer, débuter une action."},
+        {mot:"Commande", def:"Action de commander ; ordre d’achat."},
+        {mot:"Commandant", def:"Officier qui commande."},
+        {mot:"Commentaire", def:"Explication ou appréciation d’un texte."},
+        {mot:"Commerce", def:"Achat et vente de biens et services."},
+        {mot:"Commerçant", def:"Personne qui exerce le commerce."},
+        {mot:"Commodité", def:"Caractère de ce qui est pratique."},
+        {mot:"Commode", def:"Pratique ; meuble à tiroirs."},
+        {mot:"Commotion", def:"Choc physique ou psychique."},
+        {mot:"Comité", def:"Groupe chargé d’une mission."},
+        {mot:"Communauté", def:"Groupe partageant des intérêts communs."},
+        {mot:"Communication", def:"Action de communiquer ; message transmis."}
+      ],
+
+      "TEMP": [
+        {mot:"Temps", def:"Durée ; moment ; météo."},
+        {mot:"Tempête", def:"Perturbation atmosphérique violente."},
+        {mot:"Tempérer", def:"Modérer, adoucir."},
+        {mot:"Tempérament", def:"Caractère naturel d’une personne."},
+        {mot:"Température", def:"Degré de chaleur mesuré."},
+        {mot:"Temporel", def:"Relatif au temps ; non spirituel."},
+        {mot:"Temporaire", def:"Provisoire, qui ne dure pas."},
+        {mot:"Temporal", def:"Relatif au temps (anatomie : région des tempes)."},
+        {mot:"Temporiser", def:"Différer une décision ; gagner du temps."},
+        {mot:"Templier", def:"Membre de l’ordre des Templiers."}
+      ],
+
+      "POUR": [
+        {mot:"Pourcentage", def:"Proportion exprimée sur cent."},
+        {mot:"Pourboire", def:"Somme donnée en plus pour un service."},
+        {mot:"Pourvoir", def:"Fournir, doter."},
+        {mot:"Pourvoyeur", def:"Personne qui pourvoit, fournit."},
+        {mot:"Pourparlers", def:"Négociations en vue d’un accord."},
+        {mot:"Pourpre", def:"Couleur rouge violacé."},
+        {mot:"Pourchasser", def:"Poursuivre afin de capturer."},
+        {mot:"Pourrir", def:"Se décomposer ; gâter."},
+        {mot:"Pourriture", def:"Altération d’une matière organique."},
+        {mot:"Pourtour", def:"Bord, contour d’un espace."}
+      ],
+
+      "BLAN": [
+        {mot:"Blanc", def:"Couleur de la lumière, opposée au noir."},
+        {mot:"Blanchir", def:"Rendre plus blanc ; légaliser de l’argent."},
+        {mot:"Blancheur", def:"Qualité de ce qui est blanc."},
+        {mot:"Blanchiment", def:"Action de blanchir ; opération illégale financière."},
+        {mot:"Blanchisserie", def:"Lieu où l’on lave/repassage du linge."},
+        {mot:"Blanquette", def:"Plat en sauce à base de viande blanche."},
+        {mot:"Blanchâtre", def:"Qui tire sur le blanc."}
+      ],
+
+      "ROUG": [
+        {mot:"Rouge", def:"Couleur vive du spectre."},
+        {mot:"Rougir", def:"Devenir rouge."},
+        {mot:"Rougeur", def:"Coloration rouge de la peau."},
+        {mot:"Rougeole", def:"Maladie virale contagieuse."},
+        {mot:"Rougeoyant", def:"Qui luit d’une teinte rouge."},
+        {mot:"Rougeâtre", def:"Légèrement rouge."},
+        {mot:"Rougissement", def:"Action de rougir."}
+      ],
+
+      "OUVR": [
+        {mot:"Ouvrir", def:"Rendre accessible en écartant un obstacle."},
+        {mot:"Ouverture", def:"Action d’ouvrir ; espace ouvert."},
+        {mot:"Ouvrage", def:"Travail réalisé ; livre ; construction."},
+        {mot:"Ouvrier", def:"Travailleur manuel."},
+        {mot:"Ouvreur", def:"Employé qui place le public ; personne qui ouvre."},
+        {mot:"Ouvrable", def:"Se dit d’un jour où l’on travaille."},
+        {mot:"Ouvragé", def:"Travaillé avec ornementation."}
+      ],
+
+      "NUIT": [
+        {mot:"Nuit", def:"Période d’obscurité entre deux jours."},
+        {mot:"Nuité", def:"Hébergement d’une nuit (nuitée)."},
+        {mot:"Nuitée", def:"Période d’une nuit passée quelque part."},
+        {mot:"Nuitamment", def:"Pendant la nuit."},
+        {mot:"Nuiteux", def:"Qui évoque la nuit (rare)."},
+        {mot:"Nuitard", def:"Personne active tard la nuit (fam.)."}
+      ],
+
+      "VERS": [
+        {mot:"Verser", def:"Faire couler un liquide ; attribuer une somme."},
+        {mot:"Version", def:"Forme d’un texte, d’un produit."},
+        {mot:"Versant", def:"Flanc d’une montagne."},
+        {mot:"Verset", def:"Division d’un texte religieux ou poétique."},
+        {mot:"Versification", def:"Art de composer des vers."},
+        {mot:"Versificateur", def:"Personne qui compose des vers."},
+        {mot:"Versicolore", def:"De plusieurs couleurs changeantes."},
+        {mot:"Versatile", def:"Qui change facilement d’opinion."},
+        {mot:"Versoir", def:"Pièce de charrue qui renverse la terre."},
+        {mot:"Versement", def:"Somme d’argent payée."}
+      ],
+
+      "GLAC": [
+        {mot:"Glace", def:"Eau solidifiée ; miroir ; dessert glacé."},
+        {mot:"Glacier", def:"Masse de glace ; vendeur de glaces."},
+        {mot:"Glacial", def:"Très froid ; distant."},
+        {mot:"Glacière", def:"Récipient/appareil qui garde au frais."},
+        {mot:"Glacer", def:"Couvrir de glace ; refroidir fortement."},
+        {mot:"Glacis", def:"Pente dégagée devant une fortification."},
+        {mot:"Glaciation", def:"Période d’extension des glaciers."},
+        {mot:"Glaciologue", def:"Spécialiste des glaciers."},
+        {mot:"Glaciologie", def:"Étude scientifique des glaciers."},
+        {mot:"Glacure", def:"Couche vitrifiée d’une céramique."}
+      ],
+
+      "SOLE": [
+        {mot:"Sole", def:"Poisson plat ; partie inférieure d’une chaussure."},
+        {mot:"Soleil", def:"Astre central du système solaire."},
+        {mot:"Solaire", def:"Relatif au soleil."},
+        {mot:"Solennel", def:"Marqué par le sérieux d’une cérémonie."},
+        {mot:"Solennité", def:"Caractère solennel d’un événement."},
+        {mot:"Solécisme", def:"Faute de syntaxe."},
+        {mot:"Solénoïde", def:"Bobine produisant un champ magnétique."}
+      ],
+
+      "COUL": [
+        {mot:"Couler", def:"S’écouler ; sombrer."},
+        {mot:"Coulée", def:"Écoulement de matière ; langue de lave."},
+        {mot:"Coulis", def:"Sauce/purée liquide (cuisine)."},
+        {mot:"Coulissant", def:"Qui glisse sur un rail."},
+        {mot:"Coulisse", def:"Partie latérale d’une scène ; pièce mobile."},
+        {mot:"Couloir", def:"Passage étroit dans un bâtiment."},
+        {mot:"Coulure", def:"Trace laissée par un écoulement visqueux."},
+        {mot:"Couleur", def:"Sensation visuelle liée à la lumière."}
+      ],
+
+      "BOUL": [
+        {mot:"Boulanger", def:"Personne qui fabrique et vend le pain."},
+        {mot:"Boulangerie", def:"Lieu de fabrication/vente du pain."},
+        {mot:"Boule", def:"Objet de forme sphérique."},
+        {mot:"Boulon", def:"Tige filetée avec tête."},
+        {mot:"Boulonner", def:"Fixer avec des boulons."},
+        {mot:"Boulier", def:"Instrument de calcul à billes."},
+        {mot:"Bouliste", def:"Joueur de boules (pétanque, etc.)."},
+        {mot:"Boulot", def:"Travail, emploi (familier)."}
+      ],
+
+      "ROCH": [
+        {mot:"Roche", def:"Masse solide composée de minéraux."},
+        {mot:"Rocher", def:"Bloc de roche ; écueil."},
+        {mot:"Rocheux", def:"Composé de roches ; pierreux."},
+        {mot:"Rochaille", def:"Assemblage de rochers ; terrain caillouteux."},
+        {mot:"Rochassier", def:"Très pierreux (régional/tech.)."},
+        {mot:"Rochis", def:"Petit rocher (rare)."},
+        {mot:"Rochage", def:"Action de disposer des roches (tech.)."}
+      ],
+      
 
 
 
@@ -935,3 +1333,193 @@
   {mot:"Paracétamol", def:"Antalgique/antipyrétique."},
   {mot:"Paradis", def:"Lieu/état de félicité."}
 ]
+    };
+
+    // --- Éléments DOM ---
+    const prefixDisplay = document.getElementById("prefixDisplay");
+    const definitionDisplay = document.getElementById("definitionDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+    const initialBank = document.getElementById("initialBank");
+    const progressPill = document.getElementById("progressPill");
+    const speedPill = document.getElementById("speedPill");
+    const hintPrefix = document.getElementById("hintPrefix");
+
+    // --- État du jeu ---
+    let currentPrefix = null;
+    let currentIndex = 0;
+    let speechRate = 1;
+
+    // --- Utilitaires ---
+    const normalize = s => s
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // retire accents
+      .replace(/[^a-z\-’' ]/g,'')                       // garde lettres/espaces/apostrophes
+      .trim();
+
+    function updatePills(){
+      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
+      progressPill.textContent = total ? `${currentIndex+1} / ${total}` : `0 / 0`;
+      speedPill.textContent = `Vitesse ×${speechRate.toFixed(2)}`;
+      hintPrefix.textContent = currentPrefix || "— — — —";
+    }
+
+    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+    function speak(text, rate=speechRate){
+      if(!('speechSynthesis' in window)) { return; }
+      ttsCancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = rate;
+      speechSynthesis.speak(u);
+    }
+
+    function announce(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const intro = `Toutes les bonnes réponses commencent par : ${currentPrefix}.`;
+      const def  = item.def;
+      speak(`${intro} Définition : ${def}`);
+    }
+
+    function renderCard(){
+      if(!currentPrefix){
+        prefixDisplay.textContent = "— — — —";
+        definitionDisplay.textContent = "Choisis un préfixe ci-dessous pour commencer, ou appuie sur ▶️ Jouer pour démarrer au premier.";
+        updatePills();
+        return;
+      }
+      const item = FIELDS[currentPrefix][currentIndex];
+      prefixDisplay.textContent = currentPrefix;
+      definitionDisplay.textContent = item.def;
+      message.textContent = "Écris le mot correspondant. (Il doit commencer par " + currentPrefix + ")";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.placeholder = `Un mot qui commence par « ${currentPrefix} »…`;
+      answerInput.disabled = false;
+      updatePills();
+    }
+
+    function setPrefix(prefix){
+      if(!FIELDS[prefix]) return;
+      currentPrefix = prefix;
+      currentIndex = 0;
+      highlightBank(prefix);
+      renderCard();
+      announce();
+      answerInput.focus();
+    }
+
+    function next(){
+      if(!currentPrefix) return;
+      currentIndex++;
+      const list = FIELDS[currentPrefix];
+      if(currentIndex >= list.length){
+        currentIndex = list.length-1;
+        message.textContent = `🎉 Bravo ! Tu as terminé le champ lexical ${currentPrefix}. Choisis un autre préfixe ci-dessous.`;
+        message.style.color = "#00e676";
+        answerInput.disabled = true;
+        ttsCancel();
+        speak(`Bravo ! Tu as terminé le champ lexical ${currentPrefix}.`);
+        return;
+      }
+      renderCard();
+      announce();
+      answerInput.focus();
+    }
+
+    function back(){
+      if(!currentPrefix) return;
+      if(currentIndex > 0){
+        currentIndex--;
+        renderCard();
+        announce();
+        answerInput.focus();
+      }
+    }
+
+    function repeat(){ announce(); }
+
+    function slower(){
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      updatePills();
+      announce();
+    }
+    function faster(){
+      speechRate = Math.min(2, speechRate + 0.25);
+      updatePills();
+      announce();
+    }
+
+    function check(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const user = normalize(answerInput.value);
+      const target = normalize(item.mot);
+      if(user && user.startsWith(normalize(currentPrefix)) && user === target){
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
+        speak("Correct ! Bien joué.");
+        setTimeout(next, 900);
+      }else{
+        message.textContent = `❌ Incorrect. Il fallait : ${item.mot}.`;
+        message.style.color = "#ff5252";
+        speak(`Incorrect. Il fallait : ${item.mot}.`);
+      }
+    }
+
+    // --- Banque de préfixes cliquables ---
+    function buildBank(){
+      const keys = Object.keys(FIELDS);
+      keys.sort((a,b)=>a.localeCompare(b,'fr'));
+      initialBank.innerHTML = "";
+      for(const k of keys){
+        const btn = document.createElement("button");
+        btn.textContent = k.toUpperCase();
+        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
+        btn.addEventListener("click", ()=> setPrefix(k));
+        initialBank.appendChild(btn);
+      }
+    }
+    function highlightBank(k){
+      [...initialBank.children].forEach(b=>{
+        b.classList.toggle('active', b.textContent === k.toUpperCase());
+      });
+    }
+
+    // --- Écouteurs ---
+    btnPlay.addEventListener("click", ()=>{
+      if(!currentPrefix){
+        const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
+        setPrefix(first);
+      }else{
+        announce();
+      }
+    });
+    btnSlow.addEventListener("click", slower);
+    btnFast.addEventListener("click", faster);
+    btnRepeat.addEventListener("click", repeat);
+    btnSkip.addEventListener("click", next);
+    btnBack.addEventListener("click", back);
+
+    answerInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") check();
+    });
+
+    // --- Démarrage ---
+    window.addEventListener("load", ()=>{
+      buildBank();
+      renderCard();
+      if(!('speechSynthesis' in window)){
+        message.innerHTML = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
+      }
+    });
+  </script>
+</body>
+</html>
