@@ -3,1523 +3,553 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Champs Lexicaux – Jeu Vocal (4 lettres)</title>
+  <title>Jeu de Calcul Mental</title>
   <style>
-    :root{
-      --bg1:#6a11cb; --bg2:#2575fc;
-      --card: rgba(255,255,255,.12);
-      --glass: blur(12px);
-      --txt:#fff; --accent:#fff; --brand:#2575fc;
-      --ok:#00e676; --ko:#ff5252;
-    }
-    *{box-sizing:border-box}
-    body{
+    body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
-      color: var(--txt);
-      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       margin: 0;
-      display: grid;
-      place-items: center;
-      padding: 24px;
     }
-    @keyframes gradientAnimation{
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
+
+    @keyframes gradientAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
-    .container{
-      background: var(--card);
-      backdrop-filter: var(--glass);
-      width: min(920px, 94vw);
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
       border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.25);
-      animation: fadeIn .9s ease;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      max-width: 560px; /* un peu plus large pour accueillir le timer et les infos de page */
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
     }
-    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
-    header{
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    h1{
-      font-weight:800; margin:0; font-size: clamp(22px, 3.2vw, 34px);
-      text-shadow: 0 3px 8px rgba(0,0,0,.3);
-      letter-spacing:.3px;
+
+    h1 {
+      font-weight: 800;
+      margin-bottom: 12px;
+      font-size: 2rem;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
-    .status{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+
+    #metaBar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
       opacity:.95;
+      font-weight:600;
     }
-    .pill{
-      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.16);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
-      font-size:.95rem
+
+    #pageInfo, #difficultyBadge{
+      background: rgba(255,255,255,.15);
+      padding: 6px 10px;
+      border-radius: 10px;
     }
-    .display{
-      margin:24px 0 10px; display:grid; gap:10px;
+
+    #timer {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-shadow: 0 0 10px rgba(0,0,0,.25);
+      margin: 10px 0 6px;
     }
-    #prefixDisplay{
-      font-size: clamp(28px, 5vw, 48px);
-      font-weight:900; letter-spacing:.18em; text-align:center;
-      text-shadow: 0 3px 8px rgba(0,0,0,.28);
+
+    #questionDisplay {
+      font-size: 2.2rem;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+      min-height: 50px;
     }
-    #definitionDisplay{
-      font-size: clamp(16px, 2vw, 20px);
-      line-height:1.6; text-align:center;
-      background: rgba(0,0,0,.16);
-      border-radius:14px; padding:16px 18px;
+
+    input[type="text"] {
+      font-size: 1.4rem;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      margin-bottom: 14px;
+      background-color: #fff;
+      color: #333;
+      outline: none;
+      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
+      transition: all 0.3s ease;
     }
-    .controls{
-      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #2575fc;
+      caret-color: #2575fc;
     }
-    button{
-      padding:12px; font-size:1.05rem; font-weight:700; border-radius:12px; border:none;
-      cursor:pointer; background:#fff; color:var(--brand);
-      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
     }
-    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
-    button:disabled{opacity:.55; cursor:not-allowed}
-    input[type="text"]{
-      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
-      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
+
+    button {
+      flex: 1 1 40%;
+      padding: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
-    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
-    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
-    .bank{
-      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+
+    button:hover {
+      background: #2575fc;
+      color: #fff;
+      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
     }
-    .bank button{
-      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
-      border:1px solid rgba(255,255,255,.18);
+
+    #message {
+      margin-top: 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      min-height: 32px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.1);
+      transition: color 0.3s ease;
     }
-    .bank button.active{ background:#fff; color:var(--brand) }
-    .footnote{
-      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
-    }
-    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Champs lexicaux – Jeu vocal (4 lettres)</h1>
-      <div class="status">
-        <span class="pill" id="progressPill">0 / 0</span>
-        <span class="pill" id="speedPill">Vitesse ×1.00</span>
-        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">— — — —</b></span>
-      </div>
-    </header>
+    <h1> Calcul Mental</h1>
 
-    <div class="display">
-      <div id="prefixDisplay">— — — —</div>
-      <div id="definitionDisplay">Clique un préfixe ci-dessous ou appuie sur ▶️ Jouer.</div>
+    <!-- Barre méta : page & difficulté & timer -->
+    <div id="metaBar">
+      <div id="pageInfo">Page 1 / 1</div>
+      <div id="difficultyBadge">Difficulté : —</div>
+      <div id="timer">—</div>
     </div>
 
-    <input type="text" id="answer" placeholder="Écris le mot correct (même 4 lettres initiales) et appuie sur Entrée…" autocomplete="off" />
-
-    <div class="controls" role="group" aria-label="Commandes">
+    <div id="questionDisplay">Question</div>
+    <input type="text" id="answer" placeholder="Réponse..." />
+    <div class="buttons">
       <button id="btnPlay">▶️ Jouer</button>
       <button id="btnSlow">🐢 Ralentir</button>
       <button id="btnFast">🐇 Accélérer</button>
       <button id="btnRepeat">🔁 Répéter</button>
       <button id="btnSkip">⏭ Passer</button>
       <button id="btnBack">⬅️ Retour</button>
+      <!-- Ajout : bouton vocal -->
+      <button id="btnVoice">🎤 Répondre à la voix</button>
     </div>
-
-    <div id="message" aria-live="polite"></div>
-
-    <div class="divider"></div>
-
-    <div class="bank" id="initialBank" aria-label="Liste de préfixes (sélection rapide)"></div>
-    <div class="footnote">Astuce : change la vitesse et répète la définition à volonté.</div>
+    <div id="message"></div>
   </div>
 
+
   <script>
-    // ================================
-    // Données : CHAMPS LEXICAUX (4 lettres)
-    // Règles: mots simples (pas d'expressions composées), sans doublons, orthographe corrigée.
-    // Chaque réponse doit commencer par le préfixe de 4 lettres (clé du champ).
-    // ================================
-    const FIELDS = {
-      "CART": [
-        {mot:"Carton", def:"Papier rigide utilisé notamment pour emballer."},
-        {mot:"Cartable", def:"Sac d’écolier pour transporter cahiers et livres."},
-        {mot:"Carte", def:"Document figurant des informations (géographiques, etc.)."},
-        {mot:"Cartouche", def:"Recharge d’encre ou munitions."},
-        {mot:"Cartographe", def:"Spécialiste de la réalisation de cartes."},
-        {mot:"Cartographie", def:"Science/technique de la représentation des territoires."},
-        {mot:"Cartonner", def:"Obtenir un grand succès (familier)."},
-        {mot:"Cartel", def:"Entente d’entreprises visant à limiter la concurrence."},
-        {mot:"Cartomancie", def:"Art divinatoire utilisant des cartes."},
-        {mot:"Cartomancien", def:"Personne qui pratique la cartomancie."},
-        {mot:"Cartulaire", def:"Recueil de chartes et de documents (histoire)."}
-      ],
-
-      "PLAN": [
-        {mot:"Plante", def:"Être vivant du règne végétal."},
-        {mot:"Planter", def:"Mettre une graine ou un végétal en terre."},
-        {mot:"Plantation", def:"Terrain cultivé de végétaux."},
-        {mot:"Planteur", def:"Personne qui exploite une plantation."},
-        {mot:"Plantule", def:"Jeune pousse végétale."},
-        {mot:"Plantain", def:"Plante herbacée courante."},
-        {mot:"Plantigrade", def:"Animal marchant sur la plante des pieds."},
-        {mot:"Plantoir", def:"Outil servant à planter."},
-        {mot:"Plantureux", def:"Abondant, généreux."},
-        {mot:"Plantin", def:"Petit plant destiné à être replanté."}
-      ],
-
-      "CHAN": [
-        {mot:"Chant", def:"Mélodie vocale."},
-        {mot:"Chanter", def:"Produire des sons musicaux avec la voix."},
-        {mot:"Chanteur", def:"Personne qui chante."},
-        {mot:"Chanson", def:"Pièce vocale avec couplets et refrain."},
-        {mot:"Chantonner", def:"Chanter doucement, à mi-voix."},
-        {mot:"Chantonnement", def:"Fait de fredonner à voix basse."},
-        {mot:"Chanterelle", def:"Petite corde aiguë d’un instrument à cordes."},
-        {mot:"Chantre", def:"Personne qui célèbre ou défend une idée."},
-        {mot:"Chanté", def:"Interprété vocalement."}
-      ],
-
-      "PORT": [
-        {mot:"Port", def:"Lieu d’accostage des bateaux."},
-        {mot:"Porter", def:"Tenir, transporter sur soi."},
-        {mot:"Portable", def:"Qu’on peut transporter facilement."},
-        {mot:"Porteur", def:"Personne ou chose qui porte."},
-        {mot:"Portail", def:"Grande porte monumentale."},
-        {mot:"Portuaire", def:"Relatif aux ports."},
-        {mot:"Portance", def:"Force de soutien d’un profil en fluide."},
-        {mot:"Portier", def:"Personne chargée d’une entrée."},
-        {mot:"Portillon", def:"Petite porte d’accès."}
-      ],
-
-      "MONT": [
-        {mot:"Montagne", def:"Relief naturel élevé."},
-        {mot:"Monter", def:"Aller vers le haut ; grimper."},
-        {mot:"Montant", def:"Somme due ; pièce verticale."},
-        {mot:"Monture", def:"Support d’un objet ; animal qu’on monte."},
-        {mot:"Monticule", def:"Petite élévation de terrain."},
-        {mot:"Montée", def:"Action de grimper ; pente."},
-        {mot:"Montagnard", def:"Habitant des régions de montagne."},
-        {mot:"Monteur", def:"Personne qui assemble (films, machines…)."},
-        {mot:"Montreur", def:"Personne qui présente (d’animaux, marionnettes…)."}
-      ],
-
-      "LUMI": [
-        {mot:"Lumière", def:"Ce qui rend les objets visibles."},
-        {mot:"Lumineux", def:"Qui émet ou réfléchit la lumière."},
-        {mot:"Luminaire", def:"Appareil d’éclairage."},
-        {mot:"Luminescence", def:"Émission de lumière sans chaleur."},
-        {mot:"Lumignon", def:"Petite bougie mince."},
-        {mot:"Luminance", def:"Intensité lumineuse perçue d’une surface."},
-        {mot:"Luminothérapie", def:"Traitement par la lumière."},
-        {mot:"Luminophore", def:"Substance qui émet de la lumière."}
-      ],
-
-      "VENT": [
-        {mot:"Vent", def:"Mouvement d’air naturel."},
-        {mot:"Venteux", def:"Où il y a beaucoup de vent."},
-        {mot:"Ventiler", def:"Faire circuler l’air."},
-        {mot:"Ventilation", def:"Renouvellement de l’air."},
-        {mot:"Ventilateur", def:"Appareil qui brasse l’air."},
-        {mot:"Ventouse", def:"Dispositif d’aspiration par succion."},
-        {mot:"Ventail", def:"Battant (ancien) de casque ou de porte."}
-      ],
-
-      "ECLA": [
-        {mot:"Éclair", def:"Lueur brève d’un orage ; pâtisserie allongée."},
-        {mot:"Éclat", def:"Brillance vive ; fragment projeté."},
-        {mot:"Éclater", def:"Se briser violemment ; éclore au grand jour."},
-        {mot:"Éclaircir", def:"Rendre plus clair ou compréhensible."},
-        {mot:"Éclairage", def:"Action d’éclairer ; dispositif lumineux."},
-        {mot:"Éclaireur", def:"Personne qui explore et guide."},
-        {mot:"Éclabousser", def:"Projeter un liquide par éclats."},
-        {mot:"Éclaboussure", def:"Trace laissée par un liquide projeté."},
-        {mot:"Éclatant", def:"Très lumineux ; remarquable."}
-      ],
-
-      "JOUR": [
-        {mot:"Jour", def:"Espace de temps de 24 heures ; clarté du jour."},
-        {mot:"Journal", def:"Publication périodique d’actualités."},
-        {mot:"Journée", def:"Durée du jour ; période d’activité."},
-        {mot:"Journalier", def:"Quotidien ; ouvrier payé à la journée."},
-        {mot:"Journaliste", def:"Professionnel de l’information."},
-        {mot:"Journaux", def:"Pluriel de journal (publications)."}
-      ],
-
-      "COMM": [
-        {mot:"Commencer", def:"Entamer, débuter une action."},
-        {mot:"Commande", def:"Action de commander ; ordre d’achat."},
-        {mot:"Commandant", def:"Officier qui commande."},
-        {mot:"Commentaire", def:"Explication ou appréciation d’un texte."},
-        {mot:"Commerce", def:"Achat et vente de biens et services."},
-        {mot:"Commerçant", def:"Personne qui exerce le commerce."},
-        {mot:"Commodité", def:"Caractère de ce qui est pratique."},
-        {mot:"Commode", def:"Pratique ; meuble à tiroirs."},
-        {mot:"Commotion", def:"Choc physique ou psychique."},
-        {mot:"Comité", def:"Groupe chargé d’une mission."},
-        {mot:"Communauté", def:"Groupe partageant des intérêts communs."},
-        {mot:"Communication", def:"Action de communiquer ; message transmis."}
-      ],
-
-      "TEMP": [
-        {mot:"Temps", def:"Durée ; moment ; météo."},
-        {mot:"Tempête", def:"Perturbation atmosphérique violente."},
-        {mot:"Tempérer", def:"Modérer, adoucir."},
-        {mot:"Tempérament", def:"Caractère naturel d’une personne."},
-        {mot:"Température", def:"Degré de chaleur mesuré."},
-        {mot:"Temporel", def:"Relatif au temps ; non spirituel."},
-        {mot:"Temporaire", def:"Provisoire, qui ne dure pas."},
-        {mot:"Temporal", def:"Relatif au temps (anatomie : région des tempes)."},
-        {mot:"Temporiser", def:"Différer une décision ; gagner du temps."},
-        {mot:"Templier", def:"Membre de l’ordre des Templiers."}
-      ],
-
-      "POUR": [
-        {mot:"Pourcentage", def:"Proportion exprimée sur cent."},
-        {mot:"Pourboire", def:"Somme donnée en plus pour un service."},
-        {mot:"Pourvoir", def:"Fournir, doter."},
-        {mot:"Pourvoyeur", def:"Personne qui pourvoit, fournit."},
-        {mot:"Pourparlers", def:"Négociations en vue d’un accord."},
-        {mot:"Pourpre", def:"Couleur rouge violacé."},
-        {mot:"Pourchasser", def:"Poursuivre afin de capturer."},
-        {mot:"Pourrir", def:"Se décomposer ; gâter."},
-        {mot:"Pourriture", def:"Altération d’une matière organique."},
-        {mot:"Pourtour", def:"Bord, contour d’un espace."}
-      ],
-
-      "BLAN": [
-        {mot:"Blanc", def:"Couleur de la lumière, opposée au noir."},
-        {mot:"Blanchir", def:"Rendre plus blanc ; légaliser de l’argent."},
-        {mot:"Blancheur", def:"Qualité de ce qui est blanc."},
-        {mot:"Blanchiment", def:"Action de blanchir ; opération illégale financière."},
-        {mot:"Blanchisserie", def:"Lieu où l’on lave/repassage du linge."},
-        {mot:"Blanquette", def:"Plat en sauce à base de viande blanche."},
-        {mot:"Blanchâtre", def:"Qui tire sur le blanc."}
-      ],
-
-      "ROUG": [
-        {mot:"Rouge", def:"Couleur vive du spectre."},
-        {mot:"Rougir", def:"Devenir rouge."},
-        {mot:"Rougeur", def:"Coloration rouge de la peau."},
-        {mot:"Rougeole", def:"Maladie virale contagieuse."},
-        {mot:"Rougeoyant", def:"Qui luit d’une teinte rouge."},
-        {mot:"Rougeâtre", def:"Légèrement rouge."},
-        {mot:"Rougissement", def:"Action de rougir."}
-      ],
-
-      "OUVR": [
-        {mot:"Ouvrir", def:"Rendre accessible en écartant un obstacle."},
-        {mot:"Ouverture", def:"Action d’ouvrir ; espace ouvert."},
-        {mot:"Ouvrage", def:"Travail réalisé ; livre ; construction."},
-        {mot:"Ouvrier", def:"Travailleur manuel."},
-        {mot:"Ouvreur", def:"Employé qui place le public ; personne qui ouvre."},
-        {mot:"Ouvrable", def:"Se dit d’un jour où l’on travaille."},
-        {mot:"Ouvragé", def:"Travaillé avec ornementation."}
-      ],
-
-      "NUIT": [
-        {mot:"Nuit", def:"Période d’obscurité entre deux jours."},
-        {mot:"Nuité", def:"Hébergement d’une nuit (nuitée)."},
-        {mot:"Nuitée", def:"Période d’une nuit passée quelque part."},
-        {mot:"Nuitamment", def:"Pendant la nuit."},
-        {mot:"Nuiteux", def:"Qui évoque la nuit (rare)."},
-        {mot:"Nuitard", def:"Personne active tard la nuit (fam.)."}
-      ],
-
-      "VERS": [
-        {mot:"Verser", def:"Faire couler un liquide ; attribuer une somme."},
-        {mot:"Version", def:"Forme d’un texte, d’un produit."},
-        {mot:"Versant", def:"Flanc d’une montagne."},
-        {mot:"Verset", def:"Division d’un texte religieux ou poétique."},
-        {mot:"Versification", def:"Art de composer des vers."},
-        {mot:"Versificateur", def:"Personne qui compose des vers."},
-        {mot:"Versicolore", def:"De plusieurs couleurs changeantes."},
-        {mot:"Versatile", def:"Qui change facilement d’opinion."},
-        {mot:"Versoir", def:"Pièce de charrue qui renverse la terre."},
-        {mot:"Versement", def:"Somme d’argent payée."}
-      ],
-
-      "GLAC": [
-        {mot:"Glace", def:"Eau solidifiée ; miroir ; dessert glacé."},
-        {mot:"Glacier", def:"Masse de glace ; vendeur de glaces."},
-        {mot:"Glacial", def:"Très froid ; distant."},
-        {mot:"Glacière", def:"Récipient/appareil qui garde au frais."},
-        {mot:"Glacer", def:"Couvrir de glace ; refroidir fortement."},
-        {mot:"Glacis", def:"Pente dégagée devant une fortification."},
-        {mot:"Glaciation", def:"Période d’extension des glaciers."},
-        {mot:"Glaciologue", def:"Spécialiste des glaciers."},
-        {mot:"Glaciologie", def:"Étude scientifique des glaciers."},
-        {mot:"Glacure", def:"Couche vitrifiée d’une céramique."}
-      ],
-
-      "SOLE": [
-        {mot:"Sole", def:"Poisson plat ; partie inférieure d’une chaussure."},
-        {mot:"Soleil", def:"Astre central du système solaire."},
-        {mot:"Solaire", def:"Relatif au soleil."},
-        {mot:"Solennel", def:"Marqué par le sérieux d’une cérémonie."},
-        {mot:"Solennité", def:"Caractère solennel d’un événement."},
-        {mot:"Solécisme", def:"Faute de syntaxe."},
-        {mot:"Solénoïde", def:"Bobine produisant un champ magnétique."}
-      ],
-
-      "COUL": [
-        {mot:"Couler", def:"S’écouler ; sombrer."},
-        {mot:"Coulée", def:"Écoulement de matière ; langue de lave."},
-        {mot:"Coulis", def:"Sauce/purée liquide (cuisine)."},
-        {mot:"Coulissant", def:"Qui glisse sur un rail."},
-        {mot:"Coulisse", def:"Partie latérale d’une scène ; pièce mobile."},
-        {mot:"Couloir", def:"Passage étroit dans un bâtiment."},
-        {mot:"Coulure", def:"Trace laissée par un écoulement visqueux."},
-        {mot:"Couleur", def:"Sensation visuelle liée à la lumière."}
-      ],
-
-      "BOUL": [
-        {mot:"Boulanger", def:"Personne qui fabrique et vend le pain."},
-        {mot:"Boulangerie", def:"Lieu de fabrication/vente du pain."},
-        {mot:"Boule", def:"Objet de forme sphérique."},
-        {mot:"Boulon", def:"Tige filetée avec tête."},
-        {mot:"Boulonner", def:"Fixer avec des boulons."},
-        {mot:"Boulier", def:"Instrument de calcul à billes."},
-        {mot:"Bouliste", def:"Joueur de boules (pétanque, etc.)."},
-        {mot:"Boulot", def:"Travail, emploi (familier)."}
-      ],
-
-      "ROCH": [
-        {mot:"Roche", def:"Masse solide composée de minéraux."},
-        {mot:"Rocher", def:"Bloc de roche ; écueil."},
-        {mot:"Rocheux", def:"Composé de roches ; pierreux."},
-        {mot:"Rochaille", def:"Assemblage de rochers ; terrain caillouteux."},
-        {mot:"Rochassier", def:"Très pierreux (régional/tech.)."},
-        {mot:"Rochis", def:"Petit rocher (rare)."},
-        {mot:"Rochage", def:"Action de disposer des roches (tech.)."}
-      ],
-      
-
-
-
-
-"GRAV": [
-  {mot:"Grave", def:"D’une grande importance ; tonalité basse."},
-  {mot:"Gravité", def:"Force d’attraction ; caractère sérieux."},
-  {mot:"Gravement", def:"D’une manière sérieuse, critique."},
-  {mot:"Graver", def:"Inciser une surface pour y laisser une trace."},
-  {mot:"Gravure", def:"Image obtenue par incision d’une plaque."},
-  {mot:"Graveur", def:"Personne qui pratique la gravure."},
-  {mot:"Gravillon", def:"Petit caillou utilisé pour les revêtements."},
-  {mot:"Gravitation", def:"Attraction réciproque des corps."},
-  {mot:"Gravimétrie", def:"Mesure des variations de gravité."},
-  {mot:"Gravats", def:"Débris de maçonnerie."}
-],
-
-"HIST": [
-  {mot:"Histoire", def:"Récit des faits passés ; discipline qui les étudie."},
-  {mot:"Historique", def:"Relatif à l’histoire ; mémorable."},
-  {mot:"Historien", def:"Spécialiste de l’étude de l’histoire."},
-  {mot:"Historicité", def:"Caractère de ce qui appartient à l’histoire."},
-  {mot:"Historiographie", def:"Étude des méthodes de l’histoire."},
-  {mot:"Historisme", def:"Tendance à expliquer par le contexte historique."},
-  {mot:"Histologie", def:"Étude des tissus biologiques."},
-  {mot:"Histamine", def:"Molécule impliquée dans les réactions allergiques."},
-  {mot:"Histopathologie", def:"Étude des maladies au niveau tissulaire."},
-  {mot:"Histogramme", def:"Diagramme en barres contiguës."},
-  {mot:"Histocompatibilité", def:"Compatibilité tissulaire entre individus."}
-],
-
-"BIBL": [
-  {mot:"Bibliothèque", def:"Lieu de conservation et prêt de documents."},
-  {mot:"Bibliothécaire", def:"Professionnel qui gère une bibliothèque."},
-  {mot:"Bibliographie", def:"Liste des sources utilisées."},
-  {mot:"Bibliophile", def:"Amateur et collectionneur de livres."},
-  {mot:"Bibliologie", def:"Étude du livre dans sa globalité."},
-  {mot:"Bibliométrie", def:"Mesure quantitative de la production écrite."},
-  {mot:"Bibliomanie", def:"Passion excessive pour l’acquisition de livres."},
-  {mot:"Bibliobus", def:"Bibliothèque itinérante."},
-  {mot:"Bibliothéconomie", def:"Gestion et techniques des bibliothèques."}
-],
-
-"FORM": [
-  {mot:"Forme", def:"Aspect extérieur ; configuration."},
-  {mot:"Former", def:"Façonner ; instruire."},
-  {mot:"Formation", def:"Action de former ; apprentissage."},
-  {mot:"Formulaire", def:"Document à rubriques à remplir."},
-  {mot:"Formel", def:"Qui respecte les formes ; explicite."},
-  {mot:"Formellement", def:"De façon explicite, catégorique."},
-  {mot:"Format", def:"Taille, disposition d’un support."},
-  {mot:"Formatage", def:"Préparation d’un support ; mise en forme."},
-  {mot:"Formateur", def:"Personne qui enseigne, forme."},
-  {mot:"Formidable", def:"Remarquable, impressionnant."}
-],
-
-"REST": [
-  {mot:"Rester", def:"Demeurer, ne pas partir."},
-  {mot:"Restant", def:"Qui demeure ; ce qui subsiste."},
-  {mot:"Restaurant", def:"Établissement où l’on sert des repas."},
-  {mot:"Restauration", def:"Action de restaurer ; secteur des restaurants."},
-  {mot:"Restaurer", def:"Remettre en état ; rétablir."},
-  {mot:"Restituer", def:"Rendre ce qui a été pris ou perdu."},
-  {mot:"Restitution", def:"Action de rendre ; rétablissement d’un bien."},
-  {mot:"Restreindre", def:"Réduire, limiter."},
-  {mot:"Restriction", def:"Limitation, réduction."}
-],
-
-"CUIS": [
-  {mot:"Cuisiner", def:"Préparer des plats."},
-  {mot:"Cuisine", def:"Pièce ou art de préparer des mets."},
-  {mot:"Cuisinier", def:"Professionnel qui prépare les plats."},
-  {mot:"Cuisinière", def:"Appareil de cuisson ; femme qui cuisine."},
-  {mot:"Cuisson", def:"Action de cuire un aliment."},
-  {mot:"Cuisinette", def:"Petite cuisine."},
-  {mot:"Cuisant", def:"Qui brûle ; très douloureux (fig.)."},
-  {mot:"Cuisse", def:"Partie du membre inférieur entre hanche et genou."}
-],
-
-"TABL": [
-  {mot:"Table", def:"Meuble à plateau."},
-  {mot:"Tableau", def:"Œuvre peinte ; panneau d’affichage ; matrice."},
-  {mot:"Tablette", def:"Petit support plat (chocolat, argile, électronique)."},
-  {mot:"Tablier", def:"Vêtement de protection."},
-  {mot:"Tablée", def:"Groupe de personnes autour d’une table."},
-  {mot:"Tabler", def:"Compter sur, miser sur."},
-  {mot:"Tablature", def:"Notation musicale pour instruments à cordes."},
-  {mot:"Tableur", def:"Logiciel de feuilles de calcul."},
-  {mot:"Tableautin", def:"Petit tableau décoratif ou schéma."}
-],
-
-"PHOT": [
-  {mot:"Photo", def:"Image obtenue par prise de vue."},
-  {mot:"Photographe", def:"Personne qui prend des photos."},
-  {mot:"Photographie", def:"Art/technique de production d’images."},
-  {mot:"Photogénique", def:"Qui rend bien en photo."},
-  {mot:"Photosynthèse", def:"Production d’énergie par la lumière (plantes)."},
-  {mot:"Photon", def:"Quantum de lumière."},
-  {mot:"Photomètre", def:"Appareil mesurant l’intensité lumineuse."},
-  {mot:"Photocopie", def:"Reproduction d’un document."},
-  {mot:"Photovoltaïque", def:"Qui convertit la lumière en électricité."},
-  {mot:"Photogramme", def:"Image fixe d’une pellicule."},
-  {mot:"Photophobie", def:"Hypersensibilité à la lumière."},
-  {mot:"Photomontage", def:"Composition à partir de plusieurs photos."}
-],
-
-"LECT": [
-  {mot:"Lecture", def:"Action de lire."},
-  {mot:"Lecteur", def:"Personne ou appareil qui lit."},
-  {mot:"Lectrice", def:"Femme qui lit."},
-  {mot:"Lectorat", def:"Ensemble des lecteurs."},
-  {mot:"Lectine", def:"Protéine se liant aux glucides."},
-  {mot:"Lectoral", def:"Relatif aux lecteurs (rare)."},
-  {mot:"Lecturable", def:"Facile à lire (rare/techn.)."}
-],
-
-"TERR": [
-  {mot:"Terre", def:"Planète ; sol ; matière du sol."},
-  {mot:"Terrain", def:"Étendue de terre définie."},
-  {mot:"Terrasse", def:"Plateforme extérieure."},
-  {mot:"Terrien", def:"Relatif à la Terre ; habitant de la Terre."},
-  {mot:"Territoire", def:"Espace délimité soumis à une autorité."},
-  {mot:"Terreur", def:"Peur extrême."},
-  {mot:"Terrestre", def:"Relatif à la terre, au sol."},
-  {mot:"Terrassier", def:"Ouvrier des terrassements."},
-  {mot:"Terrifiant", def:"Qui inspire l’effroi."},
-  {mot:"Territorial", def:"Relatif au territoire."},
-  {mot:"Terrarium", def:"Vitrine pour animaux terrestres."}
-],
-
-"PAPI": [
-  {mot:"Papier", def:"Feuille pour écrire, imprimer, emballer."},
-  {mot:"Papillon", def:"Insecte à ailes colorées."},
-  {mot:"Papillote", def:"Emballage ; mode de cuisson en papier."},
-  {mot:"Papille", def:"Petite protubérance, notamment gustative."},
-  {mot:"Papillonner", def:"Passer sans cesse d’une chose à l’autre."},
-  {mot:"Papillomavirus", def:"Virus pouvant provoquer des verrues."},
-  {mot:"Papivore", def:"Grand lecteur (fam.)."},
-  {mot:"Papillaire", def:"Relatif aux papilles."},
-  {mot:"Papillomateux", def:"Qui présente des papillomes."}
-],
-
-"ANIM": [
-  {mot:"Animal", def:"Être vivant appartenant au règne animal."},
-  {mot:"Animer", def:"Donner vie, dynamiser."},
-  {mot:"Animation", def:"Ensemble d’activités ; film animé."},
-  {mot:"Animateur", def:"Personne qui anime."},
-  {mot:"Animatrice", def:"Femme qui anime."},
-  {mot:"Animaux", def:"Pluriel d’animal."},
-  {mot:"Animé", def:"Plein de vie ; film d’animation."},
-  {mot:"Animalier", def:"Relatif aux animaux."},
-  {mot:"Animalité", def:"Caractères propres à l’animal."},
-  {mot:"Animisme", def:"Croyance attribuant une âme aux choses."},
-  {mot:"Animatronique", def:"Robotique à apparence d’être vivant."}
-],
-
-"SERV": [
-  {mot:"Servir", def:"Rendre service, fournir."},
-  {mot:"Service", def:"Aide ; ensemble d’activités offertes."},
-  {mot:"Serveur", def:"Personne qui sert ; ordinateur fournissant un service."},
-  {mot:"Serveuse", def:"Femme qui sert."},
-  {mot:"Serviable", def:"Enclin à aider."},
-  {mot:"Serviette", def:"Tissu pour s’essuyer."},
-  {mot:"Servitude", def:"Dépendance ; charge réelle sur un bien."},
-  {mot:"Servomoteur", def:"Moteur commandé par asservissement."}
-],
-
-"DANS": [
-  {mot:"Danse", def:"Mouvement rythmique du corps."},
-  {mot:"Danser", def:"Exécuter une danse."},
-  {mot:"Dansant", def:"Qui invite à danser."},
-  {mot:"Dansé", def:"Interprété en danse."},
-  {mot:"Danseur", def:"Homme qui danse."},
-  {mot:"Danseuse", def:"Femme qui danse."},
-  {mot:"Dansoir", def:"Salle destinée à la danse (rare)."},
-  {mot:"Dansoter", def:"Danser légèrement."}
-],
-
-"PREN": [
-  {mot:"Prendre", def:"Saisir ; se saisir de."},
-  {mot:"Preneur", def:"Personne qui prend, accepte."},
-  {mot:"Prenante", def:"Captivante, absorbante."},
-  {mot:"Prenable", def:"Qui peut être pris, attaqué."},
-  {mot:"Prénom", def:"Nom individuel précédant le nom de famille."}
-],
-
-"CHEM": [
-  {mot:"Chemin", def:"Voie de passage."},
-  {mot:"Cheminer", def:"Avancer progressivement."},
-  {mot:"Cheminement", def:"Progression, parcours."},
-  {mot:"Cheminée", def:"Conduit d’évacuation des fumées ; foyer."},
-  {mot:"Cheminot", def:"Agent des chemins de fer."},
-  {mot:"Chemise", def:"Vêtement porté sur le haut du corps."},
-  {mot:"Chemisier", def:"Chemise féminine ; vendeur de chemises."},
-  {mot:"Chemiser", def:"Tapisser l’intérieur d’un moule."},
-  {mot:"Chemisette", def:"Chemise légère à manches courtes."}
-],
-
-"AMOU": [
-  {mot:"Amour", def:"Sentiment d’affection profonde."},
-  {mot:"Amoureux", def:"Qui éprouve de l’amour."},
-  {mot:"Amourette", def:"Brève aventure sentimentale."},
-  {mot:"Amouracher", def:"S’éprendre vivement (souvent à la légère)."},
-  {mot:"Amouraché", def:"Épris soudainement."}
-],
-
-"CORR": [
-  {mot:"Corriger", def:"Rectifier une erreur."},
-  {mot:"Correction", def:"Action de corriger ; qualité de tenue."},
-  {mot:"Correct", def:"Conforme aux règles."},
-  {mot:"Correcteur", def:"Personne ou outil qui corrige."},
-  {mot:"Correspondre", def:"Être en accord ; échanger du courrier."},
-  {mot:"Correspondance", def:"Lien ; ensemble des lettres échangées."},
-  {mot:"Corrélation", def:"Rapport de dépendance entre variables."},
-  {mot:"Corréler", def:"Mettre en relation."},
-  {mot:"Corrosion", def:"Altération par réaction chimique."},
-  {mot:"Corrompre", def:"Pervertir moralement ; altérer."},
-  {mot:"Corrompu", def:"Qui a été perverti ; altéré."}
-],
-
-"BENE": [
-  {mot:"Bénéfice", def:"Avantage ; profit réalisé."},
-  {mot:"Bénévole", def:"Qui agit sans rémunération."},
-  {mot:"Bénéfique", def:"Qui fait du bien."},
-  {mot:"Bénéficier", def:"Tirer avantage de."},
-  {mot:"Bénéficiaire", def:"Personne qui reçoit l’avantage."},
-  {mot:"Bénédiction", def:"Action de bénir ; faveur divine."},
-  {mot:"Bénévolat", def:"Action bénévole."},
-  {mot:"Bénéfacteur", def:"Personne qui fait le bien."},
-  {mot:"Bénéfaction", def:"Bienfait, acte généreux."},
-  {mot:"Bénédicité", def:"Prière avant le repas."},
-  {mot:"Bénédictin", def:"Membre d’un ordre religieux."}
-],
-
-"CHAP": [
-  {mot:"Chapitre", def:"Division d’un livre."},
-  {mot:"Chapeau", def:"Couvre-chef."},
-  {mot:"Chapelle", def:"Petit lieu de culte."},
-  {mot:"Chapardage", def:"Vol discret."},
-  {mot:"Chaparder", def:"Voler en cachette."},
-  {mot:"Chapiteau", def:"Tente de cirque ; élément d’architecture."},
-  {mot:"Chapelier", def:"Fabricant/vendeur de chapeaux."},
-  {mot:"Chapitrer", def:"Réprimander ; répartir en chapitres."},
-  {mot:"Chapitrage", def:"Découpage en chapitres."},
-  {mot:"Chaperon", def:"Personne qui accompagne ; capuchon."},
-  {mot:"Chapelet", def:"Suite d’objets enfilés ; rosaire."}
-],
-
-"COMB": [
-  {mot:"Combinaison", def:"Assemblage ; vêtement d’une pièce."},
-  {mot:"Combiner", def:"Assembler des éléments."},
-  {mot:"Combiné", def:"Appareil ou ensemble regroupé."},
-  {mot:"Combinatoire", def:"Relatif aux combinaisons."},
-  {mot:"Combustible", def:"Qui peut brûler."},
-  {mot:"Combustion", def:"Réaction chimique produisant de la chaleur."},
-  {mot:"Comble", def:"Partie la plus haute ; comblement."},
-  {mot:"Combler", def:"Remplir ; satisfaire entièrement."},
-  {mot:"Comblé", def:"Parfaitement satisfait."},
-  {mot:"Combe", def:"Dépression en terrain calcaire."},
-  {mot:"Combat", def:"Lutte, affrontement."},
-  {mot:"Combattre", def:"Se battre contre."},
-  {mot:"Combattant", def:"Personne qui se bat."}
-],
-
-"REFL": [
-  {mot:"Réflexion", def:"Action de penser ; renvoi d’une onde."},
-  {mot:"Réfléchir", def:"Examiner par la pensée."},
-  {mot:"Réfléchi", def:"Fait avec soin ; réfléchi."},
-  {mot:"Réfléchissant", def:"Qui renvoie la lumière ou les ondes."},
-  {mot:"Réfléchissement", def:"Action de réfléchir (physique/optique)."},
-  {mot:"Réflexe", def:"Réponse automatique et rapide."},
-  {mot:"Réflexif", def:"Qui se rapporte à la réflexion ; en grammaire, pronominal."},
-  {mot:"Réflexivité", def:"Caractère de ce qui est réflexif."},
-  {mot:"Réflecteur", def:"Dispositif qui renvoie un rayonnement."},
-  {mot:"Réflectance", def:"Rapport du flux réfléchi au flux incident."}
-],
-
-"ECRI": [
-  {mot:"Écrire", def:"Mettre des mots sur un support."},
-  {mot:"Écriture", def:"Action d'écrire ; système de signes."},
-  {mot:"Écrivain", def:"Auteur de textes littéraires."},
-  {mot:"Écrivaine", def:"Forme féminine d’écrivain."},
-  {mot:"Écrit", def:"Texte ou document rédigé."},
-  {mot:"Écriteau", def:"Petit panneau portant une inscription."},
-  {mot:"Écrivant", def:"Personne qui est en train d’écrire."},
-  {mot:"Écrivabilité", def:"Caractère de ce qui peut être écrit."}
-],
-
-"PROJ": [
-  {mot:"Projet", def:"Plan ou intention pour l’avenir."},
-  {mot:"Projeter", def:"Lancer ; planifier."},
-  {mot:"Projection", def:"Action de projeter ; représentation visuelle."},
-  {mot:"Projecteur", def:"Appareil qui projette des images ou de la lumière."},
-  {mot:"Projectionniste", def:"Opérateur qui projette des films au cinéma."},
-  {mot:"Projectif", def:"Relatif à la projection (maths, optique)."},
-  {mot:"Projeteur", def:"Concepteur de projets techniques."},
-  {mot:"Projeté", def:"Ce qui a été lancé ou planifié."}
-],
-
-"PART": [
-  {mot:"Partir", def:"Quitter un lieu."},
-  {mot:"Partage", def:"Action de diviser et répartir."},
-  {mot:"Partageable", def:"Qui peut être partagé."},
-  {mot:"Partenaire", def:"Personne associée à une action commune."},
-  {mot:"Partie", def:"Portion d’un tout ; jeu."},
-  {mot:"Participation", def:"Action de prendre part."},
-  {mot:"Participer", def:"Prendre part à une action."},
-  {mot:"Particulier", def:"Spécifique ; personne privée."},
-  {mot:"Particule", def:"Très petite partie de matière."},
-  {mot:"Partisan", def:"Soutien d’une cause ou d’un groupe."},
-  {mot:"Partant", def:"Qui est prêt à partir ou participer."}
-],
-
-"OUVR": [
-  {mot:"Ouvrir", def:"Rendre accessible."},
-  {mot:"Ouverture", def:"Action d’ouvrir ; commencement."},
-  {mot:"Ouvrage", def:"Travail réalisé ; livre ; construction."},
-  {mot:"Ouvrier", def:"Travailleur manuel ou industriel."},
-  {mot:"Ouvre-boîte", def:"Ustensile servant à ouvrir les boîtes."}
-],
-
-"COLO": [
-  {mot:"Colonie", def:"Groupe de personnes installées hors de leur pays."},
-  {mot:"Coloniser", def:"Établir une colonie sur un territoire."},
-  {mot:"Colonialisme", def:"Système de domination par colonisation."},
-  {mot:"Colonel", def:"Grade militaire supérieur."},
-  {mot:"Colocation", def:"Partage d’un logement à plusieurs."},
-  {mot:"Colocataire", def:"Personne qui partage un logement."},
-  {mot:"Colonne", def:"Support vertical ; disposition en texte."},
-  {mot:"Colombe", def:"Oiseau symbole de paix."},
-  {mot:"Coloré", def:"Qui possède des couleurs."},
-  {mot:"Colis", def:"Paquet destiné à l’expédition."}
-],
-
-"COMP": [
-  {mot:"Compter", def:"Énumérer, calculer."},
-  {mot:"Complet", def:"Entier, sans manque."},
-  {mot:"Compléter", def:"Ajouter ce qui manque."},
-  {mot:"Complément", def:"Ce qui s’ajoute à autre chose."},
-  {mot:"Composition", def:"Action d’assembler ; œuvre."},
-  {mot:"Compagnie", def:"Groupe de personnes ; entreprise."},
-  {mot:"Compagnon", def:"Camarade, associé."},
-  {mot:"Comparer", def:"Mettre en parallèle des éléments."},
-  {mot:"Complice", def:"Personne associée à une action, souvent répréhensible."},
-  {mot:"Comportement", def:"Manière d’agir."},
-  {mot:"Compétence", def:"Aptitude reconnue."},
-  {mot:"Compensation", def:"Action de rééquilibrer une perte."}
-],
-
-"DEPE": [
-  {mot:"Dépêche", def:"Message transmis rapidement."},
-  {mot:"Dépêcher", def:"Faire vite, se presser."},
-  {mot:"Dépensier", def:"Qui dépense beaucoup."},
-  {mot:"Dépense", def:"Somme d’argent utilisée."},
-  {mot:"Dépendance", def:"État de ce qui dépend d’autre chose."},
-  {mot:"Dépôt", def:"Lieu ou action de déposer."},
-  {mot:"Dépistage", def:"Recherche préventive de maladies."},
-  {mot:"Dépouillement", def:"Comptage des voix ; état de simplicité."},
-  {mot:"Dépouiller", def:"Enlever ce qui recouvre ; déposséder."},
-  {mot:"Dépannage", def:"Réparation rapide d’un problème."},
-  {mot:"Dépaysant", def:"Qui change radicalement d’environnement."}
-],
-
-"NETT": [
-  {mot:"Nettoyer", def:"Rendre propre."},
-  {mot:"Nettoyage", def:"Action de nettoyer."},
-  {mot:"Net", def:"Clair, précis ; sans impureté."},
-  {mot:"Nette", def:"Féminin de net ; claire, précise."},
-  {mot:"Netteté", def:"Caractère de ce qui est net."},
-  {mot:"Nettement", def:"De façon claire, distincte."}
-],
-
-"PEIN": [
-  {mot:"Peine", def:"Souffrance morale ou physique ; sanction."},
-  {mot:"Peiner", def:"Éprouver de la difficulté ; faire souffrir."},
-  {mot:"Peinard", def:"Fam.: tranquille, sans souci."},
-  {mot:"Peinant", def:"Qui éprouve de la peine ; en difficulté."},
-  {mot:"Peinée", def:"Participe passé de peiner."},
-  {mot:"Peindre", def:"Appliquer de la peinture ; représenter."},
-  {mot:"Peintre", def:"Personne qui peint."},
-  {mot:"Peinture", def:"Matière colorante ; art de peindre."},
-  {mot:"Peinturé", def:"Recouvert de peinture (régional)."},
-  {mot:"Peinturlurer", def:"Barbouiller de peinture (fam.)."}
-],
-
-"BRIL": [
-  {mot:"Briller", def:"Émettre de la lumière ; se distinguer."},
-  {mot:"Brillant", def:"Qui a de l’éclat ; remarquable."},
-  {mot:"Brillance", def:"Qualité de ce qui brille."},
-  {mot:"Brillamment", def:"Avec éclat, avec succès."},
-  {mot:"Brillantine", def:"Produit donnant du brillant aux cheveux."}
-],
-
-"DURA": [
-  {mot:"Durable", def:"Qui peut durer longtemps."},
-  {mot:"Durablement", def:"D’une manière durable."},
-  {mot:"Durabilité", def:"Capacité à durer dans le temps."},
-  {mot:"Duratif", def:"Qui a la propriété de durer."},
-  {mot:"Duramen", def:"Bois de cœur d’un arbre (bot.)."}
-],
-
-"RAPP": [
-  {mot:"Rappel", def:"Action de rappeler ; convocation."},
-  {mot:"Rappeler", def:"Faire souvenir ; téléphoner à nouveau."},
-  {mot:"Rapport", def:"Lien, relation ; compte rendu."},
-  {mot:"Rapporter", def:"Ramener ; faire un compte rendu."},
-  {mot:"Rapprocher", def:"Mettre plus près ; comparer."},
-  {mot:"Rapplique", def:"Arrive brusquement (fam.)."},
-  {mot:"Rappeur", def:"Artiste de rap."},
-  {mot:"Rapporteur", def:"Instrument d’angles ; auteur d’un rapport."}
-],
-
-"REND": [
-  {mot:"Rendre", def:"Donner en retour ; restituer."},
-  {mot:"Rendu", def:"Résultat obtenu ; restitution."},
-  {mot:"Rendement", def:"Rapport production/ressources."},
-  {mot:"Rendez-vous", def:"Rencontre fixée à l’avance."}
-],
-
-"CONS": [
-  {mot:"Conséquence", def:"Résultat d’une action."},
-  {mot:"Construire", def:"Édifier ; organiser."},
-  {mot:"Conseil", def:"Recommandation ; assemblée."},
-  {mot:"Consommer", def:"Utiliser ; absorber."},
-  {mot:"Conscience", def:"Perception de soi et du monde."},
-  {mot:"Considérer", def:"Examiner avec attention."},
-  {mot:"Constant", def:"Qui reste stable."},
-  {mot:"Constitution", def:"Texte fondamental ; structure."},
-  {mot:"Consolider", def:"Renforcer, rendre solide."},
-  {mot:"Conservateur", def:"Qui conserve ; partisan du conservatisme."},
-  {mot:"Consulter", def:"Demander avis ou expertise."},
-  {mot:"Constructeur", def:"Celui qui construit."},
-  {mot:"Consentir", def:"Donner son accord."},
-  {mot:"Consommation", def:"Action de consommer ; quantité utilisée."}
-],
-
-"RESP": [
-  {mot:"Respect", def:"Considération, égard."},
-  {mot:"Respecter", def:"Témoigner du respect ; observer une règle."},
-  {mot:"Responsable", def:"Qui a la charge d’une action."},
-  {mot:"Responsabilité", def:"Obligation de répondre de ses actes."},
-  {mot:"Respirer", def:"Inspirer et expirer l’air."},
-  {mot:"Respiration", def:"Processus de respiration."},
-  {mot:"Respiratoire", def:"Relatif à la respiration."},
-  {mot:"Respirateur", def:"Appareil d’assistance respiratoire."},
-  {mot:"Responsabiliser", def:"Rendre quelqu’un responsable."}
-],
-
-"GEST": [
-  {mot:"Geste", def:"Mouvement expressif du corps."},
-  {mot:"Gestion", def:"Action d’administrer."},
-  {mot:"Gestionnaire", def:"Personne qui gère."},
-  {mot:"Gestation", def:"Développement du fœtus."},
-  {mot:"Gesticuler", def:"Faire de grands gestes."},
-  {mot:"Gesticulations", def:"Mouvements excessifs."},
-  {mot:"Geste commercial", def:"Concession faite à un client."}
-],
-
-"LECT": [
-  {mot:"Lecture", def:"Action de lire."},
-  {mot:"Lecteur", def:"Personne qui lit ; dispositif de lecture."},
-  {mot:"Lectrice", def:"Féminin de lecteur."},
-  {mot:"Lectorat", def:"Ensemble des lecteurs."}
-],
-
-"CONT": [
-  {mot:"Contenir", def:"Renfermer ; maîtriser."},
-  {mot:"Content", def:"Satisfait."},
-  {mot:"Contenu", def:"Ce qui est renfermé ; substance d’un texte."},
-  {mot:"Conter", def:"Raconter."},
-  {mot:"Contretemps", def:"Incident retardant."},
-  {mot:"Contestation", def:"Action de contester."},
-  {mot:"Contradiction", def:"Opposition entre deux idées."},
-  {mot:"Contrat", def:"Accord formalisé."},
-  {mot:"Contrepartie", def:"Compensation en retour."},
-  {mot:"Contagion", def:"Transmission d’une maladie."},
-  {mot:"Contexte", def:"Ensemble des circonstances."},
-  {mot:"Contravention", def:"Infraction mineure."},
-  {mot:"Contrôler", def:"Vérifier, surveiller."}
-],
-
-"REPR": [
-  {mot:"Reprendre", def:"Prendre de nouveau ; recommencer."},
-  {mot:"Représenter", def:"Symboliser ; agir au nom de."},
-  {mot:"Représentation", def:"Action de représenter ; spectacle."},
-  {mot:"Représentant", def:"Personne qui représente."},
-  {mot:"Reprise", def:"Action de recommencer ; récupération."},
-  {mot:"Reprocher", def:"Faire des reproches."},
-  {mot:"Reproduction", def:"Action de reproduire ; procréation."},
-  {mot:"Réprimer", def:"Empêcher d’agir ; contenir."},
-  {mot:"Repriser", def:"Raccommoder un tissu."},
-  {mot:"Reprogrammer", def:"Programmer de nouveau."}
-],
-
-"COND": [
-  {mot:"Condition", def:"Circonstance nécessaire."},
-  {mot:"Conduire", def:"Diriger un véhicule ; mener."},
-  {mot:"Conducteur", def:"Personne qui conduit ; matériau qui conduit."},
-  {mot:"Condenser", def:"Rendre plus dense ; liquéfier un gaz."},
-  {mot:"Condamner", def:"Déclarer coupable ; interdire."},
-  {mot:"Conduit", def:"Canal, tuyau."},
-  {mot:"Condoléances", def:"Expressions de compassion."},
-  {mot:"Condensé", def:"Raccourci, résumé concentré."},
-  {mot:"Condescendant", def:"Qui marque de la supériorité."},
-  {mot:"Condensation", def:"Passage de l’état gazeux à liquide."},
-  {mot:"Conditionner", def:"Emballer ; influencer."}
-],
-
-"DECL": [
-  {mot:"Déclarer", def:"Annoncer officiellement."},
-  {mot:"Déclaration", def:"Acte d’annoncer ; formulaire fiscal."},
-  {mot:"Déclin", def:"Diminution, baisse."},
-  {mot:"Décliner", def:"Refuser poliment ; varier en grammaire."},
-  {mot:"Déclencheur", def:"Élément qui provoque l’amorce."},
-  {mot:"Déclenchement", def:"Action de déclencher."},
-  {mot:"Déclassement", def:"Rétrogradation de statut."},
-  {mot:"Déclinaison", def:"Variation ; série dérivée."},
-  {mot:"Déclive", def:"En pente."},
-  {mot:"Décloisonner", def:"Supprimer des séparations."}
-],
-
-"DEME": [
-  {mot:"Déménager", def:"Changer de domicile."},
-  {mot:"Déménagement", def:"Action de déménager."},
-  {mot:"Déménageur", def:"Professionnel du déménagement."},
-  {mot:"Démence", def:"Altération grave des facultés mentales."},
-  {mot:"Démesure", def:"Excès ; manque de mesure."},
-  {mot:"Démériter", def:"Perdre ses mérites."}
-],
-
-"INST": [
-  {mot:"Instant", def:"Très court moment."},
-  {mot:"Installer", def:"Mettre en place ; équiper."},
-  {mot:"Installation", def:"Action d’installer ; équipements."},
-  {mot:"Institut", def:"Établissement d’enseignement/recherche."},
-  {mot:"Institution", def:"Organisation publique ou privée."},
-  {mot:"Instruction", def:"Enseignement ; consigne."},
-  {mot:"Instance", def:"Autorité ; cas particulier."},
-  {mot:"Instantané", def:"Qui se produit immédiatement."},
-  {mot:"Instinct", def:"Comportement inné."},
-  {mot:"Institutionnel", def:"Relatif aux institutions."},
-  {mot:"Instauration", def:"Mise en place."},
-  {mot:"Instruire", def:"Enseigner ; renseigner."},
-  {mot:"Instaurer", def:"Établir, créer."},
-  {mot:"Instrument", def:"Outil ou appareil."},
-  {mot:"Instrumentaliser", def:"Utiliser à ses fins."},
-  {mot:"Instabilité", def:"Caractère de ce qui est instable."}
-],
-
-"EXPR": [
-  {mot:"Exprimer", def:"Formuler par des mots, des gestes."},
-  {mot:"Expression", def:"Manière d’exprimer ; locution."},
-  {mot:"Exprimé", def:"Formulé, énoncé."},
-  {mot:"Expressif", def:"Qui exprime fortement."},
-  {mot:"Exproprier", def:"Déposséder pour utilité publique."},
-  {mot:"Expropriation", def:"Action d’exproprier."}
-],
-
-"PROT": [
-  {mot:"Protéger", def:"Mettre à l’abri d’un danger."},
-  {mot:"Protection", def:"Action de protéger."},
-  {mot:"Protecteur", def:"Qui protège."},
-  {mot:"Protéine", def:"Macromolécule nutritive."},
-  {mot:"Protocole", def:"Règles d’un procédé ou d’une cérémonie."},
-  {mot:"Prothèse", def:"Dispositif remplaçant un organe."},
-  {mot:"Prototype", def:"Premier modèle d’essai."},
-  {mot:"Proton", def:"Particule élémentaire positive."},
-  {mot:"Protagoniste", def:"Personnage principal ; acteur clé."}
-],
-
-"COLL": [
-  {mot:"Collecter", def:"Rassembler, recueillir."},
-  {mot:"Collection", def:"Ensemble d’objets réunis."},
-  {mot:"Collectif", def:"Relatif à un groupe."},
-  {mot:"Collège", def:"Établissement scolaire du 2nd degré."},
-  {mot:"Collaboration", def:"Travail en commun."},
-  {mot:"Collier", def:"Bijou porté au cou."},
-  {mot:"Collapsus", def:"Effondrement brusque (méd., tech.)."},
-  {mot:"Collusion", def:"Entente secrète."},
-  {mot:"Collapsologie", def:"Étude des risques d’effondrement."},
-  {mot:"Collatéral", def:"Parallèle ; accessoire ; en garantie."},
-  {mot:"Colle", def:"Substance adhésive."},
-  {mot:"Collectivité", def:"Groupe humain organisé."}
-],
-
-"FORM": [
-  {mot:"Former", def:"Façonner ; instruire."},
-  {mot:"Formation", def:"Apprentissage ; constitution."},
-  {mot:"Forme", def:"Aspect extérieur ; configuration."},
-  {mot:"Formulaire", def:"Document à remplir."},
-  {mot:"Format", def:"Taille ; disposition."},
-  {mot:"Formulation", def:"Manière d’exprimer."},
-  {mot:"Formalisme", def:"Respect strict des formes."},
-  {mot:"Formatage", def:"Préparation d’un support ou de données."},
-  {mot:"Forme physique", def:"État de condition du corps."},
-  {mot:"Forme juridique", def:"Statut légal d’une entité."},
-  {mot:"Formater", def:"Préparer un support selon un format."}
-],
-
-"ENTR": [
-  {mot:"Entrer", def:"Pénétrer dans un lieu."},
-  {mot:"Entrée", def:"Action d’entrer ; accès."},
-  {mot:"Entreprise", def:"Organisation économique."},
-  {mot:"Entreprendre", def:"Commencer un projet."},
-  {mot:"Entretenir", def:"Maintenir ; nourrir (un propos)."},
-  {mot:"Entretien", def:"Maintenance ; entretien d’embauche."},
-  {mot:"Entrepôt", def:"Lieu de stockage."},
-  {mot:"Entreposer", def:"Mettre en dépôt."},
-  {mot:"Entrechoquer", def:"Heurter l’un contre l’autre."},
-  {mot:"Entrelacer", def:"Croiser, tresser."},
-  {mot:"Entrelacs", def:"Motif de lignes entrecroisées."},
-  {mot:"Entre-deux", def:"Situation intermédiaire."},
-  {mot:"Entrave", def:"Obstacle, gêne à la marche."},
-  {mot:"Entraver", def:"Gêner, empêcher."},
-  {mot:"Entrée en vigueur", def:"Moment d’application d’un texte."}
-],
-
-"INIT": [
-  {mot:"Initier", def:"Commencer ; instruire aux bases."},
-  {mot:"Initiative", def:"Action d’entreprendre en premier."},
-  {mot:"Initial", def:"Qui est au début."},
-  {mot:"Initié", def:"Personne introduite à un savoir."},
-  {mot:"Initiation", def:"Période d’apprentissage initial."},
-  {mot:"Initiateur", def:"Celui qui lance un projet."},
-  {mot:"Initialiser", def:"Configurer pour la première fois."},
-  {mot:"Initiale", def:"Première lettre d’un nom."},
-  {mot:"Initialisme", def:"Sigle lu lettre par lettre."},
-  {mot:"Initialisation", def:"Action d’initialiser."}
-],
-
-"DONN": [
-  {mot:"Donner", def:"Offrir, remettre à autrui."},
-  {mot:"Donné", def:"Accordé ; établi."},
-  {mot:"Donnée", def:"Information à traiter."},
-  {mot:"Donneur", def:"Personne qui donne."},
-  {mot:"Donnerai", def:"Futur, 1re pers. sing. de donner."},
-  {mot:"Donneras", def:"Futur, 2e pers. sing."},
-  {mot:"Donnez", def:"Impératif ou présent, 2e pers. plur."}
-],
-
-"ANAL": [
-  {mot:"Analyse", def:"Examen détaillé."},
-  {mot:"Analyser", def:"Étudier méthodiquement."},
-  {mot:"Analytique", def:"Relatif à l’analyse."},
-  {mot:"Analogie", def:"Ressemblance de rapports."},
-  {mot:"Analysé", def:"Soumis à l’analyse."},
-  {mot:"Analeptique", def:"Stimulant médicinal."},
-  {mot:"Analyseur", def:"Appareil/personne qui analyse."},
-  {mot:"Analytisme", def:"Tendance à raisonner par analyse."},
-  {mot:"Analysant", def:"Sujet d’une analyse (psychan.)."}
-],
-
-"IMAG": [
-  {mot:"Image", def:"Représentation visuelle."},
-  {mot:"Imaginer", def:"Former des images mentales."},
-  {mot:"Imaginaire", def:"Qui n’existe que dans l’esprit."},
-  {mot:"Imagination", def:"Faculté de créer des images mentales."},
-  {mot:"Imaginatif", def:"Qui a de l’imagination."},
-  {mot:"Imager", def:"Représenter par des images."},
-  {mot:"Imagerie", def:"Ensemble d’images d’un domaine."},
-  {mot:"Imaginé", def:"Conçu par l’esprit."},
-  {mot:"Imagisme", def:"Courant poétique centré sur l’image."}
-],
-
-"REME": [
-  {mot:"Remettre", def:"Donner de nouveau ; replacer."},
-  {mot:"Remerciement", def:"Expression de gratitude."},
-  {mot:"Remercier", def:"Exprimer sa gratitude."},
-  {mot:"Remise", def:"Réduction ; action de remettre."},
-  {mot:"Remontée", def:"Action de monter à nouveau."},
-  {mot:"Remonter", def:"Aller vers le haut ; restaurer."},
-  {mot:"Remplacer", def:"Mettre à la place de."},
-  {mot:"Remontrance", def:"Réprimande, reproche."}
-],
-
-"PUBL": [
-  {mot:"Publier", def:"Rendre public."},
-  {mot:"Publication", def:"Action de publier ; ouvrage publié."},
-  {mot:"Public", def:"Qui concerne tous ; auditoire."},
-  {mot:"Publicitaire", def:"Relatif à la publicité."},
-  {mot:"Publipostage", def:"Envoi massif de courriers."},
-  {mot:"Publier en ligne", def:"Mettre à disposition sur Internet."},
-  {mot:"Publicité", def:"Communication promotionnelle."},
-  {mot:"Publics", def:"Différents groupes visés."}
-],
-
-"SOUT": [
-  {mot:"Soutenir", def:"Appuyer, aider."},
-  {mot:"Soutien", def:"Aide, appui."},
-  {mot:"Soutenu", def:"Intense ; maintenu."},
-  {mot:"Soutènement", def:"Action de soutenir un terrain/ouvrage."},
-  {mot:"Soutenable", def:"Qui peut être supporté ; durable."},
-  {mot:"Soutien-gorge", def:"Sous-vêtement de maintien."},
-  {mot:"Soutenance", def:"Présentation orale d’un travail."}
-],
-
-"IMPL": [
-  {mot:"Impliquer", def:"Engager dans ; supposer."},
-  {mot:"Implication", def:"Participation ; conséquence logique."},
-  {mot:"Implant", def:"Dispositif inséré dans l’organisme."},
-  {mot:"Implanter", def:"Installer, fixer."},
-  {mot:"Implantation", def:"Action d’implanter ; établissement."},
-  {mot:"Imploser", def:"S’effondrer vers l’intérieur."},
-  {mot:"Implosif", def:"Qui relève de l’implosion."},
-  {mot:"Implorer", def:"Supplier avec instance."}
-],
-
-"TRAD": [
-  {mot:"Traduire", def:"Exprimer dans une autre langue."},
-  {mot:"Traduction", def:"Action/résultat de traduire."},
-  {mot:"Traducteur", def:"Personne qui traduit."},
-  {mot:"Traductrice", def:"Féminin de traducteur."},
-  {mot:"Traduisible", def:"Qui peut être traduit."},
-  {mot:"Traductologie", def:"Étude de la traduction."},
-  {mot:"Traduction littérale", def:"Traduction mot à mot."},
-  {mot:"Tradition", def:"Héritage de pratiques et croyances."},
-  {mot:"Traditionnel", def:"Issu de la tradition."}
-],
-
-"COMP": [
-  {mot:"Comprendre", def:"Saisir le sens ; inclure."},
-  {mot:"Compétence", def:"Aptitude reconnue."},
-  {mot:"Complet", def:"Entier, sans manque."},
-  {mot:"Compléter", def:"Ajouter ce qui manque."},
-  {mot:"Compter", def:"Calculer, énumérer."},
-  {mot:"Compagnie", def:"Entreprise ; présence de quelqu’un."},
-  {mot:"Complice", def:"Accompagnateur d’un acte (souvent répréhensible)."},
-  {mot:"Compromis", def:"Accord avec concessions réciproques."},
-  {mot:"Compétitif", def:"Porté à la concurrence."},
-  {mot:"Compenser", def:"Équilibrer une perte."},
-  {mot:"Comportement", def:"Manière d’agir."},
-  {mot:"Compliment", def:"Parole de louange."},
-  {mot:"Composer", def:"Assembler ; créer une œuvre."},
-  {mot:"Compensation", def:"Contrepartie, rééquilibrage."}
-],
-
-"DIFF": [
-  {mot:"Différence", def:"Dissemblance entre éléments."},
-  {mot:"Différencier", def:"Distinguer."},
-  {mot:"Différend", def:"Désaccord entre parties."},
-  {mot:"Différer", def:"Remettre à plus tard ; être différent."},
-  {mot:"Diffus", def:"Réparti sans forme nette."},
-  {mot:"Diffuser", def:"Répandre, transmettre largement."},
-  {mot:"Diffusion", def:"Action de diffuser."},
-  {mot:"Diffamation", def:"Atteinte à l’honneur par propos faux."},
-  {mot:"Différentiel", def:"Relatif à une différence."},
-  {mot:"Différentiation", def:"Action de rendre distinct."}
-], 
-
-"POSS": [
-  {mot:"Posséder", def:"Avoir en sa possession ; maîtriser."},
-  {mot:"Possession", def:"Fait de détenir, de contrôler."},
-  {mot:"Possible", def:"Réalizable, faisable."},
-  {mot:"Possibilité", def:"Éventualité réalisable."},
-  {mot:"Possessif", def:"Qui marque la possession ; jaloux."},
-  {mot:"Possédé", def:"Qui est possédé ; sous emprise."},
-  {mot:"Possessivité", def:"Tendance à tout vouloir garder."},
-  {mot:"Possesseur", def:"Celui qui possède."},
-  {mot:"Possessif (adj.)", def:"Relatif aux pronoms/adjectifs de possession."}
-],
-
-"CHAT": [
-  {mot:"Chat", def:"Félin domestique."},
-  {mot:"Chaton", def:"Jeune chat ; petite perle décorative."},
-  {mot:"Chatière", def:"Petite porte pour chat."},
-  {mot:"Chatouille", def:"Sensation légère qui fait rire."},
-  {mot:"Chatouiller", def:"Provoquer des chatouilles."},
-  {mot:"Chatoyant", def:"Aux reflets changeants et vifs."},
-  {mot:"Chatter", def:"Converser en ligne (anglic.)."},
-  {mot:"Chatbot", def:"Agent conversationnel automatisé."}
-],
-
-"SERV": [
-  {mot:"Servir", def:"Fournir, rendre service ; être utile."},
-  {mot:"Service", def:"Action de servir ; prestation."},
-  {mot:"Serveur", def:"Personne qui sert ; machine réseau."},
-  {mot:"Serveuse", def:"Féminin de serveur."},
-  {mot:"Serviable", def:"Enclin à aider."},
-  {mot:"Servitude", def:"Dépendance, contrainte."},
-  {mot:"Servant", def:"Celui qui sert (liturg., milit.)."},
-  {mot:"Service client", def:"Assistance dédiée aux clients."}
-],
-
-"VISI": [
-  {mot:"Vision", def:"Perception visuelle ; projet d’avenir."},
-  {mot:"Visible", def:"Qu’on peut voir."},
-  {mot:"Visibilité", def:"Degré auquel on voit ; notoriété."},
-  {mot:"Visite", def:"Action d’aller voir."},
-  {mot:"Visiter", def:"Aller examiner un lieu/personne."},
-  {mot:"Visiteur", def:"Personne en visite."},
-  {mot:"Visionnaire", def:"Qui anticipe l’avenir ; inspiré."},
-  {mot:"Visite guidée", def:"Parcours commenté par un guide."}
-],
-
-"JUST": [
-  {mot:"Juste", def:"Équitable ; exact."},
-  {mot:"Justice", def:"Principe/Institution qui juge."},
-  {mot:"Justifier", def:"Apporter une raison valable."},
-  {mot:"Justification", def:"Explication qui légitime."},
-  {mot:"Justiciable", def:"Susceptible d’être jugé."},
-  {mot:"Justement", def:"De façon juste ; à propos."},
-  {mot:"Juste prix", def:"Prix jugé équitable."},
-  {mot:"Juste milieu", def:"Position d’équilibre."}
-],
-
-"OPER": [
-  {mot:"Opérer", def:"Pratiquer une opération ; agir."},
-  {mot:"Opération", def:"Action organisée ; acte chirurgical."},
-  {mot:"Opérateur", def:"Personne/appareil qui opère."},
-  {mot:"Opérationnel", def:"Prêt à l’emploi ; efficace."},
-  {mot:"Opératoire", def:"Relatif à l’opération (méd.)."},
-  {mot:"Opéra", def:"Œuvre lyrique ; théâtre lyrique."},
-  {mot:"Opéron", def:"Unité d’expression génétique (bio.)."}
-],
-
-"TRAN": [
-  {mot:"Transmettre", def:"Faire passer à autrui."},
-  {mot:"Transport", def:"Déplacement de biens/personnes."},
-  {mot:"Transaction", def:"Échange/accord souvent commercial."},
-  {mot:"Transformation", def:"Changement profond."},
-  {mot:"Transparence", def:"Caractère de ce qui est clair/visible."},
-  {mot:"Transition", def:"Passage d’un état à un autre."},
-  {mot:"Transfert", def:"Déplacement vers ailleurs."},
-  {mot:"Transfusion", def:"Injection de sang/produits sanguins."},
-  {mot:"Transitoire", def:"Provisoire, temporaire."},
-  {mot:"Transnational", def:"Qui concerne plusieurs nations."}
-],
-
-"DOME": [
-  {mot:"Domestique", def:"Relatif à la maison ; animal apprivoisé."},
-  {mot:"Domestiquer", def:"Rendre propre à la vie domestique."},
-  {mot:"Domestication", def:"Processus d’apprivoisement."},
-  {mot:"Domesticité", def:"Condition/ensemble des domestiques."},
-  {mot:"Domestiquement", def:"D’une manière domestique."}
-],
-
-"RESE": [
-  {mot:"Réseau", def:"Ensemble d’éléments reliés."},
-  {mot:"Réseauter", def:"Développer ses contacts pro."},
-  {mot:"Réseautage", def:"Action de réseauter."},
-  {mot:"Réseau social", def:"Plateforme d’interactions en ligne."},
-  {mot:"Réseau routier", def:"Ensemble des voies de circulation."}
-],
-
-"UNIT": [
-  {mot:"Unité", def:"Caractère d’un ; mesure normalisée."},
-  {mot:"Unir", def:"Joindre, rassembler."},
-  {mot:"Union", def:"Action de s’unir ; association."},
-  {mot:"Unique", def:"Seul en son genre."},
-  {mot:"Unicité", def:"Caractère d’être unique."},
-  {mot:"Uniforme", def:"Identique ; tenue réglementaire."},
-  {mot:"Uniformiser", def:"Rendre uniforme."},
-  {mot:"Unipolaire", def:"À pôle unique (phys., géop.)."}
-],
-
-"OFFR": [
-  {mot:"Offrir", def:"Donner, proposer."},
-  {mot:"Offre", def:"Proposition ; quantité proposée."},
-  {mot:"Offrant", def:"Personne qui offre."},
-  {mot:"Offrande", def:"Don à caractère rituel."},
-  {mot:"Officiellement", def:"De manière reconnue par l’autorité."},
-  {mot:"Officiel", def:"Reconnu par l’autorité ; formel."}
-],
-
-"DEBU": [
-  {mot:"Début", def:"Commencement."},
-  {mot:"Débuter", def:"Commencer."},
-  {mot:"Débutant", def:"Qui commence ; novice."},
-  {mot:"Débattre", def:"Discuter contradictoirement."},
-  {mot:"Débarras", def:"Action de débarrasser ; pièce."},
-  {mot:"Débordement", def:"Fait de déborder ; excès."},
-  {mot:"Débiter", def:"Couper ; énoncer rapidement."},
-  {mot:"Débouler", def:"Arriver précipitamment."},
-  {mot:"Débrouiller", def:"Démêler une situation."}
-],
-
-"PART": [
-  {mot:"Partie", def:"Portion d’un tout ; manche de jeu."},
-  {mot:"Partir", def:"S’éloigner, s’en aller."},
-  {mot:"Participer", def:"Prendre part."},
-  {mot:"Partenaire", def:"Associé, compagnon d’activité."},
-  {mot:"Partage", def:"Répartition entre plusieurs."},
-  {mot:"Partiel", def:"Qui ne concerne qu’une partie."},
-  {mot:"Partie prenante", def:"Acteur concerné par une décision."},
-  {mot:"Particularité", def:"Caractère distinctif."}
-],
-
-"AUTO": [
-  {mot:"Automobile", def:"Véhicule à moteur pour personnes."},
-  {mot:"Autonomie", def:"Capacité à se gouverner seul."},
-  {mot:"Automatique", def:"Qui fonctionne sans intervention."},
-  {mot:"Autodidacte", def:"Qui apprend seul."},
-  {mot:"Autogestion", def:"Gestion par les membres eux-mêmes."},
-  {mot:"Autocollant", def:"Étiquette adhésive."},
-  {mot:"Autopsie", def:"Examen post-mortem."},
-  {mot:"Autoportrait", def:"Portrait de soi par soi."}
-],
-
-"INDI": [
-  {mot:"Indiquer", def:"Montrer, signaler."},
-  {mot:"Indication", def:"Renseignement, indication de voie."},
-  {mot:"Individu", def:"Personne prise isolément."},
-  {mot:"Individuel", def:"Propre à une personne."},
-  {mot:"Indispensable", def:"Dont on ne peut se passer."},
-  {mot:"Indiscutable", def:"Qui ne se conteste pas."},
-  {mot:"Indigné", def:"Rempli d’indignation."},
-  {mot:"Indignation", def:"Colère face à l’injustice."}
-],
-
-"EVEN": [
-  {mot:"Événement", def:"Fait marquant qui se produit."},
-  {mot:"Éventuel", def:"Qui peut se produire."},
-  {mot:"Éventail", def:"Objet pour s’éventer ; éventualités."},
-  {mot:"Éventer", def:"Aérer ; divulguer (fig.)."},
-  {mot:"Éventeré", def:"(éviter) — voir Éventrer."},
-  {mot:"Éventrer", def:"Ouvrir brutalement ; déchirer."}
-],
-
-"PARA": [
-  {mot:"Parachute", def:"Dispositif freinant une chute."},
-  {mot:"Parapluie", def:"Protection contre la pluie."},
-  {mot:"Parasol", def:"Protection contre le soleil."},
-  {mot:"Paravent", def:"Écran mobile d’intimité."},
-  {mot:"Paradoxe", def:"Idée contraire à l’opinion commune."},
-  {mot:"Paranormal", def:"Hors des lois naturelles."},
-  {mot:"Paramètre", def:"Variable qui influe un résultat."},
-  {mot:"Parallèle", def:"Équidistant ; comparaison."},
-  {mot:"Parallélogramme", def:"Quadrilatère à côtés opposés //."},
-  {mot:"Paraphrase", def:"Reformulation d’un texte."},
-  {mot:"Parasite", def:"Organisme vivant aux dépens d’un hôte."},
-  {mot:"Parapente", def:"Vol libre avec voile souple."},
-  {mot:"Paratonnerre", def:"Protection contre la foudre."},
-  {mot:"Parabolique", def:"Relatif à parabole (math., antenne)."},
-  {mot:"Paracétamol", def:"Antalgique/antipyrétique."},
-  {mot:"Paradis", def:"Lieu/état de félicité."}
-]
-    };
-
-    // --- Éléments DOM ---
-    const prefixDisplay = document.getElementById("prefixDisplay");
-    const definitionDisplay = document.getElementById("definitionDisplay");
-    const answerInput = document.getElementById("answer");
-    const message = document.getElementById("message");
-    const btnPlay = document.getElementById("btnPlay");
-    const btnSlow = document.getElementById("btnSlow");
-    const btnFast = document.getElementById("btnFast");
-    const btnRepeat = document.getElementById("btnRepeat");
-    const btnSkip = document.getElementById("btnSkip");
-    const btnBack = document.getElementById("btnBack");
-    const initialBank = document.getElementById("initialBank");
-    const progressPill = document.getElementById("progressPill");
-    const speedPill = document.getElementById("speedPill");
-    const hintPrefix = document.getElementById("hintPrefix");
-
-    // --- État du jeu ---
-    let currentPrefix = null;
-    let currentIndex = 0;
-    let speechRate = 1;
-
-    // --- Utilitaires ---
-    const normalize = s => s
+/* --------------------
+ * 1) QUESTIONS (inchangé)
+ * -------------------- */
+const questions = [
+  { question: "81 ÷ 9", answer: 9 },
+  { question: "6 × 2 + 4 ÷ 2", answer: 14 },
+  { question: "12 × 3 - 4", answer: 32 },
+  { question: "25 × 4 ÷ 5", answer: 20 },
+  { question: "15 × 5", answer: 75 },
+  { question: "7 + 5 × 3", answer: 22 },
+  { question: "81 ÷ 9 + 3", answer: 12 },
+  { question: "100 ÷ 2 - 10", answer: 40 },
+  { question: "9 × 8 - 20", answer: 52 },
+  { question: "12 × 5 ÷ 3", answer: 20 },
+  { question: "10 ÷ 2 + 3 × 4", answer: 17 },
+  { question: "5 × 3 + 6 ÷ 2", answer: 18 },
+  { question: "12 ÷ 3 + 4 × 2", answer: 12 },
+  { question: "7 × 2 + 8 ÷ 4", answer: 16 },
+  { question: "8 ÷ 2 + 5 × 3", answer: 19 },
+  { question: "6 × 3 + 9 ÷ 3", answer: 21 },
+  { question: "16 ÷ 4 + 2 × 6", answer: 16 },
+  { question: "9 × 2 + 4 ÷ 2", answer: 20 },
+  { question: "12 ÷ 2 + 3 × 2", answer: 12 },
+  { question: "7 × 3 + 6 ÷ 3", answer: 23 },
+  { question: "10 ÷ 5 + 4 × 4", answer: 18 },
+  { question: "8 × 2 + 10 ÷ 2", answer: 21 },
+  { question: "18 ÷ 3 + 5 × 2", answer: 16 },
+  { question: "6 × 4 + 8 ÷ 4", answer: 26 },
+  { question: "15 ÷ 3 + 3 × 5", answer: 20 },
+  { question: "4 × 2 + 12 ÷ 3", answer: 12 },
+  { question: "16 ÷ 4 + 6 × 2", answer: 16 },
+  { question: "3 × 5 + 9 ÷ 3", answer: 18 },
+  { question: "20 ÷ 5 + 4 × 2", answer: 12 },
+  { question: "6 × 3 + 8 ÷ 4", answer: 20 },
+  { question: "12 ÷ 2 + 7 × 1", answer: 13 },
+  { question: "8 × 2 + 6 ÷ 3", answer: 18 },
+  { question: "9 ÷ 3 + 4 × 3", answer: 15 },
+  { question: "5 × 2 + 18 ÷ 6", answer: 13 },
+  { question: "14 ÷ 2 + 3 × 3", answer: 16 },
+  { question: "3 × 4 + 8 ÷ 4", answer: 14 },
+  { question: "18 ÷ 6 + 5 × 2", answer: 13 },
+  { question: "10 × 1 + 9 ÷ 3", answer: 13 },
+  { question: "6 ÷ 2 + 7 × 2", answer: 17 },
+  { question: "8 × 3 + 6 ÷ 2", answer: 27 },
+  { question: "15 ÷ 5 + 2 × 4", answer: 11 },
+  { question: "9 × 2 + 10 ÷ 5", answer: 22 },
+  { question: "12 ÷ 3 + 6 × 2", answer: 16 },
+  { question: "4 × 4 + 12 ÷ 3", answer: 20 },
+  { question: "18 ÷ 3 + 2 × 3", answer: 12 },
+  { question: "5 × 3 + 9 ÷ 3", answer: 18 },
+  { question: "14 ÷ 2 + 3 × 4", answer: 19 },
+  { question: "7 × 2 + 10 ÷ 2", answer: 19 },
+  { question: "10 ÷ 2 + 6 × 2", answer: 17 },
+  /* ... (le reste de tes 804 questions peut rester tel quel) ... */
+];
+
+/* ---------------------------------------------------------
+ * 2) Variables existantes (inchangées) + éléments ajoutés
+ * --------------------------------------------------------- */
+let currentQuestionIndex = 0;
+const questionDisplay = document.getElementById("questionDisplay");
+const answerInput = document.getElementById("answer");
+const message = document.getElementById("message");
+const btnPlay = document.getElementById("btnPlay");
+const btnSlow = document.getElementById("btnSlow");
+const btnFast = document.getElementById("btnFast");
+const btnRepeat = document.getElementById("btnRepeat");
+const btnSkip = document.getElementById("btnSkip");
+const btnBack = document.getElementById("btnBack");
+const btnVoice = document.getElementById("btnVoice");     // <-- ajouté
+const timerEl = document.getElementById("timer");         // <-- ajouté
+const pageInfoEl = document.getElementById("pageInfo");   // <-- ajouté
+const difficultyBadge = document.getElementById("difficultyBadge"); // <-- ajouté
+
+let speechRate = 1;
+
+/* --------------------------------------
+ * 3) Utilitaires de discours (inchangés)
+ * -------------------------------------- */
+function replaceOperators(text) {
+  return text
+    .replace(/÷/g, "diviser par")
+    .replace(/×/g, "fois")
+    .replace(/-/g, "moins")
+    .replace(/\+/g, "plus");
+}
+
+function speakQuestion(text, rate = speechRate) {
+  if (!('speechSynthesis' in window)) {
+    message.textContent = "La synthèse vocale n'est pas disponible.";
+    return;
+  }
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.rate = rate;
+  speechSynthesis.speak(utterance);
+}
+
+function speakMessage(text) {
+  speakQuestion(text, speechRate);
+}
+
+/* ---------------------------------------------------
+ * 4) Heuristique de difficulté + pagination équilibrée
+ *    (on NE modifie PAS le format des questions)
+ * --------------------------------------------------- */
+function difficultyOf(expression){
+  // Score basé sur : taille des nombres, opérateurs × ÷, longueur
+  const nums = expression.match(/-?\d+(\.\d+)?/g)?.map(Number) || [];
+  const maxN = nums.length ? Math.max(...nums) : 0;
+  const hasMul = /×/.test(expression);
+  const hasDiv = /÷/.test(expression);
+  const opsCount = (expression.match(/[+\-×÷]/g) || []).length;
+  const len = expression.length;
+
+  let score = 0;
+  if (maxN >= 50) score += 2;
+  if (maxN >= 100) score += 3;
+  if (hasMul) score += 1.5;
+  if (hasDiv) score += 1.5;
+  if (opsCount >= 3) score += 1.5;
+  if (len >= 10) score += 1;
+
+  return score >= 3 ? 'difficile' : 'facile';
+}
+
+// On crée un ordre équilibré facile/difficile tout en gardant les objets intacts
+function reorderBalanced(list){
+  const easy = [], hard = [];
+  list.forEach(q => (difficultyOf(q.question) === 'facile' ? easy : hard).push(q));
+
+  const merged = [];
+  // alterner pour garder un équilibre global (≈ 5 faciles + 5 difficiles par page)
+  while (easy.length || hard.length){
+    if (easy.length) merged.push(easy.shift());
+    if (hard.length) merged.push(hard.shift());
+  }
+  return merged;
+}
+let orderedQuestions = reorderBalanced(questions);
+
+/* --------------------------------------
+ * 5) Chronomètre avec auto-révélation
+ * -------------------------------------- */
+let countdownId = null;
+let timeLeft = 0;
+
+function clearCountdown(){
+  if (countdownId){
+    clearInterval(countdownId);
+    countdownId = null;
+  }
+}
+
+function startCountdown(seconds, onExpire){
+  clearCountdown();
+  timeLeft = seconds;
+  timerEl.textContent = timeLeft.toString();
+  countdownId = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft >= 0 ? timeLeft.toString() : "0";
+    if (timeLeft <= 0){
+      clearCountdown();
+      onExpire?.();
+    }
+  }, 1000);
+}
+
+/* --------------------------------------
+ * 6) Explications (optionnel, inchangé)
+ * -------------------------------------- */
+function explainMathCalculation(question) {
+  let explanation = '';
+  if (question === "6 × 2 + 4 ÷ 2") {
+    explanation = "D'abord, on effectue la multiplication : 6 × 2 = 12. Ensuite, on fait la division : 4 ÷ 2 = 2. Puis, on additionne : 12 + 2 = 14.";
+  }
+  return explanation;
+}
+
+/* --------------------------------------
+ * 7) Affichage et logique de question
+ *    (on garde playQuestion/checkAnswer/nextQuestion)
+ * -------------------------------------- */
+function updatePageMeta(){
+  const total = orderedQuestions.length;
+  const page = Math.floor(currentQuestionIndex / 10) + 1;
+  const totalPages = Math.max(1, Math.ceil(total / 10));
+  pageInfoEl.textContent = `Page ${page} / ${totalPages}`;
+}
+
+function playQuestion() {
+  const current = orderedQuestions[currentQuestionIndex];
+  if (!current){
+    message.textContent = "🎉 Bravo, vous avez complété la liste !";
+    questionDisplay.textContent = "";
+    answerInput.value = "";
+    answerInput.disabled = true;
+    btnPlay.disabled = true;
+    btnSlow.disabled = true;
+    btnFast.disabled = true;
+    btnRepeat.disabled = true;
+    btnSkip.disabled = true;
+    btnBack.disabled = true;
+    btnVoice.disabled = true;
+    speakMessage("Bravo, vous avez terminé le jeu !");
+    timerEl.textContent = "—";
+    return;
+  }
+
+  updatePageMeta();
+
+  const level = difficultyOf(current.question);
+  difficultyBadge.textContent = `Difficulté : ${level === 'facile' ? 'Facile' : 'Difficile'}`;
+  const duration = level === 'facile' ? 5 : 10;
+
+  const questionText = replaceOperators(current.question);
+  questionDisplay.textContent = current.question;
+
+  speakQuestion(`Résolvez cette question : ${questionText}`);
+  message.textContent = "Entrez la réponse correcte.";
+  message.style.color = "#fff";
+  answerInput.value = "";
+  answerInput.disabled = false;
+  answerInput.focus();
+
+  const explanation = explainMathCalculation(current.question);
+  if (explanation) speakMessage(explanation);
+
+  // Lancer le compte à rebours — à l’expiration, on montre & lit la bonne réponse, puis on enchaîne
+  startCountdown(duration, () => {
+    const correct = current.answer;
+    message.textContent = `⌛ Temps écoulé. Réponse : ${correct}`;
+    message.style.color = "#ffd54f";
+    speakMessage(`Temps écoulé. La bonne réponse est ${correct}.`);
+    setTimeout(() => {
+      nextQuestion();
+    }, 1200);
+  });
+}
+
+function playQuestionSlow() {
+  speechRate = Math.max(0.5, speechRate - 0.25);
+  playQuestion();
+}
+
+function playQuestionFast() {
+  speechRate = Math.min(2, speechRate + 0.25);
+  playQuestion();
+}
+
+function repeatQuestion() {
+  // Ne pas relancer un nouveau chrono si on répète simplement l’énoncé
+  const current = orderedQuestions[currentQuestionIndex];
+  if (!current) return;
+  const qt = replaceOperators(current.question);
+  speakQuestion(`Répétons : ${qt}`);
+}
+
+/* --------------------------------------
+ * 8) Validation de réponse (texte & voix)
+ * -------------------------------------- */
+function markCorrectAndNext(){
+  message.textContent = "✅ Correct ! Bien joué.";
+  message.style.color = "#00e676";
+  speakMessage("Bravo, vous avez trouvé la bonne réponse !");
+  setTimeout(() => {
+    nextQuestion();
+  }, 900);
+}
+
+function checkAnswer() {
+  if (answerInput.disabled) return;
+  const current = orderedQuestions[currentQuestionIndex];
+  if (!current) return;
+
+  const userAnswer = parseFloat(answerInput.value.replace(',', '.'));
+  const correctAnswer = current.answer;
+
+  if (!Number.isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 1e-9) {
+    clearCountdown();
+    markCorrectAndNext();
+  } else {
+    message.textContent = `❌ Incorrect. La bonne réponse était : ${correctAnswer}`;
+    message.style.color = "#ff5252";
+    speakMessage(`Désolé, la réponse correcte était ${correctAnswer}.`);
+  }
+}
+
+function nextQuestion() {
+  clearCountdown();
+  currentQuestionIndex++;
+  if (currentQuestionIndex >= orderedQuestions.length) {
+    // fin gérée par playQuestion()
+  }
+  playQuestion();
+}
+
+/* --------------------------------------
+ * 9) Navigation existante (inchangée)
+ * -------------------------------------- */
+btnBack.addEventListener("click", () => {
+  if (currentQuestionIndex > 0) {
+    clearCountdown();
+    currentQuestionIndex--;
+    message.textContent = "";
+    playQuestion();
+  }
+});
+
+btnPlay.addEventListener("click", () => {
+  clearCountdown();
+  playQuestion();
+});
+btnSlow.addEventListener("click", playQuestionSlow);
+btnFast.addEventListener("click", playQuestionFast);
+btnRepeat.addEventListener("click", repeatQuestion);
+btnSkip.addEventListener("click", () => {
+  clearCountdown();
+  nextQuestion();
+});
+
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    checkAnswer();
+  }
+});
+
+/* --------------------------------------
+ * 10) Réponse vocale (Web Speech API)
+ * -------------------------------------- */
+let recognition = null;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.addEventListener('result', (event) => {
+    const transcript = event.results[0][0].transcript || "";
+    // Extraire un nombre de la réponse vocale (gère “virgule” → point)
+    const normalized = transcript
       .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // retire accents
-      .replace(/[^a-z\-’' ]/g,'')                       // garde lettres/espaces/apostrophes
+      .replace('virgule', '.')
+      .replace(',', '.')
+      .replace(/[^\d.-]+/g, '')
       .trim();
-
-    function updatePills(){
-      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
-      progressPill.textContent = total ? `${currentIndex+1} / ${total}` : `0 / 0`;
-      speedPill.textContent = `Vitesse ×${speechRate.toFixed(2)}`;
-      hintPrefix.textContent = currentPrefix || "— — — —";
+    if (normalized){
+      answerInput.value = normalized;
+      checkAnswer();
+    } else {
+      message.textContent = "🗣️ Je n’ai pas compris. Réessayez.";
+      message.style.color = "#ffd54f";
+      speakMessage("Je n’ai pas compris. Veuillez répéter votre réponse.");
     }
+  });
 
-    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
-    function speak(text, rate=speechRate){
-      if(!('speechSynthesis' in window)) { return; }
-      ttsCancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'fr-FR';
-      u.rate = rate;
-      speechSynthesis.speak(u);
-    }
+  recognition.addEventListener('error', () => {
+    message.textContent = "🎤 Erreur de reconnaissance vocale.";
+    message.style.color = "#ff5252";
+  });
+} else {
+  btnVoice.disabled = true;
+  btnVoice.textContent = "🎤 Non supporté";
+}
 
-    function announce(){
-      if(!currentPrefix) return;
-      const item = FIELDS[currentPrefix][currentIndex];
-      const intro = `Toutes les bonnes réponses commencent par : ${currentPrefix}.`;
-      const def  = item.def;
-      speak(`${intro} Définition : ${def}`);
-    }
+btnVoice.addEventListener('click', () => {
+  if (!recognition){
+    message.textContent = "🎤 La reconnaissance vocale n'est pas disponible.";
+    message.style.color = "#ffd54f";
+    return;
+  }
+  try{
+    recognition.abort(); // stoppe l’éventuelle session précédente
+  }catch(e){}
+  recognition.start();
+  message.textContent = "🎙️ Parlez maintenant...";
+  message.style.color = "#fff";
+});
 
-    function renderCard(){
-      if(!currentPrefix){
-        prefixDisplay.textContent = "— — — —";
-        definitionDisplay.textContent = "Choisis un préfixe ci-dessous pour commencer, ou appuie sur ▶️ Jouer pour démarrer au premier.";
-        updatePills();
-        return;
-      }
-      const item = FIELDS[currentPrefix][currentIndex];
-      prefixDisplay.textContent = currentPrefix;
-      definitionDisplay.textContent = item.def;
-      message.textContent = "Écris le mot correspondant. (Il doit commencer par " + currentPrefix + ")";
-      message.style.color = "#fff";
-      answerInput.value = "";
-      answerInput.placeholder = `Un mot qui commence par « ${currentPrefix} »…`;
-      answerInput.disabled = false;
-      updatePills();
-    }
-
-    function setPrefix(prefix){
-      if(!FIELDS[prefix]) return;
-      currentPrefix = prefix;
-      currentIndex = 0;
-      highlightBank(prefix);
-      renderCard();
-      announce();
-      answerInput.focus();
-    }
-
-    function next(){
-      if(!currentPrefix) return;
-      currentIndex++;
-      const list = FIELDS[currentPrefix];
-      if(currentIndex >= list.length){
-        currentIndex = list.length-1;
-        message.textContent = `🎉 Bravo ! Tu as terminé le champ lexical ${currentPrefix}. Choisis un autre préfixe ci-dessous.`;
-        message.style.color = "#00e676";
-        answerInput.disabled = true;
-        ttsCancel();
-        speak(`Bravo ! Tu as terminé le champ lexical ${currentPrefix}.`);
-        return;
-      }
-      renderCard();
-      announce();
-      answerInput.focus();
-    }
-
-    function back(){
-      if(!currentPrefix) return;
-      if(currentIndex > 0){
-        currentIndex--;
-        renderCard();
-        announce();
-        answerInput.focus();
-      }
-    }
-
-    function repeat(){ announce(); }
-
-    function slower(){
-      speechRate = Math.max(0.5, speechRate - 0.25);
-      updatePills();
-      announce();
-    }
-    function faster(){
-      speechRate = Math.min(2, speechRate + 0.25);
-      updatePills();
-      announce();
-    }
-
-    function check(){
-      if(!currentPrefix) return;
-      const item = FIELDS[currentPrefix][currentIndex];
-      const user = normalize(answerInput.value);
-      const target = normalize(item.mot);
-      if(user && user.startsWith(normalize(currentPrefix)) && user === target){
-        message.textContent = "✅ Correct ! Bien joué.";
-        message.style.color = "#00e676";
-        speak("Correct ! Bien joué.");
-        setTimeout(next, 900);
-      }else{
-        message.textContent = `❌ Incorrect. Il fallait : ${item.mot}.`;
-        message.style.color = "#ff5252";
-        speak(`Incorrect. Il fallait : ${item.mot}.`);
-      }
-    }
-
-    // --- Banque de préfixes cliquables ---
-    function buildBank(){
-      const keys = Object.keys(FIELDS);
-      keys.sort((a,b)=>a.localeCompare(b,'fr'));
-      initialBank.innerHTML = "";
-      for(const k of keys){
-        const btn = document.createElement("button");
-        btn.textContent = k.toUpperCase();
-        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
-        btn.addEventListener("click", ()=> setPrefix(k));
-        initialBank.appendChild(btn);
-      }
-    }
-    function highlightBank(k){
-      [...initialBank.children].forEach(b=>{
-        b.classList.toggle('active', b.textContent === k.toUpperCase());
-      });
-    }
-
-    // --- Écouteurs ---
-    btnPlay.addEventListener("click", ()=>{
-      if(!currentPrefix){
-        const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
-        setPrefix(first);
-      }else{
-        announce();
-      }
-    });
-    btnSlow.addEventListener("click", slower);
-    btnFast.addEventListener("click", faster);
-    btnRepeat.addEventListener("click", repeat);
-    btnSkip.addEventListener("click", next);
-    btnBack.addEventListener("click", back);
-
-    answerInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") check();
-    });
-
-    // --- Démarrage ---
-    window.addEventListener("load", ()=>{
-      buildBank();
-      renderCard();
-      if(!('speechSynthesis' in window)){
-        message.innerHTML = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
-      }
-    });
+/* --------------------------------------
+ * 11) Démarrage auto (inchangé)
+ * -------------------------------------- */
+window.addEventListener("load", playQuestion);
   </script>
 </body>
 </html>
