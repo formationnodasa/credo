@@ -1,169 +1,210 @@
+<!-- ======================= index.html ======================= -->
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UniMarket • Alibaba de l’UNIKIN</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InterCampus – Innovation Étudiante</title>
+  <meta name="description" content="Carrefour national de l’innovation étudiante : projets, clubs, événements, e-commerce." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="assets/img/logo.svg" alt="UniMarket logo" height="36">
-      <strong>UniMarket</strong><span class="sponsor"> • Sponsor : Oriscia</span>
+<header class="header">
+  <a class="brand" href="./">
+    <img src="assets/logo.svg" alt="" width="32" height="32" />
+    <span>InterCampus</span>
+  </a>
+  <nav class="nav" aria-label="Navigation principale">
+    <a href="#universites">Universités</a>
+    <a href="#projets">Projets</a>
+    <a href="#evenements">Événements</a>
+    <a href="#clubs">Clubs & CQF</a>
+    <a class="btn" href="#" data-action="submit-project">Proposer un projet</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Carrefour national de l’innovation étudiante</h1>
+    <p>Découvrez les projets, clubs et événements entrepreneuriaux des campus à travers le pays.</p>
+    <form class="search" role="search" id="global-search">
+      <input type="search" id="q" name="q" placeholder="Rechercher une université, un projet, un club…" />
+      <button type="submit" class="btn">Rechercher</button>
+    </form>
+  </section>
+
+  <section id="universites" class="section">
+    <div class="section-head">
+      <h2>Universités participantes</h2>
+      <p class="muted">Sélectionnez une université pour ouvrir son mini-portail.</p>
     </div>
-    <nav class="nav">
-      <button class="nav-btn" data-target="home">Accueil</button>
-      <button class="nav-btn" data-target="market">Projets & Produits</button>
-      <button class="nav-btn" data-target="clubs">Clubs & CQF</button>
-      <button class="nav-btn" data-target="entrepreneurship">Entrepreneuriat</button>
-      <button class="nav-btn" data-target="events">Événements</button>
-      <button class="nav-btn" data-target="about">À propos</button>
-      <button class="nav-btn" data-target="auth">Connexion / Inscription</button>
-    </nav>
-  </header>
+    <div class="map-grid" id="universities-grid"></div>
+  </section>
 
-  <main>
-    <!-- HOME -->
-    <section id="home" class="view active">
-      <div class="hero">
-        <h1>La vitrine de l’innovation étudiante de l’UNIKIN</h1>
-        <p>Découvrez, soutenez et achetez des projets conçus par des étudiants. Une initiative soutenue par le Ministère de l’Entrepreneuriat et sponsorisée par <strong>Oriscia</strong>.</p>
-        <div class="hero-actions">
-          <button class="primary" data-target="market">Explorer la marketplace</button>
-          <button class="secondary" id="openPublish">Publier un projet</button>
-        </div>
-      </div>
-      <div class="features">
-        <article>
-          <h3>Marketplace</h3>
-          <p>Fiches produit, achat direct, prise de contact et notation ★.</p>
-        </article>
-        <article>
-          <h3>Clubs & CQF</h3>
-          <p>Valorisez vos initiatives qualité, formation, commerce et innovation.</p>
-        </article>
-        <article>
-          <h3>Entrepreneuriat</h3>
-          <p>Startups incubées, témoignages et ressources pour passer à l’échelle.</p>
-        </article>
-      </div>
-    </section>
+  <section id="projets" class="section">
+    <div class="section-head">
+      <h2>Projets en vedette</h2>
+      <a class="link" href="#">Voir tous</a>
+    </div>
+    <div id="featured-projects" class="cards-grid"></div>
+  </section>
 
-    <!-- MARKET -->
-    <section id="market" class="view">
-      <div class="toolbar">
-        <input type="search" id="search" placeholder="Rechercher un projet, un produit, une startup…">
-        <select id="categoryFilter">
-          <option value="">Toutes catégories</option>
-          <option>IoT</option>
-          <option>FinTech</option>
-          <option>Agro</option>
-        </select>
-        <button id="openPublish2" class="secondary">Publier un projet</button>
-      </div>
-      <div id="productGrid" class="grid"></div>
-    </section>
+  <section id="evenements" class="section">
+    <div class="section-head">
+      <h2>Événements à venir</h2>
+      <a class="link" href="#">Ajouter</a>
+    </div>
+    <div id="events" class="list"></div>
+  </section>
 
-    <!-- CLUBS -->
-    <section id="clubs" class="view">
-      <h2>Clubs & CQF</h2>
-      <div id="clubsList" class="list"></div>
-    </section>
+  <section id="clubs" class="section">
+    <div class="section-head">
+      <h2>Clubs & Cellules (CQF)</h2>
+      <a class="link" href="#">Référencer un club</a>
+    </div>
+    <div id="clubs-list" class="cards-grid"></div>
+  </section>
 
-    <!-- ENTREPRENEURSHIP -->
-    <section id="entrepreneurship" class="view">
-      <h2>Portail Entrepreneuriat</h2>
-      <div id="startupList" class="list"></div>
-      <div class="resources">
-        <h3>Ressources</h3>
-        <ul>
-          <li>Guide de pitch (PDF) — à intégrer</li>
-          <li>Modèle de business plan — à intégrer</li>
-          <li>Parcours d’incubation — à définir</li>
-        </ul>
-      </div>
-    </section>
+  <section id="shop" class="section">
+    <div class="section-head">
+      <h2>Vitrine de produits/services</h2>
+      <a class="link" href="#">Voir la boutique</a>
+    </div>
+    <div id="shop-grid" class="cards-grid"></div>
+  </section>
+</main>
 
-    <!-- EVENTS -->
-    <section id="events" class="view">
-      <h2>Événements</h2>
-      <div id="eventList" class="list"></div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="view">
-      <h2>À propos</h2>
-      <p>UniMarket est une plateforme interfacultaire pour l’UNIKIN visant à promouvoir l’entrepreneuriat étudiant et les initiatives des CQF. Projet soutenu par le Ministère de l’Entrepreneuriat et sponsorisé par Oriscia.</p>
-      <ul>
-        <li>Transparence : badges <em>“Certifié Oriscia”</em> pour les projets validés.</li>
-        <li>Impact : mise en relation étudiants ↔ entreprises ↔ investisseurs.</li>
-        <li>Innovation : IA de recommandation (placeholder), AR (prototype à venir), gamification.</li>
-      </ul>
-    </section>
-
-    <!-- AUTH -->
-    <section id="auth" class="view">
-      <h2>Connexion / Inscription</h2>
-      <div class="auth-box">
-        <input id="authEmail" type="email" placeholder="Email universitaire">
-        <input id="authName" type="text" placeholder="Nom complet">
-        <button id="loginBtn" class="primary">Se connecter</button>
-        <p class="muted">Simulation locale (localStorage). Remplacez par une vraie authentification dans un futur backend.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- Boutons flottants -->
-  <button id="chatFab" class="fab" title="Assistance">Chat</button>
-  <button id="topFab" class="fab fab-top" title="Haut de page">↑</button>
-
-  <!-- Modale produit -->
-  <dialog id="productModal">
-    <article>
-      <header>
-        <strong id="pmTitle"></strong>
-        <button id="pmClose" aria-label="Fermer">×</button>
-      </header>
-      <img id="pmImg" alt="" style="max-width:100%;height:auto;margin:8px 0;">
-      <p id="pmDesc"></p>
-      <p><span id="pmBadge" class="badge"></span></p>
-      <div class="modal-actions">
-        <button id="pmBuy" class="primary">Acheter / Commander</button>
-        <button id="pmSupport" class="secondary">Soutenir le projet</button>
-        <button id="pmContact">Contacter l’équipe</button>
-      </div>
-    </article>
-  </dialog>
-
-  <!-- Modale publication -->
-  <dialog id="publishModal">
-    <article>
-      <header>
-        <strong>Publier un projet</strong>
-        <button id="pubClose" aria-label="Fermer">×</button>
-      </header>
-      <label>Titre <input id="pubTitle" type="text" required></label>
-      <label>Catégorie
-        <select id="pubCategory">
-          <option>IoT</option>
-          <option>FinTech</option>
-          <option>Agro</option>
-        </select>
-      </label>
-      <label>Prix (USD) <input id="pubPrice" type="number" step="0.01"></label>
-      <label>Description <textarea id="pubDesc" rows="4"></textarea></label>
-      <button id="pubSave" class="primary">Soumettre</button>
-    </article>
-  </dialog>
-
-  <footer class="footer">
-    <small>© 2025 UniMarket • Projet démo — Ministère de l’Entrepreneuriat • Sponsor : Oriscia</small>
-  </footer>
-
-  <script src="app.js"></script>
+<footer class="footer">
+  <p>© <span id="year"></span> InterCampus. Propulsé par les universités participantes.</p>
+</footer>
+<script src="./app.js" defer></script>
 </body>
 </html>
+
+<!-- ======================= university.html ======================= -->
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title id="title">InterCampus – Université</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="header">
+  <a class="brand" href="./">
+    <img src="assets/logo.svg" alt="" width="32" height="32" />
+    <span>InterCampus</span>
+  </a>
+  <nav class="nav" id="tabs">
+    <a href="#tab=projets">Projets</a>
+    <a href="#tab=evenements">Événements</a>
+    <a href="#tab=clubs">Clubs & CQF</a>
+    <a href="#tab=boutique">Boutique</a>
+    <a href="#tab=admin">Administration</a>
+  </nav>
+</header>
+
+<main class="uni">
+  <section class="hero small">
+    <h1 id="uni-name">Université</h1>
+    <p class="muted" id="uni-meta">Ville • Contacts • Liens</p>
+  </section>
+  <section id="uni-content" class="section"></section>
+</main>
+
+<footer class="footer">
+  <p>© <span id="year"></span> InterCampus – <span id="uni-foot"></span></p>
+</footer>
+<script src="./app.js" defer></script>
+</body>
+</html>
+
+<!-- ======================= styles.css ======================= -->
+<style>
+:root{
+  --bg:#0b0f17;--surface:#121826;--muted:#9aa4b2;--text:#e5e7eb;
+  --brand:#6ae3ff;--accent:#8b5cf6;--radius:14px;
+}
+body{margin:0;font-family:Inter,sans-serif;background:var(--bg);color:var(--text)}
+.header{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 20px;background:rgba(11,15,23,.6);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:800}
+.nav a{margin:0 8px;color:var(--text);text-decoration:none}
+.btn{background:linear-gradient(135deg,var(--accent),var(--brand));
+  padding:10px 14px;border-radius:999px;font-weight:700;color:#000;text-decoration:none}
+.hero{text-align:center;padding:40px 20px}
+.search{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.search input{padding:12px;border-radius:999px;border:1px solid #333;background:#111;color:var(--text)}
+.section{padding:20px;max-width:1100px;margin:auto}
+.cards-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.card{background:#121826;padding:16px;border-radius:var(--radius);border:1px solid #333}
+.list{display:grid;gap:10px}
+.footer{text-align:center;padding:20px;color:var(--muted);margin-top:20px;border-top:1px solid #333}
+</style>
+
+<!-- ======================= app.js ======================= -->
+<script>
+const DB={
+  universities:[
+    {id:"UNIKIN",name:"Université de Kinshasa",city:"Kinshasa",contacts:"innovation@unikin.cd"},
+    {id:"UPN",name:"Université Pédagogique Nationale",city:"Kinshasa",contacts:"entreprendre@upn.cd"},
+    {id:"ISC",name:"Institut Supérieur de Commerce",city:"Kinshasa",contacts:"incubation@isc.cd"},
+    {id:"UCC",name:"Université Catholique du Congo",city:"Kinshasa",contacts:"innov@ucc.cd"}
+  ],
+  projects:[
+    {id:"p1",uni:"UNIKIN",title:"AgriLink",desc:"Plateforme reliant producteurs et acheteurs."},
+    {id:"p2",uni:"UPN",title:"EduXR",desc:"Modules immersifs pour la pédagogie active."}
+  ],
+  events:[
+    {id:"e1",uni:"UNIKIN",title:"Startup Day",date:"2025-10-12"},
+    {id:"e2",uni:"UPN",title:"Atelier Lean Canvas",date:"2025-10-20"}
+  ],
+  clubs:[
+    {id:"c1",uni:"UNIKIN",name:"CQF Commerce & Innovation"},
+    {id:"c2",uni:"UPN",name:"Club Entreprendre UPN"}
+  ],
+  shop:[
+    {id:"s1",uni:"UNIKIN",title:"Café bio – 250g",price:7.5},
+    {id:"s2",uni:"UPN",title:"T-shirt Club Entreprendre",price:12}
+  ]
+};
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("year").textContent=new Date().getFullYear();
+  const ug=document.getElementById("universities-grid");
+  if(ug){ug.innerHTML=DB.universities.map(u=>`
+    <div class="card"><h3>${u.name}</h3><p>${u.city}</p>
+    <a class="btn" href="university.html#${u.id}">Ouvrir</a></div>`).join("")}
+  const fp=document.getElementById("featured-projects");
+  if(fp){fp.innerHTML=DB.projects.map(p=>`
+    <div class="card"><h3>${p.title}</h3><p>${p.desc}</p></div>`).join("")}
+  const ev=document.getElementById("events");
+  if(ev){ev.innerHTML=DB.events.map(e=>`
+    <div class="card"><strong>${e.title}</strong><br>${e.date}</div>`).join("")}
+  const cl=document.getElementById("clubs-list");
+  if(cl){cl.innerHTML=DB.clubs.map(c=>`
+    <div class="card"><h3>${c.name}</h3></div>`).join("")}
+  const sh=document.getElementById("shop-grid");
+  if(sh){sh.innerHTML=DB.shop.map(s=>`
+    <div class="card"><h3>${s.title}</h3><p>${s.price}$</p></div>`).join("")}
+  // University page
+  if(window.location.pathname.includes("university.html")){
+    const id=location.hash.replace("#","");
+    const uni=DB.universities.find(u=>u.id===id);
+    if(uni){
+      document.getElementById("uni-name").textContent=uni.name;
+      document.getElementById("uni-meta").textContent=`${uni.city} • ${uni.contacts}`;
+      document.getElementById("uni-foot").textContent=uni.name;
+      const uc=document.getElementById("uni-content");
+      uc.innerHTML="<h2>Projets</h2>"+DB.projects.filter(p=>p.uni===id).map(p=>`<div class="card"><h3>${p.title}</h3><p>${p.desc}</p></div>`).join("")
+      +"<h2>Événements</h2>"+DB.events.filter(e=>e.uni===id).map(e=>`<div class="card">${e.title} – ${e.date}</div>`).join("")
+      +"<h2>Clubs</h2>"+DB.clubs.filter(c=>c.uni===id).map(c=>`<div class="card">${c.name}</div>`).join("")
+      +"<h2>Boutique</h2>"+DB.shop.filter(s=>s.uni===id).map(s=>`<div class="card">${s.title} – ${s.price}$</div>`).join("");
+    }
+  }
+});
+</script>
