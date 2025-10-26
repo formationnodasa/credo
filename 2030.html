@@ -518,19 +518,23 @@
     </div>
 
     <script>
-        // Données des livres de la Bible
+        // Données des livres de la Bible (extrait des 74 livres)
         const bibleBooks = [
             "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges", "Ruth", 
             "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques", "Esdras", 
             "Néhémie", "Esther", "Job", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique des Cantiques",
             "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Joël", "Amos",
-            "Abdias", "Jonas", "Michée", "Nahum", "Habaquq", "Sophonie", "Aggée", "Zacharie", "Malachie"
+            "Abdias", "Jonas", "Michée", "Nahum", "Habaquq", "Sophonie", "Aggée", "Zacharie", "Malachie",
+            "Matthieu", "Marc", "Luc", "Jean", "Actes", "Romains", "1 Corinthiens", "2 Corinthiens",
+            "Galates", "Éphésiens", "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens",
+            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques", "1 Pierre", "2 Pierre",
+            "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
         ];
 
-        // Données des termes de Genèse avec prononciation phonétique exacte
+        // Données des termes de Genèse avec textes pour la synthèse vocale
         const genesisTerms = [
-            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dyœ" },
-            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dyœ" },
+            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dieu" },
+            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dieu" },
             { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "Lomme A-dam" },
             { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La famme Ève" },
             { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le ser-pan" },
@@ -553,27 +557,43 @@
 
         // Variable pour suivre le bouton vocal actif
         let currentVoiceButton = null;
-        let voicesLoaded = false;
 
-        // Fonction pour créer les étoiles
+        // Fonction pour déterminer quel texte prononcer
+        function getTextToSpeak(termName, pronunciation) {
+            // Cas spéciaux où on prononce le nom original
+            if (termName === "Dieu" || termName === "Yahvé Dieu") {
+                return termName;
+            }
+            // Pour tous les autres cas, on prononce la version phonétique (pronunciation)
+            return pronunciation;
+        }
+
+        // Créer les étoiles et étoiles filantes
         function createStars() {
             const galaxy = document.getElementById('galaxy-background');
             const starCount = 200;
             
+            // Étoiles fixes
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 
+                // Taille aléatoire
                 const size = Math.random() * 3 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
+                
+                // Position aléatoire
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
+                
+                // Animation delay aléatoire
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 
                 galaxy.appendChild(star);
             }
             
+            // Étoiles filantes
             setInterval(createShootingStar, 1500);
         }
 
@@ -582,6 +602,7 @@
             const shootingStar = document.createElement('div');
             shootingStar.className = 'shooting-star';
             
+            // Position de départ aléatoire
             const startX = Math.random() * 100 + 50;
             const startY = Math.random() * 30;
             
@@ -591,42 +612,15 @@
             
             galaxy.appendChild(shootingStar);
             
+            // Supprimer après l'animation
             setTimeout(() => {
                 shootingStar.remove();
             }, 2000);
         }
 
-        // Fonction pour trouver une voix masculine française
-        function findMaleVoice() {
-            const voices = speechSynthesis.getVoices();
-            
-            // Priorité aux voix masculines françaises
-            const maleVoices = voices.filter(voice => 
-                voice.lang.includes('fr') && 
-                (voice.name.toLowerCase().includes('homme') || 
-                 voice.name.toLowerCase().includes('male') ||
-                 voice.name.toLowerCase().includes('paul') ||
-                 voice.name.toLowerCase().includes('google') ||
-                 voice.name.toLowerCase().includes('michel'))
-            );
-            
-            if (maleVoices.length > 0) {
-                return maleVoices[0];
-            }
-            
-            // Fallback: première voix française
-            const frenchVoices = voices.filter(voice => voice.lang.includes('fr'));
-            return frenchVoices.length > 0 ? frenchVoices[0] : null;
-        }
-
-        // Fonction pour la synthèse vocale avec voix masculine
+        // Fonction pour la synthèse vocale
         function speakText(text, button) {
-            if (!voicesLoaded) {
-                alert('Les voix ne sont pas encore chargées. Veuillez réessayer dans quelques secondes.');
-                return;
-            }
-
-            // Arrêter la lecture précédente
+            // Arrêter la lecture précédente si elle existe
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
                 if (currentVoiceButton) {
@@ -634,43 +628,39 @@
                 }
             }
 
+            // Créer un nouvel objet de synthèse vocale
             const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Configurer la voix française
             utterance.lang = 'fr-FR';
-            utterance.rate = 0.7; // Plus lent pour la prononciation phonétique
-            utterance.pitch = 0.8; // Plus grave pour voix masculine
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
             utterance.volume = 1;
 
-            // Utiliser une voix masculine
-            const maleVoice = findMaleVoice();
-            if (maleVoice) {
-                utterance.voice = maleVoice;
-            }
-
+            // Ajouter l'icône de lecture au bouton
             button.classList.add('playing');
             currentVoiceButton = button;
 
+            // Quand la lecture commence
             utterance.onstart = function() {
                 button.classList.add('playing');
             };
 
+            // Quand la lecture se termine
             utterance.onend = function() {
                 button.classList.remove('playing');
                 currentVoiceButton = null;
             };
 
-            utterance.onerror = function(event) {
-                console.log('Erreur de synthèse vocale:', event);
+            // Quand il y a une erreur
+            utterance.onerror = function() {
                 button.classList.remove('playing');
                 currentVoiceButton = null;
-                
-                // Fallback avec voix par défaut
-                const fallbackUtterance = new SpeechSynthesisUtterance(text);
-                fallbackUtterance.lang = 'fr-FR';
-                fallbackUtterance.rate = 0.7;
-                speechSynthesis.speak(fallbackUtterance);
+                alert('Erreur lors de la lecture vocale. Vérifiez que votre navigateur supporte la synthèse vocale.');
             };
 
-            speechSynthesis.speak(utterance);
+            // Lancer la lecture
+            window.speechSynthesis.speak(utterance);
         }
 
         // Générer la grille des livres
@@ -683,6 +673,7 @@
                 <div class="book-chapters">Cliquez pour explorer</div>
             `;
             
+            // Ajouter un événement de clic pour Genèse
             if (book === "Genèse") {
                 bookCard.addEventListener('click', () => {
                     document.getElementById('books-section').classList.remove('active');
@@ -698,7 +689,7 @@
             booksGrid.appendChild(bookCard);
         });
 
-        // Générer les termes de Genèse
+        // Générer les termes de Genèse avec boutons vocaux
         function generateGenesisTerms() {
             const genesisTermsContainer = document.getElementById('genesis-terms');
             genesisTermsContainer.innerHTML = '';
@@ -712,16 +703,18 @@
                         <div class="term-pronunciation">${term.pronunciation}</div>
                         <div class="term-reference">${term.reference}</div>
                     </div>
-                    <div class="voice-button" title="Écouter la prononciation phonétique">
+                    <div class="voice-button" title="Écouter la prononciation">
                         <svg class="voice-icon" viewBox="0 0 24 24">
                             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                         </svg>
                     </div>
                 `;
                 
+                // Ajouter l'événement pour le bouton vocal
                 const voiceButton = termCard.querySelector('.voice-button');
                 voiceButton.addEventListener('click', () => {
-                    speakText(term.speakText, voiceButton);
+                    const textToSpeak = getTextToSpeak(term.name, term.pronunciation);
+                    speakText(textToSpeak, voiceButton);
                 });
                 
                 genesisTermsContainer.appendChild(termCard);
@@ -733,6 +726,7 @@
             document.getElementById('genesis-section').classList.remove('active');
             document.getElementById('books-section').classList.add('active');
             
+            // Arrêter toute lecture vocale en cours
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
                 if (currentVoiceButton) {
@@ -742,7 +736,7 @@
             }
         });
 
-        // Recherche dans les livres
+        // Fonctionnalité de recherche pour les livres
         const bookSearchInput = document.querySelector('#books-section .search-input');
         bookSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -758,7 +752,7 @@
             });
         });
 
-        // Recherche dans Genèse
+        // Fonctionnalité de recherche pour les termes de Genèse
         const genesisSearchInput = document.querySelector('#genesis-section .search-input');
         genesisSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -774,7 +768,7 @@
             });
         });
 
-        // Initialisation
+        // Animation au chargement de la page
         window.addEventListener('load', () => {
             document.body.style.opacity = '0';
             document.body.style.transition = 'opacity 1s';
@@ -784,30 +778,11 @@
             }, 100);
             
             createStars();
-            
-            // Charger les voix
-            if ('speechSynthesis' in window) {
-                speechSynthesis.getVoices();
-                
-                // Attendre que les voix soient chargées
-                setTimeout(() => {
-                    voicesLoaded = true;
-                    console.log('Voix chargées:', speechSynthesis.getVoices());
-                }, 1000);
-            }
         });
 
-        // Recharger les voix quand elles sont disponibles
-        if ('speechSynthesis' in window) {
-            speechSynthesis.onvoiceschanged = function() {
-                voicesLoaded = true;
-                console.log('Voies mises à jour:', speechSynthesis.getVoices());
-            };
-        }
-
-        // Gestion des erreurs de synthèse vocale
+        // Vérifier la compatibilité avec la synthèse vocale
         if (!('speechSynthesis' in window)) {
-            console.log('Votre navigateur ne supporte pas la synthèse vocale');
+            console.warn('Votre navigateur ne supporte pas la synthèse vocale');
         }
     </script>
 </body>
