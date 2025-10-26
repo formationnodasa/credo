@@ -1,679 +1,489 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jeu de Calcul Mental</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientAnimation 15s ease infinite;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploration Biblique - Genèse</title>
+    <style>
+        :root {
+            --primary-color: #8b4513;
+            --secondary-color: #daa520;
+            --accent-color: #cd7f32;
+            --light-color: #f5f5dc;
+            --dark-color: #2c1810;
+            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-    @keyframes gradientAnimation {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(12px);
-      max-width: 600px;
-      width: 90%;
-      text-align: center;
-      animation: fadeIn 1.2s ease;
-    }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--light-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    h1 {
-      font-weight: 800;
-      margin-bottom: 12px;
-      font-size: 2rem;
-      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-    }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 20px 0;
+        }
 
-    #metaBar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-      opacity:.95;
-      font-weight:600;
-      flex-wrap: wrap;
-    }
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--secondary-color), transparent);
+        }
 
-    #pageInfo, #difficultyBadge{
-      background: rgba(255,255,255,.15);
-      padding: 6px 10px;
-      border-radius: 10px;
-    }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+            background: linear-gradient(to right, var(--light-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
 
-    #timer {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-shadow: 0 0 10px rgba(0,0,0,.25);
-      margin: 10px 0 6px;
-      min-width: 2ch;
-      text-align: center;
-    }
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+        }
 
-    #questionDisplay {
-      font-size: 2.2rem;
-      font-weight: bold;
-      letter-spacing: 0.12em;
-      margin-bottom: 20px;
-      min-height: 50px;
-    }
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
 
-    input[type="text"] {
-      font-size: 1.4rem;
-      padding: 15px;
-      border-radius: 10px;
-      border: none;
-      width: 100%;
-      margin-bottom: 14px;
-      background-color: #fff;
-      color: #333;
-      outline: none;
-      box-shadow: inset 0 0 0 rgba(0, 0, 0, 0);
-      transition: all 0.3s ease;
-    }
+        .book-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
 
-    input[type="text"]:focus {
-      box-shadow: 0 0 10px #2575fc;
-      caret-color: #2575fc;
-    }
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(218, 165, 32, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
 
-    .buttons, .pager {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 6px;
-    }
+        .book-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
 
-    .pager {
-      margin-top: 14px;
-      align-items: center;
-    }
+        .book-card:hover::before {
+            transform: translateX(100%);
+        }
 
-    button {
-      flex: 1 1 40%;
-      padding: 12px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      background: #fff;
-      color: #2575fc;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+        .book-card.active {
+            background: rgba(218, 165, 32, 0.2);
+            border: 1px solid var(--secondary-color);
+            transform: scale(1.05);
+        }
 
-    .pager button {
-      flex: 0 0 auto;
-      min-width: 140px;
-    }
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
 
-    button:hover {
-      background: #2575fc;
-      color: #fff;
-      box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
-    }
+        .book-chapters {
+            font-size: 0.9rem;
+            color: var(--light-color);
+            opacity: 0.8;
+        }
 
-    #message {
-      margin-top: 12px;
-      font-size: 1.15rem;
-      font-weight: 700;
-      min-height: 32px;
-      text-shadow: 0 0 8px rgba(0,0,0,0.1);
-      transition: color 0.3s ease;
-    }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
 
-    #pageJump {
-      width: 90px;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-weight: 700;
-    }
-  </style>
+        .content-section.active {
+            display: block;
+        }
+
+        .chapter-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .chapter-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--secondary-color);
+        }
+
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .term-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 500px;
+        }
+
+        .term-card:hover {
+            transform: translateY(-5px) rotateY(5deg);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .term-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .term-pronunciation {
+            font-style: italic;
+            margin-bottom: 10px;
+            color: var(--light-color);
+            opacity: 0.8;
+        }
+
+        .term-reference {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(218, 165, 32, 0.2);
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            color: var(--secondary-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            background: rgba(218, 165, 32, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: var(--light-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(218, 165, 32, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .terms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1> Calcul Mental</h1>
-
-    <!-- Barre méta : page & difficulté & timer -->
-    <div id="metaBar">
-      <div id="pageInfo">Page 1 / 1</div>
-      <div id="difficultyBadge">Difficulté : —</div>
-      <div id="timer">—</div>
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
     </div>
 
-    <div id="questionDisplay">Question</div>
-    <input type="text" id="answer" placeholder="Réponse..." />
+    <div class="container">
+        <header>
+            <h1>Exploration Biblique</h1>
+            <p class="subtitle">Découvrez les livres de la Bible avec des animations interactives</p>
+        </header>
 
-    <div class="buttons">
-      <button id="btnPlay">▶️ Jouer</button>
-      <button id="btnSlow">🐢 Ralentir</button>
-      <button id="btnFast">🐇 Accélérer</button>
-      <button id="btnRepeat">🔁 Répéter</button>
-      <button id="btnSkip">⏭ Passer</button>
-      <button id="btnBack">⬅️ Retour</button>
+        <section id="books-section" class="content-section active">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Rechercher un livre de la Bible...">
+            </div>
+            <div class="books-grid" id="books-grid">
+                <!-- Les livres seront générés dynamiquement -->
+            </div>
+        </section>
+
+        <section id="genesis-section" class="content-section">
+            <div class="back-button" id="back-to-books">← Retour aux livres</div>
+            <h2 class="chapter-title">Genèse - Personnages et Termes</h2>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Rechercher un terme dans Genèse...">
+            </div>
+            <div class="terms-grid" id="genesis-terms">
+                <!-- Les termes de Genèse seront générés dynamiquement -->
+            </div>
+        </section>
     </div>
 
-    <!-- Pagination contrôlée par l’utilisateur -->
-    <div class="pager">
-      <button id="btnPrevPage">⬅️ Page précédente</button>
-      <div>
-        Aller à la page :
-        <input type="number" id="pageJump" min="1" value="1"/>
-        <button id="btnGoPage">Aller</button>
-      </div>
-      <button id="btnNextPage">Page suivante ➡️</button>
-    </div>
+    <script>
+        // Données des livres de la Bible (extrait des 74 livres)
+        const bibleBooks = [
+            "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges", "Ruth", 
+            "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques", "Esdras", 
+            "Néhémie", "Esther", "Job", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique des Cantiques",
+            "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Joël", "Amos",
+            "Abdias", "Jonas", "Michée", "Nahum", "Habacuc", "Sophonie", "Aggée", "Zacharie", "Malachie",
+            "Matthieu", "Marc", "Luc", "Jean", "Actes", "Romains", "1 Corinthiens", "2 Corinthiens",
+            "Galates", "Éphésiens", "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens",
+            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques", "1 Pierre", "2 Pierre",
+            "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
+        ];
 
-    <div id="message"></div>
-  </div>
+        // Données des termes de Genèse (extrait de votre liste)
+        const genesisTerms = [
+            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1" },
+            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4" },
+            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26" },
+            { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20" },
+            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1" },
+            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1" },
+            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2" },
+            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29" },
+            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32" },
+            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32" },
+            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32" },
+            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5" },
+            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15" },
+            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19" },
+            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26" },
+            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24" },
+            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8" },
+            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14" },
+            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17" },
+            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4" }
+        ];
 
+        // Générer la grille des livres
+        const booksGrid = document.getElementById('books-grid');
+        bibleBooks.forEach(book => {
+            const bookCard = document.createElement('div');
+            bookCard.className = 'book-card';
+            bookCard.innerHTML = `
+                <div class="book-title">${book}</div>
+                <div class="book-chapters">Cliquez pour explorer</div>
+            `;
+            
+            // Ajouter un événement de clic pour Genèse
+            if (book === "Genèse") {
+                bookCard.addEventListener('click', () => {
+                    document.getElementById('books-section').classList.remove('active');
+                    document.getElementById('genesis-section').classList.add('active');
+                    generateGenesisTerms();
+                });
+            } else {
+                bookCard.addEventListener('click', () => {
+                    alert(`Exploration de ${book} - Fonctionnalité à développer`);
+                });
+            }
+            
+            booksGrid.appendChild(bookCard);
+        });
 
-  <script>
-/* --------------------
- * 1) QUESTIONS (inchangé)
- * -------------------- */
-const questions = [
-  { question: "81 ÷ 9", answer: 9 },
-  { question: "6 × 2 + 4 ÷ 2", answer: 14 },
-  { question: "12 × 3 - 4", answer: 32 },
-  { question: "25 × 4 ÷ 5", answer: 20 },
-  { question: "15 × 5", answer: 75 },
-  { question: "7 + 5 × 3", answer: 22 },
-  { question: "81 ÷ 9 + 3", answer: 12 },
-  { question: "100 ÷ 2 - 10", answer: 40 },
-  { question: "9 × 8 - 20", answer: 52 },
-  { question: "12 × 5 ÷ 3", answer: 20 },
-  { question: "10 ÷ 2 + 3 × 4", answer: 17 },
-  { question: "5 × 3 + 6 ÷ 2", answer: 18 },
-  { question: "12 ÷ 3 + 4 × 2", answer: 12 },
-  { question: "7 × 2 + 8 ÷ 4", answer: 16 },
-  { question: "8 ÷ 2 + 5 × 3", answer: 19 },
-  { question: "6 × 3 + 9 ÷ 3", answer: 21 },
-  { question: "16 ÷ 4 + 2 × 6", answer: 16 },
-  { question: "9 × 2 + 4 ÷ 2", answer: 20 },
-  { question: "12 ÷ 2 + 3 × 2", answer: 12 },
-  { question: "7 × 3 + 6 ÷ 3", answer: 23 },
-  { question: "10 ÷ 5 + 4 × 4", answer: 18 },
-  { question: "8 × 2 + 10 ÷ 2", answer: 21 },
-  { question: "18 ÷ 3 + 5 × 2", answer: 16 },
-  { question: "6 × 4 + 8 ÷ 4", answer: 26 },
-  { question: "15 ÷ 3 + 3 × 5", answer: 20 },
-  { question: "4 × 2 + 12 ÷ 3", answer: 12 },
-  { question: "16 ÷ 4 + 6 × 2", answer: 16 },
-  { question: "3 × 5 + 9 ÷ 3", answer: 18 },
-  { question: "20 ÷ 5 + 4 × 2", answer: 12 },
-  { question: "6 × 3 + 8 ÷ 4", answer: 20 },
-  { question: "12 ÷ 2 + 7 × 1", answer: 13 },
-  { question: "8 × 2 + 6 ÷ 3", answer: 18 },
-  { question: "9 ÷ 3 + 4 × 3", answer: 15 },
-  { question: "5 × 2 + 18 ÷ 6", answer: 13 },
-  { question: "14 ÷ 2 + 3 × 3", answer: 16 },
-  { question: "3 × 4 + 8 ÷ 4", answer: 14 },
-  { question: "18 ÷ 6 + 5 × 2", answer: 13 },
-  { question: "10 × 1 + 9 ÷ 3", answer: 13 },
-  { question: "6 ÷ 2 + 7 × 2", answer: 17 },
-  { question: "8 × 3 + 6 ÷ 2", answer: 27 },
-  { question: "15 ÷ 5 + 2 × 4", answer: 11 },
-  { question: "9 × 2 + 10 ÷ 5", answer: 22 },
-  { question: "12 ÷ 3 + 6 × 2", answer: 16 },
-  { question: "4 × 4 + 12 ÷ 3", answer: 20 },
-  { question: "18 ÷ 3 + 2 × 3", answer: 12 },
-  { question: "5 × 3 + 9 ÷ 3", answer: 18 },
-  { question: "14 ÷ 2 + 3 × 4", answer: 19 },
-  { question: "7 × 2 + 10 ÷ 2", answer: 19 },
-  { question: "10 ÷ 2 + 6 × 2", answer: 17 },
-  /* ... garde le reste de tes 804 questions ... */
-];
+        // Générer les termes de Genèse
+        function generateGenesisTerms() {
+            const genesisTermsContainer = document.getElementById('genesis-terms');
+            genesisTermsContainer.innerHTML = '';
+            
+            genesisTerms.forEach(term => {
+                const termCard = document.createElement('div');
+                termCard.className = 'term-card';
+                termCard.innerHTML = `
+                    <div class="term-name">${term.name}</div>
+                    <div class="term-pronunciation">${term.pronunciation}</div>
+                    <div class="term-reference">${term.reference}</div>
+                `;
+                genesisTermsContainer.appendChild(termCard);
+            });
+        }
 
-/* ---------------------------------------------------------
- * 2) Variables existantes + nouveaux éléments (IDs inchangés)
- * --------------------------------------------------------- */
-let currentQuestionIndex = 0;
-const questionDisplay = document.getElementById("questionDisplay");
-const answerInput = document.getElementById("answer");
-const message = document.getElementById("message");
-const btnPlay = document.getElementById("btnPlay");
-const btnSlow = document.getElementById("btnSlow");
-const btnFast = document.getElementById("btnFast");
-const btnRepeat = document.getElementById("btnRepeat");
-const btnSkip = document.getElementById("btnSkip");
-const btnBack = document.getElementById("btnBack");
+        // Bouton de retour
+        document.getElementById('back-to-books').addEventListener('click', () => {
+            document.getElementById('genesis-section').classList.remove('active');
+            document.getElementById('books-section').classList.add('active');
+        });
 
-const timerEl = document.getElementById("timer");
-const pageInfoEl = document.getElementById("pageInfo");
-const difficultyBadge = document.getElementById("difficultyBadge");
+        // Fonctionnalité de recherche pour les livres
+        const bookSearchInput = document.querySelector('#books-section .search-input');
+        bookSearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const bookCards = document.querySelectorAll('.book-card');
+            
+            bookCards.forEach(card => {
+                const bookTitle = card.querySelector('.book-title').textContent.toLowerCase();
+                if (bookTitle.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
 
-// Pagination UI
-const btnPrevPage = document.getElementById("btnPrevPage");
-const btnNextPage = document.getElementById("btnNextPage");
-const pageJump = document.getElementById("pageJump");
-const btnGoPage = document.getElementById("btnGoPage");
+        // Fonctionnalité de recherche pour les termes de Genèse
+        const genesisSearchInput = document.querySelector('#genesis-section .search-input');
+        genesisSearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const termCards = document.querySelectorAll('.term-card');
+            
+            termCards.forEach(card => {
+                const termName = card.querySelector('.term-name').textContent.toLowerCase();
+                if (termName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
 
-let speechRate = 1;
-
-/* --------------------------------------
- * 3) Utilitaires de discours
- * -------------------------------------- */
-function replaceOperators(text) {
-  return text
-    .replace(/÷/g, "diviser par")
-    .replace(/×/g, "fois")
-    .replace(/-/g, "moins")
-    .replace(/\+/g, "plus");
-}
-
-// Enchaîne plusieurs messages vocaux, puis appelle un callback
-function speakSequence(texts, onDone){
-  if (!('speechSynthesis' in window)) {
-    onDone?.(); // si pas de TTS, on démarre tout de suite le chrono
-    return;
-  }
-  speechSynthesis.cancel();
-  let i = 0;
-  const speakNext = () => {
-    if (i >= texts.length){
-      onDone?.();
-      return;
-    }
-    const u = new SpeechSynthesisUtterance(texts[i]);
-    u.lang = "fr-FR";
-    u.rate = speechRate;
-    u.onend = () => {
-      i++;
-      speakNext();
-    };
-    speechSynthesis.speak(u);
-  };
-  speakNext();
-}
-
-function speakQuestion(text){ speakSequence([text]); }
-function speakMessage(text){ speakSequence([text]); }
-
-/* ---------------------------------------------------
- * 4) Heuristique de difficulté + ordre équilibré
- * --------------------------------------------------- */
-function difficultyOf(expression){
-  const nums = expression.match(/-?\d+(\.\d+)?/g)?.map(Number) || [];
-  const maxN = nums.length ? Math.max(...nums) : 0;
-  const hasMul = /×/.test(expression);
-  const hasDiv = /÷/.test(expression);
-  const opsCount = (expression.match(/[+\-×÷]/g) || []).length;
-  const len = expression.length;
-
-  let score = 0;
-  if (maxN >= 50) score += 2;
-  if (maxN >= 100) score += 3;
-  if (hasMul) score += 1.5;
-  if (hasDiv) score += 1.5;
-  if (opsCount >= 3) score += 1.5;
-  if (len >= 10) score += 1;
-
-  return score >= 3 ? 'difficile' : 'facile';
-}
-
-function reorderBalanced(list){
-  const easy = [], hard = [];
-  list.forEach(q => (difficultyOf(q.question) === 'facile' ? easy : hard).push(q));
-  const merged = [];
-  while (easy.length || hard.length){
-    if (easy.length) merged.push(easy.shift());
-    if (hard.length) merged.push(hard.shift());
-  }
-  return merged;
-}
-let orderedQuestions = reorderBalanced(questions);
-
-/* --------------------------------------
- * 5) Chronomètre (démarre APRÈS la lecture audio)
- * -------------------------------------- */
-let countdownId = null;
-let timeLeft = 0;
-
-function clearCountdown(){
-  if (countdownId){
-    clearInterval(countdownId);
-    countdownId = null;
-  }
-}
-
-function startCountdown(seconds, onExpire){
-  clearCountdown();
-  timeLeft = seconds;
-  timerEl.textContent = timeLeft.toString();
-  countdownId = setInterval(() => {
-    timeLeft--;
-    timerEl.textContent = timeLeft >= 0 ? timeLeft.toString() : "0";
-    if (timeLeft <= 0){
-      clearCountdown();
-      onExpire?.();
-    }
-  }, 1000);
-}
-
-/* --------------------------------------
- * 5bis) Reconnaissance vocale (réponse parlée)
- * -------------------------------------- */
-let recognition = null;
-let listening = false;
-
-function initSpeechRecognition(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return null;
-  const r = new SR();
-  r.lang = "fr-FR";
-  r.interimResults = false;
-  r.continuous = false;
-  r.maxAlternatives = 3;
-  return r;
-}
-
-function stopListening(){
-  if (recognition && listening){
-    try { recognition.onresult = null; recognition.onerror = null; recognition.onend = null; recognition.stop(); } catch(e){}
-    listening = false;
-  }
-}
-
-function parseNumberFromTranscript(tx){
-  // normaliser virgules et mots courants
-  let s = String(tx).toLowerCase().replace(',', '.').trim();
-  // enlever le texte non numérique
-  const numMatch = s.match(/-?\d+(\.\d+)?/);
-  if (!numMatch) return NaN;
-  return parseFloat(numMatch[0]);
-}
-
-function startListeningForAnswer(expectedAnswer, onCorrect){
-  if (!recognition){
-    recognition = initSpeechRecognition();
-    if (!recognition) return; // non supporté
-  }
-  stopListening();
-  listening = true;
-
-  recognition.onresult = (ev) => {
-    if (!listening) return;
-    const altTexts = [];
-    for (let i=0;i<ev.results.length;i++){
-      for (let j=0;j<ev.results[i].length;j++){
-        altTexts.push(ev.results[i][j].transcript);
-      }
-    }
-    // Essayer chaque alternative
-    for (const tx of altTexts){
-      const n = parseNumberFromTranscript(tx);
-      if (!Number.isNaN(n) && Math.abs(n - Number(expectedAnswer)) < 1e-9){
-        stopListening();
-        onCorrect?.();
-        return;
-      }
-    }
-    // Si incorrect, on peut continuer d'écouter durant le chrono
-    // Relancer une écoute unique pendant que le timer tourne
-    if (listening){
-      try { recognition.start(); } catch(e){}
-    }
-  };
-
-  recognition.onerror = () => {
-    // silencieux : on n'interrompt pas le jeu
-  };
-  recognition.onend = () => {
-    // Tant que le timer court, on relance l’écoute pour capter une nouvelle tentative
-    if (listening && countdownId){
-      try { recognition.start(); } catch(e){}
-    }
-  };
-
-  try {
-    recognition.start();
-    // message visuel
-    message.textContent = "🎙️ Dites votre réponse ou tapez-la…";
-    message.style.color = "#fff";
-  } catch(e){}
-}
-
-/* --------------------------------------
- * 6) Explication (optionnel)
- * -------------------------------------- */
-function explainMathCalculation(question) {
-  let explanation = '';
-  if (question === "6 × 2 + 4 ÷ 2") {
-    explanation = "D'abord, on effectue la multiplication : 6 × 2 = 12. Ensuite, on fait la division : 4 ÷ 2 = 2. Puis, on additionne : 12 + 2 = 14.";
-  }
-  return explanation;
-}
-
-/* --------------------------------------
- * 7) Affichage + logique principale
- * -------------------------------------- */
-function totalPages(){
-  return Math.max(1, Math.ceil(orderedQuestions.length / 10));
-}
-
-function currentPage(){
-  return Math.floor(currentQuestionIndex / 10) + 1;
-}
-
-function updatePageMeta(){
-  const page = currentPage();
-  pageInfoEl.textContent = `Page ${page} / ${totalPages()}`;
-  pageJump.value = page;
-}
-
-function playQuestion() {
-  const current = orderedQuestions[currentQuestionIndex];
-  if (!current){
-    message.textContent = "🎉 Bravo, vous avez complété la liste !";
-    questionDisplay.textContent = "";
-    answerInput.value = "";
-    answerInput.disabled = true;
-    btnPlay.disabled = true;
-    btnSlow.disabled = true;
-    btnFast.disabled = true;
-    btnRepeat.disabled = true;
-    btnSkip.disabled = true;
-    btnBack.disabled = true;
-    timerEl.textContent = "—";
-    speakMessage("Bravo, vous avez terminé le jeu !");
-    stopListening();
-    return;
-  }
-
-  updatePageMeta();
-
-  const level = difficultyOf(current.question);
-  difficultyBadge.textContent = `Difficulté : ${level === 'facile' ? 'Facile' : 'Difficile'}`;
-  const duration = level === 'facile' ? 5 : 10;
-
-  const questionText = replaceOperators(current.question);
-  questionDisplay.textContent = current.question;
-
-  // Préparer messages à lire avant de démarrer le chrono
-  const seq = [`Résolvez cette question : ${questionText}`];
-  const explanation = explainMathCalculation(current.question);
-  if (explanation) seq.push(explanation);
-
-  message.textContent = "Entrez la réponse correcte.";
-  message.style.color = "#fff";
-  answerInput.value = "";
-  answerInput.disabled = false;
-  answerInput.focus();
-
-  // LECTURE AUDIO → À LA FIN → DÉMARRER LE CHRONO + MICRO
-  speakSequence(seq, () => {
-    startCountdown(duration, () => {
-      // expiration
-      stopListening();
-      const correct = current.answer;
-      message.textContent = `⌛ Temps écoulé. Réponse : ${correct}`;
-      message.style.color = "#ffd54f";
-      speakMessage(`Temps écoulé. La bonne réponse est ${correct}.`);
-      setTimeout(() => {
-        nextQuestion();
-      }, 900);
-    });
-
-    // Démarre l'écoute vocale pendant le chrono
-    startListeningForAnswer(current.answer, () => {
-      clearCountdown();
-      markCorrectAndNext();
-    });
-  });
-}
-
-function playQuestionSlow() {
-  speechRate = Math.max(0.5, speechRate - 0.25);
-  playQuestion();
-}
-
-function playQuestionFast() {
-  speechRate = Math.min(2, speechRate + 0.25);
-  playQuestion();
-}
-
-function repeatQuestion() {
-  const current = orderedQuestions[currentQuestionIndex];
-  if (!current) return;
-  const qt = replaceOperators(current.question);
-  // On répète seulement l’énoncé SANS redémarrer le chrono
-  speakSequence([`Répétons : ${qt}`]);
-}
-
-/* --------------------------------------
- * 8) Validation (texte)
- * -------------------------------------- */
-function markCorrectAndNext(){
-  message.textContent = "✅ Correct ! Bien joué.";
-  message.style.color = "#00e676";
-  speakMessage("Bravo, vous avez trouvé la bonne réponse !");
-  stopListening();
-  setTimeout(() => {
-    nextQuestion();
-  }, 700);
-}
-
-function checkAnswer() {
-  if (answerInput.disabled) return;
-  const current = orderedQuestions[currentQuestionIndex];
-  if (!current) return;
-
-  const userAnswer = parseFloat(String(answerInput.value).replace(',', '.'));
-  const correctAnswer = Number(current.answer);
-
-  if (!Number.isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 1e-9) {
-    clearCountdown();
-    markCorrectAndNext();
-  } else {
-    message.textContent = `❌ Incorrect. La bonne réponse était : ${correctAnswer}`;
-    message.style.color = "#ff5252";
-    speakMessage(`Désolé, la réponse correcte était ${correctAnswer}.`);
-  }
-}
-
-function nextQuestion() {
-  clearCountdown();
-  stopListening();
-  currentQuestionIndex++;
-  playQuestion();
-}
-
-/* --------------------------------------
- * 9) Navigation question & pagination
- * -------------------------------------- */
-btnBack.addEventListener("click", () => {
-  if (currentQuestionIndex > 0) {
-    clearCountdown();
-    stopListening();
-    currentQuestionIndex--;
-    message.textContent = "";
-    playQuestion();
-  }
-});
-
-btnPlay.addEventListener("click", () => {
-  clearCountdown();
-  stopListening();
-  playQuestion();
-});
-btnSlow.addEventListener("click", playQuestionSlow);
-btnFast.addEventListener("click", playQuestionFast);
-btnRepeat.addEventListener("click", repeatQuestion);
-btnSkip.addEventListener("click", () => {
-  clearCountdown();
-  stopListening();
-  nextQuestion();
-});
-
-answerInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    checkAnswer();
-  }
-});
-
-// Contrôles de page
-function goToPage(pageNumber){
-  const tp = totalPages();
-  let p = Math.max(1, Math.min(tp, pageNumber|0));
-  // Aller au premier item de la page demandée
-  const targetIndex = (p - 1) * 10;
-  if (targetIndex !== currentQuestionIndex){
-    clearCountdown();
-    stopListening();
-    currentQuestionIndex = targetIndex;
-    message.textContent = "";
-    playQuestion();
-  }
-}
-
-btnPrevPage.addEventListener("click", () => {
-  goToPage(currentPage() - 1);
-});
-btnNextPage.addEventListener("click", () => {
-  goToPage(currentPage() + 1);
-});
-btnGoPage.addEventListener("click", () => {
-  goToPage(parseInt(pageJump.value, 10));
-});
-pageJump.addEventListener("keydown", (e) => {
-  if (e.key === 'Enter'){
-    goToPage(parseInt(pageJump.value, 10));
-  }
-});
-
-/* --------------------------------------
- * 10) Démarrage auto
- * -------------------------------------- */
-window.addEventListener("load", playQuestion);
-  </script>
+        // Animation au chargement de la page
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 1s';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
