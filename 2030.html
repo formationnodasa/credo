@@ -531,28 +531,28 @@
             "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
         ];
 
-        // Données des termes de Genèse avec textes pour la synthèse vocale
+        // Données des termes de Genèse avec textes phonétiques naturels pour la synthèse vocale
         const genesisTerms = [
             { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dieu" },
             { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dieu" },
-            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "Lomme A-dam" },
+            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "Lomme Adam" },
             { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La famme Ève" },
-            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le ser-pan" },
-            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1", speakText: "Ka-in" },
-            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2", speakText: "A-bèl" },
-            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "No-é" },
-            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sème" },
-            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Kam" },
-            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Ja-fète" },
-            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5", speakText: "A-bra-am" },
-            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15", speakText: "Sa-ra" },
-            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "I-zak" },
-            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Ja-kob" },
-            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Jo-zèfe" },
-            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jar-din d'É-dène" },
-            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "L'arsh" },
-            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le dé-luge" },
-            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4", speakText: "La tour de Ba-bèl" }
+            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le serpan" },
+            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1", speakText: "Kaïn" },
+            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2", speakText: "Abel" },
+            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "Noé" },
+            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sem" },
+            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Cham" },
+            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Japhet" },
+            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5", speakText: "Abraham" },
+            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15", speakText: "Sara" },
+            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "Isaac" },
+            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Jacob" },
+            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Joseph" },
+            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jardin dÉden" },
+            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "Larsh" },
+            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le déluge" },
+            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4", speakText: "La tour de Babel" }
         ];
 
         // Variable pour suivre le bouton vocal actif
@@ -566,6 +566,32 @@
             }
             // Pour tous les autres cas, on prononce la version phonétique (pronunciation)
             return pronunciation;
+        }
+
+        // Fonction pour nettoyer le texte pour la synthèse vocale
+        function cleanTextForSpeech(text) {
+            return text
+                .replace(/\(/g, '')
+                .replace(/\)/g, '')
+                .replace(/'/g, '')
+                .replace(/é/g, 'è')
+                .replace(/è/g, 'è')
+                .replace(/ê/g, 'è')
+                .replace(/ë/g, 'è')
+                .replace(/à/g, 'a')
+                .replace(/â/g, 'a')
+                .replace(/ä/g, 'a')
+                .replace(/î/g, 'i')
+                .replace(/ï/g, 'i')
+                .replace(/ô/g, 'o')
+                .replace(/ö/g, 'o')
+                .replace(/ù/g, 'u')
+                .replace(/û/g, 'u')
+                .replace(/ü/g, 'u')
+                .replace(/ç/g, 's')
+                .replace(/-/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
         }
 
         // Créer les étoiles et étoiles filantes
@@ -628,14 +654,29 @@
                 }
             }
 
+            // Nettoyer le texte pour une meilleure prononciation
+            const cleanedText = cleanTextForSpeech(text);
+            
             // Créer un nouvel objet de synthèse vocale
-            const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(cleanedText);
             
             // Configurer la voix française
             utterance.lang = 'fr-FR';
-            utterance.rate = 0.9;
+            utterance.rate = 0.85; // Légèrement plus lent pour une meilleure clarté
             utterance.pitch = 1;
             utterance.volume = 1;
+
+            // Sélectionner une voix française si disponible
+            const voices = window.speechSynthesis.getVoices();
+            const frenchVoice = voices.find(voice => 
+                voice.lang.startsWith('fr') && 
+                !voice.name.includes('Google') &&
+                !voice.name.includes('reconnaissance')
+            );
+            
+            if (frenchVoice) {
+                utterance.voice = frenchVoice;
+            }
 
             // Ajouter l'icône de lecture au bouton
             button.classList.add('playing');
@@ -662,6 +703,11 @@
             // Lancer la lecture
             window.speechSynthesis.speak(utterance);
         }
+
+        // Charger les voix disponibles
+        window.speechSynthesis.onvoiceschanged = function() {
+            console.log('Voix chargées:', window.speechSynthesis.getVoices());
+        };
 
         // Générer la grille des livres
         const booksGrid = document.getElementById('books-grid');
@@ -713,7 +759,7 @@
                 // Ajouter l'événement pour le bouton vocal
                 const voiceButton = termCard.querySelector('.voice-button');
                 voiceButton.addEventListener('click', () => {
-                    const textToSpeak = getTextToSpeak(term.name, term.pronunciation);
+                    const textToSpeak = getTextToSpeak(term.name, term.speakText);
                     speakText(textToSpeak, voiceButton);
                 });
                 
@@ -778,6 +824,13 @@
             }, 100);
             
             createStars();
+            
+            // Charger les voix dès le début
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.addEventListener('voiceschanged', () => {
+                    console.log('Voix disponibles:', window.speechSynthesis.getVoices());
+                });
+            }
         });
 
         // Vérifier la compatibilité avec la synthèse vocale
