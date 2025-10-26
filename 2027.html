@@ -3,1204 +3,1072 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Épellation des Mots de la Bible - Ya Lwanga Credo Musao</title>
+    <title>Épelle-moi Bibliquement !</title>
     <style>
         :root {
-            --galaxy-black: #000000;
-            --galaxy-dark: #0a0a0a;
-            --galaxy-purple: #4a1c6b;
-            --galaxy-blue: #1a1a4b;
-            --galaxy-pink: #b0308c;
-            --galaxy-cyan: #00c9ff;
-            --star-color: #ffffff;
-            --text-glow: 0 0 10px rgba(255, 255, 255, 0.7);
-            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #e67e22;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --text-color: #333;
+            --background-color: #f9f9f9;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #34495e;
+            --secondary-color: #2980b9;
+            --success-color: #229954;
+            --warning-color: #d68910;
+            --danger-color: #cb4335;
+            --light-color: #2c3e50;
+            --dark-color: #1a252f;
+            --text-color: #ecf0f1;
+            --background-color: #1a252f;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         body {
-            background: var(--galaxy-black);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
             padding: 20px;
-            position: relative;
-            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-            padding: 20px 0;
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 3px;
-            background: linear-gradient(to right, transparent, var(--galaxy-cyan), transparent);
-            box-shadow: var(--text-glow);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
         }
 
         h1 {
-            font-size: 3.5rem;
+            color: var(--primary-color);
             margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(0, 201, 255, 0.8);
-            background: linear-gradient(to right, #ffffff, var(--galaxy-cyan), #b0308c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 2px;
-            font-weight: 800;
         }
 
-        .subtitle {
-            font-size: 1.4rem;
-            color: var(--galaxy-cyan);
-            margin-bottom: 10px;
-            text-shadow: var(--text-glow);
-        }
-
-        .author {
-            font-size: 1.2rem;
-            color: var(--galaxy-pink);
-            font-style: italic;
-            margin-bottom: 30px;
-            text-shadow: 0 0 8px rgba(176, 48, 140, 0.7);
-        }
-
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .book-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            color: var(--text-color);
         }
 
-        .book-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(0, 201, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .book-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 201, 255, 0.3);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .book-card:hover::before {
-            transform: translateX(100%);
-        }
-
-        .book-card.active {
-            background: rgba(0, 201, 255, 0.15);
-            border: 1px solid var(--galaxy-cyan);
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 201, 255, 0.5);
-        }
-
-        .book-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--galaxy-cyan);
-            text-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
-        }
-
-        .book-chapters {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.8s ease;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        .chapter-title {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: var(--galaxy-cyan);
-            text-align: center;
-            position: relative;
-            padding-bottom: 15px;
-            text-shadow: var(--text-glow);
-        }
-
-        .chapter-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 3px;
-            background: var(--galaxy-cyan);
-            box-shadow: var(--text-glow);
-        }
-
-        .terms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .term-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+        .game-container {
+            background-color: var(--light-color);
+            border-radius: 10px;
             padding: 20px;
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .level-selector {
+            margin-bottom: 20px;
+        }
+
+        select, input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 10px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .word-display {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 20px 0;
+            min-height: 40px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .result-message {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        .success {
+            color: var(--success-color);
+        }
+
+        .error {
+            color: var(--danger-color);
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
             overflow: hidden;
-            transform-style: preserve-3d;
-            perspective: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .stats {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            margin-top: 10px;
         }
 
-        .term-card:hover {
-            transform: translateY(-5px) rotateY(5deg);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(176, 48, 140, 0.3);
-            background: rgba(255, 255, 255, 0.08);
+        .progress-section {
+            margin-top: 30px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .term-content {
-            flex: 1;
+        .progress-section h2 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
         }
 
-        .term-name {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--galaxy-cyan);
-            text-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
+        .history-list {
+            list-style-type: none;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .term-pronunciation {
-            font-style: italic;
-            margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
-        }
-
-        .term-reference {
-            font-size: 0.9rem;
-            color: var(--galaxy-pink);
-            text-shadow: 0 0 5px rgba(176, 48, 140, 0.5);
-        }
-
-        .voice-button {
-            background: rgba(0, 201, 255, 0.2);
-            border: 1px solid var(--galaxy-cyan);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-left: 15px;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
+            justify-content: space-between;
         }
 
-        .voice-button:hover {
-            background: rgba(0, 201, 255, 0.3);
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 201, 255, 0.5);
+        .history-item:last-child {
+            border-bottom: none;
         }
 
-        .voice-button.playing {
-            background: rgba(176, 48, 140, 0.3);
-            border-color: var(--galaxy-pink);
-            box-shadow: 0 0 15px rgba(176, 48, 140, 0.5);
-            animation: pulse 1s infinite;
+        .correct {
+            color: var(--success-color);
         }
 
-        .voice-icon {
-            width: 24px;
-            height: 24px;
-            fill: var(--galaxy-cyan);
-            transition: var(--transition);
+        .incorrect {
+            color: var(--danger-color);
         }
 
-        .voice-button.playing .voice-icon {
-            fill: var(--galaxy-pink);
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 12px 25px;
-            background: rgba(0, 201, 255, 0.15);
-            border: 1px solid var(--galaxy-cyan);
-            border-radius: 8px;
-            color: var(--galaxy-cyan);
-            cursor: pointer;
-            transition: var(--transition);
-            text-shadow: 0 0 5px rgba(0, 201, 255, 0.5);
-            box-shadow: 0 0 10px rgba(0, 201, 255, 0.2);
-        }
-
-        .back-button:hover {
-            background: rgba(0, 201, 255, 0.25);
-            transform: translateX(-5px);
-            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
-        }
-
-        .search-container {
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
-            color: white;
-            font-size: 1rem;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--galaxy-cyan);
-            box-shadow: 0 0 20px rgba(0, 201, 255, 0.4);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .galaxy-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            background: var(--galaxy-black);
-        }
-
-        .star {
-            position: absolute;
-            background-color: white;
-            border-radius: 50%;
-            animation: twinkle 5s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-            100% {
-                transform: translateY(0) rotate(360deg);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .nebula {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.4;
-            animation: float 25s infinite linear;
-        }
-
-        .nebula-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, var(--galaxy-purple), transparent);
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .nebula-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--galaxy-cyan), transparent);
-            top: 60%;
-            left: 80%;
-            animation-delay: -12s;
-        }
-
-        .nebula-3 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, var(--galaxy-pink), transparent);
-            top: 80%;
-            left: 20%;
-            animation-delay: -6s;
-        }
-
-        .shooting-star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 10px white;
-            opacity: 0;
-        }
-
-        @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(-500px) translateY(500px);
-                opacity: 0;
-            }
-        }
-
-        .galaxy-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, rgba(26, 26, 75, 0.3) 40%, transparent 70%);
-            border-radius: 50%;
-            animation: rotate 120s infinite linear;
-        }
-
-        @keyframes rotate {
-            from {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .books-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
             }
             
-            h1 {
-                font-size: 2.5rem;
+            .game-container, .progress-section {
+                padding: 15px;
             }
             
-            .terms-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .galaxy-center {
-                width: 400px;
-                height: 400px;
-            }
-            
-            .term-card {
-                flex-direction: column;
-            }
-            
-            .voice-button {
-                margin-left: 0;
-                margin-top: 15px;
-                align-self: center;
+            .word-display {
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="galaxy-background" id="galaxy-background">
-        <div class="galaxy-center"></div>
-        <div class="nebula nebula-1"></div>
-        <div class="nebula nebula-2"></div>
-        <div class="nebula nebula-3"></div>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+    
+    <header>
+        <h1>Épelle-moi Bibliquement !</h1>
+        <p>Testez votre connaissance de l'orthographe des noms et termes bibliques</p>
+    </header>
+
+    <div class="game-container">
+        <div class="level-selector">
+            <select id="levelSelect">
+                <option value="random">Niveau Aléatoire</option>
+                <!-- Les options de niveau seront ajoutées dynamiquement -->
+            </select>
+        </div>
+
+        <div class="word-display" id="wordDisplay">
+            Cliquez sur "Nouveau mot" pour commencer
+        </div>
+
+        <div class="result-message" id="resultMessage"></div>
+
+        <button id="listenBtn">Écouter le mot</button>
+        <input type="text" id="spellingInput" placeholder="Entrez l'orthographe du mot">
+        <button id="checkBtn">Vérifier</button>
+        <button id="nextBtn" class="btn-warning">Nouveau mot</button>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="stats">
+                <span>Score: <span id="scoreDisplay">0</span></span>
+                <span>Niveau: <span id="levelDisplay">-</span></span>
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <header>
-            <h1>Spécial Diocèse</h1>
-            <p class="subtitle">Épellation des mots de la Bible de Jérusalem à la spéciale </p>
-            <p class="author"> Ya Lwanga Credo Musao</p>
-        </header>
-
-        <section id="books-section" class="content-section active">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Rechercher un livre de la Bible...">
-            </div>
-            <div class="books-grid" id="books-grid">
-                <!-- Les livres seront générés dynamiquement -->
-            </div>
-        </section>
-
-        <section id="genesis-section" class="content-section">
-            <div class="back-button" id="back-to-books">← Retour aux livres</div>
-            <h2 class="chapter-title">Genèse - Personnages et Termes</h2>
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Rechercher un terme dans Genèse...">
-            </div>
-            <div class="terms-grid" id="genesis-terms">
-                <!-- Les termes de Genèse seront générés dynamiquement -->
-            </div>
-        </section>
+    <div class="progress-section">
+        <h2>📊 Mes progrès</h2>
+        <div>
+            <p>Score total: <span id="totalScore">0</span></p>
+            <p>Meilleur niveau: <span id="bestLevel">-</span></p>
+            <p>Pourcentage de réussite: <span id="successRate">0%</span></p>
+        </div>
+        
+        <h3>Historique récent</h3>
+        <ul class="history-list" id="historyList">
+            <!-- L'historique sera ajouté dynamiquement -->
+        </ul>
     </div>
 
     <script>
-        // Données des livres de la Bible (extrait des 74 livres)
+        // Données du jeu
         const bibleBooks = [
-            "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges", "Ruth", 
-            "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques", "Esdras", 
-            "Néhémie", "Esther", "Job", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique des Cantiques",
-            "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Joël", "Amos",
-            "Abdias", "Jonas", "Michée", "Nahum", "Habaquq", "Sophonie", "Aggée", "Zacharie", "Malachie",
+            "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges",
+            "Ruth", "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques",
+            "Esdras", "Néhémie", "Esther", "Job", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique des Cantiques",
+            "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Joël", "Amos", "Abdias",
+            "Jonas", "Michée", "Nahum", "Habacuc", "Sophonie", "Aggée", "Zacharie", "Malachie",
             "Matthieu", "Marc", "Luc", "Jean", "Actes", "Romains", "1 Corinthiens", "2 Corinthiens",
             "Galates", "Éphésiens", "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens",
-            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques", "1 Pierre", "2 Pierre",
-            "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
+            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques",
+            "1 Pierre", "2 Pierre", "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
         ];
 
-        // Données des termes de Genèse avec textes pour la synthèse vocale
-        const genesisTerms = [
-            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dieu" },
-            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dieu" },
-            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "L'homme Adam" },
-            { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La femme Ève" },
-            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le serpent" },
-            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1", speakText: "Caïn" },
-            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2", speakText: "Abel" },
-            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "Noé" },
-            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sem" },
-            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Cham" },
-            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Japhet" },
-            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5", speakText: "Abraham" },
-            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15", speakText: "Sara" },
-            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "Isaac" },
-            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Jacob" },
-            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Joseph" },
-            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jardin d'Eden" },
-            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "L'arche" },
-            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le déluge" },
-            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4", speakText: "La tour de Babel" },
+        const spellingWords = {
+            "Genèse": [
+                "Dieu", "Yahvé Dieu", "Adam", "Ève", "serpent", "Caïn", "Abel", "Hénok", "Irad", "Mehuyaël",
+                "Metushaël", "Lamek", "Ada", "Cilla", "Yabal", "Yubal", "Tubal-Caïn", "Naama", "Seth", "Enosh",
+                "Qénân", "Mahalaléel", "Yéred", "Hénok", "Mathusalem", "Lamek", "Noé", "Sem", "Cham", "Japhet",
+                "Nephilim", "chérubins", "Nemrod", "Gomer", "Magog", "Yavân", "Tubal", "Moshek", "Tiras", "Ashkenaz",
+                "Riphat", "Togarma", "Elisha", "Kush", "Miçrayim", "Put", "Canaan", "Séba", "Havila", "Sabta",
+                "Rama", "Sabteka", "Sheba", "Dedân", "Ashshur", "Arpakshad", "Lud", "Aram", "Uç", "Hul",
+                "Géter", "Mash", "Shélah", "Eber", "Péleg", "Yoqtân", "Almodad", "Shéleph", "Haççarmavet", "Yérah",
+                "Hadoram", "Uzal", "Diqla", "Obal", "Abimaël", "Ophir", "Yobab", "Réu", "Serug", "Nahor",
+                "Térah", "Abram", "Harân", "Lot", "Saraï", "Milka", "Yiska", "ciel", "terre", "abîme",
+                "vent", "eaux", "lumière", "ténèbres", "jour", "nuit", "firmament", "mers", "verdure", "herbes",
+                "arbres", "luminaires", "soleil", "lune", "étoiles", "serpents", "bêtes", "bestiaux", "bestioles",
+                "arbre de vie", "arbre de la connaissance", "jardin d'Eden", "fleuve d'Eden", "Pishôn", "Havila",
+                "bdellium", "cornaline", "Gihôn", "Kush", "Tigre", "Assur", "Euphrate", "côte", "feuilles", "sueur",
+                "pain", "tuniques", "glaive", "sol", "sang", "Nod", "ville", "signe", "arche", "déluge", "bitume",
+                "corbeau", "colombe", "rameau", "autel", "holocaustes", "arc", "vin", "vigne", "nudité", "manteau",
+                "esclave", "îles", "Babel", "Erek", "Akkad", "Shinéar", "Ninive", "Rehobot-Ir", "Kalah", "Rèsèn",
+                "Lud", "Anam", "Lehab", "Naphtuh", "Patros", "Kasluh", "Kaphtor", "Philistins", "Sidon", "Jébuséen",
+                "Amorite", "Girgashite", "Hivvite", "Arqite", "Sinite", "Arvadite", "Cemarite", "Hamatite", "Gérar",
+                "Gaza", "Sodome", "Gomorrhe", "Adma", "Ceboyim", "Lésha", "tour", "langue", "Ur", "Chaldéens", "Sara",
+                "Perizzites", "Amraphel", "Aryok", "Kedor-Laomer", "Tidéal", "Béra", "Birsha", "Shinéab", "Shémeéber",
+                "Béla", "Rephaïm", "Zuzim", "Emim", "Horites", "Amalécites", "Mambré", "Eshkol", "Aner", "Melchisédech",
+                "Shalem", "El Elyon", "Éliézer", "Qénites", "Qenizzites", "Qadmonites", "Hittites", "Agar", "Ismaël",
+                "Ange de Yahvé", "El-Roï", "El ShaddaEl Shaddaï", "Isaac", "hôtes", "Moab",ï", "Isaac", "hôtes", "Moab", " "Ben-Ammi", "Ben-Ammi", "Abimélek", "PikolAbimélek", "Pik"
+            ],
+ol"
+            ],
+            "Exode": ["Pharaon", "Moïse", "plaies", "désert", "loi"],
+            "Lévitique": ["sacrifice", "prêtre            "Exode": ["Pharaon", "Moïse", "plaies", "désert", "loi"],
+            "Lévitique": ["sacrifice", "", "purification", "sprêtre", "purification", "saint", "offaint", "offrande"],
+            "Nombres": ["recensement", "désert", "manne", "serpent", "prophétie"],
+            "Deutérande"],
+            "Nombres": ["recensement", "désert", "manne", "serpent", "prophétie"],
+            "ronome": ["commandementsDeutéronome": ["commandements", "alliance", "terre", "bénédiction", "malédiction"],
+            "Josué": ["Jéricho", "Canaan", "conquête", "partage", "tribus"],
+            "Juges": ["Samson", "Déb", "alliance", "terre", "bénédiction", "malédiction"],
+            "Josué": ["Jéricho", "Canaan", "conquête", "partage", "tribus"],
+            "Juges": ["ora", "GSamson", "Débora", "Gédéon",édéon", "victoire "victoire", "cycle"],
+            "Ruth": ["Mo", "cycle"],
+            "Ruthab", "gl": ["Moab", "glane", "rachatane", "rachat", "Booz",", "Booz", "anc "ancêtre"],
+            "1 Samuelêtre"],
+            "1 Samuel":": ["Saül", " ["Saül", "David", "David", "GGoliath", "prophète", "onoliath", "prophète", "onction"],
+            "2 Samuel": ["Jérusalem", "ction"],
+            "2 Samuel": ["Jérusalem", "alliance", "absalliance", "absalomalom", "révolte",", "révolte", "ro "royaume"],
+            "1 Rois": ["Salomon", "temple", "sagesse", "schisme", "prophètes"],
+            "2 Rois": ["exil", "prophyaume"],
+            "1 Rois": ["Salomon", "temple", "sagesse", "schisme", "prophètes"],
+            "2 Rois": ["exil", "ètes", "rois", "chuteprophètes", "rois", "ch", "Assyrie"],
+           ute", "Assyrie"],
+            "1 Chroniques": ["généalogie", "David", "temple", "l "1 Chroniques": ["généalogie", "David", "temple", "lévitesévites", "chroniques"],
+", "chroniques"],
+                       "2 Chroniques": "2 Chroniques": ["Salomon", "temple", " ["Salomon", "temple", "rois", "réforme", "rois", "réforme", "exil"],
+            "Esexil"],
+            "Esdras": ["retourdras": ["retour", "", "temple", "temple", "loi", "loi", "réforme", "scribe"],
+            "Nréforme", "scribe"],
+            "Néhémie":éhémie": ["muraille", "Jérusalem", "réforme", "g ["muraille", "Jérusalem", "réforme", "gouverouverneur", "peuple"],
+neur", "peuple"],
+            "Esther": ["            "Esther": ["reine", "Mardreine", "Mardochée", "Haman",ochée", "Haman", "pourim", "dél "pourim", "délivrance"],
+            "Jobivrance"],
+            "Job": ["souffrance": ["souffrance", "amis", "Die", "amis", "u", "sagesse",Dieu", "sagesse", "restauration"],
+ "restauration"],
+                       "Psaumes": [" "Psaumes": ["louange", "prière",louange", "prière", "David", "Asaph", "David", "Asaph", "cantique"],
+            "Prover "cantique"],
+            "Proverbes": ["sagessebes": ["sagesse", "instruction", "c", "instruction", "crainte", "folierainte", "folie", "dis", "discipline"],
+cipline"],
+            "Ecclésiaste": ["van            "Ecclésiaste": ["vanité", "sité", "sagesse",agesse", "trav "travail",ail", "temps", " "temps", "mort"],
+            "Cantique des Cantiquesmort"],
+            "Cantique des Cantiques": ["amour",": ["amour", "f "fiançailles",iançailles", "Sh "Shulamulamite",ite", " "SalSalomonomon",", "allégorie"],
+            "allégorie"],
+            "Ésaï "Ésaïe": ["prophète", "e": ["prophète", "messie", "serviteur", "jugement", "salut"],
+           messie", "serviteur", "jugement", "salut"],
+            "Jérémie": ["prophète", " "Jérémie": ["prophète", "jugement", "noujugement", "nouvelle alliance", "lamentations", "vvelle alliance", "lamentations", "vocation"],
+ocation"],
+            "Lament            "Lamentations": ["douleurations": ["douleur", "Jérusalem", "Jérusalem", "dest", "destruction", "pleruction", "pleurs", "espérance"],
+            "Éurs", "espérance"],
+           zéchiel": ["vision", " "Ézéchiel": ["vision", "glorieglorieux",ux", "oss "ossements", "temple", "prophèteements", "temple", "pro"],
+            "Daniel": ["prophphète"],
+            "Daniel": ["prophète", "visions",ète", "visions", " "lion", "fournalion", "fournaise", "royaumesise", "royaumes"],
+            "Osée":"],
+            "Osée": ["pro ["prophète", "mariphète", "mariageage", "infidélité",", "infidélité", "alliance", "resta "alliance", "restaurationuration"],
+            "Joël":"],
+            "Joël": ["prophète ["prophète", "jour", "esprit", "jug", "jour", "esprit", "jugement", "restaurationement", "restauration"],
+            "Amos": [""],
+            "Amos": ["prophète", "prophète", "justice", "jugement", "pljustice", "jugement", "plomb", "restaurationomb", "restauration"],
+            "Abdias": [""],
+            "Abdias": ["prophète", "Édom", "jugement", "orgueilprophète", "Édom", "jugement", "orgueil", "S", "Sion"],
+            "Jonas": ["proion"],
+            "Jonas": ["prophète", "phète", "Ninive", "Ninive", "baleine",baleine", "mis "miséricorde", "missionéricorde", "mission"],
+            "Michée":"],
+            "Michée": ["prophète", ["prophète", " "Bethléem", "justiceBethléem", "justice", "miséricorde", "mess", "miséricorde", "messie"],
+            "Nahie"],
+            "Nahum":um": ["prophète", ["prophète", "Nin "Ninive", "jugementive", "jugement", "colère", "", "colère", "consolation"],
+            "Habconsolation"],
+            "Habacucacuc": ["proph": ["prophèteète", "foi", "", "foi", "justice", "vision", "plainte"],
+            "Sophonie": ["justice", "vision", "plainte"],
+            "Sophonie": ["prophète", "jour", "jugement", "restes", "prophète", "jour", "jugement", "restes",joie"],
+            "Aggée": ["prophète "joie"],
+            "Aggée": ["prophète", "temple", "reconstruction", "temple", "reconstruction", "encouragement",", "encouragement", "glo "gloire"],
+            "Zacharie": ["prophèteire"],
+            "Zacharie": ["proph", "visions", "messieète", "visions", "messie", "Jér", "Jérusalem", "restauration"],
+usalem", "restauration"],
+            "Mal            "Malachie": ["prophète", "alliance",achie": ["prophète", "alliance", " "dîme", "messagerdîme", "messager", "jour"],
+            "", "jour"],
+            "Matthieu": ["JésusMatthieu": ["Jésus",", "roya "royaume", "sermon", "miracles",ume", "sermon", "miracles", " "disdisciples"],
+            "Marc":ciples"],
+            "Marc": ["Jésus", " ["Jésus", "évangileévangile", "miracles", "serviteur", "", "miracles", "serviteur", "croixcroix"],
+            "Luc":"],
+            "Luc": ["Jésus", "paraboles", " ["Jésus", "paraboles", "mémédecin", "salutdecin", "salut", "rés", "résurrection"],
+            "Jean": ["Jésus",urrection"],
+            "Jean": ["Jésus", "parole", " "parole", "signessignes", "amour", "amour", "vie"],
+            "Actes":", "vie"],
+            "Actes": ["Esprit", " ["Esprit", "apôtres", "église", "apôtres", "église", "missionmission", "Paul"],
+            "", "Paul"],
+            "Romains": ["Paul", "Romains": ["Paul", "foi", "foi", "grâce",grâce", "justification", " "justification", "élection"],
+            "1 Corinthiens": ["élection"],
+            "1 Corinthiens": ["Paul",Paul", "amour", "résurrection", "amour", "résurrection", "d "dons", "unité"],
+            "2 Corinthiens": ["ons", "unité"],
+            "2 Corinthiens": ["Paul", "Paul", "ministère", "ministère", "souffsouffrancesrances", "consolation", "gloire"],
+            "", "consolation", "gloire"],
+            "GalatesGalates": ["Paul", "liberté", "": ["Paul", "libertéloi", "grâce", "croix"],
+            "Éphésiens": ["Paul", "église", "bénédictions", "loi", "grâce", "croix"],
+            "Éphésiens": ["Paul", "église", "bénédictions", "armure", "unité"],
+            "Philippiens": ["Paul", "joie", "Christ", "armure", "unité"],
+            "Philippiens": ["Paul", "joie", "Christ", "humilité", "contentement"],
+            "Colossiens": ["Paul", "Christ", "pl", "humilité", "contentement"],
+            "Colossiens": ["Paul", "Christ", "plénitude", "liberté", "règles"],
+            "1 Thessalonénitude", "liberté", "règles"],
+            "1 Thessaloniciens": ["iciens": ["Paul", "avènement", "sainteté", "travail", "espérance"],
+           Paul", "avènement", "sainteté", "travail", "espérance"],
+            "2 Thessaloniciens": ["Paul", "avènement", "désordre", "travail", "persévérance"],
+            "1 Timothée": [" "2 Thessaloniciens": ["Paul", "avènement", "désordre", "travail", "persévérance"],
+            "1 Timothée": ["Paul", "Timothée", "doctrine", "conduite", "église"],
+            "2 Timothée": ["Paul", "Timothée", "doctrine", "conduite", "église"],
+            "2 Timothée": ["Paul", "TimPaul", "Timothée", "fidélité", "Écritures", "combat"],
+            "Tite": ["Paul", "Tothée", "fidélité", "Écritures", "combat"],
+            "Tite": ["Paul", "Tite", "doctrine", "bonnes œuvres", "église"],
+            "Philémon": ["ite", "doctrine", "bonnes œuvres", "église"],
+            "Philémon": ["Paul", "Onésime", "esclPaul", "Onésime", "esclavage", "réconciliation", "amour"],
+            "Hébreux": ["Christ", "mélchavage", "réconciliation", "amour"],
+            "Hébreux": ["Christ", "mélchisédek", "foi", "sacrifice",isédek", "foi", "sacrifice", "alliance"],
+            "Jacques": [" "alliance"],
+            "Jacques": ["foi", "œuvres", "sagesse", "langue", "prifoi", "œuvres", "sagesse", "langue", "prière"],
+            "1 Pierre": ["Pierre", "souffranceère"],
+            "1 Pierre": ["Pierre", "souff", "espérance", "sainteté", "pasterance", "espérance", "sainteté",urs"],
+            "2 "pasteurs"],
+            "2 Pierre": ["Pierre", " Pierre": ["Pierre", "connaissanceconnaissance", "faux docteurs", "avènement", "croissance"],
+            "1 Jean": ["Jean", "faux docteurs", "avènement", "croissance"],
+            "1 Jean": ["Jean", "amour", "communion", "antichrist", "amour", "communion", "antichrist", "assurance"],
+            "", "assurance"],
+            "2 Jean": ["2 Jean": ["Jean", "vérité", "amourJean", "vérité", "amour", "hospitalité", "doctrine"],
+            "3 Jean", "hospitalité", "doctrine"],
+            "3 Jean": ["Jean", "Gaïus", "Diotr": ["Jean", "Gaïus", "Diotrèphe", "hospitalité", "vérité"],
+            "Judeèphe", "hospitalité", "vérité"],
+            "Jude": ["Jude", "contention", "apostas": ["Jude", "contention", "apostasie", "miséricorde", "gloireie", "miséricorde", "gloire"],
+            "Apocalypse": ["Jean", "visions", "jug"],
+            "Apocalypse": ["Jean", "visions", "jugements", "nouvelleements", "nouvelle création", "victoire"]
+        };
+
+        // État du jeu création", "victoire"]
+        };
+
+        // État du jeu
+        let gameState =
+        let gameState = {
+            {
+            currentLevel: "random currentLevel: "random",
+",
+            current            currentWord: "",
+            currentWordWord: "",
+            currentWordBook:Book: "",
+            score: 0 "",
+            score: 0,
+           ,
+            totalAttempts:  totalAttempts: 00,
+            correctAttempts:,
+            correctAttempts:  0,
+            history:0,
+            history: [],
+            [],
+            progressData: {}
+        };
+
+ progressData: {}
+        };
+
+        // Éléments        // Éléments DOM
+        DOM
+        const levelSelect = document const levelSelect = document.getElementById('level.getElementById('levelSelect');
+        constSelect');
+        const wordDisplay = document wordDisplay = document.getElementById('wordDisplay');
+        const spellingInput =.getElementById('wordDisplay');
+        const spellingInput = document.getElementById('spelling document.getElementById('spellingInput');
+        const checkBtn = document.getElementById('Input');
+        const checkBtn = document.getElementById('checkBtn');
+checkBtn');
+        const nextBtn =        const nextBtn = document.getElementById(' document.getElementById('nextBtn');
+       nextBtn');
+        const listen const listenBtn =Btn = document.getElementById('listenBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const progressFill = document.getElementById('progressFill');
+        document.getElementById('listenBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const progressFill = document.getElementById('progressFill');
+        const totalScore = document.getElementById('totalScore');
+        const bestLevel = document.getElementById('bestLevel');
+        const successRate = document.getElementById(' const totalScore = document.getElementById('totalScore');
+        const bestLevel = document.getElementById('bestLevel');
+        const successRate = document.getElementById('successRate');
+        const historyList = document.getElementById('historyList');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Initialisation
+        function init() {
+            // ChargsuccessRate');
+        const historyList = document.getElementById('historyList');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Initialisation
+        function init() {
+            // Charger leser les données sauvegardées données sauvegardées
+           
+            loadProgressData();
             
-
-    { name: "Hénok (fils de Caïn)", pronunciation: "É-nok", reference: "Genèse 4:17", speakText: "Hénok fils de Caïn" },
-    { name: "Irad", pronunciation: "I-rad", reference: "Genèse 4:18", speakText: "Irad" },
-    { name: "Mehuyaël", pronunciation: "Mé-hou-ya-èl", reference: "Genèse 4:18", speakText: "Mehuyaël" },
-    { name: "Metushaël", pronunciation: "Mé-tou-sha-èl", reference: "Genèse 4:18", speakText: "Metushaël" },
-    { name: "Lamek", pronunciation: "La-mèk", reference: "Genèse 4:18", speakText: "Lamek" },
-    { name: "Ada (femme de Lamek)", pronunciation: "A-da", reference: "Genèse 4:19", speakText: "Ada femme de Lamek" },
-    { name: "Cilla (femme de Lamek)", pronunciation: "Sil-la", reference: "Genèse 4:19", speakText: "Cilla femme de Lamek" },
-    { name: "Yabal", pronunciation: "Ya-bal", reference: "Genèse 4:20", speakText: "Yabal" },
-    { name: "Yubal", pronunciation: "You-bal", reference: "Genèse 4:21", speakText: "Yubal" },
-    { name: "Tubal-Caïn", pronunciation: "Tou-bal Ka-in", reference: "Genèse 4:22", speakText: "Tubal-Caïn" },
-    { name: "Naama", pronunciation: "Na-a-ma", reference: "Genèse 4:22", speakText: "Naama" },
-    { name: "Seth", pronunciation: "Sète", reference: "Genèse 4:25", speakText: "Seth" },
-    { name: "Enosh", pronunciation: "É-nosh", reference: "Genèse 4:26", speakText: "Enosh" },
-    { name: "Qénân", pronunciation: "Ké-nan", reference: "Genèse 5:9", speakText: "Qénân" },
-    { name: "Mahalaléel", pronunciation: "Ma-ha-la-lé-èl", reference: "Genèse 5:12", speakText: "Mahalaléel" },
-    { name: "Yéred", pronunciation: "Yé-rède", reference: "Genèse 5:15", speakText: "Yéred" },
-    { name: "Hénok (qui marcha avec Dieu)", pronunciation: "É-nok", reference: "Genèse 5:22", speakText: "Hénok qui marcha avec Dieu" },
-    { name: "Mathusalem", pronunciation: "Ma-tou-sé-lèm", reference: "Genèse 5:21", speakText: "Mathusalem" },
-    { name: "Lamek (père de Noé)", pronunciation: "La-mèk", reference: "Genèse 5:28", speakText: "Lamek père de Noé" },
-    { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "Noé" },
-    { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sem" },
-    { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Cham" },
-    { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Japhet" },
-    { name: "Les fils de Dieu", pronunciation: "Les fis de Dyœ", reference: "Genèse 6:2", speakText: "Les fils de Dieu" },
-    { name: "Les Nephilim", pronunciation: "Les Né-fi-lim", reference: "Genèse 6:4", speakText: "Les Nephilim" },
-    { name: "Les chérubins", pronunciation: "Les ké-rou-bine", reference: "Genèse 3:24", speakText: "Les chérubins" },
-    { name: "Nemrod", pronunciation: "Nem-rod", reference: "Genèse 10:8", speakText: "Nemrod" },
-    { name: "Gomer", pronunciation: "Go-mère", reference: "Genèse 10:2", speakText: "Gomer" },
-    { name: "Magog", pronunciation: "Ma-gog", reference: "Genèse 10:2", speakText: "Magog" },
-    { name: "Yavân", pronunciation: "Ya-van", reference: "Genèse 10:2", speakText: "Yavân" },
-    { name: "Tubal", pronunciation: "Tou-bal", reference: "Genèse 10:2", speakText: "Tubal" },
-    { name: "Moshek", pronunciation: "Mo-shèk", reference: "Genèse 10:2", speakText: "Moshek" },
-    { name: "Tiras", pronunciation: "Ti-ras", reference: "Genèse 10:2", speakText: "Tiras" },
-    { name: "Ashkenaz", pronunciation: "Ash-ké-naz", reference: "Genèse 10:3", speakText: "Ashkenaz" },
-    { name: "Riphat", pronunciation: "Ri-fat", reference: "Genèse 10:3", speakText: "Riphat" },
-    { name: "Togarma", pronunciation: "To-gar-ma", reference: "Genèse 10:3", speakText: "Togarma" },
-    { name: "Elisha", pronunciation: "É-li-sha", reference: "Genèse 10:4", speakText: "Elisha" },
-    { name: "Kush", pronunciation: "Koush", reference: "Genèse 10:6", speakText: "Kush" },
-    { name: "Miçrayim", pronunciation: "Mis-ra-yim", reference: "Genèse 10:6", speakText: "Miçrayim" },
-    { name: "Put", pronunciation: "Poute", reference: "Genèse 10:6", speakText: "Put" },
-    { name: "Canaan", pronunciation: "Ka-na-an", reference: "Genèse 9:18", speakText: "Canaan" },
-    { name: "Séba", pronunciation: "Sé-ba", reference: "Genèse 10:7", speakText: "Séba" },
-    { name: "Havila", pronunciation: "Ha-vi-la", reference: "Genèse 10:7", speakText: "Havila" },
-    { name: "Sabta", pronunciation: "Sab-ta", reference: "Genèse 10:7", speakText: "Sabta" },
-    { name: "Rama", pronunciation: "Ra-ma", reference: "Genèse 10:7", speakText: "Rama" },
-    { name: "Sabteka", pronunciation: "Sab-té-ka", reference: "Genèse 10:7", speakText: "Sabteka" },
-    { name: "Sheba", pronunciation: "Shé-ba", reference: "Genèse 10:7", speakText: "Sheba" },
-    { name: "Dedân", pronunciation: "Dé-dan", reference: "Genèse 10:7", speakText: "Dedân" },
-    { name: "Ashshur", pronunciation: "Ash-shur", reference: "Genèse 10:11", speakText: "Ashshur" },
-    { name: "Arpakshad", pronunciation: "Ar-pak-shad", reference: "Genèse 10:22", speakText: "Arpakshad" },
-    { name: "Lud", pronunciation: "Lude", reference: "Genèse 10:22", speakText: "Lud" },
-    { name: "Aram", pronunciation: "A-ram", reference: "Genèse 10:22", speakText: "Aram" },
-    { name: "Uç", pronunciation: "Ouss", reference: "Genèse 10:23", speakText: "Uç" },
-    { name: "Hul", pronunciation: "Hou-le", reference: "Genèse 10:23", speakText: "Hul" },
-    { name: "Géter", pronunciation: "Gué-tère", reference: "Genèse 10:23", speakText: "Géter" },
-    { name: "Mash", pronunciation: "Mash", reference: "Genèse 10:23", speakText: "Mash" },
-    { name: "Shélah", pronunciation: "Shé-la", reference: "Genèse 10:24", speakText: "Shélah" },
-    { name: "Eber", pronunciation: "É-bère", reference: "Genèse 10:24", speakText: "Eber" },
-    { name: "Péleg", pronunciation: "Pé-lègue", reference: "Genèse 10:25", speakText: "Péleg" },
-    { name: "Yoqtân", pronunciation: "Yok-tan", reference: "Genèse 10:25", speakText: "Yoqtân" },
-    { name: "Almodad", pronunciation: "Al-mo-dad", reference: "Genèse 10:26", speakText: "Almodad" },
-    { name: "Shéleph", pronunciation: "Shé-lèfe", reference: "Genèse 10:26", speakText: "Shéleph" },
-    { name: "Haççarmavet", pronunciation: "Ha-tsar-ma-vète", reference: "Genèse 10:26", speakText: "Haççarmavet" },
-    { name: "Yérah", pronunciation: "Yé-ra", reference: "Genèse 10:26", speakText: "Yérah" },
-    { name: "Hadoram", pronunciation: "Ha-do-ram", reference: "Genèse 10:27", speakText: "Hadoram" },
-    { name: "Uzal", pronunciation: "U-zal", reference: "Genèse 10:27", speakText: "Uzal" },
-    { name: "Diqla", pronunciation: "Dik-la", reference: "Genèse 10:27", speakText: "Diqla" },
-    { name: "Obal", pronunciation: "O-bal", reference: "Genèse 10:28", speakText: "Obal" },
-    { name: "Abimaël", pronunciation: "A-bi-ma-èl", reference: "Genèse 10:28", speakText: "Abimaël" },
-    { name: "Ophir", pronunciation: "O-fir", reference: "Genèse 10:29", speakText: "Ophir" },
-    { name: "Yobab", pronunciation: "Yo-bab", reference: "Genèse 10:29", speakText: "Yobab" },
-    { name: "Réu", pronunciation: "Ré-ou", reference: "Genèse 11:18", speakText: "Réu" },
-    { name: "Serug", pronunciation: "Sé-rougue", reference: "Genèse 11:20", speakText: "Serug" },
-    { name: "Nahor", pronunciation: "Na-or", reference: "Genèse 11:22", speakText: "Nahor" },
-    { name: "Térah", pronunciation: "Té-ra", reference: "Genèse 11:24", speakText: "Térah" },
-    { name: "Abram", pronunciation: "A-bram", reference: "Genèse 11:26", speakText: "Abram" },
-    { name: "Harân", pronunciation: "Ha-ran", reference: "Genèse 11:26", speakText: "Harân" },
-    { name: "Lot", pronunciation: "Lote", reference: "Genèse 11:27", speakText: "Lot" },
-    { name: "Saraï", pronunciation: "Sa-ra-i", reference: "Genèse 11:29", speakText: "Saraï" },
-    { name: "Milka", pronunciation: "Mil-ka", reference: "Genèse 11:29", speakText: "Milka" },
-    { name: "Yiska", pronunciation: "Yis-ka", reference: "Genèse 11:29", speakText: "Yiska" },
-    { name: "Le ciel", pronunciation: "Le syèl", reference: "Genèse 1:1", speakText: "Le ciel" },
-    { name: "La terre", pronunciation: "La tère", reference: "Genèse 1:1", speakText: "La terre" },
-    { name: "L'abîme", pronunciation: "La-bîme", reference: "Genèse 1:2", speakText: "L'abîme" },
-    { name: "Un vent de Dieu", pronunciation: "Un van de Dyœ", reference: "Genèse 1:2", speakText: "Un vent de Dieu" },
-    { name: "Les eaux", pronunciation: "Les zô", reference: "Genèse 1:2", speakText: "Les eaux" },
-    { name: "La lumière", pronunciation: "La lu-mière", reference: "Genèse 1:3", speakText: "La lumière" },
-    { name: "Les ténèbres", pronunciation: "Les té-nèbre", reference: "Genèse 1:2", speakText: "Les ténèbres" },
-    { name: "Le jour", pronunciation: "Le jour", reference: "Genèse 1:5", speakText: "Le jour" },
-    { name: "La nuit", pronunciation: "La noui", reference: "Genèse 1:5", speakText: "La nuit" },
-    { name: "Le firmament", pronunciation: "Le fir-ma-man", reference: "Genèse 1:6", speakText: "Le firmament" },
-    { name: "Les mers", pronunciation: "Les mères", reference: "Genèse 1:10", speakText: "Les mers" },
-    { name: "La verdure", pronunciation: "La ver-dure", reference: "Genèse 1:11", speakText: "La verdure" },
-    { name: "Les herbes", pronunciation: "Les zèrbe", reference: "Genèse 1:11", speakText: "Les herbes" },
-    { name: "Les arbres fruitiers", pronunciation: "Les zarbre frui-tyé", reference: "Genèse 1:11", speakText: "Les arbres fruitiers" },
-    { name: "Les luminaires", pronunciation: "Les lu-mi-nère", reference: "Genèse 1:14", speakText: "Les luminaires" },
-    { name: "Le grand luminaire (le soleil)", pronunciation: "Le gran lu-mi-nère (le so-lèy)", reference: "Genèse 1:16", speakText: "Le grand luminaire le soleil" },
-    { name: "Le petit luminaire (la lune)", pronunciation: "Le p'ti lu-mi-nère (la lune)", reference: "Genèse 1:16", speakText: "Le petit luminaire la lune" },
-    { name: "Les étoiles", pronunciation: "Les zé-toile", reference: "Genèse 1:16", speakText: "Les étoiles" },
-    { name: "Les serpents de mer", pronunciation: "Les ser-pan de mère", reference: "Genèse 1:21", speakText: "Les serpents de mer" },
-    { name: "Les bêtes sauvages", pronunciation: "Les bête so-vage", reference: "Genèse 1:25", speakText: "Les bêtes sauvages" },
-    { name: "Les bestiaux", pronunciation: "Les bès-tyo", reference: "Genèse 1:25", speakText: "Les bestiaux" },
-    { name: "Les bestioles", pronunciation: "Les bès-tyol", reference: "Genèse 1:25", speakText: "Les bestioles" },
-    { name: "L'arbre de vie", pronunciation: "L'arbre de vi", reference: "Genèse 2:9", speakText: "L'arbre de vie" },
-    { name: "L'arbre de la connaissance du bien et du mal", pronunciation: "L'arbre de la co-naï-sance du biyin è du mal", reference: "Genèse 2:9", speakText: "L'arbre de la connaissance du bien et du mal" },
-    { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jardin d'Eden" },
-    { name: "Le fleuve d'Eden", pronunciation: "Le fleuve d'É-dène", reference: "Genèse 2:10", speakText: "Le fleuve d'Eden" },
-    { name: "Le Pishôn", pronunciation: "Le Pi-shon", reference: "Genèse 2:11", speakText: "Le Pishôn" },
-    { name: "Le pays de Havila", pronunciation: "Le pé-i de Ha-vi-la", reference: "Genèse 2:11", speakText: "Le pays de Havila" },
-    { name: "Le bdellium", pronunciation: "Le bdèl-liom", reference: "Genèse 2:12", speakText: "Le bdellium" },
-    { name: "La pierre de cornaline", pronunciation: "La pyère de kor-na-line", reference: "Genèse 2:12", speakText: "La pierre de cornaline" },
-    { name: "Le Gihôn", pronunciation: "Le Gui-hon", reference: "Genèse 2:13", speakText: "Le Gihôn" },
-    { name: "Le pays de Kush", pronunciation: "Le pé-i de Koush", reference: "Genèse 2:13", speakText: "Le pays de Kush" },
-    { name: "Le Tigre", pronunciation: "Le Tigre", reference: "Genèse 2:14", speakText: "Le Tigre" },
-    { name: "Assur", pronunciation: "As-sur", reference: "Genèse 2:14", speakText: "Assur" },
-    { name: "L'Euphrate", pronunciation: "L'Eu-frate", reference: "Genèse 2:14", speakText: "L'Euphrate" },
-    { name: "La côte (d'Adam)", pronunciation: "La côte (d'A-dam)", reference: "Genèse 2:21", speakText: "La côte d'Adam" },
-    { name: "Les feuilles de figuier", pronunciation: "Les feuille de fi-guyé", reference: "Genèse 3:7", speakText: "Les feuilles de figuier" },
-    { name: "La sueur", pronunciation: "La su-eur", reference: "Genèse 3:19", speakText: "La sueur" },
-    { name: "Le pain", pronunciation: "Du pin", reference: "Genèse 3:19", speakText: "Le pain" },
-    { name: "Les tuniques de peau", pronunciation: "Les tu-nique de pô", reference: "Genèse 3:21", speakText: "Les tuniques de peau" },
-    { name: "La flamme du glaive fulgurant", pronunciation: "La flamme du glève ful-gu-ran", reference: "Genèse 3:24", speakText: "La flamme du glaive fulgurant" },
-    { name: "Le sol (maudit)", pronunciation: "Le sol (mo-di)", reference: "Genèse 3:17", speakText: "Le sol maudit" },
-    { name: "Le sang", pronunciation: "Le san", reference: "Genèse 4:10", speakText: "Le sang" },
-    { name: "Le pays de Nod", pronunciation: "Le pé-i de Node", reference: "Genèse 4:16", speakText: "Le pays de Nod" },
-    { name: "Une ville (bâtie par Caïn)", pronunciation: "Une ville (bâ-ti par Ka-in)", reference: "Genèse 4:17", speakText: "Une ville bâtie par Caïn" },
-    { name: "Un signe (sur Caïn)", pronunciation: "Un si-gne (sur Ka-in)", reference: "Genèse 4:15", speakText: "Un signe sur Caïn" },
-    { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "L'arche" },
-    { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le déluge" },
-    { name: "Le bitume", pronunciation: "Le bi-tume", reference: "Genèse 6:14", speakText: "Le bitume" },
-    { name: "Le corbeau", pronunciation: "Le cor-bo", reference: "Genèse 8:7", speakText: "Le corbeau" },
-    { name: "La colombe", pronunciation: "La co-lombe", reference: "Genèse 8:8", speakText: "La colombe" },
-    { name: "Un rameau d'olivier", pronunciation: "Un ra-mo do-li-vyé", reference: "Genèse 8:11", speakText: "Un rameau d'olivier" },
-    { name: "L'autel", pronunciation: "Lo-tèl", reference: "Genèse 8:20", speakText: "L'autel" },
-    { name: "Les holocaustes", pronunciation: "Les zo-lo-coste", reference: "Genèse 8:20", speakText: "Les holocaustes" },
-    { name: "L'arc (dans la nuée)", pronunciation: "L'arc (dan la nu-é)", reference: "Genèse 9:13", speakText: "L'arc dans la nuée" },
-    { name: "Le vin", pronunciation: "Le vin", reference: "Genèse 9:21", speakText: "Le vin" },
-    { name: "La vigne", pronunciation: "La vigne", reference: "Genèse 9:20", speakText: "La vigne" },
-    { name: "La nudité", pronunciation: "La nu-di-té", reference: "Genèse 9:22", speakText: "La nudité" },
-    { name: "Le manteau", pronunciation: "Le man-to", reference: "Genèse 9:23", speakText: "Le manteau" },
-    { name: "L'esclave", pronunciation: "Lès-clave", reference: "Genèse 9:25", speakText: "L'esclave" },
-    { name: "Les îles des nations", pronunciation: "Les zîle dé na-syon", reference: "Genèse 10:5", speakText: "Les îles des nations" },
-    { name: "Babel", pronunciation: "Ba-bèl", reference: "Genèse 10:10", speakText: "Babel" },
-    { name: "Erek", pronunciation: "É-rèk", reference: "Genèse 10:10", speakText: "Erek" },
-    { name: "Akkad", pronunciation: "A-kad", reference: "Genèse 10:10", speakText: "Akkad" },
-    { name: "Le pays de Shinéar", pronunciation: "Le pé-i de Shi-né-ar", reference: "Genèse 10:10", speakText: "Le pays de Shinéar" },
-    { name: "Ninive", pronunciation: "Ni-nive", reference: "Genèse 10:11", speakText: "Ninive" },
-    { name: "Rehobot-Ir", pronunciation: "Ré-o-bot Ir", reference: "Genèse 10:11", speakText: "Rehobot-Ir" },
-    { name: "Kalah", pronunciation: "Ka-la", reference: "Genèse 10:11", speakText: "Kalah" },
-    { name: "Rèsèn", pronunciation: "Ré-sène", reference: "Genèse 10:12", speakText: "Rèsèn" },
-    { name: "Les gens de Lud, de Anam, de Lehab, de Naphtuh, de Patros, de Kasluh, de Kaphtor", pronunciation: "Les jan de Lude, de A-nam, de Lé-ab, de Naf-tou, de Pa-tros, de Kas-lou, de Kaf-tor", reference: "Genèse 10:13-14", speakText: "Les gens de Lud, de Anam, de Lehab, de Naphtuh, de Patros, de Kasluh, de Kaphtor" },
-    { name: "Les Philistins", pronunciation: "Les Fi-lis-taine", reference: "Genèse 10:14", speakText: "Les Philistins" },
-    { name: "Sidon", pronunciation: "Si-don", reference: "Genèse 10:15", speakText: "Sidon" },
-    { name: "Le Jébuséen", pronunciation: "Le Jé-bu-zé-in", reference: "Genèse 10:16", speakText: "Le Jébuséen" },
-    { name: "L'Amorite", pronunciation: "L'A-mo-rite", reference: "Genèse 10:16", speakText: "L'Amorite" },
-    { name: "Le Girgashite", pronunciation: "Le Gir-ga-shite", reference: "Genèse 10:16", speakText: "Le Girgashite" },
-    { name: "Le Hivvite", pronunciation: "Le Hi-vite", reference: "Genèse 10:17", speakText: "Le Hivvite" },
-    { name: "L'Arqite", pronunciation: "L'Ar-kite", reference: "Genèse 10:17", speakText: "L'Arqite" },
-    { name: "Le Sinite", pronunciation: "Le Si-nite", reference: "Genèse 10:17", speakText: "Le Sinite" },
-    { name: "L'Arvadite", pronunciation: "L'Ar-va-dite", reference: "Genèse 10:18", speakText: "L'Arvadite" },
-    { name: "Le Cemarite", pronunciation: "Le Sé-ma-rite", reference: "Genèse 10:18", speakText: "Le Cemarite" },
-    { name: "Le Hamatite", pronunciation: "Le Ha-ma-tite", reference: "Genèse 10:18", speakText: "Le Hamatite" },
-    { name: "Gérar", pronunciation: "Gé-rar", reference: "Genèse 10:19", speakText: "Gérar" },
-    { name: "Gaza", pronunciation: "Ga-za", reference: "Genèse 10:19", speakText: "Gaza" },
-    { name: "Sodome", pronunciation: "So-dome", reference: "Genèse 10:19", speakText: "Sodome" },
-    { name: "Gomorrhe", pronunciation: "Go-morre", reference: "Genèse 10:19", speakText: "Gomorrhe" },
-    { name: "Adma", pronunciation: "Ad-ma", reference: "Genèse 10:19", speakText: "Adma" },
-    { name: "Ceboyim", pronunciation: "Sé-bo-yim", reference: "Genèse 10:19", speakText: "Ceboyim" },
-    { name: "Lésha", pronunciation: "Lé-sha", reference: "Genèse 10:19", speakText: "Lésha" },
-    { name: "Une tour", pronunciation: "Une tour", reference: "Genèse 11:4", speakText: "Une tour" },
-    { name: "Une langue (confondue)", pronunciation: "Une lang (con-fon-due)", reference: "Genèse 11:7", speakText: "Une langue confondue" },
-    { name: "Ur des Chaldéens", pronunciation: "Ur dé Kal-dé-in", reference: "Genèse 11:28", speakText: "Ur des Chaldéens" },
-    { name: "Saraï / Sara", pronunciation: "Sa-ra-i / Sa-ra", reference: "Genèse 11:29 / Genèse 17:15", speakText: "Saraï Sara" },
-    { name: "Abram / Abraham", pronunciation: "A-bram / A-bra-am", reference: "Genèse 11:26 / Genèse 17:5", speakText: "Abram Abraham" },
-    { name: "Harân (ville)", pronunciation: "Ha-ran", reference: "Genèse 11:31", speakText: "Harân ville" },
-    { name: "Les Cananéens", pronunciation: "Les Ka-na-né-in", reference: "Genèse 12:6", speakText: "Les Cananéens" },
-    { name: "Pharaon (d'Égypte)", pronunciation: "Fa-ra-on (d'É-gypte)", reference: "Genèse 12:15", speakText: "Pharaon d'Égypte" },
-    { name: "Les Perizzites", pronunciation: "Les Pé-ri-zzite", reference: "Genèse 13:7", speakText: "Les Perizzites" },
-    { name: "Amraphel (roi de Shinéar)", pronunciation: "Am-ra-fèl", reference: "Genèse 14:1", speakText: "Amraphel roi de Shinéar" },
-    { name: "Aryok (roi d'Ellasar)", pronunciation: "A-ryok", reference: "Genèse 14:1", speakText: "Aryok roi d'Ellasar" },
-    { name: "Kedor-Laomer (roi d'Elam)", pronunciation: "Ké-dor La-o-mère", reference: "Genèse 14:1", speakText: "Kedor-Laomer roi d'Elam" },
-    { name: "Tidéal (roi des Goyim)", pronunciation: "Ti-dé-al", reference: "Genèse 14:1", speakText: "Tidéal roi des Goyim" },
-    { name: "Béra (roi de Sodome)", pronunciation: "Bé-ra", reference: "Genèse 14:2", speakText: "Béra roi de Sodome" },
-    { name: "Birsha (roi de Gomorrhe)", pronunciation: "Bir-sha", reference: "Genèse 14:2", speakText: "Birsha roi de Gomorrhe" },
-    { name: "Shinéab (roi d'Adma)", pronunciation: "Shi-né-ab", reference: "Genèse 14:2", speakText: "Shinéab roi d'Adma" },
-    { name: "Shémeéber (roi de Ceboyim)", pronunciation: "Shé-mé-é-bère", reference: "Genèse 14:2", speakText: "Shémeéber roi de Ceboyim" },
-    { name: "Le roi de Béla (Coar)", pronunciation: "Le rwa de Bé-la (Ko-ar)", reference: "Genèse 14:2", speakText: "Le roi de Béla Coar" },
-    { name: "Les Rephaïm", pronunciation: "Les Ré-fa-im", reference: "Genèse 14:5", speakText: "Les Rephaïm" },
-    { name: "Les Zuzim", pronunciation: "Les Zu-zim", reference: "Genèse 14:5", speakText: "Les Zuzim" },
-    { name: "Les Emim", pronunciation: "Les É-mim", reference: "Genèse 14:5", speakText: "Les Emim" },
-    { name: "Les Horites", pronunciation: "Les Zo-rite", reference: "Genèse 14:6", speakText: "Les Horites" },
-    { name: "Les Amalécites", pronunciation: "Les A-ma-lé-site", reference: "Genèse 14:7", speakText: "Les Amalécites" },
-    { name: "Les Amorites", pronunciation: "Les A-mo-rite", reference: "Genèse 14:7", speakText: "Les Amorites" },
-    { name: "Mambré l'Amorite", pronunciation: "Mam-bré l'A-mo-rite", reference: "Genèse 14:13", speakText: "Mambré l'Amorite" },
-    { name: "Eshkol", pronunciation: "Èsh-kol", reference: "Genèse 14:13", speakText: "Eshkol" },
-    { name: "Aner", pronunciation: "A-nère", reference: "Genèse 14:13", speakText: "Aner" },
-    { name: "Melchisédech (roi de Shalem, prêtre du Dieu Très-Haut)", pronunciation: "Mèl-ki-sé-dèk", reference: "Genèse 14:18", speakText: "Melchisédech roi de Shalem prêtre du Dieu Très-Haut" },
-    { name: "Le Dieu Très-Haut (El Elyon)", pronunciation: "Le Dyœ Trè-zô (Èl Èl-yon)", reference: "Genèse 14:18", speakText: "Le Dieu Très-Haut El Elyon" },
-    { name: "L'héritier d'Abraham (Éliézer de Damas)", pronunciation: "L'é-ri-tyé d'A-bra-am (É-li-é-zère de Da-mas)", reference: "Genèse 15:2", speakText: "L'héritier d'Abraham Éliézer de Damas" },
-    { name: "Les Qénites", pronunciation: "Les Ké-nite", reference: "Genèse 15:19", speakText: "Les Qénites" },
-    { name: "Les Qenizzites", pronunciation: "Les Ké-ni-zzite", reference: "Genèse 15:19", speakText: "Les Qenizzites" },
-    { name: "Les Qadmonites", pronunciation: "Les Kad-mo-nite", reference: "Genèse 15:19", speakText: "Les Qadmonites" },
-    { name: "Les Hittites", pronunciation: "Les Hi-ttite", reference: "Genèse 15:20", speakText: "Les Hittites" },
-    { name: "Agar l'Égyptienne", pronunciation: "A-gar l'É-gyp-tyène", reference: "Genèse 16:1", speakText: "Agar l'Égyptienne" },
-    { name: "Ismaël", pronunciation: "Is-ma-èl", reference: "Genèse 16:11", speakText: "Ismaël" },
-    { name: "L'Ange de Yahvé", pronunciation: "L'Anje de Yah-vé", reference: "Genèse 16:7", speakText: "L'Ange de Yahvé" },
-    { name: "El-Roï", pronunciation: "Èl Ro-i", reference: "Genèse 16:13", speakText: "El-Roï" },
-    { name: "El Shaddaï", pronunciation: "Èl Sha-da-i", reference: "Genèse 17:1", speakText: "El Shaddaï" },
-    { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "Isaac" },
-    { name: "Les trois hommes / hôtes / Anges", pronunciation: "Les trwa zom / zôte / Anje", reference: "Genèse 18:2", speakText: "Les trois hommes hôtes Anges" },
-    { name: "Les gens de Sodome", pronunciation: "Les jan de So-dome", reference: "Genèse 19:4", speakText: "Les gens de Sodome" },
-    { name: "Les futurs gendres de Lot", pronunciation: "Les fu-tur jan-dre de Lote", reference: "Genèse 19:14", speakText: "Les futurs gendres de Lot" },
-    { name: "La femme de Lot", pronunciation: "La famme de Lote", reference: "Genèse 19:15", speakText: "La femme de Lot" },
-    { name: "Les deux filles de Lot (l'aînée et la cadette)", pronunciation: "Les dé fille de Lote (l'é-né é la ka-dète)", reference: "Genèse 19:30-38", speakText: "Les deux filles de Lot l'aînée et la cadette" },
-    { name: "Moab", pronunciation: "Mo-ab", reference: "Genèse 19:37", speakText: "Moab" },
-    { name: "Ben-Ammi", pronunciation: "Bène A-mi", reference: "Genèse 19:38", speakText: "Ben-Ammi" },
-    { name: "Abimélek (roi de Gérar)", pronunciation: "A-bi-mé-lèk", reference: "Genèse 20:2", speakText: "Abimélek roi de Gérar" },
-    { name: "Pikol (chef de l'armée d'Abimélek)", pronunciation: "Pi-kol", reference: "Genèse 21:22", speakText: "Pikol chef de l'armée d'Abimélek" },
-    { name: "Éliézer (serviteur d'Abraham)", pronunciation: "É-li-é-zère", reference: "Genèse 15:2", speakText: "Éliézer serviteur d'Abraham" },
-    { name: "Le pays de Canaan", pronunciation: "Le pé-i de Ka-na-an", reference: "Genèse 12:5", speakText: "Le pays de Canaan" },
-    { name: "Sichem", pronunciation: "Shi-kèm", reference: "Genèse 12:6", speakText: "Sichem" },
-    { name: "Le Chêne de Moré", pronunciation: "Le shène de Mo-ré", reference: "Genèse 12:6", speakText: "Le Chêne de Moré" },
-    { name: "Béthel", pronunciation: "Bé-tèl", reference: "Genèse 12:8", speakText: "Béthel" },
-    { name: "Aï", pronunciation: "A-i", reference: "Genèse 12:8", speakText: "Aï" },
-    { name: "Le Négeb", pronunciation: "Le Né-gueb", reference: "Genèse 12:9", speakText: "Le Négeb" },
-    { name: "L'Égypte", pronunciation: "L'É-gypte", reference: "Genèse 12:10", speakText: "L'Égypte" },
-    { name: "La Plaine du Jourdain", pronunciation: "La Plène du Jour-dain", reference: "Genèse 13:10", speakText: "La Plaine du Jourdain" },
-    { name: "Coar", pronunciation: "Ko-ar", reference: "Genèse 13:10", speakText: "Coar" },
-    { name: "La vallée de Siddim (la mer du Sel)", pronunciation: "La va-lé de Si-dim (la mère du Sèl)", reference: "Genèse 14:3", speakText: "La vallée de Siddim la mer du Sel" },
-    { name: "Ashterot-Qarnayim", pronunciation: "Ash-té-rot Kar-na-yim", reference: "Genèse 14:5", speakText: "Ashterot-Qarnayim" },
-    { name: "Ham", pronunciation: "Ham", reference: "Genèse 14:5", speakText: "Ham" },
-    { name: "La plaine de Qiryatayim", pronunciation: "La plène de Kir-ya-ta-yim", reference: "Genèse 14:5", speakText: "La plaine de Qiryatayim" },
-    { name: "Les montagnes de Séïr", pronunciation: "Les mon-tagne de Sé-ir", reference: "Genèse 14:6", speakText: "Les montagnes de Séïr" },
-    { name: "El-Parân", pronunciation: "Èl Pa-ran", reference: "Genèse 14:6", speakText: "El-Parân" },
-    { name: "La Source du Jugement (Cadès)", pronunciation: "La Source du Ju-je-man (Ka-dès)", reference: "Genèse 14:7", speakText: "La Source du Jugement Cadès" },
-    { name: "Le territoire des Amalécites", pronunciation: "Le té-ri-toir dé A-ma-lé-site", reference: "Genèse 14:7", speakText: "Le territoire des Amalécites" },
-    { name: "Haçaçôn-Tamar", pronunciation: "Ha-tsa-sson Ta-mar", reference: "Genèse 14:7", speakText: "Haçaçôn-Tamar" },
-    { name: "Les puits de bitume", pronunciation: "Les pui de bi-tume", reference: "Genèse 14:10", speakText: "Les puits de bitume" },
-    { name: "Le Chêne de Mambré", pronunciation: "Le shène de Mam-bré", reference: "Genèse 13:18", speakText: "Le Chêne de Mambré" },
-    { name: "Hébron", pronunciation: "É-bron", reference: "Genèse 13:18", speakText: "Hébron" },
-    { name: "Dan", pronunciation: "Dane", reference: "Genèse 14:14", speakText: "Dan" },
-    { name: "Hoba", pronunciation: "O-ba", reference: "Genèse 14:15", speakText: "Hoba" },
-    { name: "Damas", pronunciation: "Da-mas", reference: "Genèse 14:15", speakText: "Damas" },
-    { name: "La vallée de Shavé (la vallée du Roi)", pronunciation: "La va-lé de Sha-vé (la va-lé du Rwa)", reference: "Genèse 14:17", speakText: "La vallée de Shavé la vallée du Roi" },
-    { name: "Shalem", pronunciation: "Sha-lème", reference: "Genèse 14:18", speakText: "Shalem" },
-    { name: "Le Fleuve d'Égypte", pronunciation: "Le Fleuve d'É-gypte", reference: "Genèse 15:18", speakText: "Le Fleuve d'Égypte" },
-    { name: "Le Grand Fleuve (l'Euphrate)", pronunciation: "Le Gran Fleuve (l'Eu-frate)", reference: "Genèse 15:18", speakText: "Le Grand Fleuve l'Euphrate" },
-    { name: "Le chemin de Shur", pronunciation: "Le che-min de Shur", reference: "Genèse 16:7", speakText: "Le chemin de Shur" },
-    { name: "Le puits de Lahaï-Roï", pronunciation: "Le pui de La-a-i Ro-i", reference: "Genèse 16:14", speakText: "Le puits de Lahaï-Roï" },
-    { name: "Bérèd", pronunciation: "Bé-rède", reference: "Genèse 16:14", speakText: "Bérèd" },
-    { name: "Le désert de Bersabée", pronunciation: "Le dé-zère de Bèr-sa-bé", reference: "Genèse 21:14", speakText: "Le désert de Bersabée" },
-    { name: "Le désert de Parân", pronunciation: "Le dé-zère de Pa-ran", reference: "Genèse 21:21", speakText: "Le désert de Parân" },
-    { name: "Le pays de Moriyya", pronunciation: "Le pé-i de Mo-riy-ya", reference: "Genèse 22:2", speakText: "Le pays de Moriyya" },
-    { name: "Le bois de l'holocauste", pronunciation: "Le bwa de lo-lo-coste", reference: "Genèse 22:3", speakText: "Le bois de l'holocauste" },
-    { name: "La circoncision / prépuce", pronunciation: "La sir-con-si-zyon / pré-puce", reference: "Genèse 17:11", speakText: "La circoncision prépuce" },
-    { name: "L'alliance (et son signe)", pronunciation: "L'a-li-anse (è son si-gne)", reference: "Genèse 17:2 / Genèse 17:11", speakText: "L'alliance et son signe" },
-    { name: "Un four fumant", pronunciation: "Un four fu-man", reference: "Genèse 15:17", speakText: "Un four fumant" },
-    { name: "Un brandon de feu", pronunciation: "Un bran-don de feu", reference: "Genèse 15:17", speakText: "Un brandon de feu" },
-    { name: "Une génisse, une chèvre, un bélier, une tourterelle, un pigeonneau", pronunciation: "Une jé-nisse, une chèvre, un bé-lyé, une tour-te-rèlle, un pi-jo-no", reference: "Genèse 15:9", speakText: "Une génisse, une chèvre, un bélier, une tourterelle, un pigeonneau" },
-    { name: "Du pain et du vin", pronunciation: "Du pin è du vin", reference: "Genèse 14:18", speakText: "Du pain et du vin" },
-    { name: "Du caillé et du lait", pronunciation: "Du ka-yé è du lè", reference: "Genèse 18:8", speakText: "Du caillé et du lait" },
-    { name: "Trois boisseaux de farine", pronunciation: "Trwa bwa-so de fa-rine", reference: "Genèse 18:6", speakText: "Trois boisseaux de farine" },
-    { name: "Des galettes", pronunciation: "Dé ga-lète", reference: "Genèse 18:6", speakText: "Des galettes" },
-    { name: "Un voile (pièces d'argent)", pronunciation: "Un voile (pyèse d'ar-jan)", reference: "Genèse 20:16", speakText: "Un voile pièces d'argent" },
-    { name: "Un tamaris", pronunciation: "Un ta-ma-ris", reference: "Genèse 21:33", speakText: "Un tamaris" },
-    { name: "Une colonne de sel", pronunciation: "Une ko-lonne de sèl", reference: "Genèse 19:26", speakText: "Une colonne de sel" },
-    { name: "Du soufre et du feu", pronunciation: "Du soufre è du feu", reference: "Genèse 19:24", speakText: "Du soufre et du feu" },
-    { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Jacob" },
-    { name: "Laban", pronunciation: "La-ban", reference: "Genèse 24:29", speakText: "Laban" },
-    { name: "Les fils de Laban", pronunciation: "Les fis de La-ban", reference: "Genèse 31:1", speakText: "Les fils de Laban" },
-    { name: "Rachel", pronunciation: "Ra-shèl", reference: "Genèse 29:6", speakText: "Rachel" },
-    { name: "Léa", pronunciation: "Lé-a", reference: "Genèse 29:16", speakText: "Léa" },
-    { name: "Les fils de Jacob", pronunciation: "Les fis de Ja-kob", reference: "Genèse 35:23-26", speakText: "Les fils de Jacob" },
-    { name: "Les servantes de Jacob", pronunciation: "Les ser-vante de Ja-kob", reference: "Genèse 30:3-4, 9", speakText: "Les servantes de Jacob" },
-    { name: "Les serviteurs de Jacob", pronunciation: "Les ser-vi-teur de Ja-kob", reference: "Genèse 32:16", speakText: "Les serviteurs de Jacob" },
-    { name: "L'Ange de Dieu", pronunciation: "L'Anje de Dyœ", reference: "Genèse 31:11", speakText: "L'Ange de Dieu" },
-    { name: "Le Dieu de mon père (d'Abraham et d'Isaac)", pronunciation: "Le Dyœ de mon pyère (d'A-bra-am è d'I-zak)", reference: "Genèse 31:5", speakText: "Le Dieu de mon père d'Abraham et d'Isaac" },
-    { name: "Le Parent d'Isaac", pronunciation: "Le Pa-ran d'I-zak", reference: "Genèse 31:42", speakText: "Le Parent d'Isaac" },
-    { name: "Esaü", pronunciation: "É-sa-u", reference: "Genèse 25:25", speakText: "Esaü" },
-    { name: "Les hommes d'Esaü (400)", pronunciation: "Les zom d'É-sa-u (katr san)", reference: "Genèse 32:6", speakText: "Les hommes d'Esaü 400" },
-    { name: "L'homme / Dieu (qui lutte avec Jacob)", pronunciation: "Lomme / Dyœ (qui lutte a-vèc Ja-kob)", reference: "Genèse 32:24", speakText: "L'homme Dieu qui lutte avec Jacob" },
-    { name: "Israël (nouveau nom de Jacob)", pronunciation: "Is-ra-èl", reference: "Genèse 32:28", speakText: "Israël nouveau nom de Jacob" },
-    { name: "Les anges de Dieu", pronunciation: "Les zan-je de Dyœ", reference: "Genèse 32:1", speakText: "Les anges de Dieu" },
-    { name: "Les messagers de Jacob", pronunciation: "Les mè-sa-jé de Ja-kob", reference: "Genèse 32:3", speakText: "Les messagers de Jacob" },
-    { name: "Dina", pronunciation: "Di-na", reference: "Genèse 30:21", speakText: "Dina" },
-    { name: "Sichem (fils de Hamor)", pronunciation: "Shi-kèm (fis de A-mor)", reference: "Genèse 33:19", speakText: "Sichem fils de Hamor" },
-    { name: "Hamor le Hivvite", pronunciation: "A-mor le Hi-vite", reference: "Genèse 33:19", speakText: "Hamor le Hivvite" },
-    { name: "Les fils de Hamor", pronunciation: "Les fis de A-mor", reference: "Genèse 33:19", speakText: "Les fils de Hamor" },
-    { name: "Les gens de Sichem / de la ville", pronunciation: "Les jan de Shi-kèm / de la ville", reference: "Genèse 34:24", speakText: "Les gens de Sichem de la ville" },
-    { name: "Siméon", pronunciation: "Si-mé-on", reference: "Genèse 29:33", speakText: "Siméon" },
-    { name: "Lévi", pronunciation: "Lé-vi", reference: "Genèse 29:34", speakText: "Lévi" },
-    { name: "Débora (nourrice de Rébecca)", pronunciation: "Dé-bo-ra", reference: "Genèse 35:8", speakText: "Débora nourrice de Rébecca" },
-    { name: "Ruben", pronunciation: "Rou-bène", reference: "Genèse 29:32", speakText: "Ruben" },
-    { name: "Bilha (concubine de Jacob)", pronunciation: "Bil-a", reference: "Genèse 30:3", speakText: "Bilha concubine de Jacob" },
-    { name: "Les douze fils de Jacob / les tribus d'Israël", pronunciation: "Les douze fis de Ja-kob / les tri-bu d'Is-ra-èl", reference: "Genèse 35:23-26", speakText: "Les douze fils de Jacob les tribus d'Israël" },
-    { name: "Juda", pronunciation: "Ju-da", reference: "Genèse 29:35", speakText: "Juda" },
-    { name: "Issachar", pronunciation: "I-sa-kar", reference: "Genèse 30:18", speakText: "Issachar" },
-    { name: "Zabulon", pronunciation: "Za-bu-lon", reference: "Genèse 30:20", speakText: "Zabulon" },
-    { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Joseph" },
-    { name: "Benjamin", pronunciation: "Ben-ja-main", reference: "Genèse 35:18", speakText: "Benjamin" },
-    { name: "Dan", pronunciation: "Dane", reference: "Genèse 30:6", speakText: "Dan" },
-    { name: "Nephtali", pronunciation: "Nef-ta-li", reference: "Genèse 30:8", speakText: "Nephtali" },
-    { name: "Gad", pronunciation: "Gade", reference: "Genèse 30:11", speakText: "Gad" },
-    { name: "Asher", pronunciation: "A-shère", reference: "Genèse 30:13", speakText: "Asher" },
-    { name: "Les fils d'Esaü / d'Edom", pronunciation: "Les fis d'É-sa-u / d'É-dom", reference: "Genèse 36:9", speakText: "Les fils d'Esaü d'Edom" },
-    { name: "Ada (femme d'Esaü)", pronunciation: "A-da", reference: "Genèse 36:2", speakText: "Ada femme d'Esaü" },
-    { name: "Elôn le Hittite", pronunciation: "É-lon le Hi-ttite", reference: "Genèse 26:34", speakText: "Elôn le Hittite" },
-    { name: "Oholibama (femme d'Esaü)", pronunciation: "O-o-li-ba-ma", reference: "Genèse 36:2", speakText: "Oholibama femme d'Esaü" },
-    { name: "Ana (fils de Cibéôn le Horite)", pronunciation: "A-na", reference: "Genèse 36:20", speakText: "Ana fils de Cibéôn le Horite" },
-    { name: "Cibéôn le Horite", pronunciation: "Si-bé-on le Zo-rite", reference: "Genèse 36:20", speakText: "Cibéôn le Horite" },
-    { name: "Basmat (femme d'Esaü)", pronunciation: "Bas-mat", reference: "Genèse 26:34", speakText: "Basmat femme d'Esaü" },
-    { name: "Nebayot", pronunciation: "Né-ba-yot", reference: "Genèse 25:13", speakText: "Nebayot" },
-    { name: "Eliphaz (fils d'Esaü)", pronunciation: "É-li-faz", reference: "Genèse 36:10", speakText: "Eliphaz fils d'Esaü" },
-    { name: "Réuel (fils d'Esaü)", pronunciation: "Ré-u-èl", reference: "Genèse 36:10", speakText: "Réuel fils d'Esaü" },
-    { name: "Yéush, Yalam, Qorah (fils d'Esaü)", pronunciation: "Yé-oush, Ya-lam, Ko-ra", reference: "Genèse 36:5", speakText: "Yéush, Yalam, Qorah fils d'Esaü" },
-    { name: "Timna (concubine d'Eliphaz)", pronunciation: "Tim-na", reference: "Genèse 36:12", speakText: "Timna concubine d'Eliphaz" },
-    { name: "Amaleq", pronunciation: "A-ma-lèk", reference: "Genèse 36:12", speakText: "Amaleq" },
-    { name: "Nahat, Zérah, Shamma, Mizza (fils de Réuel)", pronunciation: "Na-at, Zé-ra, Sha-ma, Miz-za", reference: "Genèse 36:13", speakText: "Nahat, Zérah, Shamma, Mizza fils de Réuel" },
-    { name: "Les chefs des fils d'Esaü", pronunciation: "Les shèf des fis d'É-sa-u", reference: "Genèse 36:15-18", speakText: "Les chefs des fils d'Esaü" },
-    { name: "Séïr le Horite", pronunciation: "Sé-ir le Zo-rite", reference: "Genèse 36:20", speakText: "Séïr le Horite" },
-    { name: "Les fils de Séïr", pronunciation: "Les fis de Sé-ir", reference: "Genèse 36:20-21", speakText: "Les fils de Séïr" },
-    { name: "Les chefs des Horites", pronunciation: "Les shèf dé Zo-rite", reference: "Genèse 36:21", speakText: "Les chefs des Horites" },
-    { name: "Les rois d'Edom", pronunciation: "Les rwa d'É-dom", reference: "Genèse 36:31-39", speakText: "Les rois d'Edom" },
-    { name: "Les chefs d'Edom", pronunciation: "Les shèf d'É-dom", reference: "Genèse 36:40-43", speakText: "Les chefs d'Edom" },
-    { name: "Les Ismaélites / Madianites", pronunciation: "Les Is-ma-é-lite / Ma-dya-nite", reference: "Genèse 37:25, 28", speakText: "Les Ismaélites Madianites" },
-    { name: "Potiphar (eunuque de Pharaon, commandant des gardes)", pronunciation: "Po-ti-far", reference: "Genèse 37:36", speakText: "Potiphar eunuque de Pharaon commandant des gardes" },
-    { name: "La femme de Potiphar", pronunciation: "La famme de Po-ti-far", reference: "Genèse 39:7", speakText: "La femme de Potiphar" },
-    { name: "Les médecins", pronunciation: "Les mé-de-cin", reference: "Genèse 50:2", speakText: "Les médecins" },
-    { name: "Le geôlier chef", pronunciation: "Le jô-lyé shèf", reference: "Genèse 39:21", speakText: "Le geôlier chef" },
-    { name: "L'échanson du roi d'Egypte (grand échanson)", pronunciation: "L'é-shan-son du rwa d'É-gypte", reference: "Genèse 40:1", speakText: "L'échanson du roi d'Egypte grand échanson" },
-    { name: "Le panetier du roi d'Egypte (grand panetier)", pronunciation: "Le pa-ne-tyé du rwa d'É-gypte", reference: "Genèse 40:1", speakText: "Le panetier du roi d'Egypte grand panetier" },
-    { name: "Les magiciens et sages d'Egypte", pronunciation: "Les ma-ji-syin è saje d'É-gypte", reference: "Genèse 41:8", speakText: "Les magiciens et sages d'Egypte" },
-    { name: "L'intendant de Joseph", pronunciation: "L'in-tan-dan de Jo-zèf", reference: "Genèse 43:16", speakText: "L'intendant de Joseph" },
-    { name: "Asnat (femme de Joseph, fille de Poti-Phéra)", pronunciation: "As-nat", reference: "Genèse 41:45", speakText: "Asnat femme de Joseph fille de Poti-Phéra" },
-    { name: "Poti-Phéra (prêtre d'On)", pronunciation: "Po-ti Fé-ra", reference: "Genèse 41:45", speakText: "Poti-Phéra prêtre d'On" },
-    { name: "Manassé (fils de Joseph)", pronunciation: "Ma-na-sé", reference: "Genèse 41:51", speakText: "Manassé fils de Joseph" },
-    { name: "Ephraïm (fils de Joseph)", pronunciation: "É-fra-im", reference: "Genèse 41:52", speakText: "Ephraïm fils de Joseph" },
-    { name: "Les régisseurs de Pharaon", pronunciation: "Les ré-jis-seur de Fa-ra-on", reference: "Genèse 41:34", speakText: "Les régisseurs de Pharaon" },
-    { name: "Les prêtres égyptiens", pronunciation: "Les prêtre é-gyp-tyin", reference: "Genèse 47:22", speakText: "Les prêtres égyptiens" },
-    { name: "L'Ange qui m'a sauvé", pronunciation: "L'Anje ki m'a so-vé", reference: "Genèse 48:16", speakText: "L'Ange qui m'a sauvé" },
-    { name: "Le Puissant de Jacob (la Pierre d'Israël, El Shaddaï)", pronunciation: "Le Pui-san de Ja-kob (la Pyère d'Is-ra-èl, Èl Sha-da-i)", reference: "Genèse 49:24", speakText: "Le Puissant de Jacob la Pierre d'Israël El Shaddaï" },
-    { name: "Les archers", pronunciation: "Les zar-shé", reference: "Genèse 49:23", speakText: "Les archers" },
-    { name: "Ephrôn le Hittite", pronunciation: "É-fron le Hi-ttite", reference: "Genèse 23:8", speakText: "Ephrôn le Hittite" },
-    { name: "Les fils de Hèt", pronunciation: "Les fis de Hète", reference: "Genèse 23:3", speakText: "Les fils de Hèt" },
-    { name: "Les dignitaires et officiers de Pharaon", pronunciation: "Les di-gni-taire è zo-fi-sye de Fa-ra-on", reference: "Genèse 45:16", speakText: "Les dignitaires et officiers de Pharaon" },
-    { name: "Les boucs rayés et tachetés", pronunciation: "Les bouk ré-yé è ta-she-té", reference: "Genèse 30:35", speakText: "Les boucs rayés et tachetés" },
-    { name: "Les chèvres mouchetées et tachetées", pronunciation: "Les chèvre mou-she-té è ta-she-té", reference: "Genèse 30:32", speakText: "Les chèvres mouchetées et tachetées" },
-    { name: "Les moutons noirs", pronunciation: "Les mou-ton nwar", reference: "Genèse 30:32", speakText: "Les moutons noirs" },
-    { name: "Les baguettes de peuplier, d'amandier, de platane", pronunciation: "Les ba-guète de peu-pyé, d'a-man-dyé, de pla-tane", reference: "Genèse 30:37", speakText: "Les baguettes de peuplier, d'amandier, de platane" },
-    { name: "Paddân-Aram", pronunciation: "Pa-dan A-ram", reference: "Genèse 28:2", speakText: "Paddân-Aram" },
-    { name: "Les idoles domestiques (teraphim)", pronunciation: "Les zi-dole do-mès-tique (té-ra-fim)", reference: "Genèse 31:19", speakText: "Les idoles domestiques teraphim" },
-    { name: "Le Fleuve (l'Euphrate)", pronunciation: "Le Fleuve (l'Eu-frate)", reference: "Genèse 31:21", speakText: "Le Fleuve l'Euphrate" },
-    { name: "Le mont Galaad", pronunciation: "Le mon Ga-la-ad", reference: "Genèse 31:21", speakText: "Le mont Galaad" },
-    { name: "Yegar Sahadûta", pronunciation: "Yé-gar Sa-ha-du-ta", reference: "Genèse 31:47", speakText: "Yegar Sahadûta" },
-    { name: "Galéed", pronunciation: "Ga-lé-èd", reference: "Genèse 31:47", speakText: "Galéed" },
-    { name: "Miçpa", pronunciation: "Mits-pa", reference: "Genèse 31:49", speakText: "Miçpa" },
-    { name: "Mahanayim", pronunciation: "Ma-ha-na-yim", reference: "Genèse 32:2", speakText: "Mahanayim" },
-    { name: "Le pays de Séïr (la steppe d'Edom)", pronunciation: "Le pé-i de Sé-ir (la stèp d'É-dom)", reference: "Genèse 32:3", speakText: "Le pays de Séïr la steppe d'Edom" },
-    { name: "Le Jourdain", pronunciation: "Le Jour-dain", reference: "Genèse 32:10", speakText: "Le Jourdain" },
-    { name: "Le gué du Yabboq", pronunciation: "Le gué du Yab-bok", reference: "Genèse 32:22", speakText: "Le gué du Yabboq" },
-    { name: "Penuel", pronunciation: "Pé-nu-èl", reference: "Genèse 32:30", speakText: "Penuel" },
-    { name: "Le nerf sciatique", pronunciation: "Le nèr sya-tique", reference: "Genèse 32:32", speakText: "Le nerf sciatique" },
-    { name: "Sukkot", pronunciation: "Sou-kote", reference: "Genèse 33:17", speakText: "Sukkot" },
-    { name: "La parcelle de champ à Sichem", pronunciation: "La par-sèlle de chan a Shi-kèm", reference: "Genèse 33:19", speakText: "La parcelle de champ à Sichem" },
-    { name: "El-Béthel", pronunciation: "Èl Bé-tèl", reference: "Genèse 35:7", speakText: "El-Béthel" },
-    { name: "Le Chêne-des-Pleurs", pronunciation: "Le shène-dé-fleur", reference: "Genèse 35:8", speakText: "Le Chêne-des-Pleurs" },
-    { name: "Ephrata / Bethléem", pronunciation: "É-fra-ta / Bèt-lé-èm", reference: "Genèse 35:19", speakText: "Ephrata Bethléem" },
-    { name: "Migdal-Edèr", pronunciation: "Mig-dal É-dère", reference: "Genèse 35:21", speakText: "Migdal-Edèr" },
-    { name: "Qiryat-Arba / Hébron", pronunciation: "Kir-yat Ar-ba / É-bron", reference: "Genèse 35:27", speakText: "Qiryat-Arba Hébron" },
-    { name: "Le shéol", pronunciation: "Le shé-ol", reference: "Genèse 37:35", speakText: "Le shéol" },
-    { name: "Le pays d'Edom", pronunciation: "Le pé-i d'É-dom", reference: "Genèse 36:16", speakText: "Le pays d'Edom" },
-    { name: "La montagne de Séïr", pronunciation: "La mon-tagne de Sé-ir", reference: "Genèse 36:8", speakText: "La montagne de Séïr" },
-    { name: "Dinhaba", pronunciation: "Din-a-ba", reference: "Genèse 36:32", speakText: "Dinhaba" },
-    { name: "Boçra", pronunciation: "Bots-ra", reference: "Genèse 36:33", speakText: "Boçra" },
-    { name: "La campagne de Moab", pronunciation: "La cam-pagne de Mo-ab", reference: "Genèse 36:35", speakText: "La campagne de Moab" },
-    { name: "Avvit", pronunciation: "Av-vite", reference: "Genèse 36:35", speakText: "Avvit" },
-    { name: "Masréqa", pronunciation: "Mas-ré-ka", reference: "Genèse 36:36", speakText: "Masréqa" },
-    { name: "Rehobot-ha-Nahar", pronunciation: "Ré-o-bot a Na-ar", reference: "Genèse 36:37", speakText: "Rehobot-ha-Nahar" },
-    { name: "Paü", pronunciation: "Pa-u", reference: "Genèse 36:39", speakText: "Paü" },
-    { name: "Mehétabéel (femme de Hadad)", pronunciation: "Mé-é-ta-bé-èl", reference: "Genèse 36:39", speakText: "Mehétabéel femme de Hadad" },
-    { name: "Matred", pronunciation: "Ma-trède", reference: "Genèse 36:39", speakText: "Matred" },
-    { name: "Mé-Zahab", pronunciation: "Mé Za-ab", reference: "Genèse 36:39", speakText: "Mé-Zahab" },
-    { name: "La tunique ornée", pronunciation: "La tu-nique or-né", reference: "Genèse 37:3", speakText: "La tunique ornée" },
-    { name: "Dotân", pronunciation: "Do-tan", reference: "Genèse 37:17", speakText: "Dotân" },
-    { name: "Galaad", pronunciation: "Ga-la-ad", reference: "Genèse 31:21", speakText: "Galaad" },
-    { name: "La gomme adragante, le baume, le ladanum", pronunciation: "La gom a-dra-gan-te, le bôme, le la-da-nom", reference: "Genèse 37:25", speakText: "La gomme adragante, le baume, le ladanum" },
-    { name: "Les pistaches et les amandes", pronunciation: "Les pis-tash è les za-mande", reference: "Genèse 43:11", speakText: "Les pistaches et les amandes" },
-    { name: "Le cercueil en Egypte", pronunciation: "Le ser-keu-yen É-gypte", reference: "Genèse 50:26", speakText: "Le cercueil en Egypte" },
-    { name: "La coupe (de Joseph) en argent", pronunciation: "La coupe (de Jo-zèf) en ar-jan", reference: "Genèse 44:2", speakText: "La coupe de Joseph en argent" },
-    { name: "La terre de Goshèn", pronunciation: "La tère de Go-shène", reference: "Genèse 45:10", speakText: "La terre de Goshèn" },
-    { name: "La terre de Ramsès", pronunciation: "La tère de Ram-sèse", reference: "Genèse 47:11", speakText: "La terre de Ramsès" },
-    { name: "Le pays de Goshèn", pronunciation: "Le pé-i de Go-shène", reference: "Genèse 46:28", speakText: "Le pays de Goshèn" },
-    { name: "La grotte du champ de Makpéla", pronunciation: "La grout du chan de Mak-pé-la", reference: "Genèse 23:9", speakText: "La grotte du champ de Makpéla" },
-    { name: "Gorèn-ha-Atad", pronunciation: "Go-rène a A-tad", reference: "Genèse 50:10", speakText: "Gorèn-ha-Atad" },
-    { name: "Abel-Miçrayim", pronunciation: "A-bèl Mis-ra-yim", reference: "Genèse 50:11", speakText: "Abel-Miçrayim" },
-    { name: "Le cep de vigne et les sarments", pronunciation: "Le sèp de vigne è les sar-man", reference: "Genèse 40:9-10", speakText: "Le cep de vigne et les sarments" },
-    { name: "Les sept vaches grasses et maigres", pronunciation: "Les sète vache grasse è mègre", reference: "Genèse 41:2-4", speakText: "Les sept vaches grasses et maigres" },
-    { name: "Les sept épis pleins et grêles", pronunciation: "Les sète zé-pi plein è grèl", reference: "Genèse 41:5-7", speakText: "Les sept épis pleins et grêles" },
-    { name: "Le vent d'est", pronunciation: "Le van d'èste", reference: "Genèse 41:6", speakText: "Le vent d'est" },
-    { name: "Les années d'abondance et de famine", pronunciation: "Les zan-né d'a-bon-dan-sè de fa-mine", reference: "Genèse 41:30", speakText: "Les années d'abondance et de famine" },
-    { name: "L'anneau de Pharaon, les habits de lin, le collier d'or", pronunciation: "L'a-no de Fa-ra-on, les za-bi de line, le kol-yé dor", reference: "Genèse 41:42", speakText: "L'anneau de Pharaon, les habits de lin, le collier d'or" },
-    { name: "Le char", pronunciation: "Le shar", reference: "Genèse 41:43", speakText: "Le char" },
-    { name: "Abrek", pronunciation: "A-brèk", reference: "Genèse 41:43", speakText: "Abrek" },
-    { name: "Cophnat-Panéah (nom égyptien de Joseph)", pronunciation: "Kof-nat Pa-né-a", reference: "Genèse 41:45", speakText: "Cophnat-Panéah nom égyptien de Joseph" },
-    { name: "On (ville)", pronunciation: "One", reference: "Genèse 41:45", speakText: "On ville" },
-    { name: "Le serment (main sous la cuisse)", pronunciation: "Le ser-man (main sou la cui-sse)", reference: "Genèse 47:29", speakText: "Le serment main sous la cuisse" },
-    { name: "Les chariots de Pharaon", pronunciation: "Les sha-ryo de Fa-ra-on", reference: "Genèse 45:19", speakText: "Les chariots de Pharaon" },
-    { name: "Les habits de fête", pronunciation: "Les za-bi de fète", reference: "Genèse 45:22", speakText: "Les habits de fête" },
-    { name: "Le tribut (le cinquième pour Pharaon)", pronunciation: "Le tri-bu (le sin-kyème pour Fa-ra-on)", reference: "Genèse 47:24", speakText: "Le tribut le cinquième pour Pharaon" },
-    { name: "Le sceptre de Juda", pronunciation: "Le sèptre de Ju-da", reference: "Genèse 49:10", speakText: "Le sceptre de Juda" },
-    { name: "La bénédiction de Jacob à ses fils", pronunciation: "La bé-né-dik-syon de Ja-kob a sé fis", reference: "Genèse 49:1-28", speakText: "La bénédiction de Jacob à ses fils" },
-    { name: "La prophétie du Shiloh (ou \"celui à qui appartient le sceptre\")", pronunciation: "La pro-fé-ti du Shi-lo (ou \"se-lui a ki a-par-tien le sèptre\")", reference: "Genèse 49:10", speakText: "La prophétie du Shiloh ou celui à qui appartient le sceptre" },
-    { name: "L'embaumement", pronunciation: "L'an-bôme-man", reference: "Genèse 50:2", speakText: "L'embaumement" },
-    { name: "Les 70 années de deuil des Egyptiens", pronunciation: "Les swa-san-t(e) zan-né de deu-y dé zégyp-tyin", reference: "Genèse 50:3", speakText: "Les 70 années de deuil des Egyptiens" },
-    { name: "Ruben : Hénok, Pallu, Heçrôn, Karmi", pronunciation: "Rou-bène : É-nok, Pa-llu, È-tsron, Kar-mi", reference: "Genèse 46:9", speakText: "Ruben Hénok, Pallu, Heçrôn, Karmi" },
-    { name: "Siméon : Yemuel, Yamîn, Ohad, Yakîn, Cohar, Shaûl (fils de la Cananéenne)", pronunciation: "Si-mé-on : Yé-mu-èl, Ya-min, O-ad, Ya-kin, Ko-ar, Sha-ul", reference: "Genèse 46:10", speakText: "Siméon Yemuel, Yamîn, Ohad, Yakîn, Cohar, Shaûl fils de la Cananéenne" },
-    { name: "Lévi : Gershôn, Qehat, Merari", pronunciation: "Lé-vi : Guer-shon, Ké-at, Mé-ra-ri", reference: "Genèse 46:11", speakText: "Lévi Gershôn, Qehat, Merari" },
-    { name: "Juda : Er, Onân, Shéla, Pérèç, Zérah (Er et Onân morts en Canaan). Fils de Pérèç : Heçrôn, Hamul", pronunciation: "Ju-da : Ère, O-nan, Shé-la, Pé-rèts, Zé-ra. Fis de Pé-rèts : È-tsron, A-mul", reference: "Genèse 46:12", speakText: "Juda Er, Onân, Shéla, Pérèç, Zérah Er et Onân morts en Canaan Fils de Pérèç Heçrôn, Hamul" },
-    { name: "Issachar : Tola, Puvva, Yashub, Shimrôn", pronunciation: "I-sa-kar : To-la, Puv-va, Ya-shub, Shim-ron", reference: "Genèse 46:13", speakText: "Issachar Tola, Puvva, Yashub, Shimrôn" },
-    { name: "Zabulon : Séred, Elôn, Yahléel", pronunciation: "Za-bu-lon : Sé-rède, É-lon, Ya-lé-èl", reference: "Genèse 46:14", speakText: "Zabulon Séred, Elôn, Yahléel" },
-    { name: "Gad : Cephôn, Haggi, Shuni, Eçbôn, Eri, Arodi, Aréli", pronunciation: "Gade : Sé-fon, Ha-gui, Shu-ni, Ès-bon, É-ri, A-ro-di, A-ré-li", reference: "Genèse 46:16", speakText: "Gad Cephôn, Haggi, Shuni, Eçbôn, Eri, Arodi, Aréli" },
-    { name: "Asher : Yimna, Yishva, Yishvi, Beria, et leur sœur Sérah. Fils de Beria : Héber, Malkiel", pronunciation: "A-shère : Yim-na, Yish-va, Yish-vi, Bé-rya, è leur seur Sé-ra. Fis de Bé-rya : É-bère, Mal-kyèl", reference: "Genèse 46:17", speakText: "Asher Yimna, Yishva, Yishvi, Beria, et leur sœur Sérah Fils de Beria Héber, Malkiel" },
-    { name: "Joseph : Manassé, Ephraïm (nés d'Asnat)", pronunciation: "Jo-zèf : Ma-na-sé, É-fra-im", reference: "Genèse 46:20", speakText: "Joseph Manassé, Ephraïm nés d'Asnat" },
-    { name: "Benjamin : Béla, Béker, Ashbel, Géra, Naamân, Ehi, Rosh, Muppim, Huppim, Ard", pronunciation: "Ben-ja-main : Bé-la, Bé-kère, Ash-bèl, Gé-ra, Na-a-man, É-hi, Rosh, Mup-pim, Hup-pim, Ard", reference: "Genèse 46:21", speakText: "Benjamin Béla, Béker, Ashbel, Géra, Naamân, Ehi, Rosh, Muppim, Huppim, Ard" },
-    { name: "Dan : Hushim", pronunciation: "Dane : Hou-shim", reference: "Genèse 46:23", speakText: "Dan Hushim" },
-    { name: "Nephtali : Yahçéel, Guni, Yéçer, Shillem", pronunciation: "Nef-ta-li : Ya-tsé-èl, Gu-ni, Yé-sère, Shil-lème", reference: "Genèse 46:24", speakText: "Nephtali Yahçéel, Guni, Yéçer, Shillem" }
-];
-
-        // Variable pour suivre le bouton vocal actif
-        let currentVoiceButton = null;
-
-        // Créer les étoiles et étoiles filantes
-        function createStars() {
-            const galaxy = document.getElementById('galaxy-background');
-            const starCount = 200;
+ loadProgressData();
             
-            // Étoiles fixes
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                // Taille aléatoire
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                
-                // Position aléatoire
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                
-                // Animation delay aléatoire
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                
-                galaxy.appendChild(star);
+            // Rempl            // Remplir le sélectir le sélecteur de niveaux
+           eur de niveaux
+            bible bibleBooks.forEach(bookBooks.forEach(book => {
+                => {
+                const option = const option = document.createElement('option document.createElement('option');
+                option.value');
+                option.value = book = book;
+                option.text;
+                option.textContent = book;
+Content = book;
+                levelSelect.appendChild                levelSelect.appendChild(option);
+            });
+            
+            // Définir le niveau actuel(option);
+            });
+            
+            // Définir le niveau actuel
+
+            levelSelect.value = game            levelSelect.value = gameState.currentState.currentLevel;
+Level;
+            updateLevelDisplay();
+            
+            // Mettre à jour            updateLevelDisplay();
+            
+            // Mettre à jour l'affichage l'affichage du du score
+            updateScore score
+            updateScoreDisplay();
+            
+           Display();
+            
+            // M // Mettre à jour les statistiquesettre à jour les statistiques
+            updateStats();
+
+            updateStats();
+            
+            // Événements
+            
+            // Événements
+            level            levelSelect.addEventListener('change',Select.addEventListener('change', onLevel onLevelChange);
+            checkBtnChange);
+            checkBtn.addEventListener('click', checkSpelling);
+            nextBtn.addEventListener('click', getNewWord);
+            listen.addEventListener('click', checkSpelling);
+            nextBtn.addEventListener('click', getNewWord);
+            listenBtn.addEventListener('click', speakCurrentBtn.addEventListener('click', speakCurrentWord);
+Word);
+            spellingInput.addEventListener            spellingInput.addEventListener('key('keypress', function(epress', function(e) {
+               ) {
+                if (e.key === if (e.key === 'Enter 'Enter') {
+                    checkSpelling') {
+                    checkSpelling();
+               ();
+                }
+            });
             }
+            });
+            themeToggle themeToggle.addEventListener('click', toggle.addEventListener('click', toggleTheme);
             
-            // Étoiles filantes
-            setInterval(createShootingStar, 1500);
+Theme);
+            
+            // Appliquer            // Appliquer le thème le thème sauvegardé
+ sauvegardé
+            const            const savedTheme savedTheme = localStorage.getItem(' = localStorage.getItem('spellingGamespellingGameTheme') || 'light';
+Theme') || 'light';
+            document            document.documentElement.set.documentElement.setAttribute('data-theAttribute('data-theme', savedThememe', savedTheme);
+           );
+            themeToggle.textContent themeToggle.textContent = saved = savedThemeTheme === 'light === 'light'' ? '🌙' : '☀ ? '🌙' : '☀️';
+            
+            //️';
+            
+            // Premier mot
+            getNewWord Premier mot
+            getNewWord();
         }
 
-        function createShootingStar() {
-            const galaxy = document.getElementById('galaxy-background');
-            const shootingStar = document.createElement('div');
-            shootingStar.className = 'shooting-star';
-            
-            // Position de départ aléatoire
-            const startX = Math.random() * 100 + 50;
-            const startY = Math.random() * 30;
-            
-            shootingStar.style.left = `${startX}%`;
-            shootingStar.style.top = `${startY}%`;
-            shootingStar.style.animation = `shoot ${Math.random() * 1 + 0.5}s linear`;
-            
-            galaxy.appendChild(shootingStar);
-            
-            // Supprimer après l'animation
-            setTimeout(() => {
-                shootingStar.remove();
-            }, 2000);
+        // Charg();
         }
 
-        // Fonction pour la synthèse vocale
-        function speakText(text, button) {
-            // Arrêter la lecture précédente si elle existe
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                if (currentVoiceButton) {
-                    currentVoiceButton.classList.remove('playing');
+        // Charger les données de progression
+        function loader les données de progression
+        function loadProgressData() {
+            constProgressData() {
+            const savedData = localStorage.getItem(' savedData = localStorage.getItem('spellingGameProgress');
+spellingGameProgress');
+            if (            if (savedData)savedData) {
+                game {
+                gameState.progressDataState.progressData = JSON.parse(savedData);
+                
+                // = JSON.parse(savedData);
+                
+                // Récupérer les données Récupérer les données pour pour le niveau actuel le niveau actuel
+                if (gameState.progress
+                if (gameState.progressDataData[gameState.currentLevel[gameState.currentLevel])]) {
+                    const levelData = {
+                    const levelData = game gameState.progressData[gameState.progressData[gameState.currentLevel];
+                    gameState.currentLevel];
+                    gameState.scoreState.score = levelData.score ||  = levelData.score || 0;
+                    gameState.total0;
+                    gameState.totalAttempts = levelData.totalAttempts = levelData.totalAttempts || 0;
+Attempts || 0;
+                    gameState.correctAttempts =                    gameState.correctAttempts = levelData.correctAttempts || levelData.correctAttempts || 0;
+                    game 0;
+                    gameState.history = levelDataState.history = levelData.history || [];
                 }
             }
-
-            // Créer un nouvel objet de synthèse vocale
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Configurer la voix française
-            utterance.lang = 'fr-FR';
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-
-            // Ajouter l'icône de lecture au bouton
-            button.classList.add('playing');
-            currentVoiceButton = button;
-
-            // Quand la lecture commence
-            utterance.onstart = function() {
-                button.classList.add('playing');
-            };
-
-            // Quand la lecture se termine
-            utterance.onend = function() {
-                button.classList.remove('playing');
-                currentVoiceButton = null;
-            };
-
-            // Quand il y a une erreur
-            utterance.onerror = function() {
-                button.classList.remove('playing');
-                currentVoiceButton = null;
-                alert('Erreur lors de la lecture vocale. Vérifiez que votre navigateur supporte la synthèse vocale.');
-            };
-
-            // Lancer la lecture
-            window.speechSynthesis.speak(utterance);
+.history || [];
+                }
+            }
         }
 
-        // Générer la grille des livres
-        const booksGrid = document.getElementById('books-grid');
-        bibleBooks.forEach(book => {
-            const bookCard = document.createElement('div');
-            bookCard.className = 'book-card';
-            bookCard.innerHTML = `
-                <div class="book-title">${book}</div>
-                <div class="book-chapters">Cliquez pour explorer</div>
-            `;
+        // Sauvegard        }
+
+        // Sauvegarderer les données de progression les données de progression
+        function saveProgressData()
+        function saveProgressData() {
+            {
+            // Mettre à jour les données // Mettre à jour les données pour le niveau actuel
+            pour le niveau actuel
+            if (!gameState.progressData[gameState.currentLevel]) {
+                gameState.progressData if (!gameState.progressData[gameState.currentLevel]) {
+                gameState.progress[gameState.currentLevelData[gameState.currentLevel] = {};
+           ] = {};
+            }
             
-            // Ajouter un événement de clic pour Genèse
-            if (book === "Genèse") {
-                bookCard.addEventListener('click', () => {
-                    document.getElementById('books-section').classList.remove('active');
-                    document.getElementById('genesis-section').classList.add('active');
-                    generateGenesisTerms();
-                });
+            game }
+            
+            gameState.proState.progressData[gameState.currentgressData[gameState.currentLevel].Level].score = gameState.scorescore = gameState.score;
+           ;
+            gameState.pro gameState.progressData[gamegressData[gameState.currentLevelState.currentLevel].totalAttempts].totalAttempts = gameState.totalAttempt = gameState.totalAttempts;
+s;
+            gameState.pro            gameState.progressDatagressData[gameState.current[gameState.currentLevel].correctAttemptLevel].correctAttempts =s = gameState.correctAttempts gameState.correctAttempts;
+            gameState;
+            gameState.progressData.progressData[gameState[gameState.currentLevel].history.currentLevel].history = game = gameState.hState.history;
+            
+            // Sauistory;
+            
+            // Sauvegarder dansvegarder dans le localStorage
+ le localStorage
+            localStorage.setItem            localStorage.setItem('spelling('spellingGameProgress', JSONGameProgress', JSON.stringify.stringify(gameState(gameState.pro.progressDatagressData));
+));
+        }
+
+        }
+
+        // Changer de niveau
+               // Changer de niveau
+        function onLevelChange() function onLevelChange() {
+            gameState.currentLevel = levelSelect {
+            gameState.currentLevel = levelSelect.value;
+            
+            // Charger les données.value;
+            
+            // Charger les données pour ce niveau pour ce niveau
+            if (game
+            if (gameState.progressState.progressData[gameData[gameState.currentLevel])State.currentLevel]) {
+                {
+                const levelData = game const levelData = gameState.progressData[State.progressData[gameStategameState.currentLevel];
+.currentLevel];
+                gameState.score = levelData.score ||                 gameState.score = levelData.score || 0;
+0;
+                game                gameState.totalAttemptsState.totalAttempts = levelData.total = levelData.totalAttemptsAttempts || 0;
+ || 0;
+                gameState                gameState.correctAttempts =.correctAttempts = levelData levelData.correctAttempts.correctAttempts ||  || 0;
+                gameState.history = levelData.history || [];
+            }0;
+                gameState.history = levelData.history || [];
             } else {
-                bookCard.addEventListener('click', () => {
-                    alert(`Exploration de ${book} - Fonctionnalité à développer`);
-                });
+                // Réinitial else {
+                // Réinitialiser pour uniser pour un nouveau niveau
+                nouveau niveau
+                gameState gameState.score = 0;
+.score = 0;
+                game                gameState.totalAttempts =State.totalAttempts = 0 0;
+                gameState.correct;
+                gameState.correctAttempts = 0;
+Attempts = 0;
+                game                gameState.history = [];
+State.history = [];
             }
             
-            booksGrid.appendChild(bookCard);
-        });
-
-        // Générer les termes de Genèse avec boutons vocaux
-        function generateGenesisTerms() {
-            const genesisTermsContainer = document.getElementById('genesis-terms');
-            genesisTermsContainer.innerHTML = '';
+            }
             
-            genesisTerms.forEach(term => {
-                const termCard = document.createElement('div');
-                termCard.className = 'term-card';
-                termCard.innerHTML = `
-                    <div class="term-content">
-                        <div class="term-name">${term.name}</div>
-                        <div class="term-pronunciation">${term.pronunciation}</div>
-                        <div class="term-reference">${term.reference}</div>
-                    </div>
-                    <div class="voice-button" title="Écouter la prononciation">
-                        <svg class="voice-icon" viewBox="0 0 24 24">
-                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                        </svg>
-                    </div>
+            updateLevelDisplay            updateLevelDisplay();
+();
+            updateScore            updateScoreDisplay();
+            updateStats();
+Display            getNewWord();
+        }
+
+        // Obtenir un();
+            updateStats();
+            getNewWord();
+        }
+
+        nouveau mot
+        function getNew // Obtenir un nouveau mot
+        function getNewWord() {
+            //Word() {
+            // Réinitialiser Réinitialiser l'affichage l
+            spellingInput.value = "";
+            resultMessage.textContent = "";
+           'affichage
+            spellingInput.value = "";
+            resultMessage.textContent = "";
+            resultMessage.className = " resultMessage.className = "resultresult-message";
+            
+            //-message";
+            
+            // Choisir un livre
+ Choisir un livre
+            let book;
+                       let book;
+            if if (gameState.current (gameState.currentLevel === "random") {
+                // SéLevel === "random") {
+                // Sélectionlectionner un livre au hasardner un livre au hasard
+
+                const randomIndex = Math                const randomIndex = Math.floor(Math.random() * bibleBooks.floor(Math.random() * bibleBooks.length);
+                book = bibleBooks.length);
+                book = bibleBooks[randomIndex];
+            } else[randomIndex];
+            } else {
+                book = gameState.currentLevel {
+                book = gameState.current;
+            }
+            
+            //Level;
+            }
+            
+            // Choisir un mot dans Choisir un mot dans ce livre ce livre
+            const words = spelling
+            const words = spellingWords[book];
+            ifWords[book];
+            if (words (words && words.length >  && words.length > 00) {
+) {
+                               const const randomIndex = Math.floor(Math.random() * words.length);
+                gameState.current randomIndex = Math.floor(Math.random() * words.length);
+               Word = words[randomIndex];
+                gameState.currentWord = words[randomIndex gameState.currentWordBook =];
+                gameState.currentWordBook = book;
+                
+                // Afficher book;
+                
+                // Afficher le mot ( le mot (masqué pour l'épellation)
+               masqué pour l'épellation)
+                wordDisplay.textContent = " wordDisplay.textContent = "?";
+?";
+            } else {
+                word            } else {
+                wordDisplay.textContent = "ADisplay.textContent = "Aucun mot disponible pour ce niveau";
+ucun mot disponible pour ce niveau";
+            }
+            
+            // Focus sur            }
+            
+            // le champ de saisie Focus sur le champ de saisie
+            spellingInput.focus
+            spellingInput.focus();
+       ();
+        }
+
+        // Vérifier }
+
+        // Vérifier l'orthographe
+ l'orthographe
+        function        function checkSp checkSpelling()elling() {
+            const userInput = spelling {
+            const userInput = spellingInput.value.trim();
+            
+            if (!userInput) {
+                resultInput.value.trim();
+            
+            if (!userInput) {
+                resultMessage.textContent = "VMessage.textContent = "Veuillez entrer uneeuillez entrer une réponse";
+                réponse";
+                resultMessage.className = "result-message error";
+ resultMessage.className = "result-message error";
+                return;
+            }
+            
+            // Vérifier la réponse (insensible à                return;
+            }
+            
+            // Vérifier la réponse ( la casse et aux accents)
+            const normalizedinsensible à la casse et aux accents)
+            const normalizedInput = userInput.toLowerCaseInput = userInput.toLowerCase().().normalize("NFD").replacenormalize("NFD").replace(/[\u0300-\(/[\u0300-\u036u036f]/g, "");
+            const normalizedWord = gameState.currentWord.toLowerCase().normalize("NFf]/g, "");
+            const normalizedWord = gameState.currentWord.toLowerCase().normalize("NFD").replace(/[\uD").replace(/0300-\u036f[\u0300-\u036f]/g, "");
+            
+            const is]/g, "");
+            
+            const isCorrect = normalizedInput === normalizedWordCorrect = normalizedInput === normalizedWord;
+            
+            // M;
+            
+            // Mettre à jour les statistiques
+            gameettre à jour les statistiques
+            gameState.totalAttempts++;
+            ifState.totalAttempts++;
+            if (isCorrect) {
+                game (isCorrect) {
+                gameStateState.correctAttempts++;
+               .correctAttempts++;
+                gameState.score += 10;
+                gameState.score += 10;
+ resultMessage.textContent                resultMessage.textContent = "Correct !";
+                resultMessage = "Correct !";
+                result.className = "resultMessage.className = "result-message success";
+           -message success";
+            } else {
+                } else {
+                resultMessage.textContent resultMessage.textContent = `Incorrect. La bonne réponse était : = `Incorrect. La bonne réponse était : ${game ${gameStateState.currentWord}`.currentWord}`;
+               ;
+                resultMessage resultMessage.className = "result-m.className = "result-message error";
+            }
+            
+           essage error";
+            }
+            
+            // Ajouter à // Ajouter à l'historique
+ l'historique
+            gameState.history.unshift({
+                           gameState.history.unshift({
+ word: gameState.currentWord,
+                word: gameState.currentWord,
+                userInput: userInput                userInput: userInput,
+               ,
+                isCorrect: is isCorrect: isCorrect,
+Correct,
+                book: gameState.current                book: gameState.currentWordBook,
+                timestamp: new DateWordBook,
+                timestamp:().toLocaleString()
+            });
+ new Date().toLocaleString()
+            });
+            
+            //            
+            // Limiter Limiter l'historique aux 10 l'historique aux 10 dernières entrées
+            if dernières entrées
+            if (gameState.history.length > 10) (gameState.history.length >  {
+                gameState.history10) {
+                gameState.history = gameState.h = gameState.history.sliceistory.slice(0, 10);
+            }
+(0, 10);
+            }
+            
+                       
+            // Afficher le mot correct
+            word // Afficher le mot correct
+            wordDisplay.textContent = gameState.currentWordDisplay.textContent = gameState.currentWord;
+            
+            // Mettre;
+            
+            // Mettre à jour l'affichage
+            à jour l'affichage updateScoreDisplay();
+            updateStats();
+
+            updateScoreDisplay();
+            updateStats();
+            
+            // Sauve            
+            // Sauvegardgarder les progrèser les progrès
+           
+            saveProgressData();
+        saveProgressData();
+        }
+
+        // Lire le mot actuel }
+
+        // Lire le mot
+        function speakCurrentWord actuel
+        function speakCurrentWord() {
+            if (!() {
+            if (!gameStategameState.currentWord) return.currentWord) return;
+            
+;
+            
+            if ('speechS            if ('speechSynthesis' in window) {
+                constynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(gameState.currentWord);
+                utterance.lang = 'fr-FR';
+                utterance. utterance = new SpeechSynthesisUtterance(gameState.currentWord);
+                utterance.lang = 'fr-FR';
+                utterance.rate = rate = 0.90.9;
+               ;
+                utterance.pitch = 1 utterance.pitch = 1;
+                
+               ;
+                
+                // // Essayer de trouver une voix française
+                const voices Essayer de trouver une voix française
+                = speechSynthesis.getVoices();
+ const voices = speechSynthesis.getVo                const frenchVoice =ices();
+                const frenchVoice = voices.find(voice => 
+ voices.find(voice => 
+                    voice.lang                    voice.lang.includes('fr').includes('fr') && voice.name.includes('Female')
+ && voice.name.includes('Female')
+                );
+                
+                if                );
+                
+                if (f (frenchVoice) {
+                   renchVoice) {
+                    utterance.voice utterance.voice = frenchVoice;
+ = frenchVoice;
+                }
+                
+                speechSynthesis.speak(                }
+                
+                speechSynthesis.sutterance);
+            }peak(utterance);
+            } else {
+ else {
+                               alert(" alert("La synthèseLa synthèse vocale n'est pas support vocale n'est pas supportée par votre navigateée par votre navigateur");
+            }
+        }
+
+        // Mettre àur");
+            }
+        }
+
+        // Mettre à jour l'affichage du jour l'affichage du score
+        function updateScoreDisplay() score
+        function updateScoreDisplay() {
+            scoreDisplay.textContent {
+            scoreDisplay.textContent = gameState.score;
+ = gameState.score;
+            
+                       
+            // Mettre à jour la barre de progression
+            // Mettre à jour la barre de progression
+            const progressPercentage const progressPercentage = Math = Math.min(gameState.score /.min(gameState.score / 100 * 100 * 100 100, 100);
+            progressFill.style.width =, 100);
+            progressFill.style.width = `${progressPercentage}%`;
+ `${progressPercentage}%`;
+        }
+
+        }
+
+        // Mettre à        // Mettre à jour l jour l'affichage du niveau'affichage du niveau
+        function updateLevelDisplay() {
+           
+        function updateLevelDisplay() {
+            levelDisplay.textContent = gameState.currentLevel === "random" levelDisplay.textContent = gameState.currentLevel === "random" ? "Alé ? "Aléatoire"atoire" : gameState.currentLevel;
+        }
+
+ : gameState.currentLevel;
+        }
+
+        // Mettre à jour        // Mettre à jour les statist les statistiques
+        function updateStatsiques
+        function updateStats() {
+            // Score total
+            let totalScoreValue() {
+            // Score total
+            let totalScoreValue = 0;
+            Object = 0;
+            Object.values(gameState.progressData).forEach.values(gameState.progressData).forEach(levelData => {
+                total(levelData => {
+                totalScoreValue += levelDataScoreValue += levelData.score || 0;
+            });
+           .score || 0;
+            });
+            totalScore.textContent = totalScoreValue totalScore.textContent = totalScoreValue;
+            
+            //;
+            
+            // Meilleur niveau
+            let best Meilleur niveau
+            let bestLevelValue = "-";
+            let highestLevelValue = "-";
+            let highestScore = 0;
+            Object.Score = 0;
+            Object.entries(gameState.progressDataentries(gameState.progressData).forEach(([level, data]) =>).forEach(([level, data]) => {
+                if (data {
+                if (data.score >.score > highestScore) {
+                    highestScore) {
+                    highestScore highestScore = data.score;
+ = data.score;
+                    bestLevelValue                    bestLevelValue = level === "random" ? "Al = level === "random" ? "Aléatoire" :éatoire" : level;
+                }
+ level;
+                }
+            });
+            });
+            bestLevel.text            bestLevel.textContent = bestLevelValue;
+            
+            // Taux deContent = bestLevelValue;
+            
+            // Taux de réussite réussite
+            const success
+            const successRateValueRateValue = gameState.totalAttempts >  = gameState.totalAttempts > 0 
+               0 
+                ? Math.round((gameState.correct ? Math.round((gameState.correctAttempts /Attempts / gameState.totalAttempt gameState.totalAttempts) * 100) 
+                : s) * 100) 
+                : 0;
+            successRate.text0;
+            successRate.textContentContent = `${successRate = `${successRateValue}%`;
+            
+Value}%`;
+            
+            // Historique
+            historyList.innerHTML            // Historique
+            historyList.innerHTML = "";
+            gameState.history.forEach(item = "";
+            gameState.h => {
+                const li = documentistory.forEach(item => {
+                const li = document.createElement('li');
+                li.className.createElement('li');
+                li.className = ` = `history-item ${itemhistory-item ${item.isCorrect ? '.isCorrect ? 'correct' :correct' : 'incorrect'}`;
+                li.innerHTML = `
+ 'incorrect'}`;
+                li.innerHTML = `
+                    <                    <span>${item.wordspan>${item.word}</span>
+}</span>
+                    <span>                    <span>${item.isCorrect ? '✓' : '${item.isCorrect ? '✓' : '✗'}</✗'}</span>
+span>
                 `;
-                
-                // Ajouter l'événement pour le bouton vocal
-                const voiceButton = termCard.querySelector('.voice-button');
-                voiceButton.addEventListener('click', () => {
-                    speakText(term.speakText, voiceButton);
-                });
-                
-                genesisTermsContainer.appendChild(termCard);
+                               `;
+                historyList.appendChild(li);
+            });
+ historyList.appendChild(li);
             });
         }
 
-        // Bouton de retour
-        document.getElementById('back-to-books').addEventListener('click', () => {
-            document.getElementById('genesis-section').classList.remove('active');
-            document.getElementById('books-section').classList.add('active');
-            
-            // Arrêter toute lecture vocale en cours
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                if (currentVoiceButton) {
-                    currentVoiceButton.classList.remove('playing');
-                    currentVoiceButton = null;
-                }
-            }
-        });
+        // Bas        }
 
-        // Fonctionnalité de recherche pour les livres
-        const bookSearchInput = document.querySelector('#books-section .search-input');
-        bookSearchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const bookCards = document.querySelectorAll('.book-card');
+        // Basculer entre les thèmes clair et sombre
+culer entre les thèmes clair et sombre
+        function toggle        function toggleTheme() {
+           Theme() {
+            const currentTheme = document.documentElement.getAttribute const currentTheme = document.documentElement.getAttribute('data-theme('data-theme');
+           ');
+            const newTheme = current const newTheme = currentTheme === 'Theme === 'light' ? 'light' ? 'dark' : 'light';
             
-            bookCards.forEach(card => {
-                const bookTitle = card.querySelector('.book-title').textContent.toLowerCase();
-                if (bookTitle.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        // Fonctionnalité de recherche pour les termes de Genèse
-        const genesisSearchInput = document.querySelector('#genesis-section .search-input');
-        genesisSearchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const termCards = document.querySelectorAll('.term-card');
+           dark' : 'light';
             
-            termCards.forEach(card => {
-                const termName = card.querySelector('.term-name').textContent.toLowerCase();
-                if (termName.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        // Animation au chargement de la page
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 1s';
+            document.documentElement.setAttribute document.documentElement.setAttribute('data('data-theme', newTheme);
+-theme', newTheme);
+            themeToggle.textContent = newTheme            themeToggle.textContent = newTheme === 'light' ? ' === 'light' ? '🌙🌙' : '' : '☀️';
             
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
+            localStorage.setItem☀️';
             
-            createStars();
-        });
-
-        // Vérifier la compatibilité avec la synthèse vocale
-        if (!('speechSynthesis' in window)) {
-            console.warn('Votre navigateur ne supporte pas la synthèse vocale');
+            localStorage.setItem('spellingGameTheme',('spellingGameTheme', newTheme);
         }
+
+        // Initialiser le newTheme);
+        }
+
+        // Initialiser le jeu au chargement de la page jeu au chargement de la page
+        document.addEventListener('
+        document.addEventListener('DOMContentLoaded', init);
+    </DOMContentLoaded', init);
     </script>
+</body>
+</script>
 </body>
 </html>
