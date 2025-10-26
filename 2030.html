@@ -527,32 +527,33 @@
             "Abdias", "Jonas", "Michée", "Nahum", "Habaquq", "Sophonie", "Aggée", "Zacharie", "Malachie"
         ];
 
-        // Données des termes de Genèse avec prononciation adaptée
+        // Données des termes de Genèse avec prononciation phonétique exacte
         const genesisTerms = [
-            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dieu" },
-            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dieu" },
-            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "L'homme Adam" },
-            { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La femme Ève" },
-            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le serpent" },
-            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1", speakText: "Caïn" },
-            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2", speakText: "Abel" },
-            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "Noé" },
-            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sem" },
-            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Cham" },
-            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Japhet" },
-            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5", speakText: "Abraham" },
-            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15", speakText: "Sara" },
-            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "Isaac" },
-            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Jacob" },
-            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Joseph" },
-            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jardin d'Éden" },
-            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "L'arche" },
-            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le déluge" },
-            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4", speakText: "La tour de Babel" }
+            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dyœ" },
+            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dyœ" },
+            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "Lomme A-dam" },
+            { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La famme Ève" },
+            { name: "Le serpent", pronunciation: "Le ser-pan", reference: "Genèse 3:1", speakText: "Le ser-pan" },
+            { name: "Caïn", pronunciation: "Ka-in", reference: "Genèse 4:1", speakText: "Ka-in" },
+            { name: "Abel", pronunciation: "A-bèl", reference: "Genèse 4:2", speakText: "A-bèl" },
+            { name: "Noé", pronunciation: "No-é", reference: "Genèse 5:29", speakText: "No-é" },
+            { name: "Sem", pronunciation: "Sème", reference: "Genèse 5:32", speakText: "Sème" },
+            { name: "Cham", pronunciation: "Kam", reference: "Genèse 5:32", speakText: "Kam" },
+            { name: "Japhet", pronunciation: "Ja-fète", reference: "Genèse 5:32", speakText: "Ja-fète" },
+            { name: "Abraham", pronunciation: "A-bra-am", reference: "Genèse 17:5", speakText: "A-bra-am" },
+            { name: "Sara", pronunciation: "Sa-ra", reference: "Genèse 17:15", speakText: "Sa-ra" },
+            { name: "Isaac", pronunciation: "I-zak", reference: "Genèse 17:19", speakText: "I-zak" },
+            { name: "Jacob", pronunciation: "Ja-kob", reference: "Genèse 25:26", speakText: "Ja-kob" },
+            { name: "Joseph", pronunciation: "Jo-zèfe", reference: "Genèse 30:24", speakText: "Jo-zèfe" },
+            { name: "Le jardin d'Eden", pronunciation: "Le jar-din d'É-dène", reference: "Genèse 2:8", speakText: "Le jar-din d'É-dène" },
+            { name: "L'arche", pronunciation: "L'arsh", reference: "Genèse 6:14", speakText: "L'arsh" },
+            { name: "Le déluge", pronunciation: "Le dé-luge", reference: "Genèse 6:17", speakText: "Le dé-luge" },
+            { name: "La tour de Babel", pronunciation: "La tour de Ba-bèl", reference: "Genèse 11:4", speakText: "La tour de Ba-bèl" }
         ];
 
         // Variable pour suivre le bouton vocal actif
         let currentVoiceButton = null;
+        let voicesLoaded = false;
 
         // Fonction pour créer les étoiles
         function createStars() {
@@ -595,8 +596,36 @@
             }, 2000);
         }
 
-        // Fonction pour la synthèse vocale
+        // Fonction pour trouver une voix masculine française
+        function findMaleVoice() {
+            const voices = speechSynthesis.getVoices();
+            
+            // Priorité aux voix masculines françaises
+            const maleVoices = voices.filter(voice => 
+                voice.lang.includes('fr') && 
+                (voice.name.toLowerCase().includes('homme') || 
+                 voice.name.toLowerCase().includes('male') ||
+                 voice.name.toLowerCase().includes('paul') ||
+                 voice.name.toLowerCase().includes('google') ||
+                 voice.name.toLowerCase().includes('michel'))
+            );
+            
+            if (maleVoices.length > 0) {
+                return maleVoices[0];
+            }
+            
+            // Fallback: première voix française
+            const frenchVoices = voices.filter(voice => voice.lang.includes('fr'));
+            return frenchVoices.length > 0 ? frenchVoices[0] : null;
+        }
+
+        // Fonction pour la synthèse vocale avec voix masculine
         function speakText(text, button) {
+            if (!voicesLoaded) {
+                alert('Les voix ne sont pas encore chargées. Veuillez réessayer dans quelques secondes.');
+                return;
+            }
+
             // Arrêter la lecture précédente
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
@@ -607,15 +636,14 @@
 
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'fr-FR';
-            utterance.rate = 0.8;
-            utterance.pitch = 1;
+            utterance.rate = 0.7; // Plus lent pour la prononciation phonétique
+            utterance.pitch = 0.8; // Plus grave pour voix masculine
             utterance.volume = 1;
 
-            // Chercher une voix française
-            const voices = speechSynthesis.getVoices();
-            const frenchVoice = voices.find(voice => voice.lang.includes('fr'));
-            if (frenchVoice) {
-                utterance.voice = frenchVoice;
+            // Utiliser une voix masculine
+            const maleVoice = findMaleVoice();
+            if (maleVoice) {
+                utterance.voice = maleVoice;
             }
 
             button.classList.add('playing');
@@ -630,10 +658,16 @@
                 currentVoiceButton = null;
             };
 
-            utterance.onerror = function() {
+            utterance.onerror = function(event) {
+                console.log('Erreur de synthèse vocale:', event);
                 button.classList.remove('playing');
                 currentVoiceButton = null;
-                console.log('Erreur de synthèse vocale');
+                
+                // Fallback avec voix par défaut
+                const fallbackUtterance = new SpeechSynthesisUtterance(text);
+                fallbackUtterance.lang = 'fr-FR';
+                fallbackUtterance.rate = 0.7;
+                speechSynthesis.speak(fallbackUtterance);
             };
 
             speechSynthesis.speak(utterance);
@@ -678,7 +712,7 @@
                         <div class="term-pronunciation">${term.pronunciation}</div>
                         <div class="term-reference">${term.reference}</div>
                     </div>
-                    <div class="voice-button" title="Écouter la prononciation">
+                    <div class="voice-button" title="Écouter la prononciation phonétique">
                         <svg class="voice-icon" viewBox="0 0 24 24">
                             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                         </svg>
@@ -754,8 +788,22 @@
             // Charger les voix
             if ('speechSynthesis' in window) {
                 speechSynthesis.getVoices();
+                
+                // Attendre que les voix soient chargées
+                setTimeout(() => {
+                    voicesLoaded = true;
+                    console.log('Voix chargées:', speechSynthesis.getVoices());
+                }, 1000);
             }
         });
+
+        // Recharger les voix quand elles sont disponibles
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = function() {
+                voicesLoaded = true;
+                console.log('Voies mises à jour:', speechSynthesis.getVoices());
+            };
+        }
 
         // Gestion des erreurs de synthèse vocale
         if (!('speechSynthesis' in window)) {
