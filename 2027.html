@@ -379,6 +379,76 @@
             border-left: 4px solid var(--danger-color);
         }
 
+        /* NOUVEAUX STYLES POUR LES FONCTIONNALITÉS AJOUTÉES */
+        .session-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .session-controls select,
+        .session-controls input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .questions-remaining {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+        }
+
+        .book-progress {
+            margin-top: 20px;
+        }
+
+        .book-progress h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .book-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .book-name {
+            flex: 1;
+        }
+
+        .book-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .book-stat {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .book-progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .book-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -404,6 +474,10 @@
             .stats {
                 flex-direction: column;
             }
+            
+            .session-controls {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -424,11 +498,22 @@
             <button id="savePlayerBtn">Enregistrer</button>
         </div>
 
-        <div class="level-selector">
+        <div class="session-controls">
             <select id="levelSelect">
                 <option value="random">Niveau Aléatoire</option>
                 <!-- Les options de niveau seront ajoutées dynamiquement -->
             </select>
+            <select id="questionsCount">
+                <option value="10">10 questions</option>
+                <option value="20" selected>20 questions</option>
+                <option value="30">30 questions</option>
+                <option value="50">50 questions</option>
+                <option value="0">Illimité</option>
+            </select>
+        </div>
+
+        <div class="questions-remaining" id="questionsRemaining">
+            Questions restantes: 20
         </div>
 
         <div class="word-display" id="wordDisplay">
@@ -454,6 +539,9 @@
                 </div>
                 <div class="stat-item">
                     <span>Niveau: <span id="levelDisplay">-</span></span>
+                </div>
+                <div class="stat-item">
+                    <span>Questions: <span id="questionsDone">0</span>/<span id="questionsTotal">20</span></span>
                 </div>
             </div>
         </div>
@@ -481,6 +569,13 @@
             </div>
         </div>
         
+        <div class="book-progress">
+            <h3>📖 Progression par livre</h3>
+            <div id="bookProgressList">
+                <!-- La progression par livre sera ajoutée dynamiquement -->
+            </div>
+        </div>
+        
         <h3>Historique récent</h3>
         <ul class="history-list" id="historyList">
             <!-- L'historique sera ajouté dynamiquement -->
@@ -505,31 +600,11 @@
             "Genèse": [
                 "Dieu", "Yahvé Dieu", "Adam", "Ève", "serpent", "Caïn", "Abel", "Hénok", "Irad", "Mehuyaël",
                 "Metushaël", "Lamek", "Ada", "Cilla", "Yabal", "Yubal", "Tubal-Caïn", "Naama", "Seth", "Enosh",
-                "Qénân", "Mahalaléel", "Yéred", "Hénok", "Mathusalem", "Lamek", "Noé", "Sem", "Cham", "Japhet",
-                "Nephilim", "chérubins", "Nemrod", "Gomer", "Magog", "Yavân", "Tubal", "Moshek", "Tiras", "Ashkenaz",
-                "Riphat", "Togarma", "Elisha", "Kush", "Miçrayim", "Put", "Canaan", "Séba", "Havila", "Sabta",
-                "Rama", "Sabteka", "Sheba", "Dedân", "Ashshur", "Arpakshad", "Lud", "Aram", "Uç", "Hul",
-                "Géter", "Mash", "Shélah", "Eber", "Péleg", "Yoqtân", "Almodad", "Shéleph", "Haççarmavet", "Yérah",
-                "Hadoram", "Uzal", "Diqla", "Obal", "Abimaël", "Ophir", "Yobab", "Réu", "Serug", "Nahor",
-                "Térah", "Abram", "Harân", "Lot", "Saraï", "Milka", "Yiska", "ciel", "terre", "abîme",
-                "vent", "eaux", "lumière", "ténèbres", "jour", "nuit", "firmament", "mers", "verdure", "herbes",
-                "arbres", "luminaires", "soleil", "lune", "étoiles", "serpents", "bêtes", "bestiaux", "bestioles",
-                "arbre de vie", "arbre de la connaissance", "jardin d'Eden", "fleuve d'Eden", "Pishôn", "Havila",
-                "bdellium", "cornaline", "Gihôn", "Kush", "Tigre", "Assur", "Euphrate", "côte", "feuilles", "sueur",
-                "pain", "tuniques", "glaive", "sol", "sang", "Nod", "ville", "signe", "arche", "déluge", "bitume",
-                "corbeau", "colombe", "rameau", "autel", "holocaustes", "arc", "vin", "vigne", "nudité", "manteau",
-                "esclave", "îles", "Babel", "Erek", "Akkad", "Shinéar", "Ninive", "Rehobot-Ir", "Kalah", "Rèsèn",
-                "Lud", "Anam", "Lehab", "Naphtuh", "Patros", "Kasluh", "Kaphtor", "Philistins", "Sidon", "Jébuséen",
-                "Amorite", "Girgashite", "Hivvite", "Arqite", "Sinite", "Arvadite", "Cemarite", "Hamatite", "Gérar",
-                "Gaza", "Sodome", "Gomorrhe", "Adma", "Ceboyim", "Lésha", "tour", "langue", "Ur", "Chaldéens", "Sara",
-                "Perizzites", "Amraphel", "Aryok", "Kedor-Laomer", "Tidéal", "Béra", "Birsha", "Shinéab", "Shémeéber",
-                "Béla", "Rephaïm", "Zuzim", "Emim", "Horites", "Amalécites", "Mambré", "Eshkol", "Aner", "Melchisédech",
-                "Shalem", "El Elyon", "Éliézer", "Qénites", "Qenizzites", "Qadmonites", "Hittites", "Agar", "Ismaël",
-                "Ange de Yahvé", "El-Roï", "El Shaddaï", "Isaac", "hôtes", "Moab", "Ben-Ammi", "Abimélek", "Pikol"
+                "Qénân", "Mahalaléel", "Yéred", "Hénok", "Mathusalem", "Lamek", "Noé", "Sem", "Cham", "Japhet"
             ],
-            "Exode": ["Pharaon", "Moïse", "plaies", "désert", "loi"],
-            "Lévitique": ["sacrifice", "prêtre", "purification", "saint", "offrande"],
-            "Nombres": ["recensement", "désert", "manne", "serpent", "prophétie"],
+            "Exode": ["Pharaon", "Moïse", "plaies", "désert", "loi", "manne", "tabernacle", "alliance"],
+            "Lévitique": ["sacrifice", "prêtre", "purification", "saint", "offrande", "expiation"],
+            "Nombres": ["recensement", "désert", "manne", "serpent", "prophétie", "Canaan"],
             "Deutéronome": ["commandements", "alliance", "terre", "bénédiction", "malédiction"],
             "Josué": ["Jéricho", "Canaan", "conquête", "partage", "tribus"],
             "Juges": ["Samson", "Débora", "Gédéon", "victoire", "cycle"],
@@ -604,13 +679,20 @@
             totalAttempts: 0,
             correctAttempts: 0,
             history: [],
-            progressData: {}
+            progressData: {},
+            questionsTotal: 20,
+            questionsDone: 0,
+            bookProgress: {}
         };
 
         // Éléments DOM
         const playerNameInput = document.getElementById('playerName');
         const savePlayerBtn = document.getElementById('savePlayerBtn');
         const levelSelect = document.getElementById('levelSelect');
+        const questionsCount = document.getElementById('questionsCount');
+        const questionsRemaining = document.getElementById('questionsRemaining');
+        const questionsDone = document.getElementById('questionsDone');
+        const questionsTotal = document.getElementById('questionsTotal');
         const wordDisplay = document.getElementById('wordDisplay');
         const spellingInput = document.getElementById('spellingInput');
         const checkBtn = document.getElementById('checkBtn');
@@ -626,6 +708,7 @@
         const successCount = document.getElementById('successCount');
         const failureCount = document.getElementById('failureCount');
         const historyList = document.getElementById('historyList');
+        const bookProgressList = document.getElementById('bookProgressList');
         const themeToggle = document.getElementById('themeToggle');
         const galaxy = document.getElementById('galaxy');
 
@@ -658,9 +741,13 @@
             // Mettre à jour les statistiques
             updateStats();
             
+            // Initialiser la progression par livre
+            initBookProgress();
+            
             // Événements
             savePlayerBtn.addEventListener('click', savePlayerName);
             levelSelect.addEventListener('change', onLevelChange);
+            questionsCount.addEventListener('change', onQuestionsCountChange);
             checkBtn.addEventListener('click', checkSpelling);
             nextBtn.addEventListener('click', getNewWord);
             listenBtn.addEventListener('click', speakCurrentWord);
@@ -701,6 +788,55 @@
                 
                 galaxy.appendChild(star);
             }
+        }
+
+        // Initialiser la progression par livre
+        function initBookProgress() {
+            bibleBooks.forEach(book => {
+                if (!gameState.bookProgress[book]) {
+                    gameState.bookProgress[book] = {
+                        attempts: 0,
+                        correct: 0,
+                        words: spellingWords[book] ? spellingWords[book].length : 0
+                    };
+                }
+            });
+            updateBookProgress();
+        }
+
+        // Mettre à jour l'affichage de la progression par livre
+        function updateBookProgress() {
+            bookProgressList.innerHTML = '';
+            
+            // Trier les livres par pourcentage de progression
+            const sortedBooks = Object.entries(gameState.bookProgress)
+                .sort(([,a], [,b]) => {
+                    const progressA = a.words > 0 ? (a.correct / a.words) * 100 : 0;
+                    const progressB = b.words > 0 ? (b.correct / b.words) * 100 : 0;
+                    return progressB - progressA;
+                });
+            
+            sortedBooks.forEach(([book, data]) => {
+                if (data.words > 0) {
+                    const progress = (data.correct / data.words) * 100;
+                    const accuracy = data.attempts > 0 ? (data.correct / data.attempts) * 100 : 0;
+                    
+                    const bookItem = document.createElement('div');
+                    bookItem.className = 'book-item';
+                    bookItem.innerHTML = `
+                        <div class="book-name">${book}</div>
+                        <div class="book-stats">
+                            <span class="book-stat">${data.correct}/${data.words}</span>
+                            <span class="book-stat">${Math.round(progress)}%</span>
+                            <span class="book-stat">${Math.round(accuracy)}% préc.</span>
+                        </div>
+                        <div class="book-progress-bar">
+                            <div class="book-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    `;
+                    bookProgressList.appendChild(bookItem);
+                }
+            });
         }
 
         // Enregistrer le nom du joueur
@@ -751,6 +887,7 @@
                         gameState.totalAttempts = levelData.totalAttempts || 0;
                         gameState.correctAttempts = levelData.correctAttempts || 0;
                         gameState.history = levelData.history || [];
+                        gameState.bookProgress = levelData.bookProgress || {};
                     }
                 } else {
                     // Initialiser les données pour ce joueur
@@ -759,6 +896,11 @@
             } else {
                 // Initialiser les données globales
                 gameState.progressData = {};
+            }
+            
+            // Initialiser la progression par livre si nécessaire
+            if (!gameState.bookProgress || Object.keys(gameState.bookProgress).length === 0) {
+                initBookProgress();
             }
         }
 
@@ -791,6 +933,7 @@
             allProgressData[gameState.currentPlayer][gameState.currentLevel].totalAttempts = gameState.totalAttempts;
             allProgressData[gameState.currentPlayer][gameState.currentLevel].correctAttempts = gameState.correctAttempts;
             allProgressData[gameState.currentPlayer][gameState.currentLevel].history = gameState.history;
+            allProgressData[gameState.currentPlayer][gameState.currentLevel].bookProgress = gameState.bookProgress;
             
             // Sauvegarder dans le localStorage
             localStorage.setItem('spellingGameProgress', JSON.stringify(allProgressData));
@@ -807,12 +950,14 @@
                 gameState.totalAttempts = levelData.totalAttempts || 0;
                 gameState.correctAttempts = levelData.correctAttempts || 0;
                 gameState.history = levelData.history || [];
+                gameState.bookProgress = levelData.bookProgress || {};
             } else {
                 // Réinitialiser pour un nouveau niveau
                 gameState.score = 0;
                 gameState.totalAttempts = 0;
                 gameState.correctAttempts = 0;
                 gameState.history = [];
+                initBookProgress();
             }
             
             updateLevelDisplay();
@@ -821,11 +966,46 @@
             getNewWord();
         }
 
+        // Changer le nombre de questions
+        function onQuestionsCountChange() {
+            gameState.questionsTotal = parseInt(questionsCount.value);
+            gameState.questionsDone = 0;
+            updateQuestionsDisplay();
+            getNewWord();
+        }
+
+        // Mettre à jour l'affichage des questions
+        function updateQuestionsDisplay() {
+            const remaining = gameState.questionsTotal - gameState.questionsDone;
+            questionsRemaining.textContent = `Questions restantes: ${remaining}`;
+            questionsDone.textContent = gameState.questionsDone;
+            questionsTotal.textContent = gameState.questionsTotal;
+            
+            // Vérifier si la session est terminée
+            if (gameState.questionsTotal > 0 && gameState.questionsDone >= gameState.questionsTotal) {
+                endSession();
+            }
+        }
+
+        // Terminer la session
+        function endSession() {
+            resultMessage.textContent = `Session terminée ! Score final: ${gameState.score}`;
+            resultMessage.className = "result-message success";
+            checkBtn.disabled = true;
+            nextBtn.disabled = true;
+            listenBtn.disabled = true;
+        }
+
         // Obtenir un nouveau mot
         function getNewWord() {
             // Vérifier qu'un joueur est défini
             if (!gameState.currentPlayer) {
                 alert("Veuillez d'abord enregistrer votre nom");
+                return;
+            }
+            
+            // Vérifier si la session est terminée
+            if (gameState.questionsTotal > 0 && gameState.questionsDone >= gameState.questionsTotal) {
                 return;
             }
             
@@ -868,6 +1048,11 @@
                 return;
             }
             
+            // Vérifier si la session est terminée
+            if (gameState.questionsTotal > 0 && gameState.questionsDone >= gameState.questionsTotal) {
+                return;
+            }
+            
             const userInput = spellingInput.value.trim();
             
             if (!userInput) {
@@ -884,9 +1069,23 @@
             
             // Mettre à jour les statistiques
             gameState.totalAttempts++;
+            gameState.questionsDone++;
+            
+            // Mettre à jour la progression par livre
+            if (!gameState.bookProgress[gameState.currentWordBook]) {
+                gameState.bookProgress[gameState.currentWordBook] = {
+                    attempts: 0,
+                    correct: 0,
+                    words: spellingWords[gameState.currentWordBook] ? spellingWords[gameState.currentWordBook].length : 0
+                };
+            }
+            
+            gameState.bookProgress[gameState.currentWordBook].attempts++;
+            
             if (isCorrect) {
                 gameState.correctAttempts++;
                 gameState.score += 10;
+                gameState.bookProgress[gameState.currentWordBook].correct++;
                 resultMessage.textContent = "Correct !";
                 resultMessage.className = "result-message success";
                 wordDisplay.classList.add("revealed");
@@ -921,6 +1120,8 @@
             // Mettre à jour l'affichage
             updateScoreDisplay();
             updateStats();
+            updateQuestionsDisplay();
+            updateBookProgress();
             
             // Sauvegarder les progrès
             saveProgressData();
