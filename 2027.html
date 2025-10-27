@@ -887,6 +887,11 @@
                 resultMessage.textContent = "Correct !";
                 resultMessage.className = "result-message success";
                 wordDisplay.classList.add("revealed");
+                
+                // Passer automatiquement au mot suivant après 1.5 secondes
+                setTimeout(() => {
+                    getNewWord();
+                }, 1500);
             } else {
                 resultMessage.textContent = `Incorrect. La bonne réponse était : ${gameState.currentWord}`;
                 resultMessage.className = "result-message error";
@@ -918,7 +923,7 @@
             saveProgressData();
         }
 
-        // Lire le mot actuel - CORRIGÉ
+        // Lire le mot actuel - CORRIGÉ avec voix masculine et aiguë
         function speakCurrentWord() {
             if (!gameState.currentWord) return;
             
@@ -929,31 +934,45 @@
                 const utterance = new SpeechSynthesisUtterance(gameState.currentWord);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.9;
-                utterance.pitch = 1;
+                utterance.pitch = 1.5; // Augmenté pour une voix plus aiguë
                 utterance.volume = 1;
                 
                 // Attendre que les voix soient chargées
                 if (speechSynthesis.getVoices().length === 0) {
                     speechSynthesis.addEventListener('voiceschanged', () => {
-                        speakWithVoice(utterance);
+                        speakWithMaleVoice(utterance);
                     });
                 } else {
-                    speakWithVoice(utterance);
+                    speakWithMaleVoice(utterance);
                 }
             } else {
                 alert("La synthèse vocale n'est pas supportée par votre navigateur");
             }
         }
 
-        // Fonction helper pour la synthèse vocale
-        function speakWithVoice(utterance) {
+        // Fonction pour sélectionner une voix masculine
+        function speakWithMaleVoice(utterance) {
             const voices = speechSynthesis.getVoices();
-            const frenchVoice = voices.find(voice => 
-                voice.lang.includes('fr') || voice.lang.includes('FR')
+            
+            // Prioriser les voix masculines françaises
+            let selectedVoice = voices.find(voice => 
+                voice.lang.includes('fr') && 
+                (voice.name.includes('Homme') || voice.name.includes('homme') || 
+                 voice.name.includes('Male') || voice.name.includes('male'))
             );
             
-            if (frenchVoice) {
-                utterance.voice = frenchVoice;
+            // Si aucune voix masculine n'est trouvée, prendre la première voix française
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.includes('fr'));
+            }
+            
+            // Si aucune voix française n'est trouvée, prendre la première voix disponible
+            if (!selectedVoice && voices.length > 0) {
+                selectedVoice = voices[0];
+            }
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
             }
             
             // Animation du bouton pendant la parole
