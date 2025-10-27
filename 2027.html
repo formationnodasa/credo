@@ -6,27 +6,15 @@
     <title>Épelle-moi Bibliquement !</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #e67e22;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-            --text-color: #333;
-            --background-color: #f9f9f9;
-        }
-
-        [data-theme="dark"] {
-            --primary-color: #34495e;
-            --secondary-color: #2980b9;
-            --success-color: #229954;
-            --warning-color: #d68910;
-            --danger-color: #cb4335;
-            --light-color: #2c3e50;
-            --dark-color: #1a252f;
-            --text-color: #ecf0f1;
-            --background-color: #1a252f;
+            --primary-color: #8a2be2;
+            --secondary-color: #9370db;
+            --success-color: #32cd32;
+            --warning-color: #ffa500;
+            --danger-color: #ff4500;
+            --light-color: rgba(255, 255, 255, 0.1);
+            --dark-color: #0f0f23;
+            --text-color: #ffffff;
+            --background-color: transparent;
         }
 
         * {
@@ -38,12 +26,81 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
+            background-color: var(--dark-color);
             color: var(--text-color);
             line-height: 1.6;
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animation Galaxie */
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+        }
+
+        .nebula-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #8a2be2, transparent);
+            top: 10%;
+            left: 10%;
+            animation: float 25s infinite linear;
+        }
+
+        .nebula-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #9370db, transparent);
+            bottom: 10%;
+            right: 10%;
+            animation: float 30s infinite linear reverse;
+        }
+
+        .nebula-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #4b0082, transparent);
+            top: 50%;
+            left: 80%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 20px) rotate(90deg); }
+            50% { transform: translate(0, 40px) rotate(180deg); }
+            75% { transform: translate(-20px, 20px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         header {
@@ -51,30 +108,50 @@
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid var(--secondary-color);
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             color: var(--primary-color);
             margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
         }
 
         .theme-toggle {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary-color);
         }
 
         .game-container {
-            background-color: var(--light-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .player-section {
@@ -89,62 +166,110 @@
         }
 
         select, input, button {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             font-size: 1rem;
             margin-bottom: 10px;
-            background-color: var(--background-color);
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-color);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
         }
 
         button {
-            background-color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::after {
+            left: 100%;
         }
 
         .btn-success {
-            background-color: var(--success-color);
+            background: linear-gradient(135deg, var(--success-color), #228b22);
         }
 
         .btn-warning {
-            background-color: var(--warning-color);
+            background: linear-gradient(135deg, var(--warning-color), #ff8c00);
         }
 
         .btn-danger {
-            background-color: var(--danger-color);
+            background: linear-gradient(135deg, var(--danger-color), #dc143c);
         }
 
         .word-display {
             text-align: center;
-            font-size: 1.5rem;
-            margin: 20px 0;
-            min-height: 40px;
+            font-size: 2rem;
+            margin: 25px 0;
+            min-height: 60px;
             font-weight: bold;
             color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .word-display.revealed {
+            color: var(--success-color);
+            text-shadow: 0 0 10px rgba(50, 205, 50, 0.7);
         }
 
         .result-message {
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
             font-weight: bold;
             min-height: 24px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .success {
             color: var(--success-color);
+            background: rgba(50, 205, 50, 0.1);
+            border: 1px solid rgba(50, 205, 50, 0.3);
         }
 
         .error {
             color: var(--danger-color);
+            background: rgba(255, 69, 0, 0.1);
+            border: 1px solid rgba(255, 69, 0, 0.3);
         }
 
         .progress-container {
@@ -153,49 +278,91 @@
 
         .progress-bar {
             height: 20px;
-            background-color: #ddd;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             overflow: hidden;
             margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background-color: var(--success-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             width: 0%;
             transition: width 0.5s;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .stats {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
 
         .progress-section {
             margin-top: 30px;
-            background-color: var(--light-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .progress-section h2 {
             margin-bottom: 15px;
             color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
         }
 
         .history-list {
             list-style-type: none;
             max-height: 200px;
             overflow-y: auto;
+            margin-top: 15px;
         }
 
         .history-item {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
         }
 
         .history-item:last-child {
@@ -204,10 +371,12 @@
 
         .correct {
             color: var(--success-color);
+            border-left: 4px solid var(--success-color);
         }
 
         .incorrect {
             color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
         }
 
         @media (max-width: 600px) {
@@ -220,17 +389,28 @@
             }
             
             .word-display {
-                font-size: 1.2rem;
+                font-size: 1.5rem;
             }
             
             .player-section {
                 flex-direction: column;
                 align-items: stretch;
             }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Animation Galaxie -->
+    <div class="galaxy" id="galaxy"></div>
+    
     <button class="theme-toggle" id="themeToggle">🌙</button>
     
     <header>
@@ -259,28 +439,46 @@
 
         <button id="listenBtn">Écouter le mot</button>
         <input type="text" id="spellingInput" placeholder="Entrez l'orthographe du mot">
-        <button id="checkBtn">Vérifier</button>
-        <button id="nextBtn" class="btn-warning">Nouveau mot</button>
+        <div style="display: flex; gap: 10px;">
+            <button id="checkBtn" style="flex: 1;">Vérifier</button>
+            <button id="nextBtn" class="btn-warning" style="flex: 1;">Nouveau mot</button>
+        </div>
 
         <div class="progress-container">
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
             <div class="stats">
-                <span>Score: <span id="scoreDisplay">0</span></span>
-                <span>Niveau: <span id="levelDisplay">-</span></span>
+                <div class="stat-item">
+                    <span>Score: <span id="scoreDisplay">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span>Niveau: <span id="levelDisplay">-</span></span>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="progress-section">
         <h2>📊 Mes progrès</h2>
-        <div>
-            <p>Score total: <span id="totalScore">0</span></p>
-            <p>Meilleur niveau: <span id="bestLevel">-</span></p>
-            <p>Pourcentage de réussite: <span id="successRate">0%</span></p>
-            <p>Réussites: <span id="successCount">0</span></p>
-            <p>Échecs: <span id="failureCount">0</span></p>
+        <div class="stats">
+            <div class="stat-item">
+                <p>Score total: <span id="totalScore">0</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Meilleur niveau: <span id="bestLevel">-</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Réussite: <span id="successRate">0%</span></p>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <p>Réussites: <span id="successCount">0</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Échecs: <span id="failureCount">0</span></p>
+            </div>
         </div>
         
         <h3>Historique récent</h3>
@@ -429,9 +627,13 @@
         const failureCount = document.getElementById('failureCount');
         const historyList = document.getElementById('historyList');
         const themeToggle = document.getElementById('themeToggle');
+        const galaxy = document.getElementById('galaxy');
 
         // Initialisation
         function init() {
+            // Créer l'animation de galaxie
+            createGalaxy();
+            
             // Charger les données sauvegardées
             loadProgressData();
             
@@ -467,12 +669,35 @@
             themeToggle.addEventListener('click', toggleTheme);
             
             // Appliquer le thème sauvegardé
-            const savedTheme = localStorage.getItem('spellingGameTheme') || 'light';
+            const savedTheme = localStorage.getItem('spellingGameTheme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             themeToggle.textContent = savedTheme === 'light' ? '🌙' : '☀️';
             
             // Premier mot
             getNewWord();
+        }
+
+        // Créer l'animation de galaxie
+        function createGalaxy() {
+            // Créer des étoiles
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Taille aléatoire
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Position aléatoire
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Animation delay aléatoire
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                galaxy.appendChild(star);
+            }
         }
 
         // Enregistrer le nom du joueur
@@ -481,7 +706,14 @@
             if (playerName) {
                 gameState.currentPlayer = playerName;
                 localStorage.setItem('spellingGamePlayer', playerName);
-                alert(`Joueur ${playerName} enregistré avec succès !`);
+                
+                // Animation de confirmation
+                savePlayerBtn.textContent = "✓ Enregistré";
+                savePlayerBtn.style.background = "linear-gradient(135deg, var(--success-color), #228b22)";
+                setTimeout(() => {
+                    savePlayerBtn.textContent = "Enregistrer";
+                    savePlayerBtn.style.background = "linear-gradient(135deg, var(--primary-color), var(--secondary-color))";
+                }, 2000);
                 
                 // Charger les données de ce joueur
                 loadProgressData();
@@ -598,6 +830,8 @@
             spellingInput.value = "";
             resultMessage.textContent = "";
             resultMessage.className = "result-message";
+            wordDisplay.textContent = "?";
+            wordDisplay.classList.remove("revealed");
             
             // Choisir un livre
             let book;
@@ -615,9 +849,6 @@
                 const randomIndex = Math.floor(Math.random() * words.length);
                 gameState.currentWord = words[randomIndex];
                 gameState.currentWordBook = book;
-                
-                // Afficher le mot (masqué pour l'épellation)
-                wordDisplay.textContent = "?";
             } else {
                 wordDisplay.textContent = "Aucun mot disponible pour ce niveau";
             }
@@ -655,9 +886,11 @@
                 gameState.score += 10;
                 resultMessage.textContent = "Correct !";
                 resultMessage.className = "result-message success";
+                wordDisplay.classList.add("revealed");
             } else {
                 resultMessage.textContent = `Incorrect. La bonne réponse était : ${gameState.currentWord}`;
                 resultMessage.className = "result-message error";
+                wordDisplay.classList.add("revealed");
             }
             
             // Ajouter à l'historique
@@ -685,30 +918,54 @@
             saveProgressData();
         }
 
-        // Lire le mot actuel
+        // Lire le mot actuel - CORRIGÉ
         function speakCurrentWord() {
             if (!gameState.currentWord) return;
+            
+            // Arrêter toute parole en cours
+            window.speechSynthesis.cancel();
             
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(gameState.currentWord);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.9;
                 utterance.pitch = 1;
+                utterance.volume = 1;
                 
-                // Essayer de trouver une voix française
-                const voices = speechSynthesis.getVoices();
-                const frenchVoice = voices.find(voice => 
-                    voice.lang.includes('fr') && voice.name.includes('Female')
-                );
-                
-                if (frenchVoice) {
-                    utterance.voice = frenchVoice;
+                // Attendre que les voix soient chargées
+                if (speechSynthesis.getVoices().length === 0) {
+                    speechSynthesis.addEventListener('voiceschanged', () => {
+                        speakWithVoice(utterance);
+                    });
+                } else {
+                    speakWithVoice(utterance);
                 }
-                
-                speechSynthesis.speak(utterance);
             } else {
                 alert("La synthèse vocale n'est pas supportée par votre navigateur");
             }
+        }
+
+        // Fonction helper pour la synthèse vocale
+        function speakWithVoice(utterance) {
+            const voices = speechSynthesis.getVoices();
+            const frenchVoice = voices.find(voice => 
+                voice.lang.includes('fr') || voice.lang.includes('FR')
+            );
+            
+            if (frenchVoice) {
+                utterance.voice = frenchVoice;
+            }
+            
+            // Animation du bouton pendant la parole
+            listenBtn.textContent = "🔊";
+            listenBtn.disabled = true;
+            
+            utterance.onend = function() {
+                listenBtn.textContent = "Écouter le mot";
+                listenBtn.disabled = false;
+            };
+            
+            speechSynthesis.speak(utterance);
         }
 
         // Mettre à jour l'affichage du score
