@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Épelle-moi Bibliquement !</title>
+    <style>
+        :root {
+            --primary-color: #8a2be2;
+            --secondary-color: #9370db;
+            --success-color: #32cd32;
+            --warning-color: #ffa500;
+            --danger-color: #ff4500;
+            --light-color: rgba(255, 255, 255, 0.1);
+            --dark-color: #0f0f23;
+            --text-color: #ffffff;
+            --background-color: transparent;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animation Galaxie */
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+        }
+
+        .nebula-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #8a2be2, transparent);
+            top: 10%;
+            left: 10%;
+            animation: float 25s infinite linear;
+        }
+
+        .nebula-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #9370db, transparent);
+            bottom: 10%;
+            right: 10%;
+            animation: float 30s infinite linear reverse;
+        }
+
+        .nebula-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #4b0082, transparent);
+            top: 50%;
+            left: 80%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 20px) rotate(90deg); }
+            50% { transform: translate(0, 40px) rotate(180deg); }
+            75% { transform: translate(-20px, 20px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        .game-container {
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .level-selector {
+            margin-bottom: 20px;
+        }
+
+        select, input, button {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #228b22);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #ff8c00);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc143c);
+        }
+
+        .word-display {
+            text-align: center;
+            font-size: 2rem;
+            margin: 25px 0;
+            min-height: 60px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .word-display.revealed {
+            color: var(--success-color);
+            text-shadow: 0 0 10px rgba(50, 205, 50, 0.7);
+        }
+
+        .result-message {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+            min-height: 24px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .success {
+            color: var(--success-color);
+            background: rgba(50, 205, 50, 0.1);
+            border: 1px solid rgba(50, 205, 50, 0.3);
+        }
+
+        .error {
+            color: var(--danger-color);
+            background: rgba(255, 69, 0, 0.1);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .progress-section {
+            margin-top: 30px;
+            background: rgba(15, 15, 35, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-section h2 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+        }
+
+        .history-list {
+            list-style-type: none;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .history-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .correct {
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .incorrect {
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .game-container, .progress-section {
+                padding: 15px;
+            }
+            
+            .word-display {
+                font-size: 1.5rem;
+            }
+            
+            .player-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animation Galaxie -->
+    <div class="galaxy" id="galaxy"></div>
+    
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+    
+    <header>
+        <h1>Épelle-moi Bibliquement !</h1>
+        <p>Testez votre connaissance de l'orthographe des noms et termes bibliques</p>
+    </header>
+
+    <div class="game-container">
+        <div class="player-section">
+            <input type="text" id="playerName" placeholder="Votre nom">
+            <button id="savePlayerBtn">Enregistrer</button>
+        </div>
+
+        <div class="level-selector">
+            <select id="levelSelect">
+                <option value="random">Niveau Aléatoire</option>
+                <!-- Les options de niveau seront ajoutées dynamiquement -->
+            </select>
+        </div>
+
+        <div class="word-display" id="wordDisplay">
+            Cliquez sur "Nouveau mot" pour commencer
+        </div>
+
+        <div class="result-message" id="resultMessage"></div>
+
+        <button id="listenBtn">Écouter le mot</button>
+        <input type="text" id="spellingInput" placeholder="Entrez l'orthographe du mot">
+        <div style="display: flex; gap: 10px;">
+            <button id="checkBtn" style="flex: 1;">Vérifier</button>
+            <button id="nextBtn" class="btn-warning" style="flex: 1;">Nouveau mot</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span>Score: <span id="scoreDisplay">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span>Niveau: <span id="levelDisplay">-</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <h2>📊 Mes progrès</h2>
+        <div class="stats">
+            <div class="stat-item">
+                <p>Score total: <span id="totalScore">0</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Meilleur niveau: <span id="bestLevel">-</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Réussite: <span id="successRate">0%</span></p>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <p>Réussites: <span id="successCount">0</span></p>
+            </div>
+            <div class="stat-item">
+                <p>Échecs: <span id="failureCount">0</span></p>
+            </div>
+        </div>
+        
+        <h3>Historique récent</h3>
+        <ul class="history-list" id="historyList">
+            <!-- L'historique sera ajouté dynamiquement -->
+        </ul>
+    </div>
+
+    <script>
+        // Données du jeu
+        const bibleBooks = [
+            "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges",
+            "Ruth", "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques",
+            "Esdras", "Néhémie", "Esther", "Job", "Psaumes", "Proverbes", "Ecclésiaste", "Cantique des Cantiques",
+            "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Joël", "Amos", "Abdias",
+            "Jonas", "Michée", "Nahum", "Habacuc", "Sophonie", "Aggée", "Zacharie", "Malachie",
+            "Matthieu", "Marc", "Luc", "Jean", "Actes", "Romains", "1 Corinthiens", "2 Corinthiens",
+            "Galates", "Éphésiens", "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens",
+            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques",
+            "1 Pierre", "2 Pierre", "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
+        ];
+
+        const spellingWords = {
+            "Genèse": [
+                "Dieu", "Yahvé Dieu", "Adam", "Ève", "serpent", "Caïn", "Abel", "Hénok", "Irad", "Mehuyaël",
+                "Metushaël", "Lamek", "Ada", "Cilla", "Yabal", "Yubal", "Tubal-Caïn", "Naama", "Seth", "Enosh",
+                "Qénân", "Mahalaléel", "Yéred", "Hénok", "Mathusalem", "Lamek", "Noé", "Sem", "Cham", "Japhet",
+                "Nephilim", "chérubins", "Nemrod", "Gomer", "Magog", "Yavân", "Tubal", "Moshek", "Tiras", "Ashkenaz",
+                "Riphat", "Togarma", "Elisha", "Kush", "Miçrayim", "Put", "Canaan", "Séba", "Havila", "Sabta",
+                "Rama", "Sabteka", "Sheba", "Dedân", "Ashshur", "Arpakshad", "Lud", "Aram", "Uç", "Hul",
+                "Géter", "Mash", "Shélah", "Eber", "Péleg", "Yoqtân", "Almodad", "Shéleph", "Haççarmavet", "Yérah",
+                "Hadoram", "Uzal", "Diqla", "Obal", "Abimaël", "Ophir", "Yobab", "Réu", "Serug", "Nahor",
+                "Térah", "Abram", "Harân", "Lot", "Saraï", "Milka", "Yiska", "ciel", "terre", "abîme",
+                "vent", "eaux", "lumière", "ténèbres", "jour", "nuit", "firmament", "mers", "verdure", "herbes",
+                "arbres", "luminaires", "soleil", "lune", "étoiles", "serpents", "bêtes", "bestiaux", "bestioles",
+                "arbre de vie", "arbre de la connaissance", "jardin d'Eden", "fleuve d'Eden", "Pishôn", "Havila",
+                "bdellium", "cornaline", "Gihôn", "Kush", "Tigre", "Assur", "Euphrate", "côte", "feuilles", "sueur",
+                "pain", "tuniques", "glaive", "sol", "sang", "Nod", "ville", "signe", "arche", "déluge", "bitume",
+                "corbeau", "colombe", "rameau", "autel", "holocaustes", "arc", "vin", "vigne", "nudité", "manteau",
+                "esclave", "îles", "Babel", "Erek", "Akkad", "Shinéar", "Ninive", "Rehobot-Ir", "Kalah", "Rèsèn",
+                "Lud", "Anam", "Lehab", "Naphtuh", "Patros", "Kasluh", "Kaphtor", "Philistins", "Sidon", "Jébuséen",
+                "Amorite", "Girgashite", "Hivvite", "Arqite", "Sinite", "Arvadite", "Cemarite", "Hamatite", "Gérar",
+                "Gaza", "Sodome", "Gomorrhe", "Adma", "Ceboyim", "Lésha", "tour", "langue", "Ur", "Chaldéens", "Sara",
+                "Perizzites", "Amraphel", "Aryok", "Kedor-Laomer", "Tidéal", "Béra", "Birsha", "Shinéab", "Shémeéber",
+                "Béla", "Rephaïm", "Zuzim", "Emim", "Horites", "Amalécites", "Mambré", "Eshkol", "Aner", "Melchisédech",
+                "Shalem", "El Elyon", "Éliézer", "Qénites", "Qenizzites", "Qadmonites", "Hittites", "Agar", "Ismaël",
+                "Ange de Yahvé", "El-Roï", "El Shaddaï", "Isaac", "hôtes", "Moab", "Ben-Ammi", "Abimélek", "Pikol"
+            ],
+            "Exode": ["Pharaon", "Moïse", "plaies", "désert", "loi"],
+            "Lévitique": ["sacrifice", "prêtre", "purification", "saint", "offrande"],
+            "Nombres": ["recensement", "désert", "manne", "serpent", "prophétie"],
+            "Deutéronome": ["commandements", "alliance", "terre", "bénédiction", "malédiction"],
+            "Josué": ["Jéricho", "Canaan", "conquête", "partage", "tribus"],
+            "Juges": ["Samson", "Débora", "Gédéon", "victoire", "cycle"],
+            "Ruth": ["Moab", "glane", "rachat", "Booz", "ancêtre"],
+            "1 Samuel": ["Saül", "David", "Goliath", "prophète", "onction"],
+            "2 Samuel": ["Jérusalem", "alliance", "absalom", "révolte", "royaume"],
+            "1 Rois": ["Salomon", "temple", "sagesse", "schisme", "prophètes"],
+            "2 Rois": ["exil", "prophètes", "rois", "chute", "Assyrie"],
+            "1 Chroniques": ["généalogie", "David", "temple", "lévites", "chroniques"],
+            "2 Chroniques": ["Salomon", "temple", "rois", "réforme", "exil"],
+            "Esdras": ["retour", "temple", "loi", "réforme", "scribe"],
+            "Néhémie": ["muraille", "Jérusalem", "réforme", "gouverneur", "peuple"],
+            "Esther": ["reine", "Mardochée", "Haman", "pourim", "délivrance"],
+            "Job": ["souffrance", "amis", "Dieu", "sagesse", "restauration"],
+            "Psaumes": ["louange", "prière", "David", "Asaph", "cantique"],
+            "Proverbes": ["sagesse", "instruction", "crainte", "folie", "discipline"],
+            "Ecclésiaste": ["vanité", "sagesse", "travail", "temps", "mort"],
+            "Cantique des Cantiques": ["amour", "fiançailles", "Shulamite", "Salomon", "allégorie"],
+            "Ésaïe": ["prophète", "messie", "serviteur", "jugement", "salut"],
+            "Jérémie": ["prophète", "jugement", "nouvelle alliance", "lamentations", "vocation"],
+            "Lamentations": ["douleur", "Jérusalem", "destruction", "pleurs", "espérance"],
+            "Ézéchiel": ["vision", "glorieux", "ossements", "temple", "prophète"],
+            "Daniel": ["prophète", "visions", "lion", "fournaise", "royaumes"],
+            "Osée": ["prophète", "mariage", "infidélité", "alliance", "restauration"],
+            "Joël": ["prophète", "jour", "esprit", "jugement", "restauration"],
+            "Amos": ["prophète", "justice", "jugement", "plomb", "restauration"],
+            "Abdias": ["prophète", "Édom", "jugement", "orgueil", "Sion"],
+            "Jonas": ["prophète", "Ninive", "baleine", "miséricorde", "mission"],
+            "Michée": ["prophète", "Bethléem", "justice", "miséricorde", "messie"],
+            "Nahum": ["prophète", "Ninive", "jugement", "colère", "consolation"],
+            "Habacuc": ["prophète", "foi", "justice", "vision", "plainte"],
+            "Sophonie": ["prophète", "jour", "jugement", "restes", "joie"],
+            "Aggée": ["prophète", "temple", "reconstruction", "encouragement", "gloire"],
+            "Zacharie": ["prophète", "visions", "messie", "Jérusalem", "restauration"],
+            "Malachie": ["prophète", "alliance", "dîme", "messager", "jour"],
+            "Matthieu": ["Jésus", "royaume", "sermon", "miracles", "disciples"],
+            "Marc": ["Jésus", "évangile", "miracles", "serviteur", "croix"],
+            "Luc": ["Jésus", "paraboles", "médecin", "salut", "résurrection"],
+            "Jean": ["Jésus", "parole", "signes", "amour", "vie"],
+            "Actes": ["Esprit", "apôtres", "église", "mission", "Paul"],
+            "Romains": ["Paul", "foi", "grâce", "justification", "élection"],
+            "1 Corinthiens": ["Paul", "amour", "résurrection", "dons", "unité"],
+            "2 Corinthiens": ["Paul", "ministère", "souffrances", "consolation", "gloire"],
+            "Galates": ["Paul", "liberté", "loi", "grâce", "croix"],
+            "Éphésiens": ["Paul", "église", "bénédictions", "armure", "unité"],
+            "Philippiens": ["Paul", "joie", "Christ", "humilité", "contentement"],
+            "Colossiens": ["Paul", "Christ", "plénitude", "liberté", "règles"],
+            "1 Thessaloniciens": ["Paul", "avènement", "sainteté", "travail", "espérance"],
+            "2 Thessaloniciens": ["Paul", "avènement", "désordre", "travail", "persévérance"],
+            "1 Timothée": ["Paul", "Timothée", "doctrine", "conduite", "église"],
+            "2 Timothée": ["Paul", "Timothée", "fidélité", "Écritures", "combat"],
+            "Tite": ["Paul", "Tite", "doctrine", "bonnes œuvres", "église"],
+            "Philémon": ["Paul", "Onésime", "esclavage", "réconciliation", "amour"],
+            "Hébreux": ["Christ", "mélchisédek", "foi", "sacrifice", "alliance"],
+            "Jacques": ["foi", "œuvres", "sagesse", "langue", "prière"],
+            "1 Pierre": ["Pierre", "souffrance", "espérance", "sainteté", "pasteurs"],
+            "2 Pierre": ["Pierre", "connaissance", "faux docteurs", "avènement", "croissance"],
+            "1 Jean": ["Jean", "amour", "communion", "antichrist", "assurance"],
+            "2 Jean": ["Jean", "vérité", "amour", "hospitalité", "doctrine"],
+            "3 Jean": ["Jean", "Gaïus", "Diotrèphe", "hospitalité", "vérité"],
+            "Jude": ["Jude", "contention", "apostasie", "miséricorde", "gloire"],
+            "Apocalypse": ["Jean", "visions", "jugements", "nouvelle création", "victoire"]
+        };
+
+        // État du jeu
+        let gameState = {
+            currentPlayer: "",
+            currentLevel: "random",
+            currentWord: "",
+            currentWordBook: "",
+            score: 0,
+            totalAttempts: 0,
+            correctAttempts: 0,
+            history: [],
+            progressData: {}
+        };
+
+        // Éléments DOM
+        const playerNameInput = document.getElementById('playerName');
+        const savePlayerBtn = document.getElementById('savePlayerBtn');
+        const levelSelect = document.getElementById('levelSelect');
+        const wordDisplay = document.getElementById('wordDisplay');
+        const spellingInput = document.getElementById('spellingInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const listenBtn = document.getElementById('listenBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const progressFill = document.getElementById('progressFill');
+        const totalScore = document.getElementById('totalScore');
+        const bestLevel = document.getElementById('bestLevel');
+        const successRate = document.getElementById('successRate');
+        const successCount = document.getElementById('successCount');
+        const failureCount = document.getElementById('failureCount');
+        const historyList = document.getElementById('historyList');
+        const themeToggle = document.getElementById('themeToggle');
+        const galaxy = document.getElementById('galaxy');
+
+        // Variable pour suivre le bouton vocal actif
+        let currentVoiceButton = null;
+
+        // Initialisation
+        function init() {
+            // Créer l'animation de galaxie
+            createGalaxy();
+            
+            // Charger les données sauvegardées
+            loadProgressData();
+            
+            // Remplir le sélecteur de niveaux
+            bibleBooks.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book;
+                option.textContent = book;
+                levelSelect.appendChild(option);
+            });
+            
+            // Définir le niveau actuel
+            levelSelect.value = gameState.currentLevel;
+            updateLevelDisplay();
+            
+            // Mettre à jour l'affichage du score
+            updateScoreDisplay();
+            
+            // Mettre à jour les statistiques
+            updateStats();
+            
+            // Événements
+            savePlayerBtn.addEventListener('click', savePlayerName);
+            levelSelect.addEventListener('change', onLevelChange);
+            checkBtn.addEventListener('click', checkSpelling);
+            nextBtn.addEventListener('click', getNewWord);
+            listenBtn.addEventListener('click', speakCurrentWord);
+            spellingInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkSpelling();
+                }
+            });
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Appliquer le thème sauvegardé
+            const savedTheme = localStorage.getItem('spellingGameTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'light' ? '🌙' : '☀️';
+            
+            // Premier mot
+            getNewWord();
+        }
+
+        // Créer l'animation de galaxie
+        function createGalaxy() {
+            // Créer des étoiles
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Taille aléatoire
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Position aléatoire
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Animation delay aléatoire
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                galaxy.appendChild(star);
+            }
+        }
+
+        // Enregistrer le nom du joueur
+        function savePlayerName() {
+            const playerName = playerNameInput.value.trim();
+            if (playerName) {
+                gameState.currentPlayer = playerName;
+                localStorage.setItem('spellingGamePlayer', playerName);
+                
+                // Animation de confirmation
+                savePlayerBtn.textContent = "✓ Enregistré";
+                savePlayerBtn.style.background = "linear-gradient(135deg, var(--success-color), #228b22)";
+                setTimeout(() => {
+                    savePlayerBtn.textContent = "Enregistrer";
+                    savePlayerBtn.style.background = "linear-gradient(135deg, var(--primary-color), var(--secondary-color))";
+                }, 2000);
+                
+                // Charger les données de ce joueur
+                loadProgressData();
+                updateStats();
+            } else {
+                alert("Veuillez entrer un nom valide");
+            }
+        }
+
+        // Charger les données de progression
+        function loadProgressData() {
+            // Charger le nom du joueur
+            const savedPlayer = localStorage.getItem('spellingGamePlayer');
+            if (savedPlayer) {
+                gameState.currentPlayer = savedPlayer;
+                playerNameInput.value = savedPlayer;
+            }
+            
+            // Charger les données de progression
+            const savedData = localStorage.getItem('spellingGameProgress');
+            if (savedData) {
+                const allProgressData = JSON.parse(savedData);
+                
+                // Si un joueur est défini, charger ses données
+                if (gameState.currentPlayer && allProgressData[gameState.currentPlayer]) {
+                    gameState.progressData = allProgressData[gameState.currentPlayer];
+                    
+                    // Récupérer les données pour le niveau actuel
+                    if (gameState.progressData[gameState.currentLevel]) {
+                        const levelData = gameState.progressData[gameState.currentLevel];
+                        gameState.score = levelData.score || 0;
+                        gameState.totalAttempts = levelData.totalAttempts || 0;
+                        gameState.correctAttempts = levelData.correctAttempts || 0;
+                        gameState.history = levelData.history || [];
+                    }
+                } else {
+                    // Initialiser les données pour ce joueur
+                    gameState.progressData = {};
+                }
+            } else {
+                // Initialiser les données globales
+                gameState.progressData = {};
+            }
+        }
+
+        // Sauvegarder les données de progression
+        function saveProgressData() {
+            // Vérifier qu'un joueur est défini
+            if (!gameState.currentPlayer) {
+                alert("Veuillez d'abord enregistrer votre nom");
+                return;
+            }
+            
+            // Charger toutes les données existantes
+            let allProgressData = {};
+            const savedData = localStorage.getItem('spellingGameProgress');
+            if (savedData) {
+                allProgressData = JSON.parse(savedData);
+            }
+            
+            // Mettre à jour les données pour le joueur actuel
+            if (!allProgressData[gameState.currentPlayer]) {
+                allProgressData[gameState.currentPlayer] = {};
+            }
+            
+            // Mettre à jour les données pour le niveau actuel
+            if (!allProgressData[gameState.currentPlayer][gameState.currentLevel]) {
+                allProgressData[gameState.currentPlayer][gameState.currentLevel] = {};
+            }
+            
+            allProgressData[gameState.currentPlayer][gameState.currentLevel].score = gameState.score;
+            allProgressData[gameState.currentPlayer][gameState.currentLevel].totalAttempts = gameState.totalAttempts;
+            allProgressData[gameState.currentPlayer][gameState.currentLevel].correctAttempts = gameState.correctAttempts;
+            allProgressData[gameState.currentPlayer][gameState.currentLevel].history = gameState.history;
+            
+            // Sauvegarder dans le localStorage
+            localStorage.setItem('spellingGameProgress', JSON.stringify(allProgressData));
+        }
+
+        // Changer de niveau
+        function onLevelChange() {
+            gameState.currentLevel = levelSelect.value;
+            
+            // Charger les données pour ce niveau
+            if (gameState.progressData[gameState.currentLevel]) {
+                const levelData = gameState.progressData[gameState.currentLevel];
+                gameState.score = levelData.score || 0;
+                gameState.totalAttempts = levelData.totalAttempts || 0;
+                gameState.correctAttempts = levelData.correctAttempts || 0;
+                gameState.history = levelData.history || [];
+            } else {
+                // Réinitialiser pour un nouveau niveau
+                gameState.score = 0;
+                gameState.totalAttempts = 0;
+                gameState.correctAttempts = 0;
+                gameState.history = [];
+            }
+            
+            updateLevelDisplay();
+            updateScoreDisplay();
+            updateStats();
+            getNewWord();
+        }
+
+        // Obtenir un nouveau mot
+        function getNewWord() {
+            // Vérifier qu'un joueur est défini
+            if (!gameState.currentPlayer) {
+                alert("Veuillez d'abord enregistrer votre nom");
+                return;
+            }
+            
+            // Réinitialiser l'affichage
+            spellingInput.value = "";
+            resultMessage.textContent = "";
+            resultMessage.className = "result-message";
+            wordDisplay.textContent = "?";
+            wordDisplay.classList.remove("revealed");
+            
+            // Choisir un livre
+            let book;
+            if (gameState.currentLevel === "random") {
+                // Sélectionner un livre au hasard
+                const randomIndex = Math.floor(Math.random() * bibleBooks.length);
+                book = bibleBooks[randomIndex];
+            } else {
+                book = gameState.currentLevel;
+            }
+            
+            // Choisir un mot dans ce livre
+            const words = spellingWords[book];
+            if (words && words.length > 0) {
+                const randomIndex = Math.floor(Math.random() * words.length);
+                gameState.currentWord = words[randomIndex];
+                gameState.currentWordBook = book;
+            } else {
+                wordDisplay.textContent = "Aucun mot disponible pour ce niveau";
+            }
+            
+            // Focus sur le champ de saisie
+            spellingInput.focus();
+        }
+
+        // Vérifier l'orthographe
+        function checkSpelling() {
+            // Vérifier qu'un joueur est défini
+            if (!gameState.currentPlayer) {
+                alert("Veuillez d'abord enregistrer votre nom");
+                return;
+            }
+            
+            const userInput = spellingInput.value.trim();
+            
+            if (!userInput) {
+                resultMessage.textContent = "Veuillez entrer une réponse";
+                resultMessage.className = "result-message error";
+                return;
+            }
+            
+            // Vérifier la réponse (insensible à la casse et aux accents)
+            const normalizedInput = userInput.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const normalizedWord = gameState.currentWord.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            const isCorrect = normalizedInput === normalizedWord;
+            
+            // Mettre à jour les statistiques
+            gameState.totalAttempts++;
+            if (isCorrect) {
+                gameState.correctAttempts++;
+                gameState.score += 10;
+                resultMessage.textContent = "Correct !";
+                resultMessage.className = "result-message success";
+                wordDisplay.classList.add("revealed");
+                
+                // Passer automatiquement au mot suivant après 1.5 secondes
+                setTimeout(() => {
+                    getNewWord();
+                }, 1500);
+            } else {
+                resultMessage.textContent = `Incorrect. La bonne réponse était : ${gameState.currentWord}`;
+                resultMessage.className = "result-message error";
+                wordDisplay.classList.add("revealed");
+            }
+            
+            // Ajouter à l'historique
+            gameState.history.unshift({
+                word: gameState.currentWord,
+                userInput: userInput,
+                isCorrect: isCorrect,
+                book: gameState.currentWordBook,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            // Limiter l'historique aux 10 dernières entrées
+            if (gameState.history.length > 10) {
+                gameState.history = gameState.history.slice(0, 10);
+            }
+            
+            // Afficher le mot correct
+            wordDisplay.textContent = gameState.currentWord;
+            
+            // Mettre à jour l'affichage
+            updateScoreDisplay();
+            updateStats();
+            
+            // Sauvegarder les progrès
+            saveProgressData();
+        }
+
+        // Fonction pour la synthèse vocale
+        function speakText(text, button) {
+            // Arrêter la lecture précédente si elle existe
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (currentVoiceButton) {
+                    currentVoiceButton.classList.remove('playing');
+                }
+            }
+
+            // Créer un nouvel objet de synthèse vocale
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Configurer la voix française
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            // Ajouter l'icône de lecture au bouton
+            button.classList.add('playing');
+            currentVoiceButton = button;
+
+            // Quand la lecture commence
+            utterance.onstart = function() {
+                button.classList.add('playing');
+            };
+
+            // Quand la lecture se termine
+            utterance.onend = function() {
+                button.classList.remove('playing');
+                currentVoiceButton = null;
+            };
+
+            // Quand il y a une erreur
+            utterance.onerror = function() {
+                button.classList.remove('playing');
+                currentVoiceButton = null;
+                alert('Erreur lors de la lecture vocale. Vérifiez que votre navigateur supporte la synthèse vocale.');
+            };
+
+            // Lancer la lecture
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Lire le mot actuel
+        function speakCurrentWord() {
+            if (!gameState.currentWord) return;
+            
+            // Utiliser la nouvelle fonction de synthèse vocale
+            speakText(gameState.currentWord, listenBtn);
+        }
+
+        // Mettre à jour l'affichage du score
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = gameState.score;
+            
+            // Mettre à jour la barre de progression
+            const progressPercentage = Math.min(gameState.score / 100 * 100, 100);
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+
+        // Mettre à jour l'affichage du niveau
+        function updateLevelDisplay() {
+            levelDisplay.textContent = gameState.currentLevel === "random" ? "Aléatoire" : gameState.currentLevel;
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            // Score total pour ce joueur
+            let totalScoreValue = 0;
+            let totalAttempts = 0;
+            let totalCorrect = 0;
+            
+            if (gameState.progressData) {
+                Object.values(gameState.progressData).forEach(levelData => {
+                    totalScoreValue += levelData.score || 0;
+                    totalAttempts += levelData.totalAttempts || 0;
+                    totalCorrect += levelData.correctAttempts || 0;
+                });
+            }
+            
+            totalScore.textContent = totalScoreValue;
+            
+            // Meilleur niveau pour ce joueur
+            let bestLevelValue = "-";
+            let highestScore = 0;
+            
+            if (gameState.progressData) {
+                Object.entries(gameState.progressData).forEach(([level, data]) => {
+                    if (data.score > highestScore) {
+                        highestScore = data.score;
+                        bestLevelValue = level === "random" ? "Aléatoire" : level;
+                    }
+                });
+            }
+            
+            bestLevel.textContent = bestLevelValue;
+            
+            // Taux de réussite global
+            const successRateValue = totalAttempts > 0 
+                ? Math.round((totalCorrect / totalAttempts) * 100) 
+                : 0;
+            successRate.textContent = `${successRateValue}%`;
+            
+            // Compteurs de réussites et échecs pour le niveau actuel
+            successCount.textContent = gameState.correctAttempts;
+            failureCount.textContent = gameState.totalAttempts - gameState.correctAttempts;
+            
+            // Historique
+            historyList.innerHTML = "";
+            gameState.history.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `history-item ${item.isCorrect ? 'correct' : 'incorrect'}`;
+                li.innerHTML = `
+                    <span>${item.word}</span>
+                    <span>${item.isCorrect ? '✓' : '✗'}</span>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+
+        // Basculer entre les thèmes clair et sombre
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            
+            localStorage.setItem('spellingGameTheme', newTheme);
+        }
+
+        // Vérifier la compatibilité avec la synthèse vocale
+        if (!('speechSynthesis' in window)) {
+            console.warn('Votre navigateur ne supporte pas la synthèse vocale');
+        }
+
+        // Initialiser le jeu au chargement de la page
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
