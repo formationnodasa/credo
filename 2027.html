@@ -629,6 +629,9 @@
         const themeToggle = document.getElementById('themeToggle');
         const galaxy = document.getElementById('galaxy');
 
+        // Variable pour suivre le bouton vocal actif
+        let currentVoiceButton = null;
+
         // Initialisation
         function init() {
             // Créer l'animation de galaxie
@@ -923,68 +926,57 @@
             saveProgressData();
         }
 
-        // Lire le mot actuel - CORRIGÉ avec voix masculine et aiguë
+        // Fonction pour la synthèse vocale
+        function speakText(text, button) {
+            // Arrêter la lecture précédente si elle existe
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (currentVoiceButton) {
+                    currentVoiceButton.classList.remove('playing');
+                }
+            }
+
+            // Créer un nouvel objet de synthèse vocale
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Configurer la voix française
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            // Ajouter l'icône de lecture au bouton
+            button.classList.add('playing');
+            currentVoiceButton = button;
+
+            // Quand la lecture commence
+            utterance.onstart = function() {
+                button.classList.add('playing');
+            };
+
+            // Quand la lecture se termine
+            utterance.onend = function() {
+                button.classList.remove('playing');
+                currentVoiceButton = null;
+            };
+
+            // Quand il y a une erreur
+            utterance.onerror = function() {
+                button.classList.remove('playing');
+                currentVoiceButton = null;
+                alert('Erreur lors de la lecture vocale. Vérifiez que votre navigateur supporte la synthèse vocale.');
+            };
+
+            // Lancer la lecture
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Lire le mot actuel
         function speakCurrentWord() {
             if (!gameState.currentWord) return;
             
-            // Arrêter toute parole en cours
-            window.speechSynthesis.cancel();
-            
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(gameState.currentWord);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.5; // Augmenté pour une voix plus aiguë
-                utterance.volume = 1;
-                
-                // Attendre que les voix soient chargées
-                if (speechSynthesis.getVoices().length === 0) {
-                    speechSynthesis.addEventListener('voiceschanged', () => {
-                        speakWithMaleVoice(utterance);
-                    });
-                } else {
-                    speakWithMaleVoice(utterance);
-                }
-            } else {
-                alert("La synthèse vocale n'est pas supportée par votre navigateur");
-            }
-        }
-
-        // Fonction pour sélectionner une voix masculine
-        function speakWithMaleVoice(utterance) {
-            const voices = speechSynthesis.getVoices();
-            
-            // Prioriser les voix masculines françaises
-            let selectedVoice = voices.find(voice => 
-                voice.lang.includes('fr') && 
-                (voice.name.includes('Homme') || voice.name.includes('homme') || 
-                 voice.name.includes('Male') || voice.name.includes('male'))
-            );
-            
-            // Si aucune voix masculine n'est trouvée, prendre la première voix française
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.includes('fr'));
-            }
-            
-            // Si aucune voix française n'est trouvée, prendre la première voix disponible
-            if (!selectedVoice && voices.length > 0) {
-                selectedVoice = voices[0];
-            }
-            
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-            
-            // Animation du bouton pendant la parole
-            listenBtn.textContent = "🔊";
-            listenBtn.disabled = true;
-            
-            utterance.onend = function() {
-                listenBtn.textContent = "Écouter le mot";
-                listenBtn.disabled = false;
-            };
-            
-            speechSynthesis.speak(utterance);
+            // Utiliser la nouvelle fonction de synthèse vocale
+            speakText(gameState.currentWord, listenBtn);
         }
 
         // Mettre à jour l'affichage du score
@@ -1065,6 +1057,11 @@
             themeToggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
             
             localStorage.setItem('spellingGameTheme', newTheme);
+        }
+
+        // Vérifier la compatibilité avec la synthèse vocale
+        if (!('speechSynthesis' in window)) {
+            console.warn('Votre navigateur ne supporte pas la synthèse vocale');
         }
 
         // Initialiser le jeu au chargement de la page
