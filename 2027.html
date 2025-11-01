@@ -1,603 +1,701 @@
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, TextInput, ScrollView } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Multijoueur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-const Stack = createNativeStackNavigator();
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-// Données complètes des questions
-const quizQuestions = [
-  {
-    category: "Champ lexical 'able'",
-    questions: [
-      { question: "Qui mérite d'être admiré ?", answer: "admirable", options: ["admirable", "agréable", "excusable", "évitable"] },
-      { question: "Qui peut être excusé ?", answer: "excusable", options: ["excusable", "regrettable", "appréciable", "tolérable"] },
-      { question: "Qui peut être évité ?", answer: "évitable", options: ["évitable", "comptable", "corrigeable", "louable"] },
-      { question: "Qui peut être regretté ?", answer: "regrettable", options: ["regrettable", "critiquable", "respectable", "comparable"] },
-      { question: "Qui peut être apprécié ?", answer: "appréciable", options: ["appréciable", "aimable", "modifiable", "supportable"] }
-    ]
-  },
-  {
-    category: "Champ lexical 'eur'",
-    questions: [
-      { question: "Celui qui chante ?", answer: "chanteur", options: ["chanteur", "vendeur", "lecteur", "formateur"] },
-      { question: "Celui qui vend ?", answer: "vendeur", options: ["vendeur", "spectateur", "traducteur", "orateur"] },
-      { question: "Celui qui lit ?", answer: "lecteur", options: ["lecteur", "inventeur", "auteur", "directeur"] },
-      { question: "Celui qui enseigne ?", answer: "formateur", options: ["formateur", "docteur", "sauveur", "entrepreneur"] },
-      { question: "Celui qui observe ?", answer: "spectateur", options: ["spectateur", "tricheur", "inspecteur", "appreneur"] }
-    ]
-  },
-  {
-    category: "Champ lexical 'tion'",
-    questions: [
-      { question: "Action de créer ?", answer: "création", options: ["création", "décision", "correction", "punition"] },
-      { question: "Action de décider ?", answer: "décision", options: ["décision", "organisation", "éducation", "communication"] },
-      { question: "Action de corriger ?", answer: "correction", options: ["correction", "évaluation", "préparation", "explication"] },
-      { question: "Action de punir ?", answer: "punition", options: ["punition", "imagination", "information", "transformation"] },
-      { question: "Action d'organiser ?", answer: "organisation", options: ["organisation", "production", "respiration", "création"] }
-    ]
-  },
-  {
-    category: "Champ lexical 'ment'",
-    questions: [
-      { question: "Transformation ou modification de quelque chose ?", answer: "changement", options: ["changement", "développement", "jugement", "déplacement"] },
-      { question: "Croissance ou progrès dans une activité ou un projet ?", answer: "développement", options: ["développement", "amélioration", "sentiment", "doucement"] },
-      { question: "Décision rendue par un tribunal ou un juge ?", answer: "jugement", options: ["jugement", "engagement", "traitement", "entraînement"] },
-      { question: "Action de se déplacer d'un endroit à un autre ?", answer: "déplacement", options: ["déplacement", "règlement", "accomplissement", "paiement"] },
-      { question: "Amélioration d'une situation ou d'un comportement ?", answer: "amélioration", options: ["amélioration", "gouvernement", "raisonnement", "changement"] }
-    ]
-  },
-  {
-    category: "Champ lexical 'isme'",
-    questions: [
-      { question: "Doctrine politique prônant l'égalité sociale ?", answer: "socialisme", options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"] },
-      { question: "Système économique basé sur le capital et le profit ?", answer: "capitalisme", options: ["capitalisme", "romantisme", "athéisme", "racisme"] },
-      { question: "Croyance en un seul Dieu ?", answer: "monothéisme", options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"] },
-      { question: "Doctrine prônant l'absence d'autorité ou d'État ?", answer: "anarchisme", options: ["anarchisme", "spiritisme", "sexisme", "cubisme"] },
-      { question: "Mouvement artistique qui privilégie l'émotion et l'individu ?", answer: "romantisme", options: ["romantisme", "bouddhisme", "fascisme", "socialisme"] }
-    ]
-  }
-];
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
 
-// Écran d'accueil
-function HomeScreen({ navigation }) {
-  return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Quiz Multijoueur</Text>
-          <Text style={styles.paragraph}>
-            Affrontez vos amis dans un quiz passionnant sur les champs lexicaux français !
-          </Text>
-        </View>
+        .screen {
+            display: none;
+            padding: 30px;
+            flex-direction: column;
+        }
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]}
-            onPress={() => navigation.navigate('CreateRoom')}
-          >
-            <Text style={styles.buttonText}>Créer une salle</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => navigation.navigate('JoinRoom')}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Rejoindre une salle</Text>
-          </TouchableOpacity>
-        </View>
+        .active {
+            display: flex;
+        }
 
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Comment jouer ?</Text>
-          <Text style={styles.infoText}>• Créez une salle ou rejoignez-en une</Text>
-          <Text style={styles.infoText}>• Partagez le code avec votre ami</Text>
-          <Text style={styles.infoText}>• Répondez aux questions le plus vite possible</Text>
-          <Text style={styles.infoText}>• Le gagnant est celui avec le meilleur score !</Text>
-        </View>
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
 
-        <View style={styles.categoriesCard}>
-          <Text style={styles.infoTitle}>Catégories disponibles :</Text>
-          <Text style={styles.infoText}>• Champ lexical 'able'</Text>
-          <Text style={styles.infoText}>• Champ lexical 'eur'</Text>
-          <Text style={styles.infoText}>• Champ lexical 'tion'</Text>
-          <Text style={styles.infoText}>• Champ lexical 'ment'</Text>
-          <Text style={styles.infoText}>• Champ lexical 'isme'</Text>
-        </View>
-      </View>
-    </ScrollView>
-  );
-}
+        h2 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
 
-// Écran de création de salle
-function CreateRoomScreen({ navigation }) {
-  const [roomCode, setRoomCode] = useState('');
+        p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
 
-  const generateRoomCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setRoomCode(code);
-  };
+        .card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
 
-  const createRoom = () => {
-    if (roomCode) {
-      navigation.navigate('Waiting', { 
-        roomCode: roomCode, 
-        isHost: true 
-      });
-    }
-  };
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 0;
+            text-align: center;
+            width: 100%;
+        }
 
-  useEffect(() => {
-    generateRoomCode();
-  }, []);
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Créer une salle</Text>
-        <Text style={styles.paragraph}>
-          Partagez ce code avec votre ami pour qu'il puisse vous rejoindre
-        </Text>
-        
-        <View style={styles.roomCodeContainer}>
-          <Text style={styles.roomCodeLabel}>Code de la salle :</Text>
-          <Text style={styles.roomCode}>{roomCode}</Text>
-        </View>
+        .btn-primary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
 
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton]}
-          onPress={createRoom}
-        >
-          <Text style={styles.buttonText}>Créer la salle</Text>
-        </TouchableOpacity>
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #2196F3;
+            color: #2196F3;
+        }
 
-        <TouchableOpacity 
-          style={[styles.button, styles.secondaryButton]}
-          onPress={generateRoomCode}
-        >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Générer un nouveau code</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
+        .btn-secondary:hover {
+            background: #e3f2fd;
+        }
 
-// Écran de rejoindre une salle
-function JoinRoomScreen({ navigation }) {
-  const [roomCode, setRoomCode] = useState('');
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-  const joinRoom = () => {
-    if (roomCode.length === 6) {
-      navigation.navigate('Waiting', { 
-        roomCode: roomCode.toUpperCase(), 
-        isHost: false 
-      });
-    } else {
-      Alert.alert('Erreur', 'Le code doit contenir 6 caractères');
-    }
-  };
+        .room-code {
+            text-align: center;
+            margin: 20px 0;
+        }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Rejoindre une salle</Text>
-        <Text style={styles.paragraph}>
-          Entrez le code de la salle partagé par votre ami
-        </Text>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Code de la salle :</Text>
-          <TextInput
-            style={styles.textInput}
-            value={roomCode}
-            onChangeText={setRoomCode}
-            placeholder="Ex: ABC123"
-            maxLength={6}
-            autoCapitalize="characters"
-          />
-        </View>
+        .room-code-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
 
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton, !roomCode && styles.disabledButton]}
-          onPress={joinRoom}
-          disabled={!roomCode}
-        >
-          <Text style={styles.buttonText}>Rejoindre la salle</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
+        .room-code-value {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: #2196F3;
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
 
-// Écran d'attente
-function WaitingScreen({ route, navigation }) {
-  const { roomCode, isHost } = route.params;
-  const [players, setPlayers] = useState(isHost ? 1 : 2);
+        .input-group {
+            margin: 20px 0;
+        }
 
-  const startGame = () => {
-    navigation.navigate('Quiz', { 
-      roomCode: roomCode,
-      isHost: isHost 
-    });
-  };
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
 
-  useEffect(() => {
-    // Simulation d'un deuxième joueur qui rejoint après 3 secondes
-    if (isHost) {
-      const timer = setTimeout(() => {
-        setPlayers(2);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isHost]);
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          {isHost ? 'En attente des joueurs...' : 'En attente du début du jeu...'}
-        </Text>
-        
-        <View style={styles.roomCodeContainer}>
-          <Text style={styles.roomCodeLabel}>Code de la salle :</Text>
-          <Text style={styles.roomCode}>{roomCode}</Text>
-        </View>
+        .input-field:focus {
+            border-color: #2196F3;
+            outline: none;
+        }
 
-        <View style={styles.playersContainer}>
-          <Text style={styles.playersText}>Joueurs connectés : {players}/2</Text>
-          <View style={styles.playersList}>
-            <Text style={styles.player}>• Joueur 1 {isHost ? '(Hôte)' : ''}</Text>
-            {players > 1 && <Text style={styles.player}>• Joueur 2 {!isHost ? '(Hôte)' : ''}</Text>}
-          </View>
-        </View>
+        .players-container {
+            margin: 20px 0;
+        }
 
-        {isHost && players === 2 && (
-          <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]}
-            onPress={startGame}
-          >
-            <Text style={styles.buttonText}>Commencer le quiz</Text>
-          </TouchableOpacity>
-        )}
+        .players-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
 
-        {!isHost && (
-          <Text style={styles.waitingText}>
-            En attente que l'hôte commence le jeu...
-          </Text>
-        )}
-      </View>
-    </View>
-  );
-}
+        .player {
+            margin: 5px 0;
+            color: #555;
+        }
 
-// Écran du quiz
-function QuizScreen({ route, navigation }) {
-  const { roomCode, isHost } = route.params;
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState('');
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [gameFinished, setGameFinished] = useState(false);
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
 
-  // Sélection aléatoire de 5 questions
-  const selectedQuestions = React.useMemo(() => {
-    const allQuestions = quizQuestions.flatMap(category => category.questions);
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 5);
-  }, []);
+        .timer {
+            color: #f44336;
+            font-weight: bold;
+        }
 
-  const currentQ = selectedQuestions[currentQuestion];
+        .score {
+            color: #4CAF50;
+            font-weight: bold;
+        }
 
-  const handleAnswer = () => {
-    if (selectedAnswer === currentQ.answer) {
-      setScore(score + 1);
-    }
+        .question-count {
+            color: #2196F3;
+            font-weight: bold;
+        }
 
-    if (currentQuestion < selectedQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer('');
-      setTimeLeft(30);
-    } else {
-      setGameFinished(true);
-    }
-  };
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
 
-  useEffect(() => {
-    if (timeLeft > 0 && !gameFinished) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !gameFinished) {
-      if (currentQuestion < selectedQuestions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer('');
-        setTimeLeft(30);
-      } else {
-        setGameFinished(true);
-      }
-    }
-  }, [timeLeft, gameFinished]);
+        .options {
+            margin: 20px 0;
+        }
 
-  const restartGame = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setSelectedAnswer('');
-    setTimeLeft(30);
-    setGameFinished(false);
-  };
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-  if (gameFinished) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Quiz Terminé !</Text>
-          <Text style={styles.score}>
-            Votre score : {score}/{selectedQuestions.length}
-          </Text>
-          <Text style={styles.percentage}>
-            {Math.round((score / selectedQuestions.length) * 100)}%
-          </Text>
-          
-          <View style={styles.resultButtons}>
-            <TouchableOpacity 
-              style={[styles.button, styles.primaryButton]}
-              onPress={restartGame}
-            >
-              <Text style={styles.buttonText}>Rejouer</Text>
-            </TouchableOpacity>
+        .option:hover {
+            background: #e3f2fd;
+        }
+
+        .option input {
+            margin-right: 10px;
+        }
+
+        .result-score {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .result-percentage {
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2196F3;
+        }
+
+        .info-card {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1976D2;
+        }
+
+        .info-text {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .categories-card {
+            background: #f3e5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                border-radius: 10px;
+            }
             
-            <TouchableOpacity 
-              style={[styles.button, styles.secondaryButton]}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text style={[styles.buttonText, styles.secondaryButtonText]}>Retour à l'accueil</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    );
-  }
+            .screen {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .room-code-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Écran d'accueil -->
+        <div id="home-screen" class="screen active">
+            <h1>Quiz Multijoueur</h1>
+            <p>Affrontez vos amis dans un quiz passionnant sur les champs lexicaux français !</p>
+            
+            <div class="card">
+                <button id="create-room-btn" class="btn btn-primary">Créer une salle</button>
+                <button id="join-room-btn" class="btn btn-secondary">Rejoindre une salle</button>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">Comment jouer ?</div>
+                <div class="info-text">• Créez une salle ou rejoignez-en une</div>
+                <div class="info-text">• Partagez le code avec votre ami</div>
+                <div class="info-text">• Répondez aux questions le plus vite possible</div>
+                <div class="info-text">• Le gagnant est celui avec le meilleur score !</div>
+            </div>
+            
+            <div class="categories-card">
+                <div class="info-title">Catégories disponibles :</div>
+                <div class="info-text">• Champ lexical 'able'</div>
+                <div class="info-text">• Champ lexical 'eur'</div>
+                <div class="info-text">• Champ lexical 'tion'</div>
+                <div class="info-text">• Champ lexical 'ment'</div>
+                <div class="info-text">• Champ lexical 'isme'</div>
+            </div>
+        </div>
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.quizHeader}>
-        <Text style={styles.timer}>Temps: {timeLeft}s</Text>
-        <Text style={styles.scoreText}>Score: {score}</Text>
-        <Text style={styles.questionCount}>
-          Question {currentQuestion + 1}/{selectedQuestions.length}
-        </Text>
-      </View>
+        <!-- Écran de création de salle -->
+        <div id="create-room-screen" class="screen">
+            <h1>Créer une salle</h1>
+            <p>Partagez ce code avec votre ami pour qu'il puisse vous rejoindre</p>
+            
+            <div class="room-code">
+                <div class="room-code-label">Code de la salle :</div>
+                <div id="room-code-value" class="room-code-value">ABC123</div>
+            </div>
+            
+            <button id="create-room-confirm-btn" class="btn btn-primary">Créer la salle</button>
+            <button id="generate-new-code-btn" class="btn btn-secondary">Générer un nouveau code</button>
+        </div>
 
-      <View style={styles.card}>
-        <Text style={styles.question}>{currentQ.question}</Text>
-        
-        <RadioButton.Group onValueChange={setSelectedAnswer} value={selectedAnswer}>
-          {currentQ.options.map((option, index) => (
-            <View key={index} style={styles.option}>
-              <RadioButton value={option} color="#2196F3" />
-              <Text style={styles.optionText}>{option}</Text>
-            </View>
-          ))}
-        </RadioButton.Group>
+        <!-- Écran de rejoindre une salle -->
+        <div id="join-room-screen" class="screen">
+            <h1>Rejoindre une salle</h1>
+            <p>Entrez le code de la salle partagé par votre ami</p>
+            
+            <div class="input-group">
+                <label class="input-label">Code de la salle :</label>
+                <input type="text" id="room-code-input" class="input-field" placeholder="Ex: ABC123" maxlength="6">
+            </div>
+            
+            <button id="join-room-confirm-btn" class="btn btn-primary" disabled>Rejoindre la salle</button>
+        </div>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton, !selectedAnswer && styles.disabledButton]}
-          onPress={handleAnswer}
-          disabled={!selectedAnswer}
-        >
-          <Text style={styles.buttonText}>
-            {currentQuestion < selectedQuestions.length - 1 ? 'Question suivante' : 'Terminer le quiz'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
+        <!-- Écran d'attente -->
+        <div id="waiting-screen" class="screen">
+            <h1 id="waiting-title">En attente des joueurs...</h1>
+            
+            <div class="room-code">
+                <div class="room-code-label">Code de la salle :</div>
+                <div id="waiting-room-code" class="room-code-value">ABC123</div>
+            </div>
+            
+            <div class="players-container">
+                <div class="info-title">Joueurs connectés : <span id="players-count">1</span>/2</div>
+                <div class="players-list">
+                    <div id="player1" class="player">• Joueur 1 (Hôte)</div>
+                    <div id="player2" class="player hidden">• Joueur 2</div>
+                </div>
+            </div>
+            
+            <button id="start-game-btn" class="btn btn-primary hidden">Commencer le quiz</button>
+            <div id="waiting-message" class="info-text">En attente que l'hôte commence le jeu...</div>
+        </div>
 
-// Styles
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#333',
-  },
-  paragraph: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#666',
-    lineHeight: 22,
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  button: {
-    padding: 15,
-    borderRadius: 8,
-    marginVertical: 8,
-    alignItems: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#2196F3',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#2196F3',
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  secondaryButtonText: {
-    color: '#2196F3',
-  },
-  infoCard: {
-    marginTop: 30,
-    padding: 15,
-    backgroundColor: '#e3f2fd',
-    borderRadius: 8,
-  },
-  categoriesCard: {
-    marginTop: 15,
-    padding: 15,
-    backgroundColor: '#f3e5f5',
-    borderRadius: 8,
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#1976d2',
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 5,
-  },
-  roomCodeContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  roomCodeLabel: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  roomCode: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    letterSpacing: 5,
-    color: '#2196F3',
-  },
-  inputContainer: {
-    marginVertical: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  playersContainer: {
-    marginVertical: 20,
-  },
-  playersText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  playersList: {
-    marginLeft: 10,
-  },
-  player: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  waitingText: {
-    textAlign: 'center',
-    fontStyle: 'italic',
-    color: '#666',
-    marginTop: 20,
-  },
-  quizHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  timer: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#f44336',
-  },
-  scoreText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4caf50',
-  },
-  questionCount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2196F3',
-  },
-  question: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 5,
-  },
-  optionText: {
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  score: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  percentage: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#2196F3',
-    marginBottom: 20,
-  },
-  resultButtons: {
-    marginTop: 10,
-  },
-});
+        <!-- Écran du quiz -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="timer">Temps: <span id="time-left">30</span>s</div>
+                <div class="score">Score: <span id="current-score">0</span></div>
+                <div class="question-count">Question <span id="current-question">1</span>/<span id="total-questions">5</span></div>
+            </div>
+            
+            <div class="card">
+                <div id="question-text" class="question">Qui mérite d'être admiré ?</div>
+                
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="option1" name="quiz-option" value="admirable">
+                        <label for="option1">admirable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="option2" name="quiz-option" value="agréable">
+                        <label for="option2">agréable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="option3" name="quiz-option" value="excusable">
+                        <label for="option3">excusable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="option4" name="quiz-option" value="évitable">
+                        <label for="option4">évitable</label>
+                    </div>
+                </div>
+                
+                <button id="next-question-btn" class="btn btn-primary" disabled>Question suivante</button>
+            </div>
+        </div>
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Quiz Multijoueur' }} />
-        <Stack.Screen name="CreateRoom" component={CreateRoomScreen} options={{ title: 'Créer une salle' }} />
-        <Stack.Screen name="JoinRoom" component={JoinRoomScreen} options={{ title: 'Rejoindre une salle' }} />
-        <Stack.Screen name="Waiting" component={WaitingScreen} options={{ title: 'En attente' }} />
-        <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Quiz en cours', headerBackVisible: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
+        <!-- Écran des résultats -->
+        <div id="results-screen" class="screen">
+            <h1>Quiz Terminé !</h1>
+            
+            <div class="result-score">Votre score : <span id="final-score">3</span>/<span id="max-score">5</span></div>
+            <div class="result-percentage" id="percentage">60%</div>
+            
+            <button id="restart-btn" class="btn btn-primary">Rejouer</button>
+            <button id="home-btn" class="btn btn-secondary">Retour à l'accueil</button>
+        </div>
+    </div>
+
+    <script>
+        // Données des questions
+        const quizQuestions = [
+            {
+                category: "Champ lexical 'able'",
+                questions: [
+                    { question: "Qui mérite d'être admiré ?", answer: "admirable", options: ["admirable", "agréable", "excusable", "évitable"] },
+                    { question: "Qui peut être excusé ?", answer: "excusable", options: ["excusable", "regrettable", "appréciable", "tolérable"] },
+                    { question: "Qui peut être évité ?", answer: "évitable", options: ["évitable", "comptable", "corrigeable", "louable"] },
+                    { question: "Qui peut être regretté ?", answer: "regrettable", options: ["regrettable", "critiquable", "respectable", "comparable"] },
+                    { question: "Qui peut être apprécié ?", answer: "appréciable", options: ["appréciable", "aimable", "modifiable", "supportable"] }
+                ]
+            },
+            {
+                category: "Champ lexical 'eur'",
+                questions: [
+                    { question: "Celui qui chante ?", answer: "chanteur", options: ["chanteur", "vendeur", "lecteur", "formateur"] },
+                    { question: "Celui qui vend ?", answer: "vendeur", options: ["vendeur", "spectateur", "traducteur", "orateur"] },
+                    { question: "Celui qui lit ?", answer: "lecteur", options: ["lecteur", "inventeur", "auteur", "directeur"] },
+                    { question: "Celui qui enseigne ?", answer: "formateur", options: ["formateur", "docteur", "sauveur", "entrepreneur"] },
+                    { question: "Celui qui observe ?", answer: "spectateur", options: ["spectateur", "tricheur", "inspecteur", "appreneur"] }
+                ]
+            },
+            {
+                category: "Champ lexical 'tion'",
+                questions: [
+                    { question: "Action de créer ?", answer: "création", options: ["création", "décision", "correction", "punition"] },
+                    { question: "Action de décider ?", answer: "décision", options: ["décision", "organisation", "éducation", "communication"] },
+                    { question: "Action de corriger ?", answer: "correction", options: ["correction", "évaluation", "préparation", "explication"] },
+                    { question: "Action de punir ?", answer: "punition", options: ["punition", "imagination", "information", "transformation"] },
+                    { question: "Action d'organiser ?", answer: "organisation", options: ["organisation", "production", "respiration", "création"] }
+                ]
+            },
+            {
+                category: "Champ lexical 'ment'",
+                questions: [
+                    { question: "Transformation ou modification de quelque chose ?", answer: "changement", options: ["changement", "développement", "jugement", "déplacement"] },
+                    { question: "Croissance ou progrès dans une activité ou un projet ?", answer: "développement", options: ["développement", "amélioration", "sentiment", "doucement"] },
+                    { question: "Décision rendue par un tribunal ou un juge ?", answer: "jugement", options: ["jugement", "engagement", "traitement", "entraînement"] },
+                    { question: "Action de se déplacer d'un endroit à un autre ?", answer: "déplacement", options: ["déplacement", "règlement", "accomplissement", "paiement"] },
+                    { question: "Amélioration d'une situation ou d'un comportement ?", answer: "amélioration", options: ["amélioration", "gouvernement", "raisonnement", "changement"] }
+                ]
+            },
+            {
+                category: "Champ lexical 'isme'",
+                questions: [
+                    { question: "Doctrine politique prônant l'égalité sociale ?", answer: "socialisme", options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"] },
+                    { question: "Système économique basé sur le capital et le profit ?", answer: "capitalisme", options: ["capitalisme", "romantisme", "athéisme", "racisme"] },
+                    { question: "Croyance en un seul Dieu ?", answer: "monothéisme", options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"] },
+                    { question: "Doctrine prônant l'absence d'autorité ou d'État ?", answer: "anarchisme", options: ["anarchisme", "spiritisme", "sexisme", "cubisme"] },
+                    { question: "Mouvement artistique qui privilégie l'émotion et l'individu ?", answer: "romantisme", options: ["romantisme", "bouddhisme", "fascisme", "socialisme"] }
+                ]
+            }
+        ];
+
+        // Variables d'état du jeu
+        let currentScreen = 'home-screen';
+        let roomCode = '';
+        let isHost = false;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval;
+        let selectedQuestions = [];
+
+        // Éléments DOM
+        const screens = {
+            home: document.getElementById('home-screen'),
+            createRoom: document.getElementById('create-room-screen'),
+            joinRoom: document.getElementById('join-room-screen'),
+            waiting: document.getElementById('waiting-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            results: document.getElementById('results-screen')
+        };
+
+        // Fonctions de navigation
+        function showScreen(screenId) {
+            // Cacher tous les écrans
+            Object.values(screens).forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Afficher l'écran demandé
+            screens[screenId].classList.add('active');
+            currentScreen = screenId;
+        }
+
+        // Génération de code de salle
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Initialisation du jeu
+        function initGame() {
+            // Événements des boutons
+            document.getElementById('create-room-btn').addEventListener('click', () => {
+                roomCode = generateRoomCode();
+                document.getElementById('room-code-value').textContent = roomCode;
+                showScreen('create-room-screen');
+            });
+
+            document.getElementById('join-room-btn').addEventListener('click', () => {
+                showScreen('join-room-screen');
+            });
+
+            document.getElementById('generate-new-code-btn').addEventListener('click', () => {
+                roomCode = generateRoomCode();
+                document.getElementById('room-code-value').textContent = roomCode;
+            });
+
+            document.getElementById('create-room-confirm-btn').addEventListener('click', () => {
+                isHost = true;
+                document.getElementById('waiting-room-code').textContent = roomCode;
+                document.getElementById('waiting-title').textContent = 'En attente des joueurs...';
+                document.getElementById('start-game-btn').classList.remove('hidden');
+                document.getElementById('waiting-message').classList.add('hidden');
+                showScreen('waiting-screen');
+                
+                // Simulation d'un joueur qui rejoint après 3 secondes
+                setTimeout(() => {
+                    document.getElementById('player2').classList.remove('hidden');
+                    document.getElementById('players-count').textContent = '2';
+                }, 3000);
+            });
+
+            document.getElementById('room-code-input').addEventListener('input', (e) => {
+                const code = e.target.value.toUpperCase();
+                document.getElementById('join-room-confirm-btn').disabled = code.length !== 6;
+            });
+
+            document.getElementById('join-room-confirm-btn').addEventListener('click', () => {
+                roomCode = document.getElementById('room-code-input').value.toUpperCase();
+                isHost = false;
+                document.getElementById('waiting-room-code').textContent = roomCode;
+                document.getElementById('waiting-title').textContent = 'En attente du début du jeu...';
+                document.getElementById('start-game-btn').classList.add('hidden');
+                document.getElementById('waiting-message').classList.remove('hidden');
+                document.getElementById('player1').textContent = '• Joueur 1 (Hôte)';
+                document.getElementById('player2').classList.remove('hidden');
+                document.getElementById('player2').textContent = '• Joueur 2';
+                document.getElementById('players-count').textContent = '2';
+                showScreen('waiting-screen');
+            });
+
+            document.getElementById('start-game-btn').addEventListener('click', startQuiz);
+
+            document.getElementById('next-question-btn').addEventListener('click', nextQuestion);
+
+            document.getElementById('restart-btn').addEventListener('click', restartGame);
+
+            document.getElementById('home-btn').addEventListener('click', () => {
+                showScreen('home-screen');
+            });
+
+            // Événements pour les options de réponse
+            document.querySelectorAll('input[name="quiz-option"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.getElementById('next-question-btn').disabled = false;
+                });
+            });
+        }
+
+        // Démarrer le quiz
+        function startQuiz() {
+            // Sélectionner 5 questions aléatoires
+            const allQuestions = quizQuestions.flatMap(category => category.questions);
+            selectedQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
+            
+            // Réinitialiser l'état du jeu
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 30;
+            
+            // Mettre à jour l'interface
+            document.getElementById('current-score').textContent = score;
+            document.getElementById('total-questions').textContent = selectedQuestions.length;
+            
+            // Afficher la première question
+            showQuestion();
+            
+            // Démarrer le timer
+            startTimer();
+            
+            // Afficher l'écran du quiz
+            showScreen('quiz-screen');
+        }
+
+        // Afficher une question
+        function showQuestion() {
+            const question = selectedQuestions[currentQuestionIndex];
+            
+            // Mettre à jour l'interface
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            
+            // Mettre à jour les options
+            const options = document.querySelectorAll('.option label');
+            const radios = document.querySelectorAll('input[name="quiz-option"]');
+            
+            question.options.forEach((option, index) => {
+                options[index].textContent = option;
+                radios[index].value = option;
+                radios[index].checked = false;
+            });
+            
+            // Désactiver le bouton suivant
+            document.getElementById('next-question-btn').disabled = true;
+            
+            // Mettre à jour le texte du bouton
+            document.getElementById('next-question-btn').textContent = 
+                currentQuestionIndex < selectedQuestions.length - 1 ? 'Question suivante' : 'Terminer le quiz';
+        }
+
+        // Passer à la question suivante
+        function nextQuestion() {
+            // Vérifier la réponse
+            const selectedOption = document.querySelector('input[name="quiz-option"]:checked');
+            if (selectedOption) {
+                const question = selectedQuestions[currentQuestionIndex];
+                if (selectedOption.value === question.answer) {
+                    score++;
+                    document.getElementById('current-score').textContent = score;
+                }
+            }
+            
+            // Passer à la question suivante ou terminer le quiz
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                currentQuestionIndex++;
+                timeLeft = 30;
+                document.getElementById('time-left').textContent = timeLeft;
+                showQuestion();
+                startTimer();
+            } else {
+                endQuiz();
+            }
+        }
+
+        // Démarrer le timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById('time-left').textContent = timeLeft;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        // Terminer le quiz
+        function endQuiz() {
+            clearInterval(timerInterval);
+            
+            // Calculer le pourcentage
+            const percentage = Math.round((score / selectedQuestions.length) * 100);
+            
+            // Mettre à jour l'interface des résultats
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('max-score').textContent = selectedQuestions.length;
+            document.getElementById('percentage').textContent = `${percentage}%`;
+            
+            // Afficher l'écran des résultats
+            showScreen('results-screen');
+        }
+
+        // Redémarrer le jeu
+        function restartGame() {
+            startQuiz();
+        }
+
+        // Initialiser l'application au chargement
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
