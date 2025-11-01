@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, TextInput, ScrollView } from 'react-native';
 import { RadioButton } from 'react-native-paper';
 
 const Stack = createNativeStackNavigator();
 
-// Données des questions
+// Données complètes des questions
 const quizQuestions = [
   {
     category: "Champ lexical 'able'",
@@ -14,6 +14,8 @@ const quizQuestions = [
       { question: "Qui mérite d'être admiré ?", answer: "admirable", options: ["admirable", "agréable", "excusable", "évitable"] },
       { question: "Qui peut être excusé ?", answer: "excusable", options: ["excusable", "regrettable", "appréciable", "tolérable"] },
       { question: "Qui peut être évité ?", answer: "évitable", options: ["évitable", "comptable", "corrigeable", "louable"] },
+      { question: "Qui peut être regretté ?", answer: "regrettable", options: ["regrettable", "critiquable", "respectable", "comparable"] },
+      { question: "Qui peut être apprécié ?", answer: "appréciable", options: ["appréciable", "aimable", "modifiable", "supportable"] }
     ]
   },
   {
@@ -22,6 +24,38 @@ const quizQuestions = [
       { question: "Celui qui chante ?", answer: "chanteur", options: ["chanteur", "vendeur", "lecteur", "formateur"] },
       { question: "Celui qui vend ?", answer: "vendeur", options: ["vendeur", "spectateur", "traducteur", "orateur"] },
       { question: "Celui qui lit ?", answer: "lecteur", options: ["lecteur", "inventeur", "auteur", "directeur"] },
+      { question: "Celui qui enseigne ?", answer: "formateur", options: ["formateur", "docteur", "sauveur", "entrepreneur"] },
+      { question: "Celui qui observe ?", answer: "spectateur", options: ["spectateur", "tricheur", "inspecteur", "appreneur"] }
+    ]
+  },
+  {
+    category: "Champ lexical 'tion'",
+    questions: [
+      { question: "Action de créer ?", answer: "création", options: ["création", "décision", "correction", "punition"] },
+      { question: "Action de décider ?", answer: "décision", options: ["décision", "organisation", "éducation", "communication"] },
+      { question: "Action de corriger ?", answer: "correction", options: ["correction", "évaluation", "préparation", "explication"] },
+      { question: "Action de punir ?", answer: "punition", options: ["punition", "imagination", "information", "transformation"] },
+      { question: "Action d'organiser ?", answer: "organisation", options: ["organisation", "production", "respiration", "création"] }
+    ]
+  },
+  {
+    category: "Champ lexical 'ment'",
+    questions: [
+      { question: "Transformation ou modification de quelque chose ?", answer: "changement", options: ["changement", "développement", "jugement", "déplacement"] },
+      { question: "Croissance ou progrès dans une activité ou un projet ?", answer: "développement", options: ["développement", "amélioration", "sentiment", "doucement"] },
+      { question: "Décision rendue par un tribunal ou un juge ?", answer: "jugement", options: ["jugement", "engagement", "traitement", "entraînement"] },
+      { question: "Action de se déplacer d'un endroit à un autre ?", answer: "déplacement", options: ["déplacement", "règlement", "accomplissement", "paiement"] },
+      { question: "Amélioration d'une situation ou d'un comportement ?", answer: "amélioration", options: ["amélioration", "gouvernement", "raisonnement", "changement"] }
+    ]
+  },
+  {
+    category: "Champ lexical 'isme'",
+    questions: [
+      { question: "Doctrine politique prônant l'égalité sociale ?", answer: "socialisme", options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"] },
+      { question: "Système économique basé sur le capital et le profit ?", answer: "capitalisme", options: ["capitalisme", "romantisme", "athéisme", "racisme"] },
+      { question: "Croyance en un seul Dieu ?", answer: "monothéisme", options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"] },
+      { question: "Doctrine prônant l'absence d'autorité ou d'État ?", answer: "anarchisme", options: ["anarchisme", "spiritisme", "sexisme", "cubisme"] },
+      { question: "Mouvement artistique qui privilégie l'émotion et l'individu ?", answer: "romantisme", options: ["romantisme", "bouddhisme", "fascisme", "socialisme"] }
     ]
   }
 ];
@@ -29,38 +63,49 @@ const quizQuestions = [
 // Écran d'accueil
 function HomeScreen({ navigation }) {
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Quiz Multijoueur</Text>
-        <Text style={styles.paragraph}>
-          Affrontez vos amis dans un quiz passionnant sur les champs lexicaux français !
-        </Text>
-      </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Quiz Multijoueur</Text>
+          <Text style={styles.paragraph}>
+            Affrontez vos amis dans un quiz passionnant sur les champs lexicaux français !
+          </Text>
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton]}
-          onPress={() => navigation.navigate('CreateRoom')}
-        >
-          <Text style={styles.buttonText}>Créer une salle</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.secondaryButton]}
-          onPress={() => navigation.navigate('JoinRoom')}
-        >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Rejoindre une salle</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.button, styles.primaryButton]}
+            onPress={() => navigation.navigate('CreateRoom')}
+          >
+            <Text style={styles.buttonText}>Créer une salle</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.button, styles.secondaryButton]}
+            onPress={() => navigation.navigate('JoinRoom')}
+          >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Rejoindre une salle</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.infoCard}>
-        <Text style={styles.infoTitle}>Comment jouer ?</Text>
-        <Text style={styles.infoText}>• Créez une salle ou rejoignez-en une</Text>
-        <Text style={styles.infoText}>• Partagez le code avec votre ami</Text>
-        <Text style={styles.infoText}>• Répondez aux questions le plus vite possible</Text>
-        <Text style={styles.infoText}>• Le gagnant est celui avec le meilleur score !</Text>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Comment jouer ?</Text>
+          <Text style={styles.infoText}>• Créez une salle ou rejoignez-en une</Text>
+          <Text style={styles.infoText}>• Partagez le code avec votre ami</Text>
+          <Text style={styles.infoText}>• Répondez aux questions le plus vite possible</Text>
+          <Text style={styles.infoText}>• Le gagnant est celui avec le meilleur score !</Text>
+        </View>
+
+        <View style={styles.categoriesCard}>
+          <Text style={styles.infoTitle}>Catégories disponibles :</Text>
+          <Text style={styles.infoText}>• Champ lexical 'able'</Text>
+          <Text style={styles.infoText}>• Champ lexical 'eur'</Text>
+          <Text style={styles.infoText}>• Champ lexical 'tion'</Text>
+          <Text style={styles.infoText}>• Champ lexical 'ment'</Text>
+          <Text style={styles.infoText}>• Champ lexical 'isme'</Text>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -238,11 +283,11 @@ function QuizScreen({ route, navigation }) {
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameFinished, setGameFinished] = useState(false);
 
-  // Sélection aléatoire de 3 questions
+  // Sélection aléatoire de 5 questions
   const selectedQuestions = React.useMemo(() => {
     const allQuestions = quizQuestions.flatMap(category => category.questions);
     const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
+    return shuffled.slice(0, 5);
   }, []);
 
   const currentQ = selectedQuestions[currentQuestion];
@@ -296,19 +341,21 @@ function QuizScreen({ route, navigation }) {
             {Math.round((score / selectedQuestions.length) * 100)}%
           </Text>
           
-          <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]}
-            onPress={restartGame}
-          >
-            <Text style={styles.buttonText}>Rejouer</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Retour à l'accueil</Text>
-          </TouchableOpacity>
+          <View style={styles.resultButtons}>
+            <TouchableOpacity 
+              style={[styles.button, styles.primaryButton]}
+              onPress={restartGame}
+            >
+              <Text style={styles.buttonText}>Rejouer</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.button, styles.secondaryButton]}
+              onPress={() => navigation.navigate('Home')}
+            >
+              <Text style={[styles.buttonText, styles.secondaryButtonText]}>Retour à l'accueil</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -352,6 +399,9 @@ function QuizScreen({ route, navigation }) {
 
 // Styles
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -413,6 +463,12 @@ const styles = StyleSheet.create({
     marginTop: 30,
     padding: 15,
     backgroundColor: '#e3f2fd',
+    borderRadius: 8,
+  },
+  categoriesCard: {
+    marginTop: 15,
+    padding: 15,
+    backgroundColor: '#f3e5f5',
     borderRadius: 8,
   },
   infoTitle: {
@@ -527,6 +583,9 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     marginBottom: 20,
   },
+  resultButtons: {
+    marginTop: 10,
+  },
 });
 
 export default function App() {
@@ -541,30 +600,4 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
-{
-  "name": "quizmultiplayer",
-  "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "dependencies": {
-    "expo": "~49.0.0",
-    "expo-status-bar": "~1.6.0",
-    "react": "18.2.0",
-    "react-native": "0.72.3",
-    "@react-navigation/native": "^6.1.7",
-    "@react-navigation/native-stack": "^6.9.13",
-    "react-native-paper": "^5.9.1",
-    "react-native-screens": "~3.22.0",
-    "react-native-safe-area-context": "4.6.3"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
-  },
-  "private": true
 }
