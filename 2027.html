@@ -1,701 +1,338 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Multijoueur</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-
-        .screen {
-            display: none;
-            padding: 30px;
-            flex-direction: column;
-        }
-
-        .active {
-            display: flex;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #555;
-            margin-bottom: 15px;
-            font-size: 22px;
-        }
-
-        p {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-
-        .card {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 8px 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid #2196F3;
-            color: #2196F3;
-        }
-
-        .btn-secondary:hover {
-            background: #e3f2fd;
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .room-code {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .room-code-label {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .room-code-value {
-            font-size: 36px;
-            font-weight: bold;
-            letter-spacing: 5px;
-            color: #2196F3;
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .input-group {
-            margin: 20px 0;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-            transition: border-color 0.3s;
-        }
-
-        .input-field:focus {
-            border-color: #2196F3;
-            outline: none;
-        }
-
-        .players-container {
-            margin: 20px 0;
-        }
-
-        .players-list {
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-
-        .player {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 8px;
-        }
-
-        .timer {
-            color: #f44336;
-            font-weight: bold;
-        }
-
-        .score {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-
-        .question-count {
-            color: #2196F3;
-            font-weight: bold;
-        }
-
-        .question {
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .options {
-            margin: 20px 0;
-        }
-
-        .option {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            margin: 10px 0;
-            background: #f9f9f9;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .option:hover {
-            background: #e3f2fd;
-        }
-
-        .option input {
-            margin-right: 10px;
-        }
-
-        .result-score {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .result-percentage {
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #2196F3;
-        }
-
-        .info-card {
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .info-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #1976D2;
-        }
-
-        .info-text {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        .categories-card {
-            background: #f3e5f5;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                border-radius: 10px;
-            }
-            
-            .screen {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .room-code-value {
-                font-size: 28px;
-            }
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Shonexika Duel — Quiz Multijoueur</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:20px auto;padding:10px}
+  .row{display:flex;gap:10px;margin-bottom:8px}
+  input,textarea,button,select{padding:8px;font-size:1rem}
+  #log{white-space:pre-wrap;background:#f7f7f7;padding:10px;border-radius:6px;height:160px;overflow:auto}
+  .hidden{display:none}
+  .player{border:1px solid #ddd;padding:8px;border-radius:6px;margin-bottom:6px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Écran d'accueil -->
-        <div id="home-screen" class="screen active">
-            <h1>Quiz Multijoueur</h1>
-            <p>Affrontez vos amis dans un quiz passionnant sur les champs lexicaux français !</p>
-            
-            <div class="card">
-                <button id="create-room-btn" class="btn btn-primary">Créer une salle</button>
-                <button id="join-room-btn" class="btn btn-secondary">Rejoindre une salle</button>
-            </div>
-            
-            <div class="info-card">
-                <div class="info-title">Comment jouer ?</div>
-                <div class="info-text">• Créez une salle ou rejoignez-en une</div>
-                <div class="info-text">• Partagez le code avec votre ami</div>
-                <div class="info-text">• Répondez aux questions le plus vite possible</div>
-                <div class="info-text">• Le gagnant est celui avec le meilleur score !</div>
-            </div>
-            
-            <div class="categories-card">
-                <div class="info-title">Catégories disponibles :</div>
-                <div class="info-text">• Champ lexical 'able'</div>
-                <div class="info-text">• Champ lexical 'eur'</div>
-                <div class="info-text">• Champ lexical 'tion'</div>
-                <div class="info-text">• Champ lexical 'ment'</div>
-                <div class="info-text">• Champ lexical 'isme'</div>
-            </div>
-        </div>
 
-        <!-- Écran de création de salle -->
-        <div id="create-room-screen" class="screen">
-            <h1>Créer une salle</h1>
-            <p>Partagez ce code avec votre ami pour qu'il puisse vous rejoindre</p>
-            
-            <div class="room-code">
-                <div class="room-code-label">Code de la salle :</div>
-                <div id="room-code-value" class="room-code-value">ABC123</div>
-            </div>
-            
-            <button id="create-room-confirm-btn" class="btn btn-primary">Créer la salle</button>
-            <button id="generate-new-code-btn" class="btn btn-secondary">Générer un nouveau code</button>
-        </div>
+<h1>Shonexika Duel — Quiz Multijoueur</h1>
+<p>Hébergé sur GitHub Pages. Utilise Firebase Realtime Database pour synchroniser les salles (config à ajouter).</p>
 
-        <!-- Écran de rejoindre une salle -->
-        <div id="join-room-screen" class="screen">
-            <h1>Rejoindre une salle</h1>
-            <p>Entrez le code de la salle partagé par votre ami</p>
-            
-            <div class="input-group">
-                <label class="input-label">Code de la salle :</label>
-                <input type="text" id="room-code-input" class="input-field" placeholder="Ex: ABC123" maxlength="6">
-            </div>
-            
-            <button id="join-room-confirm-btn" class="btn btn-primary" disabled>Rejoindre la salle</button>
-        </div>
+<!-- SECTION: Connexion rapide -->
+<div id="login">
+  <div class="row">
+    <input id="name" placeholder="Ton pseudo (ex: CoachCreed)" />
+    <button id="createRoomBtn">Créer une salle</button>
+    <input id="joinCode" placeholder="Code salle (ex: 123456)"/>
+    <button id="joinRoomBtn">Rejoindre</button>
+  </div>
+  <div class="row">
+    <small>Si tu veux tester en local: ouvre deux onglets et rejoins la même salle.</small>
+  </div>
+</div>
 
-        <!-- Écran d'attente -->
-        <div id="waiting-screen" class="screen">
-            <h1 id="waiting-title">En attente des joueurs...</h1>
-            
-            <div class="room-code">
-                <div class="room-code-label">Code de la salle :</div>
-                <div id="waiting-room-code" class="room-code-value">ABC123</div>
-            </div>
-            
-            <div class="players-container">
-                <div class="info-title">Joueurs connectés : <span id="players-count">1</span>/2</div>
-                <div class="players-list">
-                    <div id="player1" class="player">• Joueur 1 (Hôte)</div>
-                    <div id="player2" class="player hidden">• Joueur 2</div>
-                </div>
-            </div>
-            
-            <button id="start-game-btn" class="btn btn-primary hidden">Commencer le quiz</button>
-            <div id="waiting-message" class="info-text">En attente que l'hôte commence le jeu...</div>
-        </div>
+<!-- SECTION: Salle / Interface jeu -->
+<div id="roomUI" class="hidden">
+  <div class="row">
+    <div>
+      <strong>Salle :</strong> <span id="roomIdText"></span><br/>
+      <strong>Ton rôle :</strong> <span id="roleText"></span>
+    </div>
+    <div>
+      <button id="leaveBtn">Quitter</button>
+    </div>
+  </div>
 
-        <!-- Écran du quiz -->
-        <div id="quiz-screen" class="screen">
-            <div class="quiz-header">
-                <div class="timer">Temps: <span id="time-left">30</span>s</div>
-                <div class="score">Score: <span id="current-score">0</span></div>
-                <div class="question-count">Question <span id="current-question">1</span>/<span id="total-questions">5</span></div>
-            </div>
-            
-            <div class="card">
-                <div id="question-text" class="question">Qui mérite d'être admiré ?</div>
-                
-                <div class="options">
-                    <div class="option">
-                        <input type="radio" id="option1" name="quiz-option" value="admirable">
-                        <label for="option1">admirable</label>
-                    </div>
-                    <div class="option">
-                        <input type="radio" id="option2" name="quiz-option" value="agréable">
-                        <label for="option2">agréable</label>
-                    </div>
-                    <div class="option">
-                        <input type="radio" id="option3" name="quiz-option" value="excusable">
-                        <label for="option3">excusable</label>
-                    </div>
-                    <div class="option">
-                        <input type="radio" id="option4" name="quiz-option" value="évitable">
-                        <label for="option4">évitable</label>
-                    </div>
-                </div>
-                
-                <button id="next-question-btn" class="btn btn-primary" disabled>Question suivante</button>
-            </div>
-        </div>
+  <div id="playersList"></div>
 
-        <!-- Écran des résultats -->
-        <div id="results-screen" class="screen">
-            <h1>Quiz Terminé !</h1>
-            
-            <div class="result-score">Votre score : <span id="final-score">3</span>/<span id="max-score">5</span></div>
-            <div class="result-percentage" id="percentage">60%</div>
-            
-            <button id="restart-btn" class="btn btn-primary">Rejouer</button>
-            <button id="home-btn" class="btn btn-secondary">Retour à l'accueil</button>
-        </div>
+  <hr/>
+  <h3>Q: Charger / coller questions (hôte)</h3>
+  <div id="questionEditor">
+    <textarea id="questionsJSON" rows="6" placeholder='Format: [{"q":"Question...","a":"Réponse"} , ...]'></textarea>
+    <div class="row">
+      <button id="pushQuestionsBtn">Publier les questions (sur la salle)</button>
+      <button id="startBtn">Démarrer le match</button>
+    </div>
+  </div>
+
+  <hr/>
+  <div id="gameArea" class="hidden">
+    <h3>Question <span id="qIndex">0</span> / <span id="qTotal">0</span></h3>
+    <div id="currentQ" style="font-size:1.2rem;margin-bottom:8px"></div>
+
+    <div class="row">
+      <input id="answerInput" placeholder="Ta réponse ici..." />
+      <button id="submitAnswerBtn">Envoyer réponse</button>
     </div>
 
-    <script>
-        // Données des questions
-        const quizQuestions = [
-            {
-                category: "Champ lexical 'able'",
-                questions: [
-                    { question: "Qui mérite d'être admiré ?", answer: "admirable", options: ["admirable", "agréable", "excusable", "évitable"] },
-                    { question: "Qui peut être excusé ?", answer: "excusable", options: ["excusable", "regrettable", "appréciable", "tolérable"] },
-                    { question: "Qui peut être évité ?", answer: "évitable", options: ["évitable", "comptable", "corrigeable", "louable"] },
-                    { question: "Qui peut être regretté ?", answer: "regrettable", options: ["regrettable", "critiquable", "respectable", "comparable"] },
-                    { question: "Qui peut être apprécié ?", answer: "appréciable", options: ["appréciable", "aimable", "modifiable", "supportable"] }
-                ]
-            },
-            {
-                category: "Champ lexical 'eur'",
-                questions: [
-                    { question: "Celui qui chante ?", answer: "chanteur", options: ["chanteur", "vendeur", "lecteur", "formateur"] },
-                    { question: "Celui qui vend ?", answer: "vendeur", options: ["vendeur", "spectateur", "traducteur", "orateur"] },
-                    { question: "Celui qui lit ?", answer: "lecteur", options: ["lecteur", "inventeur", "auteur", "directeur"] },
-                    { question: "Celui qui enseigne ?", answer: "formateur", options: ["formateur", "docteur", "sauveur", "entrepreneur"] },
-                    { question: "Celui qui observe ?", answer: "spectateur", options: ["spectateur", "tricheur", "inspecteur", "appreneur"] }
-                ]
-            },
-            {
-                category: "Champ lexical 'tion'",
-                questions: [
-                    { question: "Action de créer ?", answer: "création", options: ["création", "décision", "correction", "punition"] },
-                    { question: "Action de décider ?", answer: "décision", options: ["décision", "organisation", "éducation", "communication"] },
-                    { question: "Action de corriger ?", answer: "correction", options: ["correction", "évaluation", "préparation", "explication"] },
-                    { question: "Action de punir ?", answer: "punition", options: ["punition", "imagination", "information", "transformation"] },
-                    { question: "Action d'organiser ?", answer: "organisation", options: ["organisation", "production", "respiration", "création"] }
-                ]
-            },
-            {
-                category: "Champ lexical 'ment'",
-                questions: [
-                    { question: "Transformation ou modification de quelque chose ?", answer: "changement", options: ["changement", "développement", "jugement", "déplacement"] },
-                    { question: "Croissance ou progrès dans une activité ou un projet ?", answer: "développement", options: ["développement", "amélioration", "sentiment", "doucement"] },
-                    { question: "Décision rendue par un tribunal ou un juge ?", answer: "jugement", options: ["jugement", "engagement", "traitement", "entraînement"] },
-                    { question: "Action de se déplacer d'un endroit à un autre ?", answer: "déplacement", options: ["déplacement", "règlement", "accomplissement", "paiement"] },
-                    { question: "Amélioration d'une situation ou d'un comportement ?", answer: "amélioration", options: ["amélioration", "gouvernement", "raisonnement", "changement"] }
-                ]
-            },
-            {
-                category: "Champ lexical 'isme'",
-                questions: [
-                    { question: "Doctrine politique prônant l'égalité sociale ?", answer: "socialisme", options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"] },
-                    { question: "Système économique basé sur le capital et le profit ?", answer: "capitalisme", options: ["capitalisme", "romantisme", "athéisme", "racisme"] },
-                    { question: "Croyance en un seul Dieu ?", answer: "monothéisme", options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"] },
-                    { question: "Doctrine prônant l'absence d'autorité ou d'État ?", answer: "anarchisme", options: ["anarchisme", "spiritisme", "sexisme", "cubisme"] },
-                    { question: "Mouvement artistique qui privilégie l'émotion et l'individu ?", answer: "romantisme", options: ["romantisme", "bouddhisme", "fascisme", "socialisme"] }
-                ]
-            }
-        ];
+    <div id="feedback" style="margin-top:8px"></div>
 
-        // Variables d'état du jeu
-        let currentScreen = 'home-screen';
-        let roomCode = '';
-        let isHost = false;
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let timeLeft = 30;
-        let timerInterval;
-        let selectedQuestions = [];
+    <div style="margin-top:12px;">
+      <button id="nextBtn" class="hidden">Question suivante (host)</button>
+    </div>
 
-        // Éléments DOM
-        const screens = {
-            home: document.getElementById('home-screen'),
-            createRoom: document.getElementById('create-room-screen'),
-            joinRoom: document.getElementById('join-room-screen'),
-            waiting: document.getElementById('waiting-screen'),
-            quiz: document.getElementById('quiz-screen'),
-            results: document.getElementById('results-screen')
-        };
+    <h4>Scores</h4>
+    <div id="scores"></div>
 
-        // Fonctions de navigation
-        function showScreen(screenId) {
-            // Cacher tous les écrans
-            Object.values(screens).forEach(screen => {
-                screen.classList.remove('active');
-            });
-            
-            // Afficher l'écran demandé
-            screens[screenId].classList.add('active');
-            currentScreen = screenId;
-        }
+    <h4>Journal</h4>
+    <div id="log"></div>
+  </div>
+</div>
 
-        // Génération de code de salle
-        function generateRoomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-        // Initialisation du jeu
-        function initGame() {
-            // Événements des boutons
-            document.getElementById('create-room-btn').addEventListener('click', () => {
-                roomCode = generateRoomCode();
-                document.getElementById('room-code-value').textContent = roomCode;
-                showScreen('create-room-screen');
-            });
+<script>
+/* =============== CONFIG FIREBASE ===============
+  -> Crée un projet Firebase (console.firebase.google.com),
+  -> Active Realtime Database en mode test (ou règles restreintes si tu sais configurer),
+  -> Copie-colle ici la config (apiKey, authDomain, databaseURL, projectId etc.)
+================================================= */
+const firebaseConfig = {
+  apiKey: "REPLACE_API_KEY",
+  authDomain: "REPLACE_AUTH_DOMAIN",
+  databaseURL: "REPLACE_DATABASE_URL",
+  projectId: "REPLACE_PROJECT_ID",
+  storageBucket: "REPLACE",
+  messagingSenderId: "REPLACE",
+  appId: "REPLACE"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-            document.getElementById('join-room-btn').addEventListener('click', () => {
-                showScreen('join-room-screen');
-            });
+/* ---------- Utilitaires ---------- */
+const $ = id => document.getElementById(id);
+const uid = () => Math.random().toString(36).slice(2,10);
 
-            document.getElementById('generate-new-code-btn').addEventListener('click', () => {
-                roomCode = generateRoomCode();
-                document.getElementById('room-code-value').textContent = roomCode;
-            });
+/* ---------- UI refs ---------- */
+const createRoomBtn = $('createRoomBtn');
+const joinRoomBtn = $('joinRoomBtn');
+const leaveBtn = $('leaveBtn');
+const pushQuestionsBtn = $('pushQuestionsBtn');
+const startBtn = $('startBtn');
+const submitAnswerBtn = $('submitAnswerBtn');
+const nextBtn = $('nextBtn');
 
-            document.getElementById('create-room-confirm-btn').addEventListener('click', () => {
-                isHost = true;
-                document.getElementById('waiting-room-code').textContent = roomCode;
-                document.getElementById('waiting-title').textContent = 'En attente des joueurs...';
-                document.getElementById('start-game-btn').classList.remove('hidden');
-                document.getElementById('waiting-message').classList.add('hidden');
-                showScreen('waiting-screen');
-                
-                // Simulation d'un joueur qui rejoint après 3 secondes
-                setTimeout(() => {
-                    document.getElementById('player2').classList.remove('hidden');
-                    document.getElementById('players-count').textContent = '2';
-                }, 3000);
-            });
+let me = {name:null,id:null};
+let roomId = null;
+let isHost = false;
+let roomRef = null;
+let localQuestions = []; // if host pushes
 
-            document.getElementById('room-code-input').addEventListener('input', (e) => {
-                const code = e.target.value.toUpperCase();
-                document.getElementById('join-room-confirm-btn').disabled = code.length !== 6;
-            });
+/* ---------- ROOM ACTIONS ---------- */
+createRoomBtn.addEventListener('click', async ()=>{
+  const name = $('name').value.trim() || 'Host';
+  me = {name, id: uid()};
+  isHost = true;
+  roomId = (Math.floor(100000 + Math.random()*900000)).toString();
+  $('roomIdText').textContent = roomId;
+  $('roleText').textContent = 'Hôte';
+  enterRoomUI();
+  // create room object
+  roomRef = db.ref('rooms/' + roomId);
+  await roomRef.set({
+    hostId: me.id,
+    hostName: me.name,
+    createdAt: Date.now(),
+    players: {
+      [me.id]: {name: me.name, joinedAt: Date.now(), lastPing: Date.now()}
+    },
+    questions: [],
+    currentIndex: -1,
+    started: false,
+    answers: {},
+    scores: {}
+  });
+  listenRoom();
+});
 
-            document.getElementById('join-room-confirm-btn').addEventListener('click', () => {
-                roomCode = document.getElementById('room-code-input').value.toUpperCase();
-                isHost = false;
-                document.getElementById('waiting-room-code').textContent = roomCode;
-                document.getElementById('waiting-title').textContent = 'En attente du début du jeu...';
-                document.getElementById('start-game-btn').classList.add('hidden');
-                document.getElementById('waiting-message').classList.remove('hidden');
-                document.getElementById('player1').textContent = '• Joueur 1 (Hôte)';
-                document.getElementById('player2').classList.remove('hidden');
-                document.getElementById('player2').textContent = '• Joueur 2';
-                document.getElementById('players-count').textContent = '2';
-                showScreen('waiting-screen');
-            });
+joinRoomBtn.addEventListener('click', async ()=>{
+  const code = $('joinCode').value.trim();
+  if(!code) return alert('Entre le code de la salle.');
+  const name = $('name').value.trim() || 'Joueur';
+  me = {name, id: uid()};
+  roomId = code;
+  roomRef = db.ref('rooms/' + roomId);
+  const snap = await roomRef.get();
+  if(!snap.exists()) return alert('Salle introuvable.');
+  isHost = false;
+  $('roomIdText').textContent = roomId;
+  $('roleText').textContent = 'Joueur';
+  enterRoomUI();
+  // add to players
+  await roomRef.child('players').child(me.id).set({name:me.name, joinedAt:Date.now(), lastPing:Date.now()});
+  listenRoom();
+});
 
-            document.getElementById('start-game-btn').addEventListener('click', startQuiz);
+leaveBtn.addEventListener('click', async ()=>{
+  if(!roomRef) return location.reload();
+  await roomRef.child('players').child(me.id).remove();
+  stopListening();
+  location.reload();
+});
 
-            document.getElementById('next-question-btn').addEventListener('click', nextQuestion);
+/* ---------- Push questions (host) ---------- */
+pushQuestionsBtn.addEventListener('click', async ()=>{
+  if(!isHost) return alert('Seul l’hôte peut publier les questions.');
+  const raw = $('questionsJSON').value.trim();
+  if(!raw) return alert('Colle des questions au format JSON.');
+  try{
+    const q = JSON.parse(raw);
+    if(!Array.isArray(q)) throw new Error('Liste attendue.');
+    localQuestions = q.map(x => ({q: x.q, a: (''+x.a).trim()}));
+    await roomRef.child('questions').set(localQuestions);
+    log('Questions publiées ('+localQuestions.length+')');
+  }catch(err){
+    alert('JSON invalide: ' + err.message);
+  }
+});
 
-            document.getElementById('restart-btn').addEventListener('click', restartGame);
+/* ---------- Start match ---------- */
+startBtn.addEventListener('click', async ()=>{
+  if(!isHost) return alert('Seul l’hôte peut démarrer.');
+  const snap = await roomRef.child('questions').get();
+  if(!snap.exists() || snap.val().length===0) return alert('Pas de questions publiées.');
+  await roomRef.update({started:true, currentIndex:0});
+  log('Match démarré.');
+});
 
-            document.getElementById('home-btn').addEventListener('click', () => {
-                showScreen('home-screen');
-            });
+/* ---------- Submit answer ---------- */
+submitAnswerBtn.addEventListener('click', async ()=>{
+  const ans = $('answerInput').value.trim();
+  if(ans==='') return;
+  const idx = (await roomRef.child('currentIndex').get()).val();
+  if(idx === null || idx < 0) return alert('Match non démarré.');
+  // push answer under answers/{idx}/{playerId}
+  const ansPath = `answers/${idx}/${me.id}`;
+  await roomRef.child(ansPath).set({answer: ans, at: Date.now(), name: me.name});
+  $('answerInput').value = '';
+  log('Réponse envoyée.');
+});
 
-            // Événements pour les options de réponse
-            document.querySelectorAll('input[name="quiz-option"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    document.getElementById('next-question-btn').disabled = false;
-                });
-            });
-        }
+/* ---------- Next question (host) ---------- */
+nextBtn.addEventListener('click', async ()=>{
+  if(!isHost) return;
+  const snap = await roomRef.get();
+  const data = snap.val();
+  const next = (data.currentIndex ?? -1) + 1;
+  const total = (data.questions || []).length;
+  if(next >= total){
+    await roomRef.update({currentIndex:-1, started:false});
+    log('Match terminé.');
+  } else {
+    await roomRef.update({currentIndex: next});
+    log('Passage à la question ' + next);
+    // reset answers for next question (optional)
+    await roomRef.child('answers').child(next).remove();
+  }
+});
 
-        // Démarrer le quiz
-        function startQuiz() {
-            // Sélectionner 5 questions aléatoires
-            const allQuestions = quizQuestions.flatMap(category => category.questions);
-            selectedQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
-            
-            // Réinitialiser l'état du jeu
-            currentQuestionIndex = 0;
-            score = 0;
-            timeLeft = 30;
-            
-            // Mettre à jour l'interface
-            document.getElementById('current-score').textContent = score;
-            document.getElementById('total-questions').textContent = selectedQuestions.length;
-            
-            // Afficher la première question
-            showQuestion();
-            
-            // Démarrer le timer
-            startTimer();
-            
-            // Afficher l'écran du quiz
-            showScreen('quiz-screen');
-        }
+/* ---------- Listening to room changes ---------- */
+let roomListener = null;
+function listenRoom(){
+  if(!roomRef) return;
+  // Listen to whole room for simplicity (for production listen only to needed nodes)
+  roomListener = roomRef.on('value', snap=>{
+    if(!snap.exists()) { log('Salle supprimée.'); stopListening(); return; }
+    const data = snap.val();
+    renderPlayers(data.players || {});
+    renderQuestions(data.questions || [], data.currentIndex, data.started);
+    renderScores(data.scores || {});
+    renderAnswers(data.answers || {});
+  });
+  // ping presence every 10s
+  setInterval(()=> {
+    if(me && roomRef){
+      roomRef.child('players').child(me.id).child('lastPing').set(Date.now());
+    }
+  }, 10000);
+}
 
-        // Afficher une question
-        function showQuestion() {
-            const question = selectedQuestions[currentQuestionIndex];
-            
-            // Mettre à jour l'interface
-            document.getElementById('question-text').textContent = question.question;
-            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
-            
-            // Mettre à jour les options
-            const options = document.querySelectorAll('.option label');
-            const radios = document.querySelectorAll('input[name="quiz-option"]');
-            
-            question.options.forEach((option, index) => {
-                options[index].textContent = option;
-                radios[index].value = option;
-                radios[index].checked = false;
-            });
-            
-            // Désactiver le bouton suivant
-            document.getElementById('next-question-btn').disabled = true;
-            
-            // Mettre à jour le texte du bouton
-            document.getElementById('next-question-btn').textContent = 
-                currentQuestionIndex < selectedQuestions.length - 1 ? 'Question suivante' : 'Terminer le quiz';
-        }
+function stopListening(){
+  if(roomRef && roomListener) roomRef.off('value', roomListener);
+}
 
-        // Passer à la question suivante
-        function nextQuestion() {
-            // Vérifier la réponse
-            const selectedOption = document.querySelector('input[name="quiz-option"]:checked');
-            if (selectedOption) {
-                const question = selectedQuestions[currentQuestionIndex];
-                if (selectedOption.value === question.answer) {
-                    score++;
-                    document.getElementById('current-score').textContent = score;
-                }
-            }
-            
-            // Passer à la question suivante ou terminer le quiz
-            if (currentQuestionIndex < selectedQuestions.length - 1) {
-                currentQuestionIndex++;
-                timeLeft = 30;
-                document.getElementById('time-left').textContent = timeLeft;
-                showQuestion();
-                startTimer();
-            } else {
-                endQuiz();
-            }
-        }
+/* ---------- Rendering helpers ---------- */
+function enterRoomUI(){
+  $('login').classList.add('hidden');
+  $('roomUI').classList.remove('hidden');
+}
 
-        // Démarrer le timer
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = 30;
-            document.getElementById('time-left').textContent = timeLeft;
-            
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('time-left').textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    nextQuestion();
-                }
-            }, 1000);
-        }
+function renderPlayers(players){
+  const el = $('playersList'); el.innerHTML = '<h4>Joueurs</h4>';
+  for(const [id,p] of Object.entries(players || {})){
+    const div = document.createElement('div'); div.className = 'player';
+    div.innerHTML = `<strong>${p.name}</strong> ${id===me.id? '(Vous)':''} <br/>${p.lastPing? 'actif':'inactif'}`;
+    el.appendChild(div);
+  }
+}
 
-        // Terminer le quiz
-        function endQuiz() {
-            clearInterval(timerInterval);
-            
-            // Calculer le pourcentage
-            const percentage = Math.round((score / selectedQuestions.length) * 100);
-            
-            // Mettre à jour l'interface des résultats
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('max-score').textContent = selectedQuestions.length;
-            document.getElementById('percentage').textContent = `${percentage}%`;
-            
-            // Afficher l'écran des résultats
-            showScreen('results-screen');
-        }
+function renderQuestions(questions, currentIndex, started){
+  $('qTotal').textContent = questions.length;
+  if(started && currentIndex>=0){
+    $('gameArea').classList.remove('hidden');
+    const qObj = questions[currentIndex];
+    $('qIndex').textContent = (currentIndex + 1);
+    $('currentQ').textContent = qObj.q || '[Question vide]';
+    // host shows next button
+    if(isHost) nextBtn.classList.remove('hidden'); else nextBtn.classList.add('hidden');
+  } else {
+    $('gameArea').classList.add('hidden');
+  }
+}
 
-        // Redémarrer le jeu
-        function restartGame() {
-            startQuiz();
-        }
+function renderAnswers(answers){
+  // show feedback if answers exist for currentIndex
+  const snapIdx = $('qIndex').textContent ? parseInt($('qIndex').textContent)-1 : null;
+  if(snapIdx === null || isNaN(snapIdx)) return;
+  const byIdx = (answers && answers[snapIdx]) || {};
+  const fb = [];
+  for(const [pid, info] of Object.entries(byIdx)){
+    fb.push(`${info.name}: ${info.answer}`);
+  }
+  $('feedback').textContent = fb.join('\n') || '';
+  // auto compute score: if host provided correct answer earlier, we can assign points
+  computeScoresForIndex(snapIdx, byIdx);
+}
 
-        // Initialiser l'application au chargement
-        document.addEventListener('DOMContentLoaded', initGame);
-    </script>
+async function computeScoresForIndex(idx, answersObj){
+  // get correct answer
+  const qSnap = await roomRef.child('questions').child(idx).get();
+  if(!qSnap.exists()) return;
+  const correct = ('' + qSnap.val().a).trim().toLowerCase();
+  let updates = {};
+  for(const [pid, info] of Object.entries(answersObj || {})){
+    const given = ('' + info.answer).trim().toLowerCase();
+    const got = (given === correct) ? 1 : 0;
+    // increment score
+    const scoreSnap = await roomRef.child('scores').child(pid).get();
+    const prev = scoreSnap.exists() ? (scoreSnap.val().points||0) : 0;
+    updates[pid + '/points'] = prev + got;
+  }
+  if(Object.keys(updates).length>0){
+    await roomRef.child('scores').update(updates);
+  }
+}
+
+function renderScores(scores){
+  const el = $('scores'); el.innerHTML = '';
+  for(const [pid, s] of Object.entries(scores || {})){
+    const div = document.createElement('div');
+    div.textContent = `${s.name || pid} : ${s.points || 0} pts`;
+    el.appendChild(div);
+  }
+}
+
+function log(msg){
+  const l = $('log');
+  l.textContent = (new Date()).toLocaleTimeString() + ' — ' + msg + '\n' + l.textContent;
+}
+
+/* ensure we don't leak listeners when closing tab */
+window.addEventListener('beforeunload', ()=> {
+  if(roomRef && me) roomRef.child('players').child(me.id).remove();
+});
+</script>
 </body>
 </html>
