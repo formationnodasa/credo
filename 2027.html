@@ -41,6 +41,12 @@
 
         .screen.active {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .container {
@@ -141,6 +147,12 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             margin-bottom: 20px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .input-group {
@@ -166,6 +178,7 @@
         .input-group input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
         }
 
         .room-code {
@@ -191,6 +204,7 @@
             border-radius: var(--border-radius);
             margin-bottom: 10px;
             border-left: 4px solid var(--primary);
+            animation: fadeIn 0.5s ease;
         }
 
         .player-avatar {
@@ -226,29 +240,52 @@
             margin: 20px 0;
         }
 
-        .options-grid {
-            display: grid;
-            gap: 12px;
-            margin: 20px 0;
+        .answer-input-container {
+            margin: 30px 0;
+            text-align: center;
         }
 
-        .option-btn {
+        .answer-input {
+            width: 100%;
             padding: 16px;
-            background: #f8fafc;
+            font-size: 1.2rem;
             border: 2px solid #e5e7eb;
             border-radius: var(--border-radius);
-            font-size: 1rem;
-            cursor: pointer;
+            text-align: center;
             transition: var(--transition);
         }
 
-        .option-btn:hover {
+        .answer-input:focus {
+            outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
         }
 
-        .option-btn.selected {
-            background: var(--primary);
-            color: white;
+        .answer-feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .answer-correct {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .answer-incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .correct-answer {
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--success);
         }
 
         .notification {
@@ -273,6 +310,52 @@
             display: none !important;
         }
 
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .name-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .name-input-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .name-input-container input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .name-input-container input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .name-input-container::after {
+            content: "👤";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
         @media (max-width: 768px) {
             .container { padding: 0 15px; }
             .header h1 { font-size: 2rem; }
@@ -291,7 +374,7 @@
                 </div>
 
                 <div class="card">
-                    <button id="create-room" class="btn btn-primary btn-large">
+                    <button id="create-room" class="btn btn-primary btn-large pulse">
                         <i class="fas fa-plus-circle"></i> Créer une salle
                     </button>
                     <button id="join-room" class="btn btn-secondary btn-large">
@@ -326,7 +409,7 @@
                         <i class="fas fa-copy"></i> Copier le code
                     </button>
 
-                    <div class="input-group">
+                    <div class="name-input-container">
                         <label>Votre nom :</label>
                         <input type="text" id="host-name" placeholder="Entrez votre nom">
                     </div>
@@ -354,7 +437,7 @@
                         <input type="text" id="join-code" placeholder="Ex: ABC123" maxlength="6">
                     </div>
 
-                    <div class="input-group">
+                    <div class="name-input-container">
                         <label>Votre nom :</label>
                         <input type="text" id="player-name" placeholder="Entrez votre nom">
                     </div>
@@ -401,8 +484,14 @@
 
                 <div class="card">
                     <div class="question" id="question-text">Chargement...</div>
-                    <div class="options-grid" id="options-container"></div>
-                    <button id="next-question" class="btn btn-primary" disabled>
+                    <div class="answer-input-container">
+                        <input type="text" id="answer-input" class="answer-input" placeholder="Tapez votre réponse ici..." autocomplete="off">
+                    </div>
+                    <div id="answer-feedback" class="answer-feedback hidden"></div>
+                    <button id="submit-answer" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Valider
+                    </button>
+                    <button id="next-question" class="btn btn-primary hidden">
                         <i class="fas fa-arrow-right"></i> Suivant
                     </button>
                 </div>
@@ -469,39 +558,39 @@
         // Base de données des questions
         const QUIZ_QUESTIONS = [
             // Champ lexical 'able'
-            { question: "Qui mérite d'être admiré ?", answer: "admirable", options: ["admirable", "agréable", "excusable", "évitable"] },
-            { question: "Qui peut être excusé ?", answer: "excusable", options: ["excusable", "regrettable", "appréciable", "tolérable"] },
-            { question: "Qui peut être évité ?", answer: "évitable", options: ["évitable", "comptable", "corrigeable", "louable"] },
-            { question: "Qui peut être regretté ?", answer: "regrettable", options: ["regrettable", "critiquable", "respectable", "comparable"] },
-            { question: "Qui peut être apprécié ?", answer: "appréciable", options: ["appréciable", "aimable", "modifiable", "supportable"] },
+            { question: "Qui mérite d'être admiré ?", answer: "admirable" },
+            { question: "Qui peut être excusé ?", answer: "excusable" },
+            { question: "Qui peut être évité ?", answer: "évitable" },
+            { question: "Qui peut être regretté ?", answer: "regrettable" },
+            { question: "Qui peut être apprécié ?", answer: "appréciable" },
             
             // Champ lexical 'eur'
-            { question: "Celui qui chante ?", answer: "chanteur", options: ["chanteur", "vendeur", "lecteur", "formateur"] },
-            { question: "Celui qui vend ?", answer: "vendeur", options: ["vendeur", "spectateur", "traducteur", "orateur"] },
-            { question: "Celui qui lit ?", answer: "lecteur", options: ["lecteur", "inventeur", "auteur", "directeur"] },
-            { question: "Celui qui enseigne ?", answer: "formateur", options: ["formateur", "docteur", "sauveur", "entrepreneur"] },
-            { question: "Celui qui observe ?", answer: "spectateur", options: ["spectateur", "tricheur", "inspecteur", "appreneur"] },
+            { question: "Celui qui chante ?", answer: "chanteur" },
+            { question: "Celui qui vend ?", answer: "vendeur" },
+            { question: "Celui qui lit ?", answer: "lecteur" },
+            { question: "Celui qui enseigne ?", answer: "formateur" },
+            { question: "Celui qui observe ?", answer: "spectateur" },
             
             // Champ lexical 'tion'
-            { question: "Action de créer ?", answer: "création", options: ["création", "décision", "correction", "punition"] },
-            { question: "Action de décider ?", answer: "décision", options: ["décision", "organisation", "éducation", "communication"] },
-            { question: "Action de corriger ?", answer: "correction", options: ["correction", "évaluation", "préparation", "explication"] },
-            { question: "Action de punir ?", answer: "punition", options: ["punition", "imagination", "information", "transformation"] },
-            { question: "Action d'organiser ?", answer: "organisation", options: ["organisation", "production", "respiration", "création"] },
+            { question: "Action de créer ?", answer: "création" },
+            { question: "Action de décider ?", answer: "décision" },
+            { question: "Action de corriger ?", answer: "correction" },
+            { question: "Action de punir ?", answer: "punition" },
+            { question: "Action d'organiser ?", answer: "organisation" },
             
             // Champ lexical 'ment'
-            { question: "Transformation ou modification ?", answer: "changement", options: ["changement", "développement", "jugement", "déplacement"] },
-            { question: "Croissance ou progrès ?", answer: "développement", options: ["développement", "amélioration", "sentiment", "doucement"] },
-            { question: "Décision d'un tribunal ?", answer: "jugement", options: ["jugement", "engagement", "traitement", "entraînement"] },
-            { question: "Action de se déplacer ?", answer: "déplacement", options: ["déplacement", "règlement", "accomplissement", "paiement"] },
-            { question: "Amélioration d'une situation ?", answer: "amélioration", options: ["amélioration", "gouvernement", "raisonnement", "changement"] },
+            { question: "Transformation ou modification ?", answer: "changement" },
+            { question: "Croissance ou progrès ?", answer: "développement" },
+            { question: "Décision d'un tribunal ?", answer: "jugement" },
+            { question: "Action de se déplacer ?", answer: "déplacement" },
+            { question: "Amélioration d'une situation ?", answer: "amélioration" },
             
             // Champ lexical 'isme'
-            { question: "Doctrine pour l'égalité sociale ?", answer: "socialisme", options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"] },
-            { question: "Système économique avec capital ?", answer: "capitalisme", options: ["capitalisme", "romantisme", "athéisme", "racisme"] },
-            { question: "Croyance en un seul Dieu ?", answer: "monothéisme", options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"] },
-            { question: "Doctrine sans autorité ?", answer: "anarchisme", options: ["anarchisme", "spiritisme", "sexisme", "cubisme"] },
-            { question: "Mouvement artistique émotionnel ?", answer: "romantisme", options: ["romantisme", "bouddhisme", "fascisme", "socialisme"] }
+            { question: "Doctrine pour l'égalité sociale ?", answer: "socialisme" },
+            { question: "Système économique avec capital ?", answer: "capitalisme" },
+            { question: "Croyance en un seul Dieu ?", answer: "monothéisme" },
+            { question: "Doctrine sans autorité ?", answer: "anarchisme" },
+            { question: "Mouvement artistique émotionnel ?", answer: "romantisme" }
         ];
 
         // Application principale
@@ -518,7 +607,8 @@
                         score: 0,
                         selectedQuestions: [],
                         timer: null,
-                        timeLeft: 30
+                        timeLeft: 30,
+                        hasAnswered: false
                     },
                     listeners: []
                 };
@@ -567,6 +657,14 @@
                 // Jeu
                 document.getElementById('start-game').addEventListener('click', () => {
                     this.startGame();
+                });
+
+                document.getElementById('submit-answer').addEventListener('click', () => {
+                    this.submitAnswer();
+                });
+
+                document.getElementById('answer-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.submitAnswer();
                 });
 
                 document.getElementById('next-question').addEventListener('click', () => {
@@ -816,31 +914,32 @@
                 document.getElementById('total-qs').textContent = questions.length;
                 document.getElementById('current-score').textContent = this.state.game.score;
 
-                this.displayOptions(question);
                 this.resetQuestionState();
             }
 
-            displayOptions(question) {
-                const container = document.getElementById('options-container');
-                container.innerHTML = '';
-
-                question.options.forEach((option) => {
-                    const button = document.createElement('button');
-                    button.className = 'option-btn';
-                    button.textContent = option;
-                    button.addEventListener('click', () => this.selectAnswer(option, question.answer));
-                    container.appendChild(button);
-                });
-            }
-
             resetQuestionState() {
-                document.getElementById('next-question').disabled = true;
+                document.getElementById('answer-input').value = '';
+                document.getElementById('answer-input').disabled = false;
+                document.getElementById('answer-feedback').classList.add('hidden');
+                document.getElementById('submit-answer').classList.remove('hidden');
+                document.getElementById('next-question').classList.add('hidden');
+                this.state.game.hasAnswered = false;
                 this.state.game.timeLeft = 30;
                 document.getElementById('time-left').textContent = this.state.game.timeLeft;
+                
+                // Focus sur l'input de réponse
+                document.getElementById('answer-input').focus();
             }
 
-            async selectAnswer(selectedAnswer, correctAnswer) {
-                const isCorrect = selectedAnswer === correctAnswer;
+            submitAnswer() {
+                if (this.state.game.hasAnswered) return;
+                
+                const answerInput = document.getElementById('answer-input');
+                const userAnswer = answerInput.value.trim().toLowerCase();
+                const currentQuestion = this.state.game.selectedQuestions[this.state.game.currentQuestion];
+                const correctAnswer = currentQuestion.answer.toLowerCase();
+                
+                const isCorrect = userAnswer === correctAnswer;
                 
                 // Mettre à jour le score
                 if (isCorrect) {
@@ -848,10 +947,36 @@
                     document.getElementById('current-score').textContent = this.state.game.score;
                 }
 
-                // Mettre à jour l'interface
-                this.highlightAnswers(selectedAnswer, correctAnswer);
+                // Afficher le feedback
+                this.showAnswerFeedback(isCorrect, correctAnswer);
                 
                 // Enregistrer la réponse dans Firebase
+                this.updateScoreInFirebase();
+                
+                // Désactiver l'input
+                answerInput.disabled = true;
+                this.state.game.hasAnswered = true;
+                document.getElementById('submit-answer').classList.add('hidden');
+                document.getElementById('next-question').classList.remove('hidden');
+                
+                // Arrêter le timer
+                clearInterval(this.state.game.timer);
+            }
+
+            showAnswerFeedback(isCorrect, correctAnswer) {
+                const feedbackEl = document.getElementById('answer-feedback');
+                feedbackEl.classList.remove('hidden');
+                
+                if (isCorrect) {
+                    feedbackEl.textContent = 'Bonne réponse !';
+                    feedbackEl.className = 'answer-feedback answer-correct';
+                } else {
+                    feedbackEl.innerHTML = `Mauvaise réponse. <div class="correct-answer">La bonne réponse était : ${correctAnswer}</div>`;
+                    feedbackEl.className = 'answer-feedback answer-incorrect';
+                }
+            }
+
+            async updateScoreInFirebase() {
                 try {
                     await db.collection('rooms').doc(this.state.roomCode).update({
                         [`scores.${this.state.playerName}`]: this.state.game.score
@@ -859,24 +984,6 @@
                 } catch (error) {
                     console.error('Erreur mise à jour score:', error);
                 }
-
-                // Activer le bouton suivant
-                document.getElementById('next-question').disabled = false;
-                clearInterval(this.state.game.timer);
-            }
-
-            highlightAnswers(selected, correct) {
-                const options = document.querySelectorAll('.option-btn');
-                options.forEach(option => {
-                    option.disabled = true;
-                    if (option.textContent === correct) {
-                        option.style.background = '#10b981';
-                        option.style.color = 'white';
-                    } else if (option.textContent === selected && selected !== correct) {
-                        option.style.background = '#ef4444';
-                        option.style.color = 'white';
-                    }
-                });
             }
 
             startTimer() {
@@ -894,10 +1001,16 @@
             }
 
             handleTimeUp() {
-                const options = document.querySelectorAll('.option-btn');
-                options.forEach(option => option.disabled = true);
-                document.getElementById('next-question').disabled = false;
-                this.showNotification('Temps écoulé !', 'error');
+                if (!this.state.game.hasAnswered) {
+                    document.getElementById('answer-input').disabled = true;
+                    this.state.game.hasAnswered = true;
+                    document.getElementById('submit-answer').classList.add('hidden');
+                    document.getElementById('next-question').classList.remove('hidden');
+                    
+                    const currentQuestion = this.state.game.selectedQuestions[this.state.game.currentQuestion];
+                    this.showAnswerFeedback(false, currentQuestion.answer);
+                    this.showNotification('Temps écoulé !', 'error');
+                }
             }
 
             async nextQuestion() {
@@ -989,7 +1102,8 @@
                     score: 0,
                     selectedQuestions: [],
                     timer: null,
-                    timeLeft: 30
+                    timeLeft: 30,
+                    hasAnswered: false
                 };
             }
 
