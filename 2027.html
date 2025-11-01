@@ -1,338 +1,2146 @@
-<!doctype html>
+
+
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Shonexika Duel — Quiz Multijoueur</title>
-<style>
-  body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:20px auto;padding:10px}
-  .row{display:flex;gap:10px;margin-bottom:8px}
-  input,textarea,button,select{padding:8px;font-size:1rem}
-  #log{white-space:pre-wrap;background:#f7f7f7;padding:10px;border-radius:6px;height:160px;overflow:auto}
-  .hidden{display:none}
-  .player{border:1px solid #ddd;padding:8px;border-radius:6px;margin-bottom:6px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Multijoueur</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div id="app">
+        <!-- Écran de chargement -->
+        <div id="loading-screen" class="screen active">
+            <div class="loader">
+                <div class="spinner"></div>
+                <h2>Initialisation du Quiz...</h2>
+            </div>
+        </div>
 
-<h1>Shonexika Duel — Quiz Multijoueur</h1>
-<p>Hébergé sur GitHub Pages. Utilise Firebase Realtime Database pour synchroniser les salles (config à ajouter).</p>
+        <!-- Écran d'accueil -->
+        <div id="home-screen" class="screen">
+            <div class="container">
+                <div class="header">
+                    <h1><i class="fas fa-brain"></i> Quiz Multijoueur</h1>
+                    <p class="subtitle">Affrontez vos amis en temps réel !</p>
+                </div>
 
-<!-- SECTION: Connexion rapide -->
-<div id="login">
-  <div class="row">
-    <input id="name" placeholder="Ton pseudo (ex: CoachCreed)" />
-    <button id="createRoomBtn">Créer une salle</button>
-    <input id="joinCode" placeholder="Code salle (ex: 123456)"/>
-    <button id="joinRoomBtn">Rejoindre</button>
-  </div>
-  <div class="row">
-    <small>Si tu veux tester en local: ouvre deux onglets et rejoins la même salle.</small>
-  </div>
-</div>
+                <div class="main-actions">
+                    <button id="create-room" class="btn btn-primary btn-large">
+                        <i class="fas fa-plus-circle"></i> Créer une salle
+                    </button>
+                    <button id="join-room" class="btn btn-secondary btn-large">
+                        <i class="fas fa-sign-in-alt"></i> Rejoindre une salle
+                    </button>
+                </div>
 
-<!-- SECTION: Salle / Interface jeu -->
-<div id="roomUI" class="hidden">
-  <div class="row">
-    <div>
-      <strong>Salle :</strong> <span id="roomIdText"></span><br/>
-      <strong>Ton rôle :</strong> <span id="roleText"></span>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Multijoueur</h3>
+                        <p>Jusqu'à 6 joueurs par salle</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Temps réel</h3>
+                        <p>Synchronisation instantanée</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Classement</h3>
+                        <p>Comparez vos scores</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran création de salle -->
+        <div id="create-screen" class="screen">
+            <div class="container">
+                <div class="header">
+                    <button class="back-btn" onclick="app.showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Créer une salle</h2>
+                </div>
+
+                <div class="form-container">
+                    <div class="room-code-display">
+                        <label>Code de votre salle :</label>
+                        <div id="room-code" class="room-code">GÉNÉRATION...</div>
+                        <button id="copy-code" class="btn btn-outline">
+                            <i class="fas fa-copy"></i> Copier
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="host-name">Votre nom :</label>
+                        <input type="text" id="host-name" placeholder="Entrez votre nom" maxlength="20">
+                    </div>
+
+                    <button id="create-confirm" class="btn btn-primary btn-large">
+                        <i class="fas fa-play"></i> Démarrer la salle
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran rejoindre salle -->
+        <div id="join-screen" class="screen">
+            <div class="container">
+                <div class="header">
+                    <button class="back-btn" onclick="app.showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Rejoindre une salle</h2>
+                </div>
+
+                <div class="form-container">
+                    <div class="input-group">
+                        <label for="join-code">Code de la salle :</label>
+                        <input type="text" id="join-code" placeholder="Ex: ABC123" maxlength="6" style="text-transform: uppercase;">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="player-name">Votre nom :</label>
+                        <input type="text" id="player-name" placeholder="Entrez votre nom" maxlength="20">
+                    </div>
+
+                    <button id="join-confirm" class="btn btn-primary btn-large" disabled>
+                        <i class="fas fa-sign-in-alt"></i> Rejoindre
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran salle d'attente -->
+        <div id="lobby-screen" class="screen">
+            <div class="container">
+                <div class="header">
+                    <h2>Salle d'attente</h2>
+                    <div class="room-badge" id="lobby-code">ABC123</div>
+                </div>
+
+                <div class="players-container">
+                    <h3>Joueurs connectés (<span id="players-count">1</span>/6)</h3>
+                    <div id="players-list" class="players-list">
+                        <!-- Joueurs dynamiques -->
+                    </div>
+                </div>
+
+                <div class="lobby-actions">
+                    <div id="host-controls" class="hidden">
+                        <button id="start-game" class="btn btn-primary btn-large">
+                            <i class="fas fa-play"></i> Démarrer le quiz
+                        </button>
+                    </div>
+                    <div id="waiting-message">
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <p>En attente du début de la partie...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran du quiz -->
+        <div id="game-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <div class="timer" id="timer">
+                        <i class="fas fa-clock"></i> <span id="time-left">30</span>s
+                    </div>
+                    <div class="score" id="score">
+                        <i class="fas fa-star"></i> <span id="current-score">0</span>
+                    </div>
+                    <div class="question-counter">
+                        Question <span id="current-q">1</span>/<span id="total-qs">10</span>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text" id="question-text">
+                        Chargement de la question...
+                    </div>
+
+                    <div class="options-grid" id="options-container">
+                        <!-- Options dynamiques -->
+                    </div>
+
+                    <div class="game-actions">
+                        <button id="next-question" class="btn btn-primary" disabled>
+                            <i class="fas fa-arrow-right"></i> Suivant
+                        </button>
+                    </div>
+                </div>
+
+                <div class="players-progress" id="players-progress">
+                    <!-- Progression des joueurs -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran résultats -->
+        <div id="results-screen" class="screen">
+            <div class="container">
+                <div class="header">
+                    <h2>Résultats du Quiz</h2>
+                </div>
+
+                <div class="results-container">
+                    <div class="personal-score">
+                        <div class="score-circle">
+                            <span id="final-score">0</span>
+                            <small>/<span id="max-score">10</span></small>
+                        </div>
+                        <div class="score-percentage" id="score-percent">0%</div>
+                    </div>
+
+                    <div class="leaderboard">
+                        <h3>Classement</h3>
+                        <div id="leaderboard-list" class="leaderboard-list">
+                            <!-- Classement dynamique -->
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button id="play-again" class="btn btn-primary">
+                            <i class="fas fa-redo"></i> Rejouer
+                        </button>
+                        <button id="back-home" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Accueil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-      <button id="leaveBtn">Quitter</button>
-    </div>
-  </div>
 
-  <div id="playersList"></div>
-
-  <hr/>
-  <h3>Q: Charger / coller questions (hôte)</h3>
-  <div id="questionEditor">
-    <textarea id="questionsJSON" rows="6" placeholder='Format: [{"q":"Question...","a":"Réponse"} , ...]'></textarea>
-    <div class="row">
-      <button id="pushQuestionsBtn">Publier les questions (sur la salle)</button>
-      <button id="startBtn">Démarrer le match</button>
-    </div>
-  </div>
-
-  <hr/>
-  <div id="gameArea" class="hidden">
-    <h3>Question <span id="qIndex">0</span> / <span id="qTotal">0</span></h3>
-    <div id="currentQ" style="font-size:1.2rem;margin-bottom:8px"></div>
-
-    <div class="row">
-      <input id="answerInput" placeholder="Ta réponse ici..." />
-      <button id="submitAnswerBtn">Envoyer réponse</button>
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span id="notification-message"></span>
+        </div>
     </div>
 
-    <div id="feedback" style="margin-top:8px"></div>
-
-    <div style="margin-top:12px;">
-      <button id="nextBtn" class="hidden">Question suivante (host)</button>
-    </div>
-
-    <h4>Scores</h4>
-    <div id="scores"></div>
-
-    <h4>Journal</h4>
-    <div id="log"></div>
-  </div>
-</div>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-/* =============== CONFIG FIREBASE ===============
-  -> Crée un projet Firebase (console.firebase.google.com),
-  -> Active Realtime Database en mode test (ou règles restreintes si tu sais configurer),
-  -> Copie-colle ici la config (apiKey, authDomain, databaseURL, projectId etc.)
-================================================= */
-const firebaseConfig = {
-  apiKey: "REPLACE_API_KEY",
-  authDomain: "REPLACE_AUTH_DOMAIN",
-  databaseURL: "REPLACE_DATABASE_URL",
-  projectId: "REPLACE_PROJECT_ID",
-  storageBucket: "REPLACE",
-  messagingSenderId: "REPLACE",
-  appId: "REPLACE"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-/* ---------- Utilitaires ---------- */
-const $ = id => document.getElementById(id);
-const uid = () => Math.random().toString(36).slice(2,10);
-
-/* ---------- UI refs ---------- */
-const createRoomBtn = $('createRoomBtn');
-const joinRoomBtn = $('joinRoomBtn');
-const leaveBtn = $('leaveBtn');
-const pushQuestionsBtn = $('pushQuestionsBtn');
-const startBtn = $('startBtn');
-const submitAnswerBtn = $('submitAnswerBtn');
-const nextBtn = $('nextBtn');
-
-let me = {name:null,id:null};
-let roomId = null;
-let isHost = false;
-let roomRef = null;
-let localQuestions = []; // if host pushes
-
-/* ---------- ROOM ACTIONS ---------- */
-createRoomBtn.addEventListener('click', async ()=>{
-  const name = $('name').value.trim() || 'Host';
-  me = {name, id: uid()};
-  isHost = true;
-  roomId = (Math.floor(100000 + Math.random()*900000)).toString();
-  $('roomIdText').textContent = roomId;
-  $('roleText').textContent = 'Hôte';
-  enterRoomUI();
-  // create room object
-  roomRef = db.ref('rooms/' + roomId);
-  await roomRef.set({
-    hostId: me.id,
-    hostName: me.name,
-    createdAt: Date.now(),
-    players: {
-      [me.id]: {name: me.name, joinedAt: Date.now(), lastPing: Date.now()}
-    },
-    questions: [],
-    currentIndex: -1,
-    started: false,
-    answers: {},
-    scores: {}
-  });
-  listenRoom();
-});
-
-joinRoomBtn.addEventListener('click', async ()=>{
-  const code = $('joinCode').value.trim();
-  if(!code) return alert('Entre le code de la salle.');
-  const name = $('name').value.trim() || 'Joueur';
-  me = {name, id: uid()};
-  roomId = code;
-  roomRef = db.ref('rooms/' + roomId);
-  const snap = await roomRef.get();
-  if(!snap.exists()) return alert('Salle introuvable.');
-  isHost = false;
-  $('roomIdText').textContent = roomId;
-  $('roleText').textContent = 'Joueur';
-  enterRoomUI();
-  // add to players
-  await roomRef.child('players').child(me.id).set({name:me.name, joinedAt:Date.now(), lastPing:Date.now()});
-  listenRoom();
-});
-
-leaveBtn.addEventListener('click', async ()=>{
-  if(!roomRef) return location.reload();
-  await roomRef.child('players').child(me.id).remove();
-  stopListening();
-  location.reload();
-});
-
-/* ---------- Push questions (host) ---------- */
-pushQuestionsBtn.addEventListener('click', async ()=>{
-  if(!isHost) return alert('Seul l’hôte peut publier les questions.');
-  const raw = $('questionsJSON').value.trim();
-  if(!raw) return alert('Colle des questions au format JSON.');
-  try{
-    const q = JSON.parse(raw);
-    if(!Array.isArray(q)) throw new Error('Liste attendue.');
-    localQuestions = q.map(x => ({q: x.q, a: (''+x.a).trim()}));
-    await roomRef.child('questions').set(localQuestions);
-    log('Questions publiées ('+localQuestions.length+')');
-  }catch(err){
-    alert('JSON invalide: ' + err.message);
-  }
-});
-
-/* ---------- Start match ---------- */
-startBtn.addEventListener('click', async ()=>{
-  if(!isHost) return alert('Seul l’hôte peut démarrer.');
-  const snap = await roomRef.child('questions').get();
-  if(!snap.exists() || snap.val().length===0) return alert('Pas de questions publiées.');
-  await roomRef.update({started:true, currentIndex:0});
-  log('Match démarré.');
-});
-
-/* ---------- Submit answer ---------- */
-submitAnswerBtn.addEventListener('click', async ()=>{
-  const ans = $('answerInput').value.trim();
-  if(ans==='') return;
-  const idx = (await roomRef.child('currentIndex').get()).val();
-  if(idx === null || idx < 0) return alert('Match non démarré.');
-  // push answer under answers/{idx}/{playerId}
-  const ansPath = `answers/${idx}/${me.id}`;
-  await roomRef.child(ansPath).set({answer: ans, at: Date.now(), name: me.name});
-  $('answerInput').value = '';
-  log('Réponse envoyée.');
-});
-
-/* ---------- Next question (host) ---------- */
-nextBtn.addEventListener('click', async ()=>{
-  if(!isHost) return;
-  const snap = await roomRef.get();
-  const data = snap.val();
-  const next = (data.currentIndex ?? -1) + 1;
-  const total = (data.questions || []).length;
-  if(next >= total){
-    await roomRef.update({currentIndex:-1, started:false});
-    log('Match terminé.');
-  } else {
-    await roomRef.update({currentIndex: next});
-    log('Passage à la question ' + next);
-    // reset answers for next question (optional)
-    await roomRef.child('answers').child(next).remove();
-  }
-});
-
-/* ---------- Listening to room changes ---------- */
-let roomListener = null;
-function listenRoom(){
-  if(!roomRef) return;
-  // Listen to whole room for simplicity (for production listen only to needed nodes)
-  roomListener = roomRef.on('value', snap=>{
-    if(!snap.exists()) { log('Salle supprimée.'); stopListening(); return; }
-    const data = snap.val();
-    renderPlayers(data.players || {});
-    renderQuestions(data.questions || [], data.currentIndex, data.started);
-    renderScores(data.scores || {});
-    renderAnswers(data.answers || {});
-  });
-  // ping presence every 10s
-  setInterval(()=> {
-    if(me && roomRef){
-      roomRef.child('players').child(me.id).child('lastPing').set(Date.now());
-    }
-  }, 10000);
-}
-
-function stopListening(){
-  if(roomRef && roomListener) roomRef.off('value', roomListener);
-}
-
-/* ---------- Rendering helpers ---------- */
-function enterRoomUI(){
-  $('login').classList.add('hidden');
-  $('roomUI').classList.remove('hidden');
-}
-
-function renderPlayers(players){
-  const el = $('playersList'); el.innerHTML = '<h4>Joueurs</h4>';
-  for(const [id,p] of Object.entries(players || {})){
-    const div = document.createElement('div'); div.className = 'player';
-    div.innerHTML = `<strong>${p.name}</strong> ${id===me.id? '(Vous)':''} <br/>${p.lastPing? 'actif':'inactif'}`;
-    el.appendChild(div);
-  }
-}
-
-function renderQuestions(questions, currentIndex, started){
-  $('qTotal').textContent = questions.length;
-  if(started && currentIndex>=0){
-    $('gameArea').classList.remove('hidden');
-    const qObj = questions[currentIndex];
-    $('qIndex').textContent = (currentIndex + 1);
-    $('currentQ').textContent = qObj.q || '[Question vide]';
-    // host shows next button
-    if(isHost) nextBtn.classList.remove('hidden'); else nextBtn.classList.add('hidden');
-  } else {
-    $('gameArea').classList.add('hidden');
-  }
-}
-
-function renderAnswers(answers){
-  // show feedback if answers exist for currentIndex
-  const snapIdx = $('qIndex').textContent ? parseInt($('qIndex').textContent)-1 : null;
-  if(snapIdx === null || isNaN(snapIdx)) return;
-  const byIdx = (answers && answers[snapIdx]) || {};
-  const fb = [];
-  for(const [pid, info] of Object.entries(byIdx)){
-    fb.push(`${info.name}: ${info.answer}`);
-  }
-  $('feedback').textContent = fb.join('\n') || '';
-  // auto compute score: if host provided correct answer earlier, we can assign points
-  computeScoresForIndex(snapIdx, byIdx);
-}
-
-async function computeScoresForIndex(idx, answersObj){
-  // get correct answer
-  const qSnap = await roomRef.child('questions').child(idx).get();
-  if(!qSnap.exists()) return;
-  const correct = ('' + qSnap.val().a).trim().toLowerCase();
-  let updates = {};
-  for(const [pid, info] of Object.entries(answersObj || {})){
-    const given = ('' + info.answer).trim().toLowerCase();
-    const got = (given === correct) ? 1 : 0;
-    // increment score
-    const scoreSnap = await roomRef.child('scores').child(pid).get();
-    const prev = scoreSnap.exists() ? (scoreSnap.val().points||0) : 0;
-    updates[pid + '/points'] = prev + got;
-  }
-  if(Object.keys(updates).length>0){
-    await roomRef.child('scores').update(updates);
-  }
-}
-
-function renderScores(scores){
-  const el = $('scores'); el.innerHTML = '';
-  for(const [pid, s] of Object.entries(scores || {})){
-    const div = document.createElement('div');
-    div.textContent = `${s.name || pid} : ${s.points || 0} pts`;
-    el.appendChild(div);
-  }
-}
-
-function log(msg){
-  const l = $('log');
-  l.textContent = (new Date()).toLocaleTimeString() + ' — ' + msg + '\n' + l.textContent;
-}
-
-/* ensure we don't leak listeners when closing tab */
-window.addEventListener('beforeunload', ()=> {
-  if(roomRef && me) roomRef.child('players').child(me.id).remove();
-});
-</script>
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/app.js"></script>
 </body>
-</html>
+</html> 
+
+/* Reset et variables */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --dark: #1f2937;
+    --light: #f9fafb;
+    --gray: #6b7280;
+    --border-radius: 12px;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* Screens */
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.screen.active {
+    display: block;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header h2 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+.back-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--gray);
+    color: var(--gray);
+}
+
+.btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-large {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+}
+
+/* Main Actions */
+.main-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* Features */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.feature-card i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.feature-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--dark);
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+/* Form Container */
+.form-container {
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Room Code Display */
+.room-code-display {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.room-code-display label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--gray);
+}
+
+.room-code {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--primary);
+    letter-spacing: 8px;
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+}
+
+.room-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Players List */
+.players-container {
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.players-list {
+    margin-top: 15px;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.player-host {
+    background: var(--secondary);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* Loading Dots */
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 15px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/* Game Screen */
+.game-header {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+}
+
+.timer, .score, .question-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.timer {
+    color: var(--danger);
+}
+
+.score {
+    color: var(--success);
+}
+
+.question-counter {
+    color: var(--gray);
+}
+
+.question-card {
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;
+    line-height: 1.4;
+    color: var(--dark);
+}
+
+.options-grid {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.option-btn {
+    padding: 16px;
+    background: #f8fafc;
+    border: 2px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.option-btn:hover {
+    border-color: var(--primary);
+    background: white;
+}
+
+.option-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.option-btn.correct {
+    border-color: var(--success);
+    background: var(--success);
+    color: white;
+}
+
+.option-btn.incorrect {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+}
+
+.game-actions {
+    text-align: center;
+}
+
+/* Players Progress */
+.players-progress {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.progress-player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.progress-player:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.progress-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Results Screen */
+.results-container {
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.personal-score {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 auto 15px;
+    box-shadow: var(--shadow);
+}
+
+.score-circle small {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.score-percentage {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.leaderboard {
+    margin-bottom: 25px;
+}
+
+.leaderboard-list {
+    margin-top: 15px;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+}
+
+.leaderboard-rank {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.leaderboard-rank.rank-1 { background: var(--secondary); }
+.leaderboard-rank.rank-2 { background: var(--gray); }
+.leaderboard-rank.rank-3 { background: #cd7f32; }
+
+.leaderboard-player {
+    flex: 1;
+    margin: 0 15px;
+    font-weight: 600;
+}
+
+.leaderboard-score {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.results-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.results-actions .btn {
+    flex: 1;
+}
+
+/* Loading Screen */
+#loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loader {
+    text-align: center;
+    color: white;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--success);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.hidden {
+    display: none;
+}
+
+.notification.error {
+    border-left-color: var(--danger);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .room-code {
+        font-size: 2.5rem;
+        letter-spacing: 6px;
+    }
+    
+    .features {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .results-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .screen {
+        padding: 15px;
+    }
+    
+    .room-code {
+        font-size: 2rem;
+        letter-spacing: 4px;
+    }
+    
+    .question-text {
+        font-size: 1.1rem;
+    }
+}
+
+// 🔥 CONFIGURATION FIREBASE - À REMPLACER AVEC VOS CLÉS
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
+  authDomain: "match-en-ligne.firebaseapp.com",
+  projectId: "match-en-ligne",
+  storageBucket: "match-en-ligne.firebasestorage.app",
+  messagingSenderId: "706011207623",
+  appId: "1:706011207623:web:17374990a6202b64f0abe2",
+  measurementId: "G-D9XYRE3W2M"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+
+// Références aux collections
+const roomsCollection = db.collection('rooms');
+const playersCollection = db.collection('players');
+
+// Gestionnaire des salles
+const RoomManager = {
+    async createRoom(roomCode, hostName) {
+        const roomData = {
+            code: roomCode,
+            host: hostName,
+            status: 'waiting',
+            players: [hostName],
+            maxPlayers: 6,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            currentQuestion: 0,
+            gameStarted: false,
+            scores: { [hostName]: 0 },
+            selectedQuestions: []
+        };
+
+        try {
+            await roomsCollection.doc(roomCode).set(roomData);
+            return roomData;
+        } catch (error) {
+            console.error('Erreur création salle:', error);
+            throw error;
+        }
+    },
+
+    async joinRoom(roomCode, playerName) {
+        const roomRef = roomsCollection.doc(roomCode);
+        
+        try {
+            const roomDoc = await roomRef.get();
+            
+            if (!roomDoc.exists) {
+                throw new Error('Salle non trouvée');
+            }
+
+            const roomData = roomDoc.data();
+            
+            if (roomData.players.includes(playerName)) {
+                throw new Error('Nom déjà utilisé');
+            }
+
+            if (roomData.players.length >= roomData.maxPlayers) {
+                throw new Error('Salle pleine');
+            }
+
+            if (roomData.gameStarted) {
+                throw new Error('Partie déjà commencée');
+            }
+
+            await roomRef.update({
+                players: firebase.firestore.FieldValue.arrayUnion(playerName),
+                [`scores.${playerName}`]: 0
+            });
+
+            return roomData;
+        } catch (error) {
+            console.error('Erreur rejoindre salle:', error);
+            throw error;
+        }
+    },
+
+    async startGame(roomCode, questions) {
+        const roomRef = roomsCollection.doc(roomCode);
+        
+        try {
+            await roomRef.update({
+                gameStarted: true,
+                status: 'playing',
+                currentQuestion: 0,
+                selectedQuestions: questions,
+                startTime: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error('Erreur démarrage jeu:', error);
+            throw error;
+        }
+    },
+
+    async updateScore(roomCode, playerName, score) {
+        const roomRef = roomsCollection.doc(roomCode);
+        
+        try {
+            await roomRef.update({
+                [`scores.${playerName}`]: score
+            });
+        } catch (error) {
+            console.error('Erreur mise à jour score:', error);
+            throw error;
+        }
+    },
+
+    async nextQuestion(roomCode) {
+        const roomRef = roomsCollection.doc(roomCode);
+        
+        try {
+            const roomDoc = await roomRef.get();
+            const roomData = roomDoc.data();
+            
+            await roomRef.update({
+                currentQuestion: roomData.currentQuestion + 1
+            });
+        } catch (error) {
+            console.error('Erreur question suivante:', error);
+            throw error;
+        }
+    },
+
+    async finishGame(roomCode) {
+        const roomRef = roomsCollection.doc(roomCode);
+        
+        try {
+            await roomRef.update({
+                status: 'finished',
+                endTime: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error('Erreur fin de jeu:', error);
+            throw error;
+        }
+    },
+
+    onRoomUpdate(roomCode, callback) {
+        return roomsCollection.doc(roomCode).onSnapshot((doc) => {
+            if (doc.exists) {
+                callback(doc.data());
+            }
+        });
+    },
+
+    async deleteRoom(roomCode) {
+        try {
+            await roomsCollection.doc(roomCode).delete();
+        } catch (error) {
+            console.error('Erreur suppression salle:', error);
+        }
+    }
+};
+
+// Gestionnaire des réponses
+const AnswerManager = {
+    async submitAnswer(roomCode, playerName, questionIndex, answer, isCorrect, timeSpent) {
+        try {
+            await playersCollection.doc(`${roomCode}_${playerName}_${questionIndex}`).set({
+                roomCode,
+                playerName,
+                questionIndex,
+                answer,
+                isCorrect,
+                timeSpent,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (error) {
+            console.error('Erreur envoi réponse:', error);
+            throw error;
+        }
+    },
+
+    onPlayerAnswers(roomCode, callback) {
+        return playersCollection
+            .where('roomCode', '==', roomCode)
+            .onSnapshot((snapshot) => {
+                const answers = [];
+                snapshot.forEach(doc => {
+                    answers.push(doc.data());
+                });
+                callback(answers);
+            });
+    },
+
+    async clearRoomAnswers(roomCode) {
+        try {
+            const answers = await playersCollection
+                .where('roomCode', '==', roomCode)
+                .get();
+            
+            const batch = db.batch();
+            answers.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            
+            await batch.commit();
+        } catch (error) {
+            console.error('Erreur nettoyage réponses:', error);
+        }
+    }
+};
+
+// Export global
+window.firebaseApp = {
+    db,
+    RoomManager,
+    AnswerManager
+};
+
+// 📚 BASE DE DONNÉES DES QUESTIONS
+const QUIZ_DATABASE = {
+    categories: [
+        {
+            id: 'able',
+            name: "Champ lexical 'able'",
+            description: "Adjectifs dérivés avec le suffixe 'able'",
+            questions: [
+                {
+                    question: "Qui mérite d'être admiré ?",
+                    answer: "admirable",
+                    options: ["admirable", "agréable", "excusable", "évitable"],
+                    explanation: "'Admirable' vient du verbe 'admirer'"
+                },
+                {
+                    question: "Qui peut être excusé ?",
+                    answer: "excusable",
+                    options: ["excusable", "regrettable", "appréciable", "tolérable"],
+                    explanation: "'Excusable' signifie qui peut être excusé"
+                },
+                {
+                    question: "Qui peut être évité ?",
+                    answer: "évitable",
+                    options: ["évitable", "comptable", "corrigeable", "louable"],
+                    explanation: "'Évitable' est le contraire d'inévitable"
+                },
+                {
+                    question: "Qui peut être regretté ?",
+                    answer: "regrettable",
+                    options: ["regrettable", "critiquable", "respectable", "comparable"],
+                    explanation: "'Regrettable' qualifie ce qu'on peut regretter"
+                },
+                {
+                    question: "Qui peut être apprécié ?",
+                    answer: "appréciable",
+                    options: ["appréciable", "aimable", "modifiable", "supportable"],
+                    explanation: "'Appréciable' vient du verbe 'apprécier'"
+                },
+                {
+                    question: "Qui peut être toléré ?",
+                    answer: "tolérable",
+                    options: ["tolérable", "comptable", "louable", "critiquable"],
+                    explanation: "'Tolérable' signifie supportable, acceptable"
+                },
+                {
+                    question: "Qui peut être compté ?",
+                    answer: "comptable",
+                    options: ["comptable", "corrigeable", "regrettable", "admirable"],
+                    explanation: "'Comptable' signifie qui peut être compté"
+                },
+                {
+                    question: "Qui peut être corrigé ?",
+                    answer: "corrigeable",
+                    options: ["corrigeable", "appréciable", "évitable", "excusable"],
+                    explanation: "'Corrigeable' vient du verbe 'corriger'"
+                },
+                {
+                    question: "Qui peut être loué ?",
+                    answer: "louable",
+                    options: ["louable", "tolérable", "admirable", "regrettable"],
+                    explanation: "'Louable' signifie digne d'éloges"
+                },
+                {
+                    question: "Qui peut être critiqué ?",
+                    answer: "critiquable",
+                    options: ["critiquable", "appréciable", "supportable", "modifiable"],
+                    explanation: "'Critiquable' signifie qui peut être critiqué"
+                }
+            ]
+        },
+        {
+            id: 'eur',
+            name: "Champ lexical 'eur'",
+            description: "Noms de métier en 'eur'",
+            questions: [
+                {
+                    question: "Celui qui chante ?",
+                    answer: "chanteur",
+                    options: ["chanteur", "vendeur", "lecteur", "formateur"],
+                    explanation: "Un chanteur est une personne qui chante"
+                },
+                {
+                    question: "Celui qui vend ?",
+                    answer: "vendeur",
+                    options: ["vendeur", "spectateur", "traducteur", "orateur"],
+                    explanation: "Un vendeur travaille dans le commerce"
+                },
+                {
+                    question: "Celui qui lit ?",
+                    answer: "lecteur",
+                    options: ["lecteur", "inventeur", "auteur", "directeur"],
+                    explanation: "Un lecteur est une personne qui lit"
+                },
+                {
+                    question: "Celui qui enseigne ?",
+                    answer: "formateur",
+                    options: ["formateur", "docteur", "sauveur", "entrepreneur"],
+                    explanation: "Un formateur transmet des connaissances"
+                },
+                {
+                    question: "Celui qui observe ?",
+                    answer: "spectateur",
+                    options: ["spectateur", "tricheur", "inspecteur", "appreneur"],
+                    explanation: "Un spectateur regarde un spectacle"
+                },
+                {
+                    question: "Celui qui traduit ?",
+                    answer: "traducteur",
+                    options: ["traducteur", "orateur", "inventeur", "auteur"],
+                    explanation: "Un traducteur convertit une langue en une autre"
+                },
+                {
+                    question: "Celui qui parle en public ?",
+                    answer: "orateur",
+                    options: ["orateur", "directeur", "docteur", "sauveur"],
+                    explanation: "Un orateur est un bon communicateur"
+                },
+                {
+                    question: "Celui qui invente ?",
+                    answer: "inventeur",
+                    options: ["inventeur", "entrepreneur", "tricheur", "inspecteur"],
+                    explanation: "Un inventeur crée de nouvelles choses"
+                },
+                {
+                    question: "Celui qui écrit ?",
+                    answer: "auteur",
+                    options: ["auteur", "directeur", "lecteur", "chanteur"],
+                    explanation: "Un auteur écrit des livres ou articles"
+                },
+                {
+                    question: "Celui qui dirige ?",
+                    answer: "directeur",
+                    options: ["directeur", "docteur", "sauveur", "entrepreneur"],
+                    explanation: "Un directeur manage une organisation"
+                }
+            ]
+        },
+        {
+            id: 'tion',
+            name: "Champ lexical 'tion'",
+            description: "Noms d'action en 'tion'",
+            questions: [
+                {
+                    question: "Action de créer ?",
+                    answer: "création",
+                    options: ["création", "décision", "correction", "punition"],
+                    explanation: "La création est l'action de créer"
+                },
+                {
+                    question: "Action de décider ?",
+                    answer: "décision",
+                    options: ["décision", "organisation", "éducation", "communication"],
+                    explanation: "Une décision est un choix arrêté"
+                },
+                {
+                    question: "Action de corriger ?",
+                    answer: "correction",
+                    options: ["correction", "évaluation", "préparation", "explication"],
+                    explanation: "La correction rectifie les erreurs"
+                },
+                {
+                    question: "Action de punir ?",
+                    answer: "punition",
+                    options: ["punition", "imagination", "information", "transformation"],
+                    explanation: "La punition est une sanction"
+                },
+                {
+                    question: "Action d'organiser ?",
+                    answer: "organisation",
+                    options: ["organisation", "production", "respiration", "création"],
+                    explanation: "L'organisation structure les éléments"
+                },
+                {
+                    question: "Action d'éduquer ?",
+                    answer: "éducation",
+                    options: ["éducation", "communication", "évaluation", "préparation"],
+                    explanation: "L'éducation forme l'esprit"
+                },
+                {
+                    question: "Action de communiquer ?",
+                    answer: "communication",
+                    options: ["communication", "information", "transformation", "imagination"],
+                    explanation: "La communication échange des informations"
+                },
+                {
+                    question: "Action d'évaluer ?",
+                    answer: "évaluation",
+                    options: ["évaluation", "préparation", "explication", "respiration"],
+                    explanation: "L'valuation estime la valeur"
+                },
+                {
+                    question: "Action de préparer ?",
+                    answer: "préparation",
+                    options: ["préparation", "production", "création", "décision"],
+                    explanation: "La préparation met en état"
+                },
+                {
+                    question: "Action d'expliquer ?",
+                    answer: "explication",
+                    options: ["explication", "correction", "punition", "organisation"],
+                    explanation: "L'explication rend compréhensible"
+                }
+            ]
+        },
+        {
+            id: 'ment',
+            name: "Champ lexical 'ment'",
+            description: "Noms abstraits en 'ment'",
+            questions: [
+                {
+                    question: "Transformation ou modification ?",
+                    answer: "changement",
+                    options: ["changement", "développement", "jugement", "déplacement"],
+                    explanation: "Le changement est une modification"
+                },
+                {
+                    question: "Croissance ou progrès ?",
+                    answer: "développement",
+                    options: ["développement", "amélioration", "sentiment", "doucement"],
+                    explanation: "Le développement est une croissance"
+                },
+                {
+                    question: "Décision d'un tribunal ?",
+                    answer: "jugement",
+                    options: ["jugement", "engagement", "traitement", "entraînement"],
+                    explanation: "Le jugement est une décision judiciaire"
+                },
+                {
+                    question: "Action de se déplacer ?",
+                    answer: "déplacement",
+                    options: ["déplacement", "règlement", "accomplissement", "paiement"],
+                    explanation: "Le déplacement change de lieu"
+                },
+                {
+                    question: "Amélioration d'une situation ?",
+                    answer: "amélioration",
+                    options: ["amélioration", "gouvernement", "raisonnement", "changement"],
+                    explanation: "L'amélioration rend meilleur"
+                },
+                {
+                    question: "Émotion ressentie ?",
+                    answer: "sentiment",
+                    options: ["sentiment", "développement", "changement", "jugement"],
+                    explanation: "Le sentiment est une émotion"
+                },
+                {
+                    question: "Soin pour guérir ?",
+                    answer: "traitement",
+                    options: ["traitement", "entraînement", "paiement", "accomplissement"],
+                    explanation: "Le traitement soigne une maladie"
+                },
+                {
+                    question: "Entraînement régulier ?",
+                    answer: "entraînement",
+                    options: ["entraînement", "règlement", "gouvernement", "raisonnement"],
+                    explanation: "L'entraînement améliore les capacités"
+                },
+                {
+                    question: "Ensemble de règles ?",
+                    answer: "règlement",
+                    options: ["règlement", "paiement", "accomplissement", "déplacement"],
+                    explanation: "Le règlement fixe des règles"
+                },
+                {
+                    question: "Réussite d'une mission ?",
+                    answer: "accomplissement",
+                    options: ["accomplissement", "gouvernement", "raisonnement", "amélioration"],
+                    explanation: "L'accomplissement est la réalisation"
+                }
+            ]
+        },
+        {
+            id: 'isme',
+            name: "Champ lexical 'isme'",
+            description: "Doctrines et courants en 'isme'",
+            questions: [
+                {
+                    question: "Doctrine pour l'égalité sociale ?",
+                    answer: "socialisme",
+                    options: ["socialisme", "capitalisme", "monothéisme", "anarchisme"],
+                    explanation: "Le socialisme prône l'égalité sociale"
+                },
+                {
+                    question: "Système économique avec capital ?",
+                    answer: "capitalisme",
+                    options: ["capitalisme", "romantisme", "athéisme", "racisme"],
+                    explanation: "Le capitalisme base sur le profit"
+                },
+                {
+                    question: "Croyance en un seul Dieu ?",
+                    answer: "monothéisme",
+                    options: ["monothéisme", "polythéisme", "hédonisme", "égoïsme"],
+                    explanation: "Le monothéisme croit en un dieu unique"
+                },
+                {
+                    question: "Doctrine sans autorité ?",
+                    answer: "anarchisme",
+                    options: ["anarchisme", "spiritisme", "sexisme", "cubisme"],
+                    explanation: "L'anarchisme rejette l'autorité"
+                },
+                {
+                    question: "Mouvement artistique émotionnel ?",
+                    answer: "romantisme",
+                    options: ["romantisme", "bouddhisme", "fascisme", "socialisme"],
+                    explanation: "Le romantisme privilégie l'émotion"
+                },
+                {
+                    question: "Croyance sans Dieu ?",
+                    answer: "athéisme",
+                    options: ["athéisme", "polythéisme", "hédonisme", "égoïsme"],
+                    explanation: "L'athéisme nie l'existence de Dieu"
+                },
+                {
+                    question: "Système de supériorité raciale ?",
+                    answer: "racisme",
+                    options: ["racisme", "sexisme", "fascisme", "capitalisme"],
+                    explanation: "Le racisme discrimine par la race"
+                },
+                {
+                    question: "Croyance en plusieurs dieux ?",
+                    answer: "polythéisme",
+                    options: ["polythéisme", "monothéisme", "spiritisme", "bouddhisme"],
+                    explanation: "Le polythéisme croit en plusieurs dieux"
+                },
+                {
+                    question: "Recherche du plaisir ?",
+                    answer: "hédonisme",
+                    options: ["hédonisme", "égoïsme", "athéisme", "racisme"],
+                    explanation: "L'hédonisme cherche le plaisir"
+                },
+                {
+                    question: "Centré sur soi-même ?",
+                    answer: "égoïsme",
+                    options: ["égoïsme", "hédonisme", "sexisme", "cubisme"],
+                    explanation: "L'égoïsme privilégie son intérêt"
+                }
+            ]
+        }
+    ],
+
+    // Méthodes utilitaires
+    getRandomQuestions(count = 10) {
+        const allQuestions = this.categories.flatMap(cat => cat.questions);
+        const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
+    },
+
+    getQuestionsByCategory(categoryId, count = 10) {
+        const category = this.categories.find(cat => cat.id === categoryId);
+        if (!category) return this.getRandomQuestions(count);
+        
+        const shuffled = [...category.questions].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
+    },
+
+    shuffleOptions(question) {
+        const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+        return {
+            ...question,
+            options: shuffledOptions
+        };
+    },
+
+    getAllCategories() {
+        return this.categories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            description: cat.description,
+            questionCount: cat.questions.length
+        }));
+    }
+};
+
+window.QuizDatabase = QUIZ_DATABASE;
+
+// 🎮 APPLICATION PRINCIPALE
+class QuizApp {
+    constructor() {
+        this.state = {
+            currentScreen: 'loading-screen',
+            roomCode: '',
+            playerName: '',
+            isHost: false,
+            currentRoom: null,
+            game: {
+                currentQuestion: 0,
+                score: 0,
+                selectedQuestions: [],
+                playerAnswers: new Map(),
+                timer: null,
+                timeLeft: 30
+            },
+            listeners: []
+        };
+
+        this.init();
+    }
+
+    async init() {
+        try {
+            // Vérifier Firebase
+            if (typeof firebaseApp === 'undefined') {
+                throw new Error('Firebase non chargé');
+            }
+
+            await this.setupEventListeners();
+            this.showScreen('home-screen');
+            this.hideLoading();
+
+            console.log('✅ QuizApp initialisé');
+        } catch (error) {
+            console.error('❌ Erreur initialisation:', error);
+            this.showNotification('Erreur de chargement', 'error');
+        }
+    }
+
+    setupEventListeners() {
+        // Navigation
+        document.getElementById('create-room').addEventListener('click', () => {
+            this.showScreen('create-screen');
+            this.generateRoomCode();
+        });
+
+        document.getElementById('join-room').addEventListener('click', () => {
+            this.showScreen('join-screen');
+        });
+
+        // Création salle
+        document.getElementById('create-confirm').addEventListener('click', () => {
+            this.createRoom();
+        });
+
+        document.getElementById('copy-code').addEventListener('click', () => {
+            this.copyRoomCode();
+        });
+
+        document.getElementById('host-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.createRoom();
+        });
+
+        // Rejoindre salle
+        document.getElementById('join-confirm').addEventListener('click', () => {
+            this.joinRoom();
+        });
+
+        document.getElementById('join-code').addEventListener('input', () => {
+            this.validateJoinForm();
+        });
+
+        document.getElementById('player-name').addEventListener('input', () => {
+            this.validateJoinForm();
+        });
+
+        document.getElementById('join-code').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.joinRoom();
+        });
+
+        document.getElementById('player-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.joinRoom();
+        });
+
+        // Jeu
+        document.getElementById('start-game').addEventListener('click', () => {
+            this.startGame();
+        });
+
+        document.getElementById('next-question').addEventListener('click', () => {
+            this.nextQuestion();
+        });
+
+        // Résultats
+        document.getElementById('play-again').addEventListener('click', () => {
+            this.playAgain();
+        });
+
+        document.getElementById('back-home').addEventListener('click', () => {
+            this.leaveRoom();
+            this.showScreen('home-screen');
+        });
+    }
+
+    generateRoomCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        this.state.roomCode = code;
+        document.getElementById('room-code').textContent = code;
+    }
+
+    async copyRoomCode() {
+        try {
+            await navigator.clipboard.writeText(this.state.roomCode);
+            this.showNotification('Code copié !');
+        } catch (err) {
+            this.showNotification('Erreur copie', 'error');
+        }
+    }
+
+    validateJoinForm() {
+        const code = document.getElementById('join-code').value.trim();
+        const name = document.getElementById('player-name').value.trim();
+        const button = document.getElementById('join-confirm');
+        
+        button.disabled = !(code.length === 6 && name.length >= 2);
+    }
+
+    async createRoom() {
+        const playerName = document.getElementById('host-name').value.trim();
+        
+        if (!this.validateName(playerName)) return;
+
+        try {
+            this.state.playerName = playerName;
+            this.state.isHost = true;
+
+            await firebaseApp.RoomManager.createRoom(this.state.roomCode, playerName);
+            
+            this.showScreen('lobby-screen');
+            this.setupRoomListeners();
+            this.updateLobby();
+            
+            this.showNotification('Salle créée !');
+        } catch (error) {
+            this.showNotification('Erreur: ' + error.message, 'error');
+        }
+    }
+
+    async joinRoom() {
+        const roomCode = document.getElementById('join-code').value.trim().toUpperCase();
+        const playerName = document.getElementById('player-name').value.trim();
+
+        if (!this.validateName(playerName) || !roomCode) return;
+
+        try {
+            this.state.roomCode = roomCode;
+            this.state.playerName = playerName;
+            this.state.isHost = false;
+
+            await firebaseApp.RoomManager.joinRoom(roomCode, playerName);
+            
+            this.showScreen('lobby-screen');
+            this.setupRoomListeners();
+            this.updateLobby();
+            
+            this.showNotification('Salle rejointe !');
+        } catch (error) {
+            this.showNotification('Erreur: ' + error.message, 'error');
+        }
+    }
+
+    validateName(name) {
+        if (!name) {
+            this.showNotification('Entrez votre nom', 'error');
+            return false;
+        }
+        if (name.length < 2) {
+            this.showNotification('Nom trop court', 'error');
+            return false;
+        }
+        if (name.length > 20) {
+            this.showNotification('Nom trop long', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    setupRoomListeners() {
+        // Écouter la salle
+        const roomUnsubscribe = firebaseApp.RoomManager.onRoomUpdate(
+            this.state.roomCode,
+            (roomData) => this.handleRoomUpdate(roomData)
+        );
+
+        // Écouter les réponses
+        const answersUnsubscribe = firebaseApp.AnswerManager.onPlayerAnswers(
+            this.state.roomCode,
+            (answers) => this.handlePlayerAnswers(answers)
+        );
+
+        this.state.listeners.push(roomUnsubscribe, answersUnsubscribe);
+    }
+
+    handleRoomUpdate(roomData) {
+        this.state.currentRoom = roomData;
+        
+        if (this.state.currentScreen === 'lobby-screen') {
+            this.updateLobby(roomData);
+        }
+        
+        if (roomData.gameStarted && this.state.currentScreen === 'lobby-screen') {
+            this.startQuiz(roomData);
+        }
+        
+        if (roomData.status === 'finished' && this.state.currentScreen === 'game-screen') {
+            this.showResults(roomData);
+        }
+
+        if (this.state.currentScreen === 'game-screen') {
+            this.updateGameState(roomData);
+        }
+    }
+
+    updateLobby(roomData = this.state.currentRoom) {
+        if (!roomData) return;
+
+        document.getElementById('lobby-code').textContent = this.state.roomCode;
+        document.getElementById('players-count').textContent = roomData.players.length;
+        
+        this.updatePlayersList(roomData.players, roomData.host);
+        this.updateLobbyControls(roomData);
+    }
+
+    updatePlayersList(players, host) {
+        const list = document.getElementById('players-list');
+        list.innerHTML = '';
+
+        players.forEach(player => {
+            const playerEl = document.createElement('div');
+            playerEl.className = 'player-item';
+            playerEl.innerHTML = `
+                <div class="player-info">
+                    <div class="player-avatar">${player.charAt(0).toUpperCase()}</div>
+                    <div>${player}</div>
+                </div>
+                ${player === host ? '<div class="player-host">HÔTE</div>' : ''}
+            `;
+            list.appendChild(playerEl);
+        });
+    }
+
+    updateLobbyControls(roomData) {
+        const hostControls = document.getElementById('host-controls');
+        const waitingMsg = document.getElementById('waiting-message');
+
+        if (this.state.isHost) {
+            hostControls.classList.remove('hidden');
+            waitingMsg.classList.add('hidden');
+        } else {
+            hostControls.classList.add('hidden');
+            waitingMsg.classList.remove('hidden');
+            waitingMsg.querySelector('p').textContent = 
+                `En attente que ${roomData.host} commence...`;
+        }
+    }
+
+    async startGame() {
+        if (!this.state.isHost) return;
+
+        try {
+            const questions = QuizDatabase.getRandomQuestions(10);
+            this.state.game.selectedQuestions = questions;
+            
+            await firebaseApp.RoomManager.startGame(this.state.roomCode, questions);
+            this.showNotification('Partie démarrée !');
+        } catch (error) {
+            this.showNotification('Erreur: ' + error.message, 'error');
+        }
+    }
+
+    startQuiz(roomData) {
+        this.state.game.selectedQuestions = roomData.selectedQuestions;
+        this.state.game.currentQuestion = roomData.currentQuestion;
+        this.state.game.score = roomData.scores[this.state.playerName] || 0;
+        
+        this.showScreen('game-screen');
+        this.displayQuestion();
+        this.startTimer();
+    }
+
+    displayQuestion() {
+        const questionIndex = this.state.game.currentQuestion;
+        const questions = this.state.game.selectedQuestions;
+        
+        if (questionIndex >= questions.length) {
+            this.finishQuiz();
+            return;
+        }
+
+        const question = questions[questionIndex];
+        
+        document.getElementById('question-text').textContent = question.question;
+        document.getElementById('current-q').textContent = questionIndex + 1;
+        document.getElementById('total-qs').textContent = questions.length;
+        document.getElementById('current-score').textContent = this.state.game.score;
+
+        this.displayOptions(question);
+        this.resetQuestionState();
+    }
+
+    displayOptions(question) {
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        question.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.textContent = option;
+            button.addEventListener('click', () => 
+                this.selectAnswer(option, question.answer)
+            );
+            container.appendChild(button);
+        });
+    }
+
+    resetQuestionState() {
+        document.getElementById('next-question').disabled = true;
+        this.state.game.timeLeft = 30;
+        document.getElementById('time-left').textContent = this.state.game.timeLeft;
+    }
+
+    async selectAnswer(selectedAnswer, correctAnswer) {
+        const isCorrect = selectedAnswer === correctAnswer;
+        const timeSpent = 30 - this.state.game.timeLeft;
+        
+        // Mettre à jour le score
+        if (isCorrect) {
+            this.state.game.score++;
+            document.getElementById('current-score').textContent = this.state.game.score;
+        }
+
+        // Mettre à jour l'interface
+        this.highlightAnswers(selectedAnswer, correctAnswer);
+        
+        // Enregistrer la réponse
+        try {
+            await firebaseApp.AnswerManager.submitAnswer(
+                this.state.roomCode,
+                this.state.playerName,
+                this.state.game.currentQuestion,
+                selectedAnswer,
+                isCorrect,
+                timeSpent
+            );
+
+            await firebaseApp.RoomManager.updateScore(
+                this.state.roomCode,
+                this.state.playerName,
+                this.state.game.score
+            );
+        } catch (error) {
+            console.error('Erreur réponse:', error);
+        }
+
+        // Activer le bouton suivant
+        document.getElementById('next-question').disabled = false;
+        clearInterval(this.state.game.timer);
+    }
+
+    highlightAnswers(selected, correct) {
+        const options = document.querySelectorAll('.option-btn');
+        options.forEach(option => {
+            option.disabled = true;
+            if (option.textContent === correct) {
+                option.classList.add('correct');
+            } else if (option.textContent === selected && selected !== correct) {
+                option.classList.add('incorrect');
+            }
+        });
+    }
+
+    startTimer() {
+        clearInterval(this.state.game.timer);
+        
+        this.state.game.timer = setInterval(() => {
+            this.state.game.timeLeft--;
+            document.getElementById('time-left').textContent = this.state.game.timeLeft;
+            
+            if (this.state.game.timeLeft <= 0) {
+                clearInterval(this.state.game.timer);
+                this.handleTimeUp();
+            }
+        }, 1000);
+    }
+
+    handleTimeUp() {
+        const options = document.querySelectorAll('.option-btn');
+        options.forEach(option => option.disabled = true);
+        
+        document.getElementById('next-question').disabled = false;
+        this.showNotification('Temps écoulé !', 'error');
+    }
+
+    async nextQuestion() {
+        if (this.state.isHost) {
+            await firebaseApp.RoomManager.nextQuestion(this.state.roomCode);
+        }
+    }
+
+    updateGameState(roomData) {
+        if (roomData.currentQuestion !== this.state.game.currentQuestion) {
+            this.state.game.currentQuestion = roomData.currentQuestion;
+            this.displayQuestion();
+            this.startTimer();
+        }
+        
+        this.updatePlayersProgress(roomData);
+    }
+
+    updatePlayersProgress(roomData) {
+        const container = document.getElementById('players-progress');
+        if (!container) return;
+
+        container.innerHTML = '<h3>Progression</h3>';
+
+        Object.entries(roomData.scores || {}).forEach(([player, score]) => {
+            if (player === this.state.playerName) return;
+
+            const progress = document.createElement('div');
+            progress.className = 'progress-player';
+            progress.innerHTML = `
+                <div class="progress-info">
+                    <div class="player-avatar">${player.charAt(0)}</div>
+                    <div>${player}</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${(score / 10) * 100}%"></div>
+                </div>
+                <div>${score}</div>
+            `;
+            container.appendChild(progress);
+        });
+    }
+
+    handlePlayerAnswers(answers) {
+        // Logique pour afficher les réponses des autres joueurs
+        console.log('Réponses reçues:', answers);
+    }
+
+    async finishQuiz() {
+        if (this.state.isHost) {
+            await firebaseApp.RoomManager.finishGame(this.state.roomCode);
+        }
+    }
+
+    showResults(roomData = this.state.currentRoom) {
+        this.showScreen('results-screen');
+        
+        const finalScore = this.state.game.score;
+        const maxScore = this.state.game.selectedQuestions.length;
+        const percentage = Math.round((finalScore / maxScore) * 100);
+        
+        document.getElementById('final-score').textContent = finalScore;
+        document.getElementById('max-score').textContent = maxScore;
+        document.getElementById('score-percent').textContent = `${percentage}%`;
+        
+        this.displayLeaderboard(roomData);
+    }
+
+    displayLeaderboard(roomData) {
+        const leaderboard = document.getElementById('leaderboard-list');
+        leaderboard.innerHTML = '';
+
+        if (!roomData || !roomData.scores) return;
+
+        const sortedScores = Object.entries(roomData.scores)
+            .sort(([, a], [, b]) => b - a);
+
+        sortedScores.forEach(([player, score], index) => {
+            const rank = index + 1;
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            item.innerHTML = `
+                <div class="leaderboard-rank ${rank <= 3 ? `rank-${rank}` : ''}">
+                    ${rank}
+                </div>
+                <div class="leaderboard-player">
+                    ${player} ${player === roomData.host ? '👑' : ''}
+                </div>
+                <div class="leaderboard-score">
+                    ${score}/${this.state.game.selectedQuestions.length}
+                </div>
+            `;
+            leaderboard.appendChild(item);
+        });
+    }
+
+    async playAgain() {
+        if (this.state.isHost) {
+            // Nettoyer et recréer
+            await this.cleanupRoom();
+            this.generateRoomCode();
+            await this.createRoom();
+        } else {
+            this.showScreen('lobby-screen');
+        }
+    }
+
+    async cleanupRoom() {
+        await firebaseApp.RoomManager.deleteRoom(this.state.roomCode);
+        await firebaseApp.AnswerManager.clearRoomAnswers(this.state.roomCode);
+    }
+
+    leaveRoom() {
+        // Nettoyer les listeners
+        this.state.listeners.forEach(unsubscribe => unsubscribe());
+        this.state.listeners = [];
+        
+        // Réinitialiser l'état
+        this.state.roomCode = '';
+        this.state.playerName = '';
+        this.state.isHost = false;
+        this.state.currentRoom = null;
+        this.state.game = {
+            currentQuestion: 0,
+            score: 0,
+            selectedQuestions: [],
+            playerAnswers: new Map(),
+            timer: null,
+            timeLeft: 30
+        };
+    }
+
+    showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.getElementById(screenId).classList.add('active');
+        this.state.currentScreen = screenId;
+    }
+
+    hideLoading() {
+        document.getElementById('loading-screen').classList.remove('active');
+    }
+
+    showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        const messageEl = document.getElementById('notification-message');
+        
+        messageEl.textContent = message;
+        notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+        notification.classList.remove('hidden');
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.classList.add('hidden'), 300);
+        }, 3000);
+    }
+}
+
+// Démarrer l'application
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new QuizApp();
+}); {
+  "name": "quiz-multiplayer-firebase",
+  "version": "1.0.0",
+  "description": "Jeu quiz multijoueur en temps réel avec Firebase",
+  "main": "public/index.html",
+  "scripts": {
+    "dev": "live-server public --port=3000",
+    "build": "echo 'Build completed'",
+    "deploy": "firebase deploy"
+  },
+  "keywords": [
+    "quiz",
+    "multiplayer",
+    "firebase",
+    "realtime",
+    "game"
+  ],
+  "author": "Votre Nom",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+} {
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+} rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Règles pour le développement - À sécuriser en production
+    match /rooms/{roomId} {
+      allow read, write: if true;
+    }
+    
+    match /players/{playerId} {
+      allow read, write: if true;
+    }
+  }
+} # 🎯 Quiz Multijoueur avec Firebase
+
+Jeu de quiz multijoueur en temps réel avec synchronisation Firebase.
+
+## ✨ Fonctionnalités
+
+- 🏠 Création de salles avec codes uniques
+- 👥 Multijoueur jusqu'à 6 joueurs
+- ⏱ Questions chronométrées
+- 📊 Classement en direct
+- 📱 Design responsive
+- 🔥 Synchronisation Firebase
+
+## 🚀 Installation
+
+1. **Cloner le projet**
+```bash
+git clone <votre-repo>
+cd quiz-multiplayer-firebase
+
+
+
+￼
