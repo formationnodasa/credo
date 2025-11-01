@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combat de Téléphones</title>
+    <title>Combat de Téléphones Connectés</title>
     <style>
         * {
             margin: 0;
@@ -44,6 +44,68 @@
         @keyframes titlePulse {
             from { transform: scale(1); }
             to { transform: scale(1.05); }
+        }
+
+        .connection-panel {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ff4757;
+        }
+
+        .status-indicator.connected {
+            background-color: #2ed573;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .connection-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .connect-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+        }
+
+        .disconnect-btn {
+            background: linear-gradient(to right, #ff5e62, #ff9966);
+            color: white;
         }
 
         .arena {
@@ -150,17 +212,6 @@
             margin-top: 30px;
         }
 
-        button {
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
         .attack-btn {
             background: linear-gradient(to right, #ff416c, #ff4b2b);
             color: white;
@@ -178,6 +229,12 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .message {
@@ -235,26 +292,6 @@
             100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
 
-        .power-up {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: gold;
-            border-radius: 50%;
-            animation: powerUpFloat 4s infinite;
-            box-shadow: 0 0 15px gold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #333;
-        }
-
-        @keyframes powerUpFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
         .winner {
             animation: winnerGlow 1s infinite alternate;
         }
@@ -263,13 +300,77 @@
             from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.7); }
             to { box-shadow: 0 0 40px gold, 0 0 60px gold; }
         }
+
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #00ff88, transparent);
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .connection-line::before, .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            top: -4px;
+        }
+
+        .connection-line::before {
+            left: 30%;
+            animation: dataFlow 2s infinite;
+        }
+
+        .connection-line::after {
+            right: 30%;
+            animation: dataFlow 2s infinite reverse;
+        }
+
+        @keyframes dataFlow {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .qr-code {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .qr-code img {
+            width: 150px;
+            height: 150px;
+        }
     </style>
 </head>
 <body>
     <div class="particles" id="particles"></div>
+    <div class="connection-line"></div>
     
     <div class="container">
-        <h1>COMBAT DE TÉLÉPHONES</h1>
+        <h1>COMBAT DE TÉLÉPHONES CONNECTÉS</h1>
+        
+        <div class="connection-panel">
+            <div class="connection-status">
+                <div class="status-indicator" id="status-indicator"></div>
+                <span id="status-text">Déconnecté</span>
+            </div>
+            <div class="connection-buttons">
+                <button class="connect-btn" id="host-btn">Créer une partie</button>
+                <button class="connect-btn" id="join-btn">Rejoindre une partie</button>
+                <button class="disconnect-btn" id="disconnect-btn" disabled>Déconnexion</button>
+            </div>
+            <div id="connection-info"></div>
+        </div>
         
         <div class="arena">
             <div class="phone phone-left">
@@ -280,6 +381,7 @@
                     <div class="health-bar">
                         <div class="health-fill health-left" id="health-left" style="width: 100%"></div>
                     </div>
+                    <div id="player-left-status" style="margin-top: 10px; font-size: 0.9rem;">En attente...</div>
                 </div>
                 <div class="home-button"></div>
             </div>
@@ -294,18 +396,19 @@
                     <div class="health-bar">
                         <div class="health-fill health-right" id="health-right" style="width: 100%"></div>
                     </div>
+                    <div id="player-right-status" style="margin-top: 10px; font-size: 0.9rem;">En attente...</div>
                 </div>
                 <div class="home-button"></div>
             </div>
         </div>
         
-        <div class="message" id="message">Prêt pour le combat!</div>
+        <div class="message" id="message">Connectez-vous pour commencer le combat!</div>
         
         <div class="controls">
-            <button class="attack-btn" id="attack-left">Attaquer iPhone</button>
-            <button class="special-btn" id="special-left">Spécial iPhone</button>
-            <button class="special-btn" id="special-right">Spécial Android</button>
-            <button class="attack-btn" id="attack-right">Attaquer Android</button>
+            <button class="attack-btn" id="attack-left" disabled>Attaquer iPhone</button>
+            <button class="special-btn" id="special-left" disabled>Spécial iPhone</button>
+            <button class="special-btn" id="special-right" disabled>Spécial Android</button>
+            <button class="attack-btn" id="attack-right" disabled>Attaquer Android</button>
         </div>
     </div>
 
@@ -321,11 +424,119 @@
         const phoneLeft = document.querySelector('.phone-left');
         const phoneRight = document.querySelector('.phone-right');
         const particlesContainer = document.getElementById('particles');
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const hostBtn = document.getElementById('host-btn');
+        const joinBtn = document.getElementById('join-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const connectionInfo = document.getElementById('connection-info');
+        const playerLeftStatus = document.getElementById('player-left-status');
+        const playerRightStatus = document.getElementById('player-right-status');
 
         // Variables du jeu
         let healthLeftValue = 100;
         let healthRightValue = 100;
-        let gameActive = true;
+        let gameActive = false;
+        let isConnected = false;
+        let playerRole = null; // 'host' ou 'client'
+        let ws = null;
+
+        // Simulation de WebSocket (à remplacer par une vraie implémentation WebSocket)
+        function connectWebSocket(role) {
+            playerRole = role;
+            
+            // Dans un vrai projet, vous utiliseriez:
+            // ws = new WebSocket('ws://votre-serveur:port');
+            
+            // Simulation de connexion
+            setTimeout(() => {
+                isConnected = true;
+                updateConnectionStatus();
+                
+                if (role === 'host') {
+                    messageEl.textContent = 'Partie créée! En attente d\'un adversaire...';
+                    connectionInfo.innerHTML = '<div class="qr-code">QR Code de connexion (simulé)</div>';
+                    playerLeftStatus.textContent = 'Prêt';
+                } else {
+                    messageEl.textContent = 'Connecté! Le combat va commencer!';
+                    playerRightStatus.textContent = 'Prêt';
+                    
+                    // Simuler la connexion d'un deuxième joueur
+                    setTimeout(() => {
+                        startGame();
+                    }, 2000);
+                }
+            }, 1500);
+        }
+
+        function disconnectWebSocket() {
+            // Dans un vrai projet: ws.close();
+            
+            isConnected = false;
+            gameActive = false;
+            playerRole = null;
+            updateConnectionStatus();
+            resetGame();
+            
+            messageEl.textContent = 'Déconnecté. Créez ou rejoignez une partie.';
+            connectionInfo.innerHTML = '';
+        }
+
+        function updateConnectionStatus() {
+            if (isConnected) {
+                statusIndicator.classList.add('connected');
+                statusText.textContent = 'Connecté (' + (playerRole === 'host' ? 'Hôte' : 'Client') + ')';
+                hostBtn.disabled = true;
+                joinBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                statusIndicator.classList.remove('connected');
+                statusText.textContent = 'Déconnecté';
+                hostBtn.disabled = false;
+                joinBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+
+        function startGame() {
+            gameActive = true;
+            messageEl.textContent = 'Le combat commence!';
+            
+            // Activer les boutons selon le rôle du joueur
+            if (playerRole === 'host') {
+                attackLeftBtn.disabled = false;
+                specialLeftBtn.disabled = false;
+                attackRightBtn.disabled = true;
+                specialRightBtn.disabled = true;
+                playerLeftStatus.textContent = 'En combat';
+                playerRightStatus.textContent = 'En combat';
+            } else {
+                attackLeftBtn.disabled = true;
+                specialLeftBtn.disabled = true;
+                attackRightBtn.disabled = false;
+                specialRightBtn.disabled = false;
+                playerLeftStatus.textContent = 'En combat';
+                playerRightStatus.textContent = 'En combat';
+            }
+        }
+
+        function resetGame() {
+            healthLeftValue = 100;
+            healthRightValue = 100;
+            healthLeft.style.width = '100%';
+            healthRight.style.width = '100%';
+            
+            attackLeftBtn.disabled = true;
+            attackRightBtn.disabled = true;
+            specialLeftBtn.disabled = true;
+            specialRightBtn.disabled = true;
+            
+            phoneLeft.classList.remove('winner');
+            phoneRight.classList.remove('winner');
+            
+            playerLeftStatus.textContent = 'En attente...';
+            playerRightStatus.textContent = 'En attente...';
+        }
 
         // Créer des particules d'arrière-plan
         function createParticles() {
@@ -368,11 +579,14 @@
 
         // Attaquer
         function attack(isLeftAttacking) {
-            if (!gameActive) return;
+            if (!gameActive || !isConnected) return;
             
             const damage = Math.floor(Math.random() * 15) + 5;
             const critical = Math.random() < 0.2; // 20% de chance de coup critique
             const finalDamage = critical ? damage * 2 : damage;
+            
+            // Dans un vrai jeu, vous enverriez cette action via WebSocket
+            // simulateWebSocketSend({ type: 'attack', damage: finalDamage, target: isLeftAttacking ? 'right' : 'left' });
             
             if (isLeftAttacking) {
                 healthRightValue = Math.max(0, healthRightValue - finalDamage);
@@ -415,7 +629,7 @@
 
         // Attaque spéciale
         function specialAttack(isLeftAttacking) {
-            if (!gameActive) return;
+            if (!gameActive || !isConnected) return;
             
             // Vérifier si l'attaque spéciale est disponible (cooldown simulé)
             if (isLeftAttacking && !specialLeftBtn.disabled) {
@@ -438,10 +652,8 @@
                 
                 // Désactiver le bouton temporairement
                 specialLeftBtn.disabled = true;
-                specialLeftBtn.style.opacity = '0.5';
                 setTimeout(() => {
-                    specialLeftBtn.disabled = false;
-                    specialLeftBtn.style.opacity = '1';
+                    if (gameActive) specialLeftBtn.disabled = false;
                 }, 3000);
             } else if (!isLeftAttacking && !specialRightBtn.disabled) {
                 const damage = Math.floor(Math.random() * 25) + 15;
@@ -463,10 +675,8 @@
                 
                 // Désactiver le bouton temporairement
                 specialRightBtn.disabled = true;
-                specialRightBtn.style.opacity = '0.5';
                 setTimeout(() => {
-                    specialRightBtn.disabled = false;
-                    specialRightBtn.style.opacity = '1';
+                    if (gameActive) specialRightBtn.disabled = false;
                 }, 3000);
             }
             
@@ -479,11 +689,20 @@
                 gameActive = false;
                 messageEl.textContent = 'Android gagne le combat!';
                 phoneRight.classList.add('winner');
+                disableAllButtons();
             } else if (healthRightValue <= 0) {
                 gameActive = false;
                 messageEl.textContent = 'iPhone gagne le combat!';
                 phoneLeft.classList.add('winner');
+                disableAllButtons();
             }
+        }
+
+        function disableAllButtons() {
+            attackLeftBtn.disabled = true;
+            attackRightBtn.disabled = true;
+            specialLeftBtn.disabled = true;
+            specialRightBtn.disabled = true;
         }
 
         // Événements
@@ -492,8 +711,13 @@
         specialLeftBtn.addEventListener('click', () => specialAttack(true));
         specialRightBtn.addEventListener('click', () => specialAttack(false));
 
+        hostBtn.addEventListener('click', () => connectWebSocket('host'));
+        joinBtn.addEventListener('click', () => connectWebSocket('client'));
+        disconnectBtn.addEventListener('click', disconnectWebSocket);
+
         // Initialiser le jeu
         createParticles();
+        updateConnectionStatus();
     </script>
 </body>
 </html>
