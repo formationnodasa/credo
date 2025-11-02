@@ -3,1144 +3,816 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Multijoueur - Match en Ligne</title>
+    <title>Match en Ligne - Jeux Éducatifs</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #f59e0b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --gray: #6b7280;
-            --border-radius: 12px;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: var(--dark);
-            line-height: 1.6;
+            overflow-x: hidden;
+            color: white;
         }
 
-        .screen {
-            display: none;
-            min-height: 100vh;
-            padding: 20px;
+        /* Animation Galaxie */
+        .galaxy-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #000000, #0a0a2a, #000000);
         }
 
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
+        /* Conteneur principal */
         .container {
-            max-width: 500px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header {
+        /* En-tête */
+        header {
             text-align: center;
+            padding: 30px 0;
             margin-bottom: 30px;
-            position: relative;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            color: white;
+        h1 {
+            font-size: 3.5rem;
             margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header h2 {
-            font-size: 2rem;
-            color: white;
-            margin-bottom: 10px;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #8b0000;
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
 
-        .back-btn {
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        /* Menu de sélection */
+        .game-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: rgba(20, 20, 40, 0.8);
+            border: 1px solid #8b0000;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
         }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.5);
+            border-color: #ff0000;
+        }
+
+        .game-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+        }
+
+        .game-card p {
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .game-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Zone de jeu */
+        .game-area {
+            background: rgba(10, 10, 30, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #8b0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+            display: none;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            color: #ff6b6b;
+        }
+
+        .game-timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff0000;
+        }
+
+        .game-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .question {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: rgba(40, 40, 80, 0.7);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: rgba(60, 60, 100, 0.9);
+            border-color: #ff6b6b;
+        }
+
+        .input-answer {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            background: rgba(30, 30, 60, 0.8);
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(45deg, #8b0000, #ff0000);
             color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
         }
 
         .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
+            background: linear-gradient(45deg, #333, #555);
         }
 
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--primary);
-            color: white;
+        .btn-secondary:hover {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
-        .btn-large {
-            padding: 16px 32px;
-            font-size: 1.1rem;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-
-        .room-code {
-            font-size: 3rem;
-            font-weight: bold;
-            color: var(--primary);
-            letter-spacing: 8px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
+        /* Résultats */
+        .results {
             text-align: center;
-        }
-
-        .players-list {
-            margin: 20px 0;
-        }
-
-        .player-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: #f8fafc;
-            border-radius: var(--border-radius);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .player-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .quiz-header {
-            background: white;
             padding: 20px;
-            border-radius: var(--border-radius);
+        }
+
+        .score {
+            font-size: 2rem;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
+            color: #ff6b6b;
         }
 
-        .timer { color: var(--danger); font-weight: bold; }
-        .score { color: var(--success); font-weight: bold; }
-
-        .question {
-            font-size: 1.3rem;
-            font-weight: 600;
+        /* Pied de page */
+        footer {
             text-align: center;
-            margin: 20px 0;
+            padding: 20px;
+            margin-top: auto;
+            color: #888;
+            border-top: 1px solid #333;
         }
 
-        .answer-input-container {
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .answer-input {
-            width: 100%;
-            padding: 16px;
-            font-size: 1.2rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius);
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .answer-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-
-        .answer-feedback {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            font-weight: 600;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .answer-correct {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid var(--success);
-        }
-
-        .answer-incorrect {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-
-        .correct-answer {
-            margin-top: 10px;
-            font-weight: 600;
-            color: var(--success);
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            border-left: 4px solid var(--success);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .name-input-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .name-input-container label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .name-input-container input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .name-input-container input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-
-        .name-input-container::after {
-            content: "👤";
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
-            .container { padding: 0 15px; }
-            .header h1 { font-size: 2rem; }
-            .room-code { font-size: 2.5rem; }
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .game-menu {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-card {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Écran d'accueil -->
-        <div id="home-screen" class="screen active">
-            <div class="container">
-                <div class="header">
-                    <h1><i class="fas fa-brain"></i> Quiz Multijoueur</h1>
-                    <p class="subtitle">Affrontez vos amis en temps réel !</p>
-                </div>
+    <!-- Canvas pour l'animation galaxie -->
+    <canvas class="galaxy-canvas"></canvas>
 
-                <div class="card">
-                    <button id="create-room" class="btn btn-primary btn-large pulse">
-                        <i class="fas fa-plus-circle"></i> Créer une salle
-                    </button>
-                    <button id="join-room" class="btn btn-secondary btn-large">
-                        <i class="fas fa-sign-in-alt"></i> Rejoindre une salle
-                    </button>
-                </div>
+    <div class="container">
+        <header>
+            <h1>MATCH EN LIGNE</h1>
+            <p class="subtitle">Défiez votre esprit avec nos jeux éducatifs</p>
+        </header>
 
-                <div class="card">
-                    <h3>Catégories disponibles :</h3>
-                    <p>• Champ lexical 'able' (admirable, excusable...)</p>
-                    <p>• Champ lexical 'eur' (chanteur, vendeur...)</p>
-                    <p>• Champ lexical 'tion' (création, décision...)</p>
-                    <p>• Champ lexical 'ment' (changement, développement...)</p>
-                    <p>• Champ lexical 'isme' (socialisme, capitalisme...)</p>
-                </div>
+        <!-- Menu de sélection des jeux -->
+        <div class="game-menu" id="gameMenu">
+            <div class="game-card" data-game="dictation">
+                <div class="game-icon">📝</div>
+                <h3>Dictée</h3>
+                <p>Testez votre orthographe avec des dictées variées</p>
+            </div>
+            <div class="game-card" data-game="spelling">
+                <div class="game-icon">📚</div>
+                <h3>Épellation</h3>
+                <p>Améliorez votre vocabulaire et votre prononciation</p>
+            </div>
+            <div class="game-card" data-game="anagram">
+                <div class="game-icon">🔤</div>
+                <h3>Anagramme</h3>
+                <p>Trouvez les mots cachés dans les anagrammes</p>
+            </div>
+            <div class="game-card" data-game="math">
+                <div class="game-icon">➗</div>
+                <h3>Mathématiques</h3>
+                <p>Résolvez des problèmes mathématiques en 5 secondes</p>
+            </div>
+            <div class="game-card" data-game="lexical">
+                <div class="game-icon">🧠</div>
+                <h3>Champ Lexical</h3>
+                <p>Trouvez les mots appartenant au même champ lexical</p>
+            </div>
+            <div class="game-card" data-game="complete">
+                <div class="game-icon">🏆</div>
+                <h3>Match Complet</h3>
+                <p>Affrontez tous les défis dans un match complet</p>
             </div>
         </div>
 
-        <!-- Écran création de salle -->
-        <div id="create-screen" class="screen">
-            <div class="container">
-                <div class="header">
-                    <button class="back-btn" onclick="app.showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Créer une salle</h2>
-                </div>
-
-                <div class="card">
-                    <div class="room-code" id="room-code">GÉNÉRATION...</div>
-                    <button id="copy-code" class="btn btn-secondary">
-                        <i class="fas fa-copy"></i> Copier le code
-                    </button>
-
-                    <div class="name-input-container">
-                        <label>Votre nom :</label>
-                        <input type="text" id="host-name" placeholder="Entrez votre nom">
-                    </div>
-
-                    <button id="create-confirm" class="btn btn-primary btn-large">
-                        <i class="fas fa-play"></i> Démarrer la salle
-                    </button>
-                </div>
+        <!-- Zone de jeu (initialement cachée) -->
+        <div class="game-area" id="gameArea">
+            <div class="game-header">
+                <h2 class="game-title" id="gameTitle">Jeu</h2>
+                <div class="game-timer" id="gameTimer">00</div>
+            </div>
+            <div class="game-content" id="gameContent">
+                <!-- Le contenu du jeu sera injecté ici -->
+            </div>
+            <div class="game-actions">
+                <button class="btn" id="startGame">Commencer</button>
+                <button class="btn btn-secondary" id="backToMenu">Retour au menu</button>
             </div>
         </div>
 
-        <!-- Écran rejoindre salle -->
-        <div id="join-screen" class="screen">
-            <div class="container">
-                <div class="header">
-                    <button class="back-btn" onclick="app.showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Rejoindre une salle</h2>
-                </div>
-
-                <div class="card">
-                    <div class="input-group">
-                        <label>Code de la salle :</label>
-                        <input type="text" id="join-code" placeholder="Ex: ABC123" maxlength="6">
-                    </div>
-
-                    <div class="name-input-container">
-                        <label>Votre nom :</label>
-                        <input type="text" id="player-name" placeholder="Entrez votre nom">
-                    </div>
-
-                    <button id="join-confirm" class="btn btn-primary btn-large" disabled>
-                        <i class="fas fa-sign-in-alt"></i> Rejoindre
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Écran salle d'attente -->
-        <div id="lobby-screen" class="screen">
-            <div class="container">
-                <div class="header">
-                    <h2>Salle d'attente</h2>
-                    <div class="room-code" id="lobby-code">ABC123</div>
-                </div>
-
-                <div class="card">
-                    <h3>Joueurs connectés (<span id="players-count">1</span>/6)</h3>
-                    <div id="players-list" class="players-list"></div>
-
-                    <div id="host-controls" class="hidden">
-                        <button id="start-game" class="btn btn-primary btn-large">
-                            <i class="fas fa-play"></i> Démarrer le quiz
-                        </button>
-                    </div>
-                    <div id="waiting-message">
-                        <p>En attente du début de la partie...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Écran du quiz -->
-        <div id="game-screen" class="screen">
-            <div class="container">
-                <div class="quiz-header">
-                    <div class="timer"><i class="fas fa-clock"></i> <span id="time-left">30</span>s</div>
-                    <div class="score"><i class="fas fa-star"></i> <span id="current-score">0</span></div>
-                    <div>Question <span id="current-q">1</span>/<span id="total-qs">10</span></div>
-                </div>
-
-                <div class="card">
-                    <div class="question" id="question-text">Chargement...</div>
-                    <div class="answer-input-container">
-                        <input type="text" id="answer-input" class="answer-input" placeholder="Tapez votre réponse ici..." autocomplete="off">
-                    </div>
-                    <div id="answer-feedback" class="answer-feedback hidden"></div>
-                    <button id="submit-answer" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Valider
-                    </button>
-                    <button id="next-question" class="btn btn-primary hidden">
-                        <i class="fas fa-arrow-right"></i> Suivant
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Écran résultats -->
-        <div id="results-screen" class="screen">
-            <div class="container">
-                <div class="header">
-                    <h2>Résultats du Quiz</h2>
-                </div>
-
-                <div class="card">
-                    <div style="text-align: center; margin: 20px 0;">
-                        <div class="room-code" style="font-size: 2rem;">
-                            <span id="final-score">0</span>/<span id="max-score">10</span>
-                        </div>
-                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;">
-                            <span id="score-percent">0%</span>
-                        </div>
-                    </div>
-
-                    <div id="leaderboard"></div>
-
-                    <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <button id="play-again" class="btn btn-primary">
-                            <i class="fas fa-redo"></i> Rejouer
-                        </button>
-                        <button id="back-home" class="btn btn-secondary">
-                            <i class="fas fa-home"></i> Accueil
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <footer>
+            <p>Match en Ligne - Développé avec passion pour l'apprentissage</p>
+        </footer>
     </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification hidden">
-        <div id="notification-message"></div>
-    </div>
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 🔥 CONFIGURATION FIREBASE - AVEC VOS CLÉS
-        const firebaseConfig = {
-            apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
-            authDomain: "match-en-ligne.firebaseapp.com",
-            projectId: "match-en-ligne",
-            storageBucket: "match-en-ligne.firebasestorage.app",
-            messagingSenderId: "706011207623",
-            appId: "1:706011207623:web:17374990a6202b64f0abe2",
-            measurementId: "G-D9XYRE3W2M"
+        // Données des jeux
+        const gameData = {
+            dictation: {
+                title: "Dictée",
+                questions: [
+                    "Le chat dort paisiblement sur le canapé.",
+                    "La pluie tombe doucement sur les toits.",
+                    "Les enfants jouent dans le jardin.",
+                    "Le soleil brille intensément aujourd'hui.",
+                    "Nous avons visité un magnifique château."
+                ]
+            },
+            spelling: {
+                title: "Épellation",
+                questions: [
+                    { word: "bibliothèque", hint: "Lieu où l'on trouve des livres" },
+                    { word: "émerveillement", hint: "État d'admiration profonde" },
+                    { word: "phénomène", hint: "Fait observable, événement" },
+                    { word: "conscience", hint: "Connaissance de soi et du monde" },
+                    { word: "extraordinaire", hint: "Qui sort de l'ordinaire" }
+                ]
+            },
+            anagram: {
+                title: "Anagramme",
+                questions: [
+                    { anagram: "CHARENT", solution: "CHANTER" },
+                    { anagram: "LAPINER", solution: "RAPLINE" },
+                    { anagram: "MARIE", solution: "AIMER" },
+                    { anagram: "CHIEN", solution: "NICHE" },
+                    { anagram: "VALSE", solution: "SALVE" }
+                ]
+            },
+            math: {
+                title: "Mathématiques",
+                questions: [
+                    { problem: "15 + 27", solution: "42" },
+                    { problem: "8 × 6", solution: "48" },
+                    { problem: "64 ÷ 8", solution: "8" },
+                    { problem: "17 - 9", solution: "8" },
+                    { problem: "5² + 3", solution: "28" }
+                ]
+            },
+            lexical: {
+                title: "Champ Lexical",
+                questions: [
+                    { theme: "La mer", words: ["océan", "vague", "plage", "bateau", "poisson"] },
+                    { theme: "L'école", words: ["crayon", "livre", "professeur", "classe", "cours"] },
+                    { theme: "La forêt", words: ["arbre", "feuille", "animal", "ombre", "sentier"] },
+                    { theme: "La cuisine", words: ["recette", "ingrédient", "four", "couteau", "repas"] },
+                    { theme: "Le sport", words: ["ballon", "joueur", "équipe", "victoire", "entraînement"] }
+                ]
+            }
         };
 
-        // Initialisation Firebase
-        const appFirebase = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Variables globales
+        let currentGame = null;
+        let currentQuestion = 0;
+        let score = 0;
+        let timer = null;
+        let timeLeft = 0;
 
-        // Base de données des questions
-        const QUIZ_QUESTIONS = [
-            // Champ lexical 'able'
-            { question: "Qui mérite d'être admiré ?", answer: "admirable" },
-            { question: "Qui peut être excusé ?", answer: "excusable" },
-            { question: "Qui peut être évité ?", answer: "évitable" },
-            { question: "Qui peut être regretté ?", answer: "regrettable" },
-            { question: "Qui peut être apprécié ?", answer: "appréciable" },
-            
-            // Champ lexical 'eur'
-            { question: "Celui qui chante ?", answer: "chanteur" },
-            { question: "Celui qui vend ?", answer: "vendeur" },
-            { question: "Celui qui lit ?", answer: "lecteur" },
-            { question: "Celui qui enseigne ?", answer: "formateur" },
-            { question: "Celui qui observe ?", answer: "spectateur" },
-            
-            // Champ lexical 'tion'
-            { question: "Action de créer ?", answer: "création" },
-            { question: "Action de décider ?", answer: "décision" },
-            { question: "Action de corriger ?", answer: "correction" },
-            { question: "Action de punir ?", answer: "punition" },
-            { question: "Action d'organiser ?", answer: "organisation" },
-            
-            // Champ lexical 'ment'
-            { question: "Transformation ou modification ?", answer: "changement" },
-            { question: "Croissance ou progrès ?", answer: "développement" },
-            { question: "Décision d'un tribunal ?", answer: "jugement" },
-            { question: "Action de se déplacer ?", answer: "déplacement" },
-            { question: "Amélioration d'une situation ?", answer: "amélioration" },
-            
-            // Champ lexical 'isme'
-            { question: "Doctrine pour l'égalité sociale ?", answer: "socialisme" },
-            { question: "Système économique avec capital ?", answer: "capitalisme" },
-            { question: "Croyance en un seul Dieu ?", answer: "monothéisme" },
-            { question: "Doctrine sans autorité ?", answer: "anarchisme" },
-            { question: "Mouvement artistique émotionnel ?", answer: "romantisme" }
-        ];
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initGalaxyAnimation();
+            setupEventListeners();
+        });
 
-        // Application principale
-        class QuizApp {
-            constructor() {
-                this.state = {
-                    currentScreen: 'home-screen',
-                    roomCode: '',
-                    playerName: '',
-                    isHost: false,
-                    currentRoom: null,
-                    game: {
-                        currentQuestion: 0,
-                        score: 0,
-                        selectedQuestions: [],
-                        timer: null,
-                        timeLeft: 30,
-                        hasAnswered: false
-                    },
-                    listeners: []
-                };
+        // Animation Galaxie
+        function initGalaxyAnimation() {
+            const canvas = document.querySelector('.galaxy-canvas');
+            const ctx = canvas.getContext('2d');
+            let animationFrameId;
 
-                this.init();
-            }
+            // Redimensionner le canvas
+            const resizeCanvas = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
 
-            init() {
-                this.setupEventListeners();
-                console.log('✅ QuizApp initialisé avec Firebase');
-            }
+            // Configuration des particules
+            const particles = [];
+            const particleCount = 150;
 
-            setupEventListeners() {
-                // Navigation
-                document.getElementById('create-room').addEventListener('click', () => {
-                    this.showScreen('create-screen');
-                    this.generateRoomCode();
-                });
-
-                document.getElementById('join-room').addEventListener('click', () => {
-                    this.showScreen('join-screen');
-                });
-
-                // Création salle
-                document.getElementById('create-confirm').addEventListener('click', () => {
-                    this.createRoom();
-                });
-
-                document.getElementById('copy-code').addEventListener('click', () => {
-                    this.copyRoomCode();
-                });
-
-                // Rejoindre salle
-                document.getElementById('join-confirm').addEventListener('click', () => {
-                    this.joinRoom();
-                });
-
-                document.getElementById('join-code').addEventListener('input', () => {
-                    this.validateJoinForm();
-                });
-
-                document.getElementById('player-name').addEventListener('input', () => {
-                    this.validateJoinForm();
-                });
-
-                // Jeu
-                document.getElementById('start-game').addEventListener('click', () => {
-                    this.startGame();
-                });
-
-                document.getElementById('submit-answer').addEventListener('click', () => {
-                    this.submitAnswer();
-                });
-
-                document.getElementById('answer-input').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.submitAnswer();
-                });
-
-                document.getElementById('next-question').addEventListener('click', () => {
-                    this.nextQuestion();
-                });
-
-                // Résultats
-                document.getElementById('play-again').addEventListener('click', () => {
-                    this.playAgain();
-                });
-
-                document.getElementById('back-home').addEventListener('click', () => {
-                    this.leaveRoom();
-                    this.showScreen('home-screen');
-                });
-
-                // Entrées clavier
-                document.getElementById('host-name').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.createRoom();
-                });
-
-                document.getElementById('join-code').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.joinRoom();
-                });
-
-                document.getElementById('player-name').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.joinRoom();
-                });
-            }
-
-            generateRoomCode() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let code = '';
-                for (let i = 0; i < 6; i++) {
-                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+            class Particle {
+                constructor() {
+                    this.reset();
                 }
-                this.state.roomCode = code;
-                document.getElementById('room-code').textContent = code;
-            }
 
-            async copyRoomCode() {
-                try {
-                    await navigator.clipboard.writeText(this.state.roomCode);
-                    this.showNotification('Code copié !');
-                } catch (err) {
-                    this.showNotification('Erreur copie', 'error');
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 0.5;
+                    this.speedY = (Math.random() - 0.5) * 0.5;
+                    this.color = Math.random() > 0.7 ? '#ff0000' : '#8b0000';
+                    this.alpha = Math.random() * 0.5 + 0.2;
                 }
-            }
 
-            validateJoinForm() {
-                const code = document.getElementById('join-code').value.trim();
-                const name = document.getElementById('player-name').value.trim();
-                const button = document.getElementById('join-confirm');
-                button.disabled = !(code.length === 6 && name.length >= 2);
-            }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
 
-            async createRoom() {
-                const playerName = document.getElementById('host-name').value.trim();
-                if (!this.validateName(playerName)) return;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
 
-                try {
-                    this.state.playerName = playerName;
-                    this.state.isHost = true;
-
-                    // Créer la salle dans Firebase
-                    await db.collection('rooms').doc(this.state.roomCode).set({
-                        code: this.state.roomCode,
-                        host: playerName,
-                        status: 'waiting',
-                        players: [playerName],
-                        maxPlayers: 6,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        currentQuestion: 0,
-                        gameStarted: false,
-                        scores: { [playerName]: 0 },
-                        selectedQuestions: []
-                    });
-
-                    this.showScreen('lobby-screen');
-                    this.setupRoomListeners();
-                    this.showNotification('Salle créée !');
-                } catch (error) {
-                    this.showNotification('Erreur: ' + error.message, 'error');
+                    this.alpha = 0.2 + 0.3 * Math.sin(Date.now() * 0.001 + this.x * 0.01);
                 }
-            }
 
-            async joinRoom() {
-                const roomCode = document.getElementById('join-code').value.trim().toUpperCase();
-                const playerName = document.getElementById('player-name').value.trim();
-
-                if (!this.validateName(playerName)) return;
-
-                try {
-                    this.state.roomCode = roomCode;
-                    this.state.playerName = playerName;
-                    this.state.isHost = false;
-
-                    const roomRef = db.collection('rooms').doc(roomCode);
-                    const roomDoc = await roomRef.get();
-
-                    if (!roomDoc.exists) throw new Error('Salle non trouvée');
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
                     
-                    const roomData = roomDoc.data();
-                    if (roomData.players.includes(playerName)) throw new Error('Nom déjà utilisé');
-                    if (roomData.players.length >= 6) throw new Error('Salle pleine');
-                    if (roomData.gameStarted) throw new Error('Partie déjà commencée');
-
-                    await roomRef.update({
-                        players: firebase.firestore.FieldValue.arrayUnion(playerName),
-                        [`scores.${playerName}`]: 0
-                    });
-
-                    this.showScreen('lobby-screen');
-                    this.setupRoomListeners();
-                    this.showNotification('Salle rejointe !');
-                } catch (error) {
-                    this.showNotification('Erreur: ' + error.message, 'error');
+                    // Effet de lueur
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                    ctx.restore();
                 }
             }
 
-            validateName(name) {
-                if (!name) {
-                    this.showNotification('Entrez votre nom', 'error');
-                    return false;
-                }
-                if (name.length < 2) {
-                    this.showNotification('Nom trop court', 'error');
-                    return false;
-                }
-                return true;
+            // Créer les particules
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
             }
 
-            setupRoomListeners() {
-                const unsubscribe = db.collection('rooms').doc(this.state.roomCode)
-                    .onSnapshot((doc) => {
-                        if (doc.exists) {
-                            const roomData = doc.data();
-                            this.state.currentRoom = roomData;
-                            this.handleRoomUpdate(roomData);
+            // Animation
+            const animate = () => {
+                ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Dessiner des connexions entre particules proches
+                ctx.strokeStyle = 'rgba(139, 0, 0, 0.1)';
+                ctx.lineWidth = 0.5;
+                
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
                         }
-                    });
-
-                this.state.listeners.push(unsubscribe);
-            }
-
-            handleRoomUpdate(roomData) {
-                // Mettre à jour l'écran d'attente
-                if (this.state.currentScreen === 'lobby-screen') {
-                    this.updateLobby(roomData);
-                }
-                
-                // Démarrer le jeu si nécessaire
-                if (roomData.gameStarted && this.state.currentScreen === 'lobby-screen') {
-                    this.startQuiz(roomData);
-                }
-                
-                // Afficher les résultats
-                if (roomData.status === 'finished' && this.state.currentScreen === 'game-screen') {
-                    this.showResults(roomData);
-                }
-
-                // Mettre à jour le jeu
-                if (this.state.currentScreen === 'game-screen') {
-                    this.updateGameState(roomData);
-                }
-            }
-
-            updateLobby(roomData) {
-                document.getElementById('lobby-code').textContent = this.state.roomCode;
-                document.getElementById('players-count').textContent = roomData.players.length;
-                
-                // Mettre à jour la liste des joueurs
-                const playersList = document.getElementById('players-list');
-                playersList.innerHTML = '';
-                
-                roomData.players.forEach(player => {
-                    const playerEl = document.createElement('div');
-                    playerEl.className = 'player-item';
-                    playerEl.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="player-avatar">${player.charAt(0).toUpperCase()}</div>
-                            <div>${player}</div>
-                        </div>
-                        ${player === roomData.host ? '<div style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem;">HÔTE</div>' : ''}
-                    `;
-                    playersList.appendChild(playerEl);
-                });
-
-                // Afficher/masquer les contrôles de l'hôte
-                const hostControls = document.getElementById('host-controls');
-                const waitingMsg = document.getElementById('waiting-message');
-                
-                if (this.state.isHost) {
-                    hostControls.classList.remove('hidden');
-                    waitingMsg.classList.add('hidden');
-                } else {
-                    hostControls.classList.add('hidden');
-                    waitingMsg.classList.remove('hidden');
-                }
-            }
-
-            async startGame() {
-                if (!this.state.isHost) return;
-
-                try {
-                    // Sélectionner 10 questions aléatoires
-                    const questions = [...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
-                    this.state.game.selectedQuestions = questions;
-                    
-                    await db.collection('rooms').doc(this.state.roomCode).update({
-                        gameStarted: true,
-                        status: 'playing',
-                        currentQuestion: 0,
-                        selectedQuestions: questions,
-                        startTime: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    this.showNotification('Partie démarrée !');
-                } catch (error) {
-                    this.showNotification('Erreur: ' + error.message, 'error');
-                }
-            }
-
-            startQuiz(roomData) {
-                this.state.game.selectedQuestions = roomData.selectedQuestions;
-                this.state.game.currentQuestion = roomData.currentQuestion;
-                this.state.game.score = roomData.scores[this.state.playerName] || 0;
-                
-                this.showScreen('game-screen');
-                this.displayQuestion();
-                this.startTimer();
-            }
-
-            displayQuestion() {
-                const questionIndex = this.state.game.currentQuestion;
-                const questions = this.state.game.selectedQuestions;
-                
-                if (questionIndex >= questions.length) {
-                    this.finishQuiz();
-                    return;
-                }
-
-                const question = questions[questionIndex];
-                
-                document.getElementById('question-text').textContent = question.question;
-                document.getElementById('current-q').textContent = questionIndex + 1;
-                document.getElementById('total-qs').textContent = questions.length;
-                document.getElementById('current-score').textContent = this.state.game.score;
-
-                this.resetQuestionState();
-            }
-
-            resetQuestionState() {
-                document.getElementById('answer-input').value = '';
-                document.getElementById('answer-input').disabled = false;
-                document.getElementById('answer-feedback').classList.add('hidden');
-                document.getElementById('submit-answer').classList.remove('hidden');
-                document.getElementById('next-question').classList.add('hidden');
-                this.state.game.hasAnswered = false;
-                this.state.game.timeLeft = 30;
-                document.getElementById('time-left').textContent = this.state.game.timeLeft;
-                
-                // Focus sur l'input de réponse
-                document.getElementById('answer-input').focus();
-            }
-
-            submitAnswer() {
-                if (this.state.game.hasAnswered) return;
-                
-                const answerInput = document.getElementById('answer-input');
-                const userAnswer = answerInput.value.trim().toLowerCase();
-                const currentQuestion = this.state.game.selectedQuestions[this.state.game.currentQuestion];
-                const correctAnswer = currentQuestion.answer.toLowerCase();
-                
-                const isCorrect = userAnswer === correctAnswer;
-                
-                // Mettre à jour le score
-                if (isCorrect) {
-                    this.state.game.score++;
-                    document.getElementById('current-score').textContent = this.state.game.score;
-                }
-
-                // Afficher le feedback
-                this.showAnswerFeedback(isCorrect, correctAnswer);
-                
-                // Enregistrer la réponse dans Firebase
-                this.updateScoreInFirebase();
-                
-                // Désactiver l'input
-                answerInput.disabled = true;
-                this.state.game.hasAnswered = true;
-                document.getElementById('submit-answer').classList.add('hidden');
-                document.getElementById('next-question').classList.remove('hidden');
-                
-                // Arrêter le timer
-                clearInterval(this.state.game.timer);
-            }
-
-            showAnswerFeedback(isCorrect, correctAnswer) {
-                const feedbackEl = document.getElementById('answer-feedback');
-                feedbackEl.classList.remove('hidden');
-                
-                if (isCorrect) {
-                    feedbackEl.textContent = 'Bonne réponse !';
-                    feedbackEl.className = 'answer-feedback answer-correct';
-                } else {
-                    feedbackEl.innerHTML = `Mauvaise réponse. <div class="correct-answer">La bonne réponse était : ${correctAnswer}</div>`;
-                    feedbackEl.className = 'answer-feedback answer-incorrect';
-                }
-            }
-
-            async updateScoreInFirebase() {
-                try {
-                    await db.collection('rooms').doc(this.state.roomCode).update({
-                        [`scores.${this.state.playerName}`]: this.state.game.score
-                    });
-                } catch (error) {
-                    console.error('Erreur mise à jour score:', error);
-                }
-            }
-
-            startTimer() {
-                clearInterval(this.state.game.timer);
-                
-                this.state.game.timer = setInterval(() => {
-                    this.state.game.timeLeft--;
-                    document.getElementById('time-left').textContent = this.state.game.timeLeft;
-                    
-                    if (this.state.game.timeLeft <= 0) {
-                        clearInterval(this.state.game.timer);
-                        this.handleTimeUp();
                     }
-                }, 1000);
-            }
-
-            handleTimeUp() {
-                if (!this.state.game.hasAnswered) {
-                    document.getElementById('answer-input').disabled = true;
-                    this.state.game.hasAnswered = true;
-                    document.getElementById('submit-answer').classList.add('hidden');
-                    document.getElementById('next-question').classList.remove('hidden');
-                    
-                    const currentQuestion = this.state.game.selectedQuestions[this.state.game.currentQuestion];
-                    this.showAnswerFeedback(false, currentQuestion.answer);
-                    this.showNotification('Temps écoulé !', 'error');
                 }
-            }
 
-            async nextQuestion() {
-                if (this.state.isHost) {
-                    await db.collection('rooms').doc(this.state.roomCode).update({
-                        currentQuestion: this.state.game.currentQuestion + 1
-                    });
-                }
-            }
+                animationFrameId = requestAnimationFrame(animate);
+            };
 
-            updateGameState(roomData) {
-                if (roomData.currentQuestion !== this.state.game.currentQuestion) {
-                    this.state.game.currentQuestion = roomData.currentQuestion;
-                    this.displayQuestion();
-                    this.startTimer();
-                }
-            }
+            animate();
+        }
 
-            async finishQuiz() {
-                if (this.state.isHost) {
-                    await db.collection('rooms').doc(this.state.roomCode).update({
-                        status: 'finished',
-                        endTime: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-            }
-
-            showResults(roomData) {
-                this.showScreen('results-screen');
-                
-                const finalScore = this.state.game.score;
-                const maxScore = this.state.game.selectedQuestions.length;
-                const percentage = Math.round((finalScore / maxScore) * 100);
-                
-                document.getElementById('final-score').textContent = finalScore;
-                document.getElementById('max-score').textContent = maxScore;
-                document.getElementById('score-percent').textContent = `${percentage}%`;
-                
-                this.displayLeaderboard(roomData);
-            }
-
-            displayLeaderboard(roomData) {
-                const leaderboard = document.getElementById('leaderboard');
-                leaderboard.innerHTML = '<h3>Classement</h3>';
-
-                if (!roomData.scores) return;
-
-                const sortedScores = Object.entries(roomData.scores)
-                    .sort(([, a], [, b]) => b - a);
-
-                sortedScores.forEach(([player, score], index) => {
-                    const rank = index + 1;
-                    const item = document.createElement('div');
-                    item.className = 'player-item';
-                    item.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="player-avatar">${rank}</div>
-                            <div>${player} ${player === roomData.host ? '👑' : ''}</div>
-                        </div>
-                        <div style="font-weight: bold; color: #4f46e5;">${score}</div>
-                    `;
-                    leaderboard.appendChild(item);
+        // Configuration des écouteurs d'événements
+        function setupEventListeners() {
+            // Sélection des jeux
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const gameType = this.getAttribute('data-game');
+                    selectGame(gameType);
                 });
-            }
+            });
 
-            async playAgain() {
-                if (this.state.isHost) {
-                    // Nettoyer et recréer
-                    await db.collection('rooms').doc(this.state.roomCode).delete();
-                    this.generateRoomCode();
-                    await this.createRoom();
-                } else {
-                    this.showScreen('lobby-screen');
-                }
-            }
+            // Boutons de contrôle
+            document.getElementById('startGame').addEventListener('click', startGame);
+            document.getElementById('backToMenu').addEventListener('click', backToMenu);
+        }
 
-            leaveRoom() {
-                // Nettoyer les listeners
-                this.state.listeners.forEach(unsubscribe => unsubscribe());
-                this.state.listeners = [];
-                
-                // Réinitialiser l'état
-                this.state.roomCode = '';
-                this.state.playerName = '';
-                this.state.isHost = false;
-                this.state.currentRoom = null;
-                this.state.game = {
-                    currentQuestion: 0,
-                    score: 0,
-                    selectedQuestions: [],
-                    timer: null,
-                    timeLeft: 30,
-                    hasAnswered: false
-                };
-            }
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.remove('active');
-                });
-                document.getElementById(screenId).classList.add('active');
-                this.state.currentScreen = screenId;
-            }
-
-            showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                const messageEl = document.getElementById('notification-message');
-                
-                messageEl.textContent = message;
-                notification.className = `notification ${type === 'error' ? 'error' : ''}`;
-                notification.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
-                notification.classList.remove('hidden');
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => notification.classList.add('hidden'), 300);
-                }, 3000);
+        // Sélection d'un jeu
+        function selectGame(gameType) {
+            currentGame = gameType;
+            document.getElementById('gameTitle').textContent = 
+                gameType === 'complete' ? 'Match Complet' : gameData[gameType].title;
+            
+            document.getElementById('gameMenu').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            if (gameType === 'complete') {
+                setupCompleteMatch();
+            } else {
+                setupGameScreen();
             }
         }
 
-        // Démarrer l'application
-        document.addEventListener('DOMContentLoaded', () => {
-            window.app = new QuizApp();
-        });
+        // Configuration de l'écran de jeu
+        function setupGameScreen() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="game-instructions">
+                    <h3>Instructions</h3>
+                    <p id="instructionsText">Chargement...</p>
+                </div>
+            `;
+            
+            // Définir les instructions selon le jeu
+            let instructions = "";
+            switch(currentGame) {
+                case 'dictation':
+                    instructions = "Écoutez attentivement la phrase et écrivez-la correctement.";
+                    break;
+                case 'spelling':
+                    instructions = "Épelez correctement le mot affiché en tenant compte de l'indice.";
+                    break;
+                case 'anagram':
+                    instructions = "Trouvez le mot correspondant à l'anagramme affiché.";
+                    break;
+                case 'math':
+                    instructions = "Résolvez le problème mathématique. Vous avez 5 secondes!";
+                    break;
+                case 'lexical':
+                    instructions = "Trouvez 3 mots appartenant au champ lexical donné. Vous avez 10 secondes!";
+                    break;
+            }
+            
+            document.getElementById('instructionsText').textContent = instructions;
+        }
 
-        // Icônes Font Awesome
-        const faScript = document.createElement('script');
-        faScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js';
-        document.head.appendChild(faScript);
+        // Configuration du match complet
+        function setupCompleteMatch() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="game-instructions">
+                    <h3>Match Complet</h3>
+                    <p>Vous allez affronter tous les jeux dans l'ordre :</p>
+                    <ol>
+                        <li>Dictée (3 phrases)</li>
+                        <li>Épellation (3 mots)</li>
+                        <li>Anagramme (3 mots)</li>
+                        <li>Mathématiques (3 problèmes)</li>
+                        <li>Champ Lexical (3 thèmes)</li>
+                    </ol>
+                    <p>Votre score total sera calculé à la fin. Bonne chance!</p>
+                </div>
+            `;
+        }
+
+        // Démarrer le jeu
+        function startGame() {
+            currentQuestion = 0;
+            score = 0;
+            
+            if (currentGame === 'complete') {
+                startCompleteMatch();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        // Charger une question
+        function loadQuestion() {
+            const gameContent = document.getElementById('gameContent');
+            const questions = gameData[currentGame].questions;
+            
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            let html = '';
+            
+            switch(currentGame) {
+                case 'dictation':
+                    html = `
+                        <div class="question">Phrase ${currentQuestion + 1}/${questions.length}</div>
+                        <p>Écoutez attentivement puis écrivez la phrase :</p>
+                        <button class="btn" id="playPhrase">Écouter la phrase</button>
+                        <input type="text" class="input-answer" id="dictationAnswer" placeholder="Tapez la phrase ici...">
+                        <button class="btn" id="submitDictation">Valider</button>
+                    `;
+                    break;
+                    
+                case 'spelling':
+                    html = `
+                        <div class="question">Mot ${currentQuestion + 1}/${questions.length}</div>
+                        <p>Indice : ${question.hint}</p>
+                        <p class="word-to-spell">${question.word}</p>
+                        <input type="text" class="input-answer" id="spellingAnswer" placeholder="Épelez le mot ici...">
+                        <button class="btn" id="submitSpelling">Valider</button>
+                    `;
+                    break;
+                    
+                case 'anagram':
+                    html = `
+                        <div class="question">Anagramme ${currentQuestion + 1}/${questions.length}</div>
+                        <p>Trouvez le mot correspondant à :</p>
+                        <p class="anagram">${question.anagram}</p>
+                        <input type="text" class="input-answer" id="anagramAnswer" placeholder="Votre réponse...">
+                        <button class="btn" id="submitAnagram">Valider</button>
+                    `;
+                    break;
+                    
+                case 'math':
+                    timeLeft = 5;
+                    html = `
+                        <div class="question">Problème ${currentQuestion + 1}/${questions.length}</div>
+                        <p>Résolvez :</p>
+                        <p class="math-problem">${question.problem}</p>
+                        <input type="text" class="input-answer" id="mathAnswer" placeholder="Votre réponse...">
+                        <button class="btn" id="submitMath">Valider</button>
+                    `;
+                    startTimer();
+                    break;
+                    
+                case 'lexical':
+                    timeLeft = 10;
+                    html = `
+                        <div class="question">Champ Lexical ${currentQuestion + 1}/${questions.length}</div>
+                        <p>Trouvez 3 mots appartenant au champ lexical :</p>
+                        <p class="lexical-theme">${question.theme}</p>
+                        <input type="text" class="input-answer" id="lexicalAnswer1" placeholder="Mot 1">
+                        <input type="text" class="input-answer" id="lexicalAnswer2" placeholder="Mot 2">
+                        <input type="text" class="input-answer" id="lexicalAnswer3" placeholder="Mot 3">
+                        <button class="btn" id="submitLexical">Valider</button>
+                    `;
+                    startTimer();
+                    break;
+            }
+            
+            gameContent.innerHTML = html;
+            setupQuestionEvents();
+        }
+
+        // Configurer les événements pour la question actuelle
+        function setupQuestionEvents() {
+            switch(currentGame) {
+                case 'dictation':
+                    document.getElementById('playPhrase').addEventListener('click', playPhrase);
+                    document.getElementById('submitDictation').addEventListener('click', checkDictation);
+                    break;
+                case 'spelling':
+                    document.getElementById('submitSpelling').addEventListener('click', checkSpelling);
+                    break;
+                case 'anagram':
+                    document.getElementById('submitAnagram').addEventListener('click', checkAnagram);
+                    break;
+                case 'math':
+                    document.getElementById('submitMath').addEventListener('click', checkMath);
+                    break;
+                case 'lexical':
+                    document.getElementById('submitLexical').addEventListener('click', checkLexical);
+                    break;
+            }
+        }
+
+        // Jouer une phrase (pour la dictée)
+        function playPhrase() {
+            const phrase = gameData.dictation.questions[currentQuestion];
+            const utterance = new SpeechSynthesisUtterance(phrase);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Vérifier la dictée
+        function checkDictation() {
+            const userAnswer = document.getElementById('dictationAnswer').value.trim();
+            const correctAnswer = gameData.dictation.questions[currentQuestion];
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                score++;
+                alert("Correct! 👍");
+            } else {
+                alert(`Incorrect. La bonne réponse était : "${correctAnswer}"`);
+            }
+            
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Vérifier l'épellation
+        function checkSpelling() {
+            const userAnswer = document.getElementById('spellingAnswer').value.trim();
+            const correctAnswer = gameData.spelling.questions[currentQuestion].word;
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                score++;
+                alert("Correct! 👍");
+            } else {
+                alert(`Incorrect. La bonne orthographe était : "${correctAnswer}"`);
+            }
+            
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Vérifier l'anagramme
+        function checkAnagram() {
+            const userAnswer = document.getElementById('anagramAnswer').value.trim().toUpperCase();
+            const correctAnswer = gameData.anagram.questions[currentQuestion].solution;
+            
+            if (userAnswer === correctAnswer) {
+                score++;
+                alert("Correct! 👍");
+            } else {
+                alert(`Incorrect. La bonne réponse était : "${correctAnswer}"`);
+            }
+            
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Vérifier les maths
+        function checkMath() {
+            clearInterval(timer);
+            const userAnswer = document.getElementById('mathAnswer').value.trim();
+            const correctAnswer = gameData.math.questions[currentQuestion].solution;
+            
+            if (userAnswer === correctAnswer) {
+                score++;
+                alert("Correct! 👍");
+            } else {
+                alert(`Incorrect. La bonne réponse était : "${correctAnswer}"`);
+            }
+            
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Vérifier le champ lexical
+        function checkLexical() {
+            clearInterval(timer);
+            const answer1 = document.getElementById('lexicalAnswer1').value.trim().toLowerCase();
+            const answer2 = document.getElementById('lexicalAnswer2').value.trim().toLowerCase();
+            const answer3 = document.getElementById('lexicalAnswer3').value.trim().toLowerCase();
+            
+            const correctWords = gameData.lexical.questions[currentQuestion].words.map(w => w.toLowerCase());
+            let correctCount = 0;
+            
+            if (correctWords.includes(answer1)) correctCount++;
+            if (correctWords.includes(answer2)) correctCount++;
+            if (correctWords.includes(answer3)) correctCount++;
+            
+            score += correctCount;
+            alert(`Vous avez trouvé ${correctCount} bon(s) mot(s) sur 3. Les mots possibles étaient : ${correctWords.join(', ')}`);
+            
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Démarrer le match complet
+        function startCompleteMatch() {
+            // Implémentation simplifiée pour l'exemple
+            alert("Le match complet va commencer! Cette fonctionnalité est en cours de développement.");
+            backToMenu();
+        }
+
+        // Afficher les résultats
+        function showResults() {
+            const gameContent = document.getElementById('gameContent');
+            const totalQuestions = gameData[currentGame].questions.length;
+            
+            gameContent.innerHTML = `
+                <div class="results">
+                    <h3>Résultats</h3>
+                    <div class="score">Votre score : ${score}/${totalQuestions}</div>
+                    <p>${getResultMessage(score, totalQuestions)}</p>
+                    <button class="btn" id="playAgain">Rejouer</button>
+                </div>
+            `;
+            
+            document.getElementById('playAgain').addEventListener('click', startGame);
+        }
+
+        // Obtenir le message de résultat
+        function getResultMessage(score, total) {
+            const percentage = (score / total) * 100;
+            
+            if (percentage >= 90) return "Excellent! Vous maîtrisez parfaitement ce jeu!";
+            if (percentage >= 70) return "Très bien! Bonne performance!";
+            if (percentage >= 50) return "Pas mal! Vous pouvez encore vous améliorer.";
+            return "Continuez à vous entraîner, vous progresserez!";
+        }
+
+        // Démarrer le timer
+        function startTimer() {
+            document.getElementById('gameTimer').textContent = timeLeft;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('gameTimer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Temps écoulé!");
+                    currentQuestion++;
+                    loadQuestion();
+                }
+            }, 1000);
+        }
+
+        // Retour au menu
+        function backToMenu() {
+            if (timer) clearInterval(timer);
+            document.getElementById('gameMenu').style.display = 'grid';
+            document.getElementById('gameArea').style.display = 'none';
+        }
     </script>
 </body>
 </html>
