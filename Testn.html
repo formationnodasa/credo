@@ -162,6 +162,7 @@
             padding: 15px;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .player-card.active {
@@ -179,10 +180,34 @@
             box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
         }
 
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
         .player-name {
             font-size: 1.2rem;
-            margin-bottom: 8px;
             color: #66aaff;
+            margin-right: 8px;
+        }
+
+        .presence-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .presence-online {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00;
+        }
+
+        .presence-offline {
+            background: #ff4444;
+            box-shadow: 0 0 8px #ff4444;
         }
 
         .player-score {
@@ -211,6 +236,16 @@
             margin: 20px 0;
             font-weight: bold;
             text-shadow: 0 0 10px #0066ff;
+        }
+
+        .player-count {
+            font-size: 1.1rem;
+            color: #66aaff;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: rgba(0, 102, 255, 0.2);
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .code-input {
@@ -451,6 +486,7 @@
             <h3>Création de Salle</h3>
             <p>Donnez ce code à vos amis :</p>
             <div class="code-display" id="sessionCode">----</div>
+            <div class="player-count" id="playerCount">1 joueur connecté</div>
             <div class="players-container" id="createPlayersList"></div>
             <p>En attente de joueurs...</p>
             <button class="btn" id="startMultiplayerGame">Démarrer la Partie</button>
@@ -519,17 +555,65 @@
         let localTimer = null;
         let currentQuestionIndex = 0;
         let timerStartTime = null;
+        let lastActivityTime = Date.now();
+        let presenceUpdateInterval = null;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             initGalaxyAnimation();
             setupEventListeners();
             generatePlayerId();
+            setupActivityTracking();
         });
 
         // Générer un ID unique pour le joueur
         function generatePlayerId() {
             playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Configurer le suivi d'activité
+        function setupActivityTracking() {
+            // Mettre à jour l'activité lors d'interactions
+            document.addEventListener('mousemove', updateActivity);
+            document.addEventListener('keypress', updateActivity);
+            document.addEventListener('click', updateActivity);
+            
+            // Vérifier périodiquement l'activité
+            setInterval(checkActivity, 2000);
+        }
+
+        // Mettre à jour le timestamp d'activité
+        function updateActivity() {
+            lastActivityTime = Date.now();
+            if (currentSession) {
+                updatePlayerPresence(true);
+            }
+        }
+
+        // Vérifier l'activité
+        function checkActivity() {
+            const now = Date.now();
+            const inactiveTime = now - lastActivityTime;
+            
+            // Si inactif depuis plus de 5 secondes, marquer comme hors ligne
+            if (inactiveTime > 5000 && currentSession) {
+                updatePlayerPresence(false);
+            }
+        }
+
+        // Mettre à jour la présence du joueur
+        async function updatePlayerPresence(isOnline) {
+            if (!currentSession) return;
+            
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? { ...p, isOnline: isOnline } : p
+                    )
+                });
+            } catch (error) {
+                console.error('Erreur mise à jour présence:', error);
+            }
         }
 
         // Animation Galaxie Bleue
@@ -699,7 +783,8 @@
                         score: 0,
                         hasAnswered: false,
                         answer: '',
-                        isCorrect: false
+                        isCorrect: false,
+                        isOnline: true
                     }],
                     status: 'waiting',
                     currentQuestion: 0,
@@ -716,7 +801,8 @@
                     score: 0,
                     hasAnswered: false,
                     answer: '',
-                    isCorrect: false
+                    isCorrect: false,
+                    isOnline: true
                 }];
                 
                 showSessionLobby();
@@ -763,7 +849,8 @@
                             score: 0,
                             hasAnswered: false,
                             answer: '',
-                            isCorrect: false
+                            isCorrect: false,
+                            isOnline: true
                         })
                     });
                 }
@@ -777,7 +864,8 @@
                         score: 0,
                         hasAnswered: false,
                         answer: '',
-                        isCorrect: false
+                        isCorrect: false,
+                        isOnline: true
                     });
                 }
                 
@@ -808,6 +896,7 @@
                     const sessionData = doc.data();
                     players = sessionData.players || [];
                     updatePlayersList();
+                    updatePlayerCount();
 
                     // Mettre à jour l'interface selon le statut
                     if (sessionData.status === 'playing') {
@@ -826,6 +915,17 @@
                     backToMenu();
                 }
             });
+        }
+
+        // Mettre à jour le compteur de joueurs
+        function updatePlayerCount() {
+            const playerCountElement = document.getElementById('playerCount');
+            const onlinePlayers = players.filter(p => p.isOnline).length;
+            const totalPlayers = players.length;
+            
+            if (playerCountElement) {
+                playerCountElement.textContent = `${onlinePlayers}/${totalPlayers} joueur${totalPlayers > 1 ? 's' : ''} connecté${totalPlayers > 1 ? 's' : ''}`;
+            }
         }
 
         // Gérer le timer
@@ -934,7 +1034,10 @@
             if (playersList) {
                 playersList.innerHTML = players.map(player => 
                     `<div class="player-card ${player.id === playerId ? 'active' : ''}">
-                        <div class="player-name">${player.name}</div>
+                        <div class="player-header">
+                            <div class="player-name">${player.name}</div>
+                            <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                        </div>
                         <div class="player-score">${player.score} pts</div>
                         <div class="player-status">${player.hasAnswered ? '✅ Répondu' : '⏳ En attente'}</div>
                     </div>`
@@ -989,7 +1092,10 @@
                     <div class="players-container">
                         ${players.map(player => `
                             <div class="player-card ${player.id === playerId ? 'active' : ''} ${player.hasAnswered ? 'correct' : ''}">
-                                <div class="player-name">${player.name}</div>
+                                <div class="player-header">
+                                    <div class="player-name">${player.name}</div>
+                                    <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                                </div>
                                 <div class="player-score">${player.score} pts</div>
                                 <div class="player-status">${player.hasAnswered ? '✅ Répondu' : '🤔 Réfléchit'}</div>
                                 ${player.hasAnswered ? `<div class="player-answer">${player.answer}</div>` : ''}
@@ -1106,7 +1212,10 @@
                     <div class="players-container">
                         ${sortedPlayers.map((player, index) => `
                             <div class="player-card ${player.id === winner.id ? 'active' : ''}">
-                                <div class="player-name">${player.name}</div>
+                                <div class="player-header">
+                                    <div class="player-name">${player.name}</div>
+                                    <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                                </div>
                                 <div class="player-score">${player.score} points</div>
                                 <div class="player-status">${index + 1}ère place</div>
                             </div>
@@ -1137,7 +1246,8 @@
                         score: 0,
                         hasAnswered: false,
                         answer: '',
-                        isCorrect: false
+                        isCorrect: false,
+                        isOnline: true
                     }))
                 });
 
