@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+m<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -367,6 +367,28 @@
             border: 1px solid #0066ff;
         }
 
+        .final-results {
+            background: rgba(20, 30, 60, 0.95);
+            border: 3px solid #ffcc00;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
+        }
+
+        .winner-crown {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .game-mode { grid-template-columns: 1fr; }
@@ -465,6 +487,14 @@
             <p>Scores actuels (Épellation + Anagrammes)</p>
             <button class="btn" onclick="continueToSecondHalf()">Continuer vers la 2ème mi-temps</button>
         </div>
+
+        <!-- Résultats Finaux -->
+        <div class="final-results" id="finalResults">
+            <div class="winner-crown">👑</div>
+            <h2 class="halftime-title">🏆 RÉSULTATS FINAUX</h2>
+            <div class="players-container" id="finalPlayers"></div>
+            <button class="btn" onclick="resetInterface()">Retour au Menu</button>
+        </div>
     </div>
 
     <script>
@@ -547,6 +577,18 @@
             { theme: "Précaution", hint: "mesure prise pour éviter un danger ou un problème", letter: "P" },
             { theme: "Privilège", hint: "avantage ou droit spécial accordé à certaines personnes", letter: "P" }
         ];
+
+        // Structure des données de jeu
+        const gameData = {
+            spelling: {
+                dictionary: dictionaryWords,
+                initiation: initiationWords,
+                bible: bibleWords
+            },
+            anagram: anagrams,
+            math: mathQuestions,
+            lexical: lexicalFields
+        };
 
         // ============================
         // VARIABLES GLOBALES
@@ -649,7 +691,9 @@
                         halftimeScore: 0,
                         isOnline: true,
                         hasAnswered: false,
-                        readyForSecondHalf: false
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
                     }],
                     status: 'waiting',
                     gameState: 'lobby',
@@ -707,7 +751,9 @@
                         halftimeScore: 0,
                         isOnline: true,
                         hasAnswered: false,
-                        readyForSecondHalf: false
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
                     })
                 });
 
@@ -796,7 +842,7 @@
                     status: 'playing',
                     gameState: 'spelling_dictionary',
                     currentQuestion: 0,
-                    timer: 15,
+                    timer: 12,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -844,7 +890,7 @@
             `;
 
             updateGamePlayers();
-            speakText(`Épelez le mot: ${word}`);
+            speakText(`Épellation ${typeNames[type]}. Épelez le mot: ${word}`);
         }
 
         async function submitSpellingAnswer(correctAnswer) {
@@ -897,7 +943,7 @@
             `;
 
             updateGamePlayers();
-            speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
+            speakText(`Anagramme. Trouvez le mot correspondant à: ${anagram.anagram}`);
         }
 
         async function submitAnagramAnswer(index) {
@@ -964,6 +1010,7 @@
                 await db.collection('sessions').doc(currentSession).update({
                     gameState: nextType,
                     currentQuestion: 0,
+                    timer: nextType === 'anagram' ? 10 : 12,
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false
@@ -1044,7 +1091,8 @@
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false,
-                        quickAnswer: false
+                        quickAnswer: false,
+                        isCorrect: false
                     }))
                 });
             } catch (error) {
@@ -1101,6 +1149,7 @@
 
             if (!hasQuickAnswer && isHost) {
                 startTimer(question.time);
+                speakText(`Mathématiques. Résolvez: ${question.problem}`);
             }
         }
 
@@ -1142,10 +1191,12 @@
                 await db.collection('sessions').doc(currentSession).update({
                     gameState: 'lexical',
                     currentQuestion: 0,
+                    timer: 10,
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false,
-                        quickAnswer: false
+                        quickAnswer: false,
+                        isCorrect: false
                     }))
                 });
             } catch (error) {
@@ -1191,7 +1242,9 @@
             document.getElementById('gameContent').innerHTML = content;
             updateGamePlayers();
 
-            speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
+            if (!hasQuickAnswer) {
+                speakText(`Champ lexical. ${question.hint}. Tous les mots commencent par la lettre ${question.letter}`);
+            }
         }
 
         async function submitLexicalAnswer(correctAnswer) {
@@ -1325,6 +1378,7 @@
             document.getElementById('createSessionInterface').style.display = 'none';
             document.getElementById('gameArea').style.display = 'none';
             document.getElementById('halftimeSection').style.display = 'none';
+            document.getElementById('finalResults').style.display = 'none';
             document.getElementById('gameMode').style.display = 'grid';
             currentSession = null;
             players = [];
@@ -1349,24 +1403,18 @@
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
             const winner = sortedPlayers[0];
             
-            document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('gameTitle').textContent = "Résultats Finaux";
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('finalResults').style.display = 'block';
             
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">🏆 ${winner.name} remporte la partie !</div>
-                <div class="players-container">
-                    ${sortedPlayers.map((player, index) => `
-                        <div class="player-card ${player.id === winner.id ? 'active' : ''}">
-                            <div class="player-header">
-                                <div class="player-name">${player.name}</div>
-                            </div>
-                            <div class="player-score">${player.score} points</div>
-                            <div class="player-status">${index + 1}ère place</div>
-                        </div>
-                    `).join('')}
+            document.getElementById('finalPlayers').innerHTML = sortedPlayers.map((player, index) => `
+                <div class="player-card ${player.id === winner.id ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                    </div>
+                    <div class="player-score">${player.score} points</div>
+                    <div class="player-status">${index + 1}ère place</div>
                 </div>
-                <button class="btn" onclick="resetInterface()">Retour au Menu</button>
-            `;
+            `).join('');
 
             speakText(`Félicitations à ${winner.name} qui gagne avec ${winner.score} points !`);
         }
