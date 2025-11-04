@@ -1,4 +1,4 @@
-m<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -339,6 +339,8 @@ m<!DOCTYPE html>
             top: 20px;
             right: 20px;
             z-index: 1000;
+            display: flex;
+            gap: 10px;
         }
 
         .audio-btn {
@@ -352,11 +354,20 @@ m<!DOCTYPE html>
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .audio-btn:hover {
             background: rgba(0, 204, 255, 1);
             transform: scale(1.1);
+        }
+
+        .audio-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .halftime {
@@ -425,6 +436,16 @@ m<!DOCTYPE html>
             transition: width 0.3s ease;
         }
 
+        .voice-status {
+            background: rgba(0, 102, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #88ccff;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .game-mode { grid-template-columns: 1fr; }
@@ -433,6 +454,8 @@ m<!DOCTYPE html>
             .game-timer { font-size: 2.2rem; }
             .game-title { font-size: 1.8rem; }
             .question { font-size: 1.6rem; }
+            .audio-controls { top: 10px; right: 10px; }
+            .audio-btn { width: 50px; height: 50px; font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -440,6 +463,8 @@ m<!DOCTYPE html>
     <div class="notification" id="notification"></div>
     <div class="audio-controls">
         <button class="audio-btn" id="toggleAudio" title="Activer/Désactiver le son">🔊</button>
+        <button class="audio-btn" id="repeatQuestion" title="Répéter la question" disabled>🔁</button>
+        <button class="audio-btn" id="pauseAudio" title="Pause/Reprendre" disabled>⏸️</button>
     </div>
 
     <div class="container">
@@ -515,6 +540,10 @@ m<!DOCTYPE html>
             
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="voice-status" id="voiceStatus">
+                Préparation de la question...
             </div>
             
             <div class="game-content" id="gameContent">
@@ -602,6 +631,12 @@ m<!DOCTYPE html>
         let gameTimerInterval = null;
         let sessionUnsubscribe = null;
         let presenceInterval = null;
+        
+        // NOUVELLES VARIABLES POUR LA GESTION VOCALE AMÉLIORÉE
+        let currentUtterance = null;
+        let isSpeechPaused = false;
+        let voiceQueue = [];
+        let isSpeaking = false;
 
         // =============================================
         // INITIALISATION
@@ -610,13 +645,40 @@ m<!DOCTYPE html>
             setupAudio();
             setupPresenceTracking();
             setupInputListeners();
+            setupVoiceControls();
         });
 
         function setupAudio() {
             document.getElementById('toggleAudio').addEventListener('click', function() {
                 audioEnabled = !audioEnabled;
                 this.textContent = audioEnabled ? '🔊' : '🔇';
-                if (audioEnabled) speakText("Son activé");
+                if (audioEnabled) {
+                    speakText("Son activé");
+                } else {
+                    stopAllSpeech();
+                }
+            });
+        }
+
+        function setupVoiceControls() {
+            // Bouton Répéter
+            document.getElementById('repeatQuestion').addEventListener('click', function() {
+                if (currentGameState && currentQuestionIndex >= 0) {
+                    repeatCurrentQuestion();
+                }
+            });
+
+            // Bouton Pause/Reprendre
+            document.getElementById('pauseAudio').addEventListener('click', function() {
+                if (isSpeaking) {
+                    if (isSpeechPaused) {
+                        resumeSpeech();
+                        this.textContent = '⏸️';
+                    } else {
+                        pauseSpeech();
+                        this.textContent = '▶️';
+                    }
+                }
             });
         }
 
@@ -642,6 +704,129 @@ m<!DOCTYPE html>
             document.getElementById('joinCodeInput')?.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') joinSession();
             });
+        }
+
+        // =============================================
+        // SYSTÈME VOCAL AMÉLIORÉ
+        // =============================================
+        function speakText(text, options = {}) {
+            if (!audioEnabled) return;
+
+            const {
+                rate = 0.75,      // Plus lent pour plus de clarté
+                pitch = 1.0,      // Ton normal
+                volume = 1.0,     // Volume maximum
+                delay = 0,        // Délai avant de parler
+                onStart = null,   // Callback de début
+                onEnd = null      // Callback de fin
+            } = options;
+
+            if (delay > 0) {
+                setTimeout(() => speakImmediately(text, rate, pitch, volume, onStart, onEnd), delay);
+            } else {
+                speakImmediately(text, rate, pitch, volume, onStart, onEnd);
+            }
+        }
+
+        function speakImmediately(text, rate, pitch, volume, onStart, onEnd) {
+            if (!audioEnabled) return;
+
+            if ('speechSynthesis' in window) {
+                // Arrêter toute parole en cours
+                window.speechSynthesis.cancel();
+                
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = 'fr-FR';
+                currentUtterance.rate = rate;
+                currentUtterance.pitch = pitch;
+                currentUtterance.volume = volume;
+
+                currentUtterance.onstart = function() {
+                    isSpeaking = true;
+                    document.getElementById('pauseAudio').disabled = false;
+                    document.getElementById('repeatQuestion').disabled = false;
+                    updateVoiceStatus("Lecture en cours...");
+                    if (onStart) onStart();
+                };
+
+                currentUtterance.onend = function() {
+                    isSpeaking = false;
+                    isSpeechPaused = false;
+                    document.getElementById('pauseAudio').disabled = true;
+                    document.getElementById('pauseAudio').textContent = '⏸️';
+                    updateVoiceStatus("Prêt");
+                    if (onEnd) onEnd();
+                };
+
+                currentUtterance.onerror = function(event) {
+                    console.error('Erreur synthèse vocale:', event);
+                    isSpeaking = false;
+                    isSpeechPaused = false;
+                    updateVoiceStatus("Erreur audio");
+                };
+
+                window.speechSynthesis.speak(currentUtterance);
+            }
+        }
+
+        function pauseSpeech() {
+            if (window.speechSynthesis.speaking && !isSpeechPaused) {
+                window.speechSynthesis.pause();
+                isSpeechPaused = true;
+                updateVoiceStatus("Audio en pause");
+            }
+        }
+
+        function resumeSpeech() {
+            if (window.speechSynthesis.speaking && isSpeechPaused) {
+                window.speechSynthesis.resume();
+                isSpeechPaused = false;
+                updateVoiceStatus("Lecture en cours...");
+            }
+        }
+
+        function stopAllSpeech() {
+            window.speechSynthesis.cancel();
+            isSpeaking = false;
+            isSpeechPaused = false;
+            document.getElementById('pauseAudio').disabled = true;
+            document.getElementById('repeatQuestion').disabled = true;
+            document.getElementById('pauseAudio').textContent = '⏸️';
+            updateVoiceStatus("Audio désactivé");
+        }
+
+        function updateVoiceStatus(message) {
+            const statusElement = document.getElementById('voiceStatus');
+            statusElement.textContent = message;
+            statusElement.style.display = message ? 'block' : 'none';
+        }
+
+        function repeatCurrentQuestion() {
+            if (currentGameState && currentQuestionIndex >= 0) {
+                const gameState = currentGameState;
+                const questionIndex = currentQuestionIndex;
+                
+                if (gameState.startsWith('spelling_')) {
+                    const words = gameData[gameState];
+                    if (questionIndex < words.length) {
+                        const word = words[questionIndex];
+                        const typeName = getGameTypeName(gameState);
+                        
+                        speakText(`Épellation - ${typeName}. Épelez le mot: ${word}`, {
+                            rate: 0.7,
+                            delay: 500
+                        });
+                    }
+                } else if (gameState === 'anagram') {
+                    const anagram = gameData.anagrams[questionIndex];
+                    if (anagram) {
+                        speakText(`Anagrammes. Trouvez le mot correspondant à: ${anagram.anagram}`, {
+                            rate: 0.7,
+                            delay: 500
+                        });
+                    }
+                }
+            }
         }
 
         // =============================================
@@ -967,7 +1152,18 @@ m<!DOCTYPE html>
 
             if (!hasAnswered) {
                 document.getElementById('answerInput')?.focus();
-                speakText(`Épellation. Épelez le mot: ${word}`);
+                
+                // SYNCHRONISATION VOCALE AMÉLIORÉE
+                speakText(`Épellation - ${typeNames[type]}. Épelez le mot: ${word}`, {
+                    rate: 0.7,
+                    delay: 1000,
+                    onStart: () => {
+                        updateVoiceStatus("Lecture de la question...");
+                    },
+                    onEnd: () => {
+                        updateVoiceStatus("Prêt à répondre");
+                    }
+                });
             }
         }
 
@@ -1012,7 +1208,18 @@ m<!DOCTYPE html>
 
             if (!hasAnswered) {
                 document.getElementById('answerInput')?.focus();
-                speakText(`Anagrammes. Trouvez le mot correspondant à: ${anagram.anagram}`);
+                
+                // SYNCHRONISATION VOCALE AMÉLIORÉE
+                speakText(`Anagrammes. Trouvez le mot correspondant à: ${anagram.anagram}`, {
+                    rate: 0.7,
+                    delay: 1000,
+                    onStart: () => {
+                        updateVoiceStatus("Lecture de la question...");
+                    },
+                    onEnd: () => {
+                        updateVoiceStatus("Prêt à répondre");
+                    }
+                });
             }
         }
 
@@ -1021,7 +1228,6 @@ m<!DOCTYPE html>
             const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
             try {
-                // Mettre à jour le joueur dans la liste
                 const updatedPlayers = players.map(p => 
                     p.id === playerId ? {
                         ...p,
@@ -1037,10 +1243,10 @@ m<!DOCTYPE html>
                 });
 
                 if (isCorrect) {
-                    speakText("Correct ! +10 points");
+                    speakText("Correct ! Plus dix points", { rate: 0.75, delay: 500 });
                     showNotification("✅ Réponse correcte ! +10 points", "success");
                 } else {
-                    speakText("Incorrect");
+                    speakText(`Incorrect. Le mot était: ${correctAnswer}`, { rate: 0.75, delay: 500 });
                     showNotification(`❌ Réponse incorrecte. Le mot était: ${correctAnswer}`, "error");
                 }
 
@@ -1075,10 +1281,11 @@ m<!DOCTYPE html>
                 });
 
                 if (isCorrect) {
-                    speakText("Correct ! +10 points");
+                    speakText("Correct ! Plus dix points", { rate: 0.75, delay: 500 });
                     showNotification("✅ Réponse correcte ! +10 points", "success");
                 } else {
-                    speakText("Incorrect");
+                    const solutionsText = anagram.solutions.slice(0, 3).join(', ');
+                    speakText(`Incorrect. Solutions possibles: ${solutionsText}`, { rate: 0.7, delay: 500 });
                     showNotification(`❌ Réponse incorrecte. Solutions: ${anagram.solutions.join(', ')}`, "error");
                 }
 
@@ -1098,7 +1305,8 @@ m<!DOCTYPE html>
             
             const allAnswered = sessionData.players.every(p => p.hasAnswered);
             if (allAnswered && isHost) {
-                setTimeout(() => nextQuestion(), 2000);
+                // Attendre que le feedback audio soit terminé avant de passer à la question suivante
+                setTimeout(() => nextQuestion(), 3000);
             }
         }
 
@@ -1116,11 +1324,14 @@ m<!DOCTYPE html>
 
             if (gameState === 'spelling_dictionary' && nextIndex >= gameData.spelling_dictionary.length) {
                 nextGameState = 'spelling_initiation';
+                speakText("Prochaine série: Épellation - Initiation", { rate: 0.75, delay: 500 });
             } else if (gameState === 'spelling_initiation' && nextIndex >= gameData.spelling_initiation.length) {
                 nextGameState = 'spelling_bible';
+                speakText("Prochaine série: Épellation - Bible", { rate: 0.75, delay: 500 });
             } else if (gameState === 'spelling_bible' && nextIndex >= gameData.spelling_bible.length) {
                 nextGameState = 'anagram';
                 timer = 10;
+                speakText("Prochaine série: Anagrammes", { rate: 0.75, delay: 500 });
             } else if (gameState === 'anagram' && nextIndex >= gameData.anagrams.length) {
                 await endFirstHalf();
                 return;
@@ -1138,16 +1349,6 @@ m<!DOCTYPE html>
                 })),
                 lastActivity: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            // Annoncer le nouveau type
-            const typeNames = {
-                'spelling_initiation': 'Initiation',
-                'spelling_bible': 'Bible',
-                'anagram': 'Anagrammes'
-            };
-            if (typeNames[nextGameState]) {
-                speakText(`Prochaine série: ${typeNames[nextGameState]}`);
-            }
         }
 
         async function nextSpellingType(currentType) {
@@ -1175,7 +1376,7 @@ m<!DOCTYPE html>
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                speakText(`Prochaine série: ${getGameTypeName(nextType)}`);
+                speakText(`Prochaine série: ${getGameTypeName(nextType)}`, { rate: 0.75, delay: 500 });
             } catch (error) {
                 console.error("Erreur changement type:", error);
             }
@@ -1200,6 +1401,8 @@ m<!DOCTYPE html>
                     })),
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
+                speakText("Mi-temps. Voici les scores actuels.", { rate: 0.75, delay: 1000 });
                 showNotification("⏸️ Mi-temps ! Vérifiez les scores.");
             } catch (error) {
                 console.error("Erreur mi-temps:", error);
@@ -1227,7 +1430,16 @@ m<!DOCTYPE html>
                 </div>
             `).join('');
 
-            speakText("Mi-temps ! Voici les scores actuels.");
+            // Annonce vocale des scores
+            if (sortedPlayers.length > 0) {
+                const topPlayer = sortedPlayers[0];
+                setTimeout(() => {
+                    speakText(`${topPlayer.name} est en tête avec ${topPlayer.halftimeScore} points.`, { 
+                        rate: 0.75,
+                        delay: 500 
+                    });
+                }, 2000);
+            }
         }
 
         async function continueToSecondHalf() {
@@ -1241,8 +1453,10 @@ m<!DOCTYPE html>
 
                 const allReady = players.every(p => p.readyForSecondHalf);
                 if (allReady && isHost) {
+                    speakText("La deuxième mi-temps sera disponible prochainement.", { rate: 0.75 });
                     showNotification("🎮 La deuxième mi-temps sera disponible prochainement !");
                 } else {
+                    speakText("En attente des autres joueurs.", { rate: 0.75 });
                     showNotification("⏳ En attente des autres joueurs...", "info");
                 }
             } catch (error) {
@@ -1328,20 +1542,6 @@ m<!DOCTYPE html>
                 .trim();
         }
 
-        function speakText(text) {
-            if (!audioEnabled) return;
-            
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.8;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
         function showNotification(message, type = "info") {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -1405,6 +1605,7 @@ m<!DOCTYPE html>
                 gameTimerInterval = null;
             }
             
+            stopAllSpeech();
             showNotification("🔌 Déconnexion réussie");
         }
 
@@ -1424,6 +1625,7 @@ m<!DOCTYPE html>
             if (sessionUnsubscribe) sessionUnsubscribe();
             if (gameTimerInterval) clearInterval(gameTimerInterval);
             if (presenceInterval) clearInterval(presenceInterval);
+            stopAllSpeech();
         });
     </script>
 </body>
