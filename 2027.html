@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match en Ligne - Créer une Salle</title>
+    <title>Créer une Salle - Match en Ligne</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
@@ -11,696 +11,168 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
         }
 
-        header {
-            text-align: center;
-            padding: 30px 0;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            margin-bottom: 30px;
-            border: 3px solid #00ccff;
-            box-shadow: 0 0 40px rgba(0, 204, 255, 0.4);
+            border-radius: 20px;
+            padding: 40px;
             backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-            animation: rainbow 3s linear infinite;
-        }
-
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            animation: bounce 2s infinite;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            color: #a5d8ff;
+        .input-group {
             margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(165, 216, 255, 0.5);
         }
 
-        .session-interface {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #4ecdc4;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: none;
-            box-shadow: 0 0 50px rgba(78, 205, 196, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .name-input-area {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #ff6b6b;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: block;
-            box-shadow: 0 0 50px rgba(255, 107, 107, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .input-field {
+        input {
             width: 100%;
-            max-width: 400px;
-            padding: 18px 25px;
-            font-size: 1.3rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #4ecdc4;
-            border-radius: 20px;
-            color: white;
-            margin: 25px 0;
-            text-align: center;
-            box-shadow: 0 0 25px rgba(78, 205, 196, 0.3);
-            transition: all 0.3s ease;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
 
-        .input-field:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            transform: scale(1.05);
-        }
-
-        .input-field::placeholder {
-            color: #a5d8ff;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #4CAF50;
             color: white;
             border: none;
-            padding: 18px 35px;
-            font-size: 1.3rem;
-            border-radius: 50px;
+            border-radius: 10px;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
+            margin-top: 10px;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #4ecdc4, #67e6dc);
-            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 12px 30px rgba(78, 205, 196, 0.6);
+        button:hover {
+            background: #45a049;
         }
 
         .code-display {
-            font-size: 5rem;
-            letter-spacing: 20px;
-            color: #ff6b6b;
-            margin: 40px 0;
-            font-weight: bold;
-            text-shadow: 0 0 30px #ff6b6b;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            border-radius: 25px;
-            border: 3px solid #ff6b6b;
-            animation: pulse 2s infinite;
-        }
-
-        .online-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 15px 0;
-            padding: 12px 20px;
-            background: rgba(78, 205, 196, 0.15);
-            border-radius: 15px;
-            border: 2px solid #4ecdc4;
-            backdrop-filter: blur(10px);
-        }
-
-        .presence-indicator {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            position: relative;
-            animation: none;
-        }
-
-        .presence-online {
-            background: #4ecdc4;
-            box-shadow: 0 0 15px #4ecdc4;
-            animation: pulse 2s infinite;
-        }
-
-        .presence-offline {
-            background: #ff6b6b;
-            box-shadow: 0 0 15px #ff6b6b;
-        }
-
-        .status-text {
-            font-size: 1.1rem;
-            color: #ffeaa7;
-            font-weight: bold;
-        }
-
-        .players-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
-        }
-
-        .player-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #444;
-            border-radius: 20px;
-            padding: 25px;
+            font-size: 3em;
             text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-
-        .player-card.active {
-            border-color: #4ecdc4;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
-            background: linear-gradient(145deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
-            transform: scale(1.05);
-        }
-
-        .player-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .player-name {
-            font-size: 1.5rem;
-            color: #ffeaa7;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 234, 167, 0.5);
-        }
-
-        .player-score {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #ffffff;
-            margin: 15px 0;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .player-status {
-            font-size: 1rem;
-            color: #a5d8ff;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background: rgba(165, 216, 255, 0.1);
+            letter-spacing: 10px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
             border-radius: 10px;
-            border: 1px solid #a5d8ff;
         }
 
-        @keyframes pulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% { 
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
+        .players-list {
+            margin-top: 30px;
         }
 
-        .notification {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-            font-size: 1.2rem;
-            font-weight: bold;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(-50%) translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .confetti {
-            position: fixed;
-            width: 15px;
-            height: 15px;
-            background: #ff6b6b;
-            opacity: 0;
-            animation: confetti-fall 5s linear forwards;
-            z-index: 1000;
-        }
-
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .copy-btn {
-            background: linear-gradient(45deg, #ffeaa7, #ffd43b);
-            color: #2d3436;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
-            box-shadow: 0 8px 20px rgba(255, 234, 167, 0.4);
-            font-weight: bold;
-        }
-
-        .copy-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 25px rgba(255, 234, 167, 0.6);
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .code-display { font-size: 3rem; letter-spacing: 10px; }
+        .player-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎮 MATCH EN LIGNE 🎮</h1>
-            <p class="subtitle">✨ Crée ta salle et joue avec tes amis ! ✨</p>
-            <div class="online-status" id="onlineStatus" style="display: none;">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">0/0 joueurs en ligne</span>
+        <h1>🎮 Créer une Salle</h1>
+        
+        <div id="nameSection">
+            <div class="input-group">
+                <input type="text" id="playerName" placeholder="Ton nom" value="Joueur">
             </div>
-        </header>
-
-        <!-- Saisie du nom -->
-        <div class="name-input-area" id="nameInputArea">
-            <h3>👤 Choisis ton nom de super héros !</h3>
-            <p>Comment veux-tu qu'on t'appelle ?</p>
-            <input type="text" class="input-field" id="playerNameInput" placeholder="Ex: SuperJoueur123" maxlength="20" value="Joueur">
-            <button class="btn btn-success" onclick="confirmName()">Créer ma salle ! 🚀</button>
+            <button onclick="createRoom()">Créer la Salle</button>
         </div>
 
-        <!-- Interface Création de Salle -->
-        <div class="session-interface" id="createSessionInterface">
-            <h3>🎉 Super ! Ta salle est créée !</h3>
-            <p>Partage ce code magique avec tes amis :</p>
-            <div class="code-display" id="sessionCode">----</div>
-            <button class="copy-btn" onclick="copySessionCode()">
-                📋 Copier le code
-            </button>
-            <div class="online-status" id="sessionOnlineStatus">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">1/1 joueurs en ligne</span>
+        <div id="roomSection" style="display: none;">
+            <h2>Code de la salle :</h2>
+            <div class="code-display" id="roomCode">----</div>
+            <button onclick="copyCode()">📋 Copier le code</button>
+            <button onclick="startGame()" id="startBtn" disabled>Démarrer le Jeu</button>
+            
+            <div class="players-list">
+                <h3>Joueurs connectés :</h3>
+                <div id="playersContainer"></div>
             </div>
-            <div class="players-container" id="playersList"></div>
-            <button class="btn btn-success" onclick="startGame()" id="startBtn">Démarrer la Partie ! 🚀</button>
-            <button class="btn" onclick="leaveSession()">Quitter la salle</button>
         </div>
     </div>
 
     <script>
-        // ============================
-        // CONFIGURATION FIREBASE
-        // ============================
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
             authDomain: "match-en-ligne.firebaseapp.com",
             projectId: "match-en-ligne",
             storageBucket: "match-en-ligne.firebasestorage.app",
             messagingSenderId: "706011207623",
-            appId: "1:706011207623:web:17374990a6202b64f0abe2",
-            measurementId: "G-D9XYRE3W2M"
+            appId: "1:706011207623:web:17374990a6202b64f0abe2"
         };
 
-        // Initialisation Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            console.log("🔥 Firebase initialisé avec succès !");
-        } catch (error) {
-            console.log("Firebase déjà initialisé");
-        }
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ============================
-        // VARIABLES GLOBALES
-        // ============================
-        let currentSession = null;
-        let players = [];
+        let currentRoom = null;
         let playerId = Math.random().toString(36).substr(2, 9);
-        let playerName = "";
         let isHost = false;
-        let sessionUnsubscribe = null;
-        let presenceInterval = null;
 
-        // ============================
-        // INITIALISATION
-        // ============================
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("🎮 Match en Ligne - Initialisation");
-            setupPresenceTracking();
-        });
-
-        function setupPresenceTracking() {
-            // Mettre à jour la présence quand la page devient visible/invisible
-            document.addEventListener('visibilitychange', function() {
-                if (currentSession) {
-                    updatePresence(!document.hidden);
-                }
-            });
-
-            // Vérifier la présence toutes les 3 secondes
-            presenceInterval = setInterval(() => {
-                if (currentSession) {
-                    updatePresence(!document.hidden);
-                }
-            }, 3000);
-        }
-
-        // ============================
-        // GESTION DU NOM
-        // ============================
-        function confirmName() {
-            const nameInput = document.getElementById('playerNameInput').value.trim();
-            if (nameInput.length < 2) {
-                showError("Choisis un nom d'au moins 2 lettres ! ✏️");
+        function createRoom() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Entre ton nom');
                 return;
             }
-            
-            playerName = nameInput;
-            document.getElementById('nameInputArea').style.display = 'none';
-            createSession();
-        }
 
-        // ============================
-        // GESTION DES SESSIONS - CRÉATION
-        // ============================
-        async function createSession() {
-            try {
-                showFunMessage("Création de ta salle magique... ✨");
-                
-                // Générer un code unique
-                const sessionCode = generateSessionCode();
-                currentSession = sessionCode;
-                isHost = true;
+            // Générer un code de salle
+            const roomCode = generateRoomCode();
+            currentRoom = roomCode;
+            isHost = true;
 
-                // Données du joueur
-                const playerData = {
+            // Créer la salle dans Firebase
+            db.collection('rooms').doc(roomCode).set({
+                code: roomCode,
+                host: playerId,
+                players: [{
                     id: playerId,
                     name: playerName,
                     score: 0,
-                    halftimeScore: 0,
-                    isOnline: true,
-                    hasAnswered: false,
-                    readyForSecondHalf: false,
-                    quickAnswer: false,
-                    isCorrect: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                // Créer la session dans Firebase
-                await db.collection('sessions').doc(sessionCode).set({
-                    code: sessionCode,
-                    host: playerId,
-                    players: [playerData],
-                    status: 'waiting',
-                    gameState: 'lobby',
-                    currentQuestion: 0,
-                    currentGameType: null,
-                    timer: 12,
-                    timerStart: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                console.log("✅ Salle créée:", sessionCode);
+                    isOnline: true
+                }],
+                status: 'waiting',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                // Afficher l'interface de la salle
+                document.getElementById('nameSection').style.display = 'none';
+                document.getElementById('roomSection').style.display = 'block';
+                document.getElementById('roomCode').textContent = roomCode;
                 
-                // Afficher l'interface
-                showCreateSessionInterface(sessionCode);
-                listenToSessionChanges();
-                
-                // Feedback
-                showFunMessage(`🎊 Salle créée ! Code: ${sessionCode}`);
-                createConfetti(20);
-                
-            } catch (error) {
-                console.error("❌ Erreur création:", error);
-                showError("Oups ! Impossible de créer la salle. Réessaie ! 🛠️");
-            }
-        }
-
-        function showCreateSessionInterface(code) {
-            document.getElementById('createSessionInterface').style.display = 'block';
-            document.getElementById('sessionCode').textContent = code;
-            updatePlayersList();
-        }
-
-        function listenToSessionChanges() {
-            if (sessionUnsubscribe) {
-                sessionUnsubscribe();
-            }
-            
-            sessionUnsubscribe = db.collection('sessions').doc(currentSession).onSnapshot((doc) => {
-                if (doc.exists) {
-                    const sessionData = doc.data();
-                    players = sessionData.players || [];
-                    
-                    updatePlayersList();
-                    updateOnlineStatus();
-
-                    const startBtn = document.getElementById('startBtn');
-                    if (startBtn) {
-                        startBtn.disabled = players.length < 2;
-                        startBtn.textContent = players.length < 2 ? 
-                            `En attente d'amis... (${players.length}/2)` : 
-                            'Démarrer la Partie ! 🚀';
-                    }
-
-                    // Si un nouveau joueur rejoint
-                    if (players.length > 1) {
-                        const newPlayers = players.filter(p => p.id !== playerId && p.isOnline);
-                        if (newPlayers.length > 0) {
-                            showFunMessage(`🎉 ${newPlayers[0].name} a rejoint la salle !`);
-                        }
-                    }
-
-                    // Gérer les changements d'état du jeu
-                    if (sessionData.status === 'playing') {
-                        showFunMessage("La partie commence ! 🎮");
-                    }
-                } else {
-                    showFunMessage("La salle a été fermée ! 🏠");
-                    resetInterface();
-                }
-            }, (error) => {
-                console.error("❌ Erreur écoute session:", error);
-                showError("Problème de connexion. Reconnexion...");
-                setTimeout(() => {
-                    if (currentSession) {
-                        listenToSessionChanges();
-                    }
-                }, 2000);
+                // Écouter les changements
+                listenToRoom();
+            }).catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur de création');
             });
         }
 
-        function updatePlayersList() {
-            const container = document.getElementById('playersList');
-            if (!container) return;
-            
-            container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name} ${player.id === playerId ? '(Toi)' : ''}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
-                    </div>
-                    <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">
-                        ${player.isOnline ? 
-                          (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
-                          '🔴 Hors ligne'}
-                        ${player.id === currentSession?.host ? '<br>👑 Hôte' : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateOnlineStatus() {
-            const onlinePlayers = players.filter(p => p.isOnline).length;
-            const totalPlayers = players.length;
-            
-            const globalStatus = document.getElementById('onlineStatus');
-            if (globalStatus) {
-                globalStatus.style.display = 'flex';
-                globalStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
-            }
-            
-            const sessionStatus = document.getElementById('sessionOnlineStatus');
-            if (sessionStatus) {
-                sessionStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
-            }
-        }
-
-        async function updatePresence(isOnline) {
-            if (!currentSession) return;
-            
-            try {
-                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                if (!sessionDoc.exists) return;
-                
-                const sessionData = sessionDoc.data();
-                const updatedPlayers = sessionData.players.map(p => 
-                    p.id === playerId ? { 
-                        ...p, 
-                        isOnline: isOnline, 
-                        lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
-                    } : p
-                );
-                
-                await db.collection('sessions').doc(currentSession).update({
-                    players: updatedPlayers,
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-            } catch (error) {
-                console.error("Erreur présence:", error);
-            }
-        }
-
-        // ============================
-        // DÉMARRAGE DU JEU
-        // ============================
-        async function startGame() {
-            if (!isHost) return;
-            if (players.length < 2) {
-                showError("Invite au moins un ami pour jouer ! 👥");
-                return;
-            }
-
-            try {
-                showFunMessage("La partie commence ! 🎉");
-                createConfetti(30);
-                
-                // Réinitialiser tous les joueurs pour le début du jeu
-                const resetPlayers = players.map(player => ({
-                    ...player,
-                    score: 0,
-                    halftimeScore: 0,
-                    hasAnswered: false,
-                    readyForSecondHalf: false,
-                    quickAnswer: false,
-                    isCorrect: false
-                }));
-                
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'playing',
-                    gameState: 'spelling_dictionary',
-                    currentQuestion: 0,
-                    players: resetPlayers,
-                    timer: 12,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur démarrage:", error);
-                showError("Impossible de démarrer la partie");
-            }
-        }
-
-        // ============================
-        // FONCTIONS UTILITAIRES
-        // ============================
-        function generateSessionCode() {
+        function generateRoomCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let result = '';
             for (let i = 0; i < 4; i++) {
@@ -709,111 +181,46 @@
             return result;
         }
 
-        function copySessionCode() {
-            const code = document.getElementById('sessionCode').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                showFunMessage("✅ Code copié dans le presse-papier !");
-            }).catch(err => {
-                showError("❌ Impossible de copier le code");
+        function listenToRoom() {
+            db.collection('rooms').doc(currentRoom).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const roomData = doc.data();
+                    updatePlayersList(roomData.players);
+                    
+                    // Activer le bouton start si au moins 2 joueurs
+                    const startBtn = document.getElementById('startBtn');
+                    startBtn.disabled = roomData.players.length < 2;
+                }
             });
         }
 
-        async function leaveSession() {
-            if (currentSession) {
-                try {
-                    // Mettre à jour la présence avant de partir
-                    await updatePresence(false);
-                    
-                    if (isHost) {
-                        // Si c'est l'hôte, supprimer la session
-                        await db.collection('sessions').doc(currentSession).delete();
-                        showFunMessage("Salle fermée ! À bientôt ! 👋");
-                    } else {
-                        // Si c'est un joueur, se retirer de la liste
-                        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                        if (sessionDoc.exists) {
-                            const sessionData = sessionDoc.data();
-                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId);
-                            
-                            await db.collection('sessions').doc(currentSession).update({
-                                players: updatedPlayers
-                            });
-                        }
-                        showFunMessage("À bientôt ! 👋");
-                    }
-                } catch (error) {
-                    console.error("Erreur déconnexion:", error);
-                }
-            }
-            
-            resetInterface();
+        function updatePlayersList(players) {
+            const container = document.getElementById('playersContainer');
+            container.innerHTML = players.map(player => `
+                <div class="player-item">
+                    <span>${player.name}</span>
+                    <span>${player.score} pts</span>
+                </div>
+            `).join('');
         }
 
-        function resetInterface() {
-            if (sessionUnsubscribe) {
-                sessionUnsubscribe();
-            }
-            
-            document.getElementById('createSessionInterface').style.display = 'none';
-            document.getElementById('nameInputArea').style.display = 'block';
-            document.getElementById('onlineStatus').style.display = 'none';
-            
-            currentSession = null;
-            players = [];
-            isHost = false;
-            
-            showFunMessage("Retour à la création de salle ! 🏠");
+        function copyCode() {
+            const code = document.getElementById('roomCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copié !');
+            });
         }
 
-        function showError(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.background = 'linear-gradient(45deg, #ff6b6b, #ff8e8e)';
-            notification.textContent = message;
-            document.body.appendChild(notification);
+        function startGame() {
+            if (!isHost) return;
             
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            db.collection('rooms').doc(currentRoom).update({
+                status: 'playing',
+                gameStart: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert('Jeu démarré !');
+            });
         }
-
-        function showFunMessage(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function createConfetti(count) {
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                    document.body.appendChild(confetti);
-                    
-                    setTimeout(() => {
-                        confetti.remove();
-                    }, 5000);
-                }, i * 100);
-            }
-        }
-
-        // Nettoyage quand la page se ferme
-        window.addEventListener('beforeunload', () => {
-            if (currentSession) {
-                updatePresence(false);
-            }
-            if (presenceInterval) {
-                clearInterval(presenceInterval);
-            }
-        });
     </script>
 </body>
 </html>
