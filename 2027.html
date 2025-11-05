@@ -559,22 +559,31 @@
             }
         }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .game-mode { grid-template-columns: 1fr; }
-            .mode-card { padding: 30px 20px; }
-            .code-display { font-size: 3rem; letter-spacing: 10px; }
-            .game-timer { font-size: 2.5rem; }
-            .game-title { font-size: 2rem; }
-            .question { font-size: 2rem; }
-            .game-header { flex-direction: column; gap: 20px; }
+        .notification {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            animation: slideIn 0.5s ease-out;
         }
 
-        .fun-emoji {
-            font-size: 2rem;
-            margin: 0 10px;
-            animation: bounce 2s infinite;
-            display: inline-block;
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50%) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
         }
 
         .category-badge {
@@ -585,6 +594,43 @@
             margin: 10px;
             font-weight: bold;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .fun-emoji {
+            font-size: 2rem;
+            margin: 0 10px;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: scoreFloat 1s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .game-mode { grid-template-columns: 1fr; }
+            .mode-card { padding: 30px 20px; }
+            .code-display { font-size: 3rem; letter-spacing: 10px; }
+            .game-timer { font-size: 2.5rem; }
+            .game-title { font-size: 2rem; }
+            .question { font-size: 2rem; }
+            .game-header { flex-direction: column; gap: 20px; }
         }
     </style>
 </head>
@@ -825,7 +871,6 @@
         }
 
         function setupPresenceTracking() {
-            // Surveillance de la visibilité de la page
             document.addEventListener('visibilitychange', function() {
                 if (currentSession) {
                     const isVisible = !document.hidden;
@@ -836,7 +881,6 @@
                 }
             });
 
-            // Mise à jour périodique de la présence
             presenceInterval = setInterval(() => {
                 if (currentSession) {
                     updatePresence(!document.hidden);
@@ -950,8 +994,6 @@
             document.getElementById('createSessionInterface').style.display = 'block';
             document.getElementById('sessionCode').textContent = code;
             updatePlayersList();
-            
-            // Animation du code
             animateCodeDisplay();
         }
 
@@ -995,13 +1037,6 @@
                     return;
                 }
 
-                // Vérifier si le joueur est déjà dans la salle
-                const existingPlayer = sessionData.players.find(p => p.id === playerId);
-                if (existingPlayer) {
-                    hideLoading();
-                    showFunMessage("Content de te revoir ! ✨");
-                }
-
                 currentSession = code;
                 
                 const playerData = {
@@ -1017,7 +1052,6 @@
                     lastSeen: new Date()
                 };
 
-                // Ajouter le joueur à la session
                 await db.collection('sessions').doc(code).update({
                     players: firebase.firestore.FieldValue.arrayUnion(playerData),
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
@@ -1052,7 +1086,6 @@
                     updatePlayersList();
                     updateOnlineStatus();
 
-                    // Mettre à jour le bouton démarrer
                     const startBtn = document.getElementById('startBtn');
                     if (startBtn) {
                         startBtn.disabled = players.length < 2;
@@ -1061,7 +1094,6 @@
                             'Démarrer la Partie ! 🚀';
                     }
 
-                    // Gestion des différents états du jeu
                     switch(sessionData.status) {
                         case 'playing':
                             if (document.getElementById('createSessionInterface').style.display === 'block') {
@@ -1080,10 +1112,8 @@
                             break;
                     }
 
-                    // Gestion du timer
                     handleTimer(sessionData);
                 } else {
-                    // Session supprimée
                     showFunMessage("La salle a été fermée ! 🏠");
                     resetInterface();
                 }
@@ -1094,82 +1124,6 @@
             });
         }
 
-        // [Le reste du code reste identique mais avec les améliorations visuelles...]
-
-        // ============================
-        // FONCTIONS UTILITAIRES AMÉLIORÉES
-        // ============================
-        function showLoading(message) {
-            const gameContent = document.getElementById('gameContent');
-            if (gameContent) {
-                gameContent.innerHTML = `
-                    <div style="text-align: center; padding: 50px;">
-                        <div class="loading"></div>
-                        <p style="margin-top: 20px; font-size: 1.3rem; color: #4ecdc4;">${message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function hideLoading() {
-            // Cette fonction sera utilisée pour cacher les indicateurs de chargement
-        }
-
-        function showError(message) {
-            speakText("Oups ! " + message);
-            alert(`❌ ${message}`);
-        }
-
-        function showFunMessage(message) {
-            // Créer une notification amusante
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20%;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-                color: white;
-                padding: 20px 30px;
-                border-radius: 20px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 10000;
-                font-size: 1.2rem;
-                font-weight: bold;
-                animation: slideIn 0.5s ease-out;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function createConfetti(count) {
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                    document.body.appendChild(confetti);
-                    
-                    setTimeout(() => {
-                        confetti.remove();
-                    }, 5000);
-                }, i * 100);
-            }
-        }
-
-        // Les autres fonctions (updatePlayersList, updateOnlineStatus, etc.) restent similaires
-        // mais avec les améliorations visuelles intégrées...
-
-        // ============================
-        // FONCTIONS EXISTANTES (adaptées)
-        // ============================
-        
         function updatePlayersList() {
             const container = document.getElementById('playersList');
             if (!container) return;
@@ -1238,6 +1192,9 @@
             }
         }
 
+        // ============================
+        // GESTION DU JEU - PARTIE 3 INTÉGRÉE
+        // ============================
         async function startGame() {
             if (!isHost) return;
             if (players.length < 2) {
@@ -1248,6 +1205,7 @@
             try {
                 showFunMessage("La partie commence ! 🎉");
                 speakText("C'est parti ! Bonne chance à tous !");
+                createConfetti(30);
                 
                 await db.collection('sessions').doc(currentSession).update({
                     status: 'playing',
@@ -1262,7 +1220,600 @@
             }
         }
 
-        // [Les autres fonctions de jeu restent similaires avec les améliorations enfantines...]
+        function startGameSession(sessionData) {
+            document.getElementById('createSessionInterface').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+        }
+
+        function handleGameState(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState.startsWith('spelling_')) {
+                const type = gameState.split('_')[1];
+                showSpellingQuestion(type, sessionData.currentQuestion);
+            } else if (gameState === 'anagram') {
+                showAnagramQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function showSpellingQuestion(type, index) {
+            const words = gameData.spelling[type];
+            if (index >= words.length) {
+                if (isHost) nextSpellingType(type);
+                return;
+            }
+
+            const word = words[index];
+            const typeNames = {
+                'dictionary': 'Dictionnaire 📚',
+                'initiation': 'Découverte 🔍', 
+                'bible': 'Bons Moments 🌟'
+            };
+
+            document.getElementById('gameTitle').textContent = `Épellation - ${typeNames[type]}`;
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${word}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Épelez ce mot correctement :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Tape ta réponse ici...">
+                <button class="btn btn-success" onclick="submitSpellingAnswer('${word}')">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            updateGamePlayers();
+            speakText(`Épelez le mot: ${word}`);
+        }
+
+        async function submitSpellingAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            hasAnswered: true,
+                            score: p.score + (isCorrect ? 10 : 0)
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Bravo ! Réponse correcte ! 10 points gagnés !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText("Dommage ! La bonne réponse était : " + correctAnswer);
+                    showScorePopup("+0", false);
+                }
+
+                const allAnswered = players.every(p => p.hasAnswered);
+                if (allAnswered && isHost) {
+                    setTimeout(() => nextQuestion(), 2000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission:", error);
+            }
+        }
+
+        function showAnagramQuestion(index) {
+            if (index >= anagrams.length) {
+                if (isHost) endFirstHalf();
+                return;
+            }
+
+            const anagram = anagrams[index];
+            document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${anagram.anagram}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Trouvez le mot correspondant à cet anagramme :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
+                <button class="btn btn-success" onclick="submitAnagramAnswer(${index})">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            updateGamePlayers();
+            speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
+        }
+
+        async function submitAnagramAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
+            const anagram = anagrams[index];
+            const isCorrect = anagram.solutions.includes(userAnswer);
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            hasAnswered: true,
+                            score: p.score + (isCorrect ? 10 : 0)
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Excellent ! Anagramme trouvé ! 10 points !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText(`Presque ! Les solutions étaient: ${anagram.solutions.join(', ')}`);
+                    showScorePopup("+0", false);
+                }
+
+                const allAnswered = players.every(p => p.hasAnswered);
+                if (allAnswered && isHost) {
+                    setTimeout(() => nextQuestion(), 2000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission:", error);
+            }
+        }
+
+        async function nextQuestion() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    currentQuestion: currentQuestionIndex + 1,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur question suivante:", error);
+            }
+        }
+
+        async function nextSpellingType(currentType) {
+            if (!isHost) return;
+
+            const nextTypes = {
+                'dictionary': 'spelling_initiation',
+                'initiation': 'spelling_bible', 
+                'bible': 'anagram'
+            };
+
+            const nextType = nextTypes[currentType];
+            
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    gameState: nextType,
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur changement type:", error);
+            }
+        }
+
+        // ============================
+        // MI-TEMPS
+        // ============================
+        async function endFirstHalf() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'halftime',
+                    players: players.map(p => ({
+                        ...p,
+                        halftimeScore: p.score,
+                        readyForSecondHalf: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur mi-temps:", error);
+            }
+        }
+
+        function showHalftime(sessionData) {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('halftimeSection').style.display = 'block';
+
+            const container = document.getElementById('halftimePlayers');
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">${player.halftimeScore} points</div>
+                    <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
+                </div>
+            `).join('');
+
+            speakText("Mi-temps ! Voici les scores actuels.");
+            showFunMessage("Mi-temps ! Repose-toi un peu ! 🎯");
+        }
+
+        async function continueToSecondHalf() {
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? { ...p, readyForSecondHalf: true } : p
+                    )
+                });
+
+                const allReady = players.every(p => p.readyForSecondHalf);
+                if (allReady && isHost) {
+                    startSecondHalf();
+                }
+            } catch (error) {
+                console.error("Erreur préparation 2ème mi-temps:", error);
+            }
+        }
+
+        // ============================
+        // DEUXIÈME MI-TEMPS
+        // ============================
+        async function startSecondHalf() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'second_half',
+                    gameState: 'math',
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur début 2ème mi-temps:", error);
+            }
+        }
+
+        function handleSecondHalf(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState === 'math') {
+                showMathQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'lexical') {
+                showLexicalQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function showMathQuestion(index) {
+            if (index >= mathQuestions.length) {
+                if (isHost) startLexicalGame();
+                return;
+            }
+
+            const question = mathQuestions[index];
+            const hasQuickAnswer = players.some(p => p.quickAnswer);
+
+            document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
+            
+            let content = `
+                <div class="question">${question.problem}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Résolvez rapidement cette opération !
+                </p>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            if (!hasQuickAnswer) {
+                content += `
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
+                    <button class="btn btn-success" onclick="submitMathAnswer(${index})">Répondre ! ⚡</button>
+                `;
+            } else {
+                const quickPlayer = players.find(p => p.quickAnswer);
+                content += `
+                    <div class="game-status">
+                        ${quickPlayer.isCorrect ? 
+                            `✅ ${quickPlayer.name} a répondu correctement ! +20 points` : 
+                            `❌ ${quickPlayer.name} a répondu incorrectement`
+                        }
+                    </div>
+                `;
+            }
+
+            document.getElementById('gameContent').innerHTML = content;
+            updateGamePlayers();
+
+            if (!hasQuickAnswer && isHost) {
+                startTimer(question.time);
+            }
+        }
+
+        async function submitMathAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const question = mathQuestions[index];
+            const isCorrect = userAnswer === question.solution;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            quickAnswer: true,
+                            score: p.score + (isCorrect ? 20 : 0),
+                            isCorrect: isCorrect
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Génial ! Calcul réussi ! 20 points !");
+                    showScorePopup("+20", true);
+                    createConfetti(15);
+                } else {
+                    speakText("Dommage ! La réponse était " + question.solution);
+                    showScorePopup("+0", false);
+                }
+
+                if (isHost) {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission maths:", error);
+            }
+        }
+
+        async function startLexicalGame() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    gameState: 'lexical',
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur début lexical:", error);
+            }
+        }
+
+        function showLexicalQuestion(index) {
+            if (index >= lexicalFields.length) {
+                if (isHost) endGame();
+                return;
+            }
+
+            const question = lexicalFields[index];
+            const hasQuickAnswer = players.some(p => p.quickAnswer);
+
+            document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
+            
+            let content = `
+                <div class="question">${question.hint}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Tous les mots commencent par la lettre: 
+                    <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
+                </p>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            if (!hasQuickAnswer) {
+                content += `
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}">
+                    <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
+                `;
+            } else {
+                const quickPlayer = players.find(p => p.quickAnswer);
+                content += `
+                    <div class="game-status">
+                        ${quickPlayer.isCorrect ? 
+                            `✅ ${quickPlayer.name} a trouvé le mot ! +10 points` : 
+                            `❌ ${quickPlayer.name} n'a pas trouvé`
+                        }
+                    </div>
+                    <div class="game-status">Le mot était: <strong style="color: #4ecdc4;">${question.theme}</strong></div>
+                `;
+            }
+
+            document.getElementById('gameContent').innerHTML = content;
+            updateGamePlayers();
+
+            speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
+        }
+
+        async function submitLexicalAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            quickAnswer: true,
+                            score: p.score + (isCorrect ? 10 : 0),
+                            isCorrect: isCorrect
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Bravo ! Mot trouvé ! 10 points !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText(`Presque ! Le mot était: ${correctAnswer}`);
+                    showScorePopup("+0", false);
+                }
+
+                if (isHost) {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission lexical:", error);
+            }
+        }
+
+        // ============================
+        // FONCTIONS UTILITAIRES AMÉLIORÉES
+        // ============================
+        function updateGamePlayers() {
+            const container = document.getElementById('gamePlayers');
+            if (!container) return;
+            
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">${player.score} pts</div>
+                    <div class="player-status">
+                        ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' : '❌ Raté') : 
+                         player.hasAnswered ? '✅ Répondu' : '⏳ En jeu'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleTimer(sessionData) {
+            const timerElement = document.getElementById('gameTimer');
+            if (!timerElement || !sessionData.timerStart) return;
+
+            const startTime = sessionData.timerStart.toDate().getTime();
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
+
+            timerElement.textContent = remaining;
+
+            timerElement.classList.remove('warning', 'danger');
+            if (remaining <= 5) {
+                timerElement.classList.add('danger');
+            } else if (remaining <= 10) {
+                timerElement.classList.add('warning');
+            }
+
+            if (gameTimer) clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                const newRemaining = Math.max(0, remaining - 1);
+                timerElement.textContent = newRemaining;
+                
+                if (newRemaining <= 0) {
+                    clearInterval(gameTimer);
+                    if (isHost) handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function startTimer(seconds) {
+            if (!isHost) return;
+
+            db.collection('sessions').doc(currentSession).update({
+                timer: seconds,
+                timerStart: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function handleTimeUp() {
+            if (!isHost) return;
+
+            await db.collection('sessions').doc(currentSession).update({
+                players: players.map(p => 
+                    !p.hasAnswered && !p.quickAnswer ? {
+                        ...p,
+                        hasAnswered: true,
+                        isCorrect: false
+                    } : p
+                )
+            });
+
+            const allAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
+            if (allAnswered) {
+                setTimeout(() => nextQuestion(), 2000);
+            }
+        }
+
+        function showScorePopup(points, isSuccess) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = points;
+            popup.style.color = isSuccess ? '#4ecdc4' : '#ff6b6b';
+            popup.style.left = '50%';
+            popup.style.top = '50%';
+            
+            document.getElementById('gameContent').appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 1000);
+        }
+
+        function showLoading(message) {
+            const gameContent = document.getElementById('gameContent');
+            if (gameContent) {
+                gameContent.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 20px; font-size: 1.3rem; color: #4ecdc4;">${message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function hideLoading() {
+            // Fonction pour cacher le loading si nécessaire
+        }
+
+        function showError(message) {
+            speakText("Oups ! " + message);
+            alert(`❌ ${message}`);
+        }
+
+        function showFunMessage(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function createConfetti(count) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 100);
+            }
+        }
+
+        function speakText(text) {
+            if (!audioEnabled) return;
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.2;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
 
         function generateSessionCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1306,7 +1857,6 @@
             if (presenceInterval) clearInterval(presenceInterval);
             if (sessionUnsubscribe) sessionUnsubscribe();
             
-            // Réinitialiser toute l'interface
             const interfaces = [
                 'createSessionInterface', 'gameArea', 'halftimeSection', 
                 'multiplayerInterface', 'joinInterface', 'nameInputArea'
@@ -1331,21 +1881,55 @@
             showFunMessage("Retour au menu principal ! 🏠");
         }
 
-        function speakText(text) {
-            if (!audioEnabled) return;
-            
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.2;
-                window.speechSynthesis.speak(utterance);
-            }
+        function startSoloGame() {
+            document.getElementById('gameMode').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">Mode Solo en développement</div>
+                <p style="font-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
+                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode multijoueur ! 🎮
+                </p>
+                <button class="btn" onclick="resetInterface()">Retour au Menu</button>
+            `;
         }
 
-        // Les fonctions de jeu spécifiques (showSpellingQuestion, submitAnswer, etc.)
-        // suivent le même pattern avec des améliorations visuelles et sonores
+        function showFinalResults(sessionData) {
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const winner = sortedPlayers[0];
+            
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${winner.name} remporte la partie !</div>
+                <div class="players-container">
+                    ${sortedPlayers.map((player, index) => `
+                        <div class="player-card ${player.id === winner.id ? 'active' : ''}">
+                            <div class="player-header">
+                                <div class="player-name">${player.name}</div>
+                                <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                            </div>
+                            <div class="player-score">${player.score} points</div>
+                            <div class="player-status">${index + 1}ère place</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-success" onclick="resetInterface()">Rejouer ! 🔄</button>
+            `;
 
+            speakText(`Félicitations à ${winner.name} qui gagne avec ${winner.score} points !`);
+            createConfetti(50);
+            showFunMessage(`Bravo ${winner.name} ! Tu es le champion ! 🏆`);
+        }
+
+        async function endGame() {
+            if (!isHost) return;
+
+            await db.collection('sessions').doc(currentSession).update({
+                status: 'finished'
+            });
+        }
     </script>
 </body>
 </html>
