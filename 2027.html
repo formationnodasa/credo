@@ -373,69 +373,6 @@
             createSession(); // Créer automatiquement une salle au chargement
         });
 
-     // Générer un code de salle
-            const roomCode = generateRoomCode();
-            currentRoom = roomCode;
-            isHost = true;
-
-            // Créer la salle dans Firebase
-            db.collection('rooms').doc(roomCode).set({
-                code: roomCode,
-                host: playerId,
-                players: [{
-                    id: playerId,
-                    name: playerName,
-                    score: 0,
-                    isOnline: true
-                }],
-                status: 'waiting',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                // Afficher l'interface de la salle
-                document.getElementById('nameSection').style.display = 'none';
-                document.getElementById('roomSection').style.display = 'block';
-                document.getElementById('roomCode').textContent = roomCode;
-                
-                // Écouter les changements
-                listenToRoom();
-            }).catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur de création');
-            });
-        }
-
-        function generateRoomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let result = '';
-            for (let i = 0; i < 4; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        function listenToRoom() {
-            db.collection('rooms').doc(currentRoom).onSnapshot((doc) => {
-                if (doc.exists) {
-                    const roomData = doc.data();
-                    updatePlayersList(roomData.players);
-                    
-                    // Activer le bouton start si au moins 2 joueurs
-                    const startBtn = document.getElementById('startBtn');
-                    startBtn.disabled = roomData.players.length < 2;
-                }
-            });
-        }
-
-        function updatePlayersList(players) {
-            const container = document.getElementById('playersContainer');
-            container.innerHTML = players.map(player => `
-                <div class="player-item">
-                    <span>${player.name}</span>
-                    <span>${player.score} pts</span>
-                </div>
-            `).join('');
-        }
-
         // ============================
         // GESTION DES SESSIONS - CRÉATION
         // ============================
