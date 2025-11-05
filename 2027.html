@@ -564,7 +564,7 @@
             top: 20%;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(45deg, #4ecdc4, #67e6dc);
             color: white;
             padding: 20px 30px;
             border-radius: 20px;
@@ -573,6 +573,29 @@
             font-size: 1.2rem;
             font-weight: bold;
             animation: slideIn 0.5s ease-out;
+            cursor: pointer;
+            min-width: 300px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid;
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-color: #ff4757;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #2ed573, #7bed9f);
+            border-color: #2ed573;
+            box-shadow: 0 10px 30px rgba(46, 213, 115, 0.6);
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, #ffa502, #ffb142);
+            border-color: #ffa502;
+            box-shadow: 0 10px 30px rgba(255, 165, 2, 0.6);
         }
 
         @keyframes slideIn {
@@ -583,6 +606,17 @@
             to {
                 transform: translateX(-50%) translateY(0);
                 opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(-50px);
+                opacity: 0;
             }
         }
 
@@ -631,6 +665,7 @@
             .game-title { font-size: 2rem; }
             .question { font-size: 2rem; }
             .game-header { flex-direction: column; gap: 20px; }
+            .notification { min-width: 250px; padding: 15px 20px; }
         }
     </style>
 </head>
@@ -723,6 +758,14 @@
                 <!-- Contenu dynamique -->
             </div>
         </div>
+
+        <!-- Section Mi-temps -->
+        <div class="halftime" id="halftimeSection">
+            <h2 class="halftime-title">⏸️ MI-TEMPS ⏸️</h2>
+            <div class="players-container" id="halftimePlayers"></div>
+            <p>Voici les scores après la première partie ! 📊</p>
+            <button class="btn btn-success" onclick="continueToSecondHalf()">Continuer l'aventure ! 🎯</button>
+        </div>
     </div>
 
     <script>
@@ -741,12 +784,85 @@
 
         // Initialisation Firebase
         try {
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             console.log("🔥 Firebase initialisé avec succès !");
         } catch (error) {
             console.log("Firebase déjà initialisé");
         }
         const db = firebase.firestore();
+
+        // ============================
+        // DONNÉES DES JEUX - Version Enfants
+        // ============================
+
+        // 📘 Mots du dictionnaire pour enfants
+        const dictionaryWords = [
+            "Bonjour", "Amitié", "École", "Jouet", "Famille",
+            "Courage", "Rêve", "Sourire", "Partage", "Aventure"
+        ];
+
+        // 📘 Mots éducatifs amusants
+        const initiationWords = [
+            "Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination",
+            "Exploration", "Inventeur", "Scientifique", "Artiste", "Explorateur"
+        ];
+
+        // 📖 Mots inspirants
+        const bibleWords = [
+            "Partage", "Gentillesse", "Espoir", "Paix", "Joie",
+            "Amour", "Amitié", "Pardon", "Générosité", "Respect"
+        ];
+
+        // Anagrammes simples pour enfants
+        const anagrams = [
+            { anagram: "CHAT", solutions: ["ACHT"] },
+            { anagram: "RIRE", solutions: ["ERRI"] },
+            { anagram: "LUNE", solutions: ["NULE"] },
+            { anagram: "ROSE", solutions: ["ORES", "SORE"] },
+            { anagram: "CIEL", solutions: ["LICE"] },
+            { anagram: "JARDIN", solutions: ["RADJIN"] },
+            { anagram: "ÉCOLE", solutions: ["COLÉE"] },
+            { anagram: "AMOUR", solutions: ["ROUMA"] },
+            { anagram: "TABLE", solutions: ["BATEL", "BLATE"] },
+            { anagram: "FLEUR", solutions: ["FLUER"] }
+        ];
+
+        // Mathématiques adaptées aux enfants
+        const mathQuestions = [
+            { problem: "5 + 3 × 2", solution: "11", time: 12 },
+            { problem: "10 - 4 + 1", solution: "7", time: 12 },
+            { problem: "2 × 6 - 3", solution: "9", time: 12 },
+            { problem: "8 ÷ 2 + 5", solution: "9", time: 12 },
+            { problem: "7 + 7 - 2", solution: "12", time: 12 }
+        ];
+
+        // Champ lexical adapté aux enfants
+        const lexicalFields = [
+            { theme: "Animaux", hint: "créatures vivantes qui peuplent notre planète", letter: "A" },
+            { theme: "École", hint: "endroit où on apprend et où on se fait des amis", letter: "E" },
+            { theme: "Jeux", hint: "activités amusantes pour s'amuser", letter: "J" },
+            { theme: "Famille", hint: "les personnes avec qui on vit et qu'on aime", letter: "F" },
+            { theme: "Nature", hint: "tout ce qui nous entoure dans le monde naturel", letter: "N" },
+            { theme: "Couleurs", hint: "ce qui rend le monde beau et coloré", letter: "C" },
+            { theme: "Saisons", hint: "les quatre périodes de l'année", letter: "S" },
+            { theme: "Sports", hint: "activités physiques pour rester en forme", letter: "S" },
+            { theme: "Musique", hint: "art des sons et des mélodies", letter: "M" },
+            { theme: "Lecture", hint: "action de lire des livres et des histoires", letter: "L" }
+        ];
+
+        // Structure des données de jeu
+        const gameData = {
+            spelling: {
+                'dictionary': dictionaryWords,
+                'initiation': initiationWords, 
+                'bible': bibleWords
+            },
+            anagrams: anagrams,
+            math: mathQuestions,
+            lexical: lexicalFields
+        };
 
         // ============================
         // VARIABLES GLOBALES
@@ -756,19 +872,180 @@
         let playerId = Math.random().toString(36).substr(2, 9);
         let playerName = "";
         let isHost = false;
+        let audioEnabled = true;
+        let currentGameState = null;
+        let currentQuestionIndex = 0;
+        let gameTimer = null;
+        let presenceInterval = null;
+        let sessionUnsubscribe = null;
+        let currentQuestionText = "";
+        let questionSpoken = false;
+
+        // ============================
+        // FONCTIONS D'AFFICHAGE DES MESSAGES
+        // ============================
+        function showFunMessage(message, type = 'info') {
+            console.log(`💬 Message (${type}):`, message);
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">${getEmojiForType(type)}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animation d'entrée
+            notification.style.animation = 'slideIn 0.5s ease-out';
+            
+            // Parler le message si audio activé et pas une erreur
+            if (audioEnabled && type !== 'error') {
+                speakText(message);
+            }
+            
+            // Supprimer après un délai
+            const duration = type === 'error' ? 5000 : 4000;
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.5s ease-in forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 500);
+            }, duration);
+            
+            // Permettre de fermer en cliquant
+            notification.addEventListener('click', function() {
+                this.style.animation = 'slideOut 0.5s ease-in forwards';
+                setTimeout(() => {
+                    if (this.parentNode) {
+                        this.remove();
+                    }
+                }, 500);
+            });
+            
+            return notification;
+        }
+
+        function getEmojiForType(type) {
+            const emojis = {
+                'info': '💬',
+                'success': '✅',
+                'warning': '⚠️',
+                'error': '❌'
+            };
+            return emojis[type] || '💬';
+        }
+
+        function showError(message) {
+            return showFunMessage(message, 'error');
+        }
+
+        // ============================
+        // FONCTIONS AUDIO ET SYNTHÈSE VOCALE
+        // ============================
+        function speakText(text) {
+            if (!audioEnabled) return;
+            
+            if ('speechSynthesis' in window) {
+                try {
+                    window.speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'fr-FR';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.2;
+                    utterance.volume = 0.8;
+                    
+                    utterance.onerror = function(event) {
+                        console.error('❌ Erreur synthèse vocale:', event.error);
+                    };
+                    
+                    utterance.onend = function() {
+                        console.log('✅ Synthèse vocale terminée');
+                    };
+                    
+                    window.speechSynthesis.speak(utterance);
+                    
+                } catch (error) {
+                    console.error('❌ Erreur lors de la synthèse vocale:', error);
+                }
+            }
+        }
+
+        function createConfetti(count) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 100);
+            }
+        }
 
         // ============================
         // INITIALISATION
         // ============================
         document.addEventListener('DOMContentLoaded', function() {
             console.log("🎮 Match en Ligne - Initialisation");
+            setupAudio();
+            setupPresenceTracking();
+            showFunMessage("Bienvenue ! Prêt à jouer ? 🎉", "success");
         });
+
+        function setupAudio() {
+            const audioBtn = document.getElementById('toggleAudio');
+            audioBtn.addEventListener('click', function() {
+                audioEnabled = !audioEnabled;
+                this.textContent = audioEnabled ? '🔊' : '🔇';
+                this.style.background = audioEnabled ? 
+                    'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 
+                    'linear-gradient(45deg, #666, #999)';
+                
+                if (audioEnabled) {
+                    speakText("Son activé ! Prêt à jouer !");
+                    showFunMessage("🔊 Son activé !", "success");
+                } else {
+                    showFunMessage("🔇 Son désactivé", "info");
+                }
+            });
+        }
+
+        function setupPresenceTracking() {
+            document.addEventListener('visibilitychange', function() {
+                if (currentSession) {
+                    const isVisible = !document.hidden;
+                    updatePresence(isVisible);
+                    if (isVisible) {
+                        showFunMessage("Content de te revoir ! ✨", "success");
+                    }
+                }
+            });
+
+            presenceInterval = setInterval(() => {
+                if (currentSession) {
+                    updatePresence(!document.hidden);
+                }
+            }, 3000);
+        }
 
         // ============================
         // GESTION DE LA NAVIGATION
         // ============================
         function selectMode(mode) {
+            speakText("Super choix !");
             createConfetti(20);
+            
             document.getElementById('gameMode').style.display = 'none';
             if (mode === 'multiplayer') {
                 showNameInput();
@@ -792,7 +1069,8 @@
             playerName = nameInput;
             document.getElementById('nameInputArea').style.display = 'none';
             showMultiplayerInterface();
-            showFunMessage(`Bienvenue ${playerName} ! 🎉`);
+            speakText(`Super ${playerName} ! Prêt à jouer avec tes amis ?`);
+            showFunMessage(`Bienvenue ${playerName} ! 🎉`, "success");
         }
 
         function showMainMenu() {
@@ -810,41 +1088,80 @@
         }
 
         // ============================
-        // GESTION DES SESSIONS - CRÉATION DE SALLE FONCTIONNELLE
+        // GESTION DES SESSIONS
         // ============================
         async function createSession() {
             try {
-                showFunMessage("Création de ta salle magique... ✨");
+                showFunMessage("Création de ta salle magique... ✨", "info");
                 
+                // Générer un code unique
                 const sessionCode = generateSessionCode();
+                console.log("🆕 Code généré:", sessionCode);
+                
                 currentSession = sessionCode;
                 isHost = true;
 
+                // Données du joueur
                 const playerData = {
                     id: playerId,
                     name: playerName,
                     score: 0,
+                    halftimeScore: 0,
                     isOnline: true,
-                    hasAnswered: false
+                    hasAnswered: false,
+                    readyForSecondHalf: false,
+                    quickAnswer: false,
+                    isCorrect: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
+                // Créer la session dans Firebase
                 await db.collection('sessions').doc(sessionCode).set({
                     code: sessionCode,
                     host: playerId,
                     players: [playerData],
                     status: 'waiting',
                     gameState: 'lobby',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    currentQuestion: 0,
+                    currentGameType: null,
+                    timer: 12,
+                    timerStart: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showCreateSessionInterface(sessionCode);
-                listenToSessionChanges();
-                showFunMessage(`🎊 Salle créée ! Code: ${sessionCode}`);
+                console.log("✅ Salle créée avec succès:", sessionCode);
+                
+                // Vérifier que la session existe
+                const verifyDoc = await db.collection('sessions').doc(sessionCode).get();
+                if (verifyDoc.exists) {
+                    console.log("✅ Session vérifiée dans Firebase");
+                    
+                    // Afficher l'interface
+                    showCreateSessionInterface(sessionCode);
+                    listenToSessionChanges();
+                    
+                    // Feedback
+                    speakText(`Félicitations ! Ta salle est créée. Code: ${sessionCode}`);
+                    showFunMessage(`🎊 Salle créée ! Code: ${sessionCode}`, "success");
+                    createConfetti(20);
+                } else {
+                    throw new Error("La session n'a pas été créée dans Firebase");
+                }
                 
             } catch (error) {
-                console.error("Erreur création:", error);
-                showFunMessage("Erreur de création. Réessayez !");
+                console.error("❌ Erreur création:", error);
+                showError(`Oups ! Impossible de créer la salle: ${error.message}`);
             }
+        }
+
+        function generateSessionCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
         function showCreateSessionInterface(code) {
@@ -852,25 +1169,29 @@
             document.getElementById('joinInterface').style.display = 'none';
             document.getElementById('createSessionInterface').style.display = 'block';
             document.getElementById('sessionCode').textContent = code;
+            updatePlayersList();
         }
 
         async function joinSession() {
             const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
+            
             if (code.length !== 4) {
                 showError("Le code doit avoir 4 lettres ! 🔤");
                 return;
             }
 
             try {
-                showFunMessage("Connexion à la salle... 🔗");
+                showFunMessage("Connexion à la salle... 🔗", "info");
                 
                 const sessionDoc = await db.collection('sessions').doc(code).get();
+                
                 if (!sessionDoc.exists) {
                     showError("Salle non trouvée ! Vérifie le code. 🔍");
                     return;
                 }
 
                 const sessionData = sessionDoc.data();
+                
                 if (sessionData.status !== 'waiting') {
                     showError("La partie a déjà commencé ! ⏰");
                     return;
@@ -882,36 +1203,467 @@
                     id: playerId,
                     name: playerName,
                     score: 0,
+                    halftimeScore: 0,
                     isOnline: true,
-                    hasAnswered: false
+                    hasAnswered: false,
+                    readyForSecondHalf: false,
+                    quickAnswer: false,
+                    isCorrect: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 await db.collection('sessions').doc(code).update({
-                    players: firebase.firestore.FieldValue.arrayUnion(playerData)
+                    players: firebase.firestore.FieldValue.arrayUnion(playerData),
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
+                console.log("✅ Joueur ajouté à la session:", code);
                 showCreateSessionInterface(code);
                 listenToSessionChanges();
-                showFunMessage(`🎯 Connecté à la salle ${code} !`);
+                speakText(`Bienvenue dans la salle ${playerName} !`);
+                showFunMessage(`🎯 Connecté à la salle ${code} !`, "success");
                 
             } catch (error) {
-                console.error("Erreur connexion:", error);
-                showError("Impossible de se connecter. Réessaie ! 🔄");
+                console.error("❌ Erreur connexion:", error);
+                showError(`Impossible de se connecter: ${error.message}`);
             }
         }
 
         function listenToSessionChanges() {
-            db.collection('sessions').doc(currentSession).onSnapshot((doc) => {
-                const sessionData = doc.data();
-                players = sessionData.players;
-                updatePlayersList();
-            });
+            if (sessionUnsubscribe) {
+                sessionUnsubscribe();
+            }
+            
+            sessionUnsubscribe = db.collection('sessions').doc(currentSession)
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const sessionData = doc.data();
+                        players = sessionData.players || [];
+                        currentGameState = sessionData.gameState;
+                        currentQuestionIndex = sessionData.currentQuestion || 0;
+
+                        updatePlayersList();
+                        updateOnlineStatus();
+
+                        const startBtn = document.getElementById('startBtn');
+                        if (startBtn) {
+                            startBtn.disabled = players.length < 2;
+                            startBtn.textContent = players.length < 2 ? 
+                                `En attente d'amis... (${players.length}/2)` : 
+                                'Démarrer la Partie ! 🚀';
+                        }
+
+                        handleSessionState(sessionData);
+                        
+                    } else {
+                        showFunMessage("La salle a été fermée ! 🏠", "warning");
+                        resetInterface();
+                    }
+                }, (error) => {
+                    console.error("❌ Erreur écoute session:", error);
+                    showError("Problème de connexion. Retour au menu...");
+                    resetInterface();
+                });
+        }
+
+        function handleSessionState(sessionData) {
+            switch(sessionData.status) {
+                case 'playing':
+                    if (document.getElementById('createSessionInterface').style.display === 'block') {
+                        startGameSession(sessionData);
+                    }
+                    handleGameState(sessionData);
+                    break;
+                case 'halftime':
+                    showHalftime(sessionData);
+                    break;
+                case 'second_half':
+                    handleSecondHalf(sessionData);
+                    break;
+                case 'finished':
+                    showFinalResults(sessionData);
+                    break;
+            }
+
+            handleTimer(sessionData);
         }
 
         function updatePlayersList() {
             const container = document.getElementById('playersList');
             if (!container) return;
+            
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name} ${player.id === playerId ? '(Toi)' : ''}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">${player.score} pts</div>
+                    <div class="player-status">
+                        ${player.isOnline ? 
+                          (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
+                          '🔴 Hors ligne'}
+                    </div>
+                </div>
+            `).join('');
+        }
 
+        function updateOnlineStatus() {
+            const onlinePlayers = players.filter(p => p.isOnline).length;
+            const totalPlayers = players.length;
+            
+            const globalStatus = document.getElementById('onlineStatus');
+            if (globalStatus) {
+                globalStatus.style.display = 'flex';
+                globalStatus.innerHTML = `
+                    <div class="presence-indicator presence-online"></div>
+                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
+                `;
+            }
+            
+            const sessionStatus = document.getElementById('sessionOnlineStatus');
+            if (sessionStatus) {
+                sessionStatus.innerHTML = `
+                    <div class="presence-indicator presence-online"></div>
+                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
+                `;
+            }
+        }
+
+        async function updatePresence(isOnline) {
+            if (!currentSession) return;
+            
+            try {
+                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
+                if (!sessionDoc.exists) return;
+                
+                const sessionData = sessionDoc.data();
+                const updatedPlayers = sessionData.players.map(p => 
+                    p.id === playerId ? { ...p, isOnline: isOnline, lastSeen: firebase.firestore.FieldValue.serverTimestamp() } : p
+                );
+                
+                await db.collection('sessions').doc(currentSession).update({
+                    players: updatedPlayers,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                players = updatedPlayers;
+                updatePlayersList();
+                updateOnlineStatus();
+                
+            } catch (error) {
+                console.error("Erreur présence:", error);
+            }
+        }
+
+        // ============================
+        // GESTION DU JEU
+        // ============================
+        async function startGame() {
+            if (!isHost) return;
+            if (players.length < 2) {
+                showError("Invite au moins un ami pour jouer ! 👥");
+                return;
+            }
+
+            try {
+                showFunMessage("La partie commence ! 🎉", "success");
+                speakText("C'est parti ! Bonne chance à tous !");
+                createConfetti(30);
+                
+                questionSpoken = false;
+                
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'playing',
+                    gameState: 'spelling_dictionary',
+                    currentQuestion: 0,
+                    timer: 12,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur démarrage:", error);
+                showError("Impossible de démarrer la partie");
+            }
+        }
+
+        function startGameSession(sessionData) {
+            document.getElementById('createSessionInterface').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+        }
+
+        function handleGameState(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState.startsWith('spelling_')) {
+                const type = gameState.split('_')[1];
+                showSpellingQuestion(type, sessionData.currentQuestion);
+            } else if (gameState === 'anagram') {
+                showAnagramQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function showSpellingQuestion(type, index) {
+            const words = gameData.spelling[type];
+            if (index >= words.length) {
+                if (isHost) nextSpellingType(type);
+                return;
+            }
+
+            const word = words[index];
+            
+            if (currentQuestionText !== word) {
+                currentQuestionText = word;
+                questionSpoken = false;
+            }
+
+            const typeNames = {
+                'dictionary': 'Dictionnaire 📚',
+                'initiation': 'Découverte 🔍', 
+                'bible': 'Bons Moments 🌟'
+            };
+
+            document.getElementById('gameTitle').textContent = `Épellation - ${typeNames[type]}`;
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${word}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Épelez ce mot correctement :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Tape ta réponse ici...">
+                <button class="btn btn-success" onclick="submitSpellingAnswer('${word}')">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            updateGamePlayers();
+            
+            if (!questionSpoken && audioEnabled) {
+                speakText(`Épelez le mot: ${word}`);
+                questionSpoken = true;
+            }
+        }
+
+        async function submitSpellingAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            hasAnswered: true,
+                            score: p.score + (isCorrect ? 10 : 0)
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Bravo ! Réponse correcte ! 10 points gagnés !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText("Dommage ! La bonne réponse était : " + correctAnswer);
+                    showScorePopup("+0", false);
+                }
+
+                const onlinePlayers = players.filter(p => p.isOnline);
+                const allAnswered = onlinePlayers.every(p => p.hasAnswered);
+                
+                if (allAnswered && isHost) {
+                    setTimeout(() => nextQuestion(), 2000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission:", error);
+                showError("Erreur lors de l'envoi de la réponse");
+            }
+        }
+
+        function showAnagramQuestion(index) {
+            if (index >= anagrams.length) {
+                if (isHost) endFirstHalf();
+                return;
+            }
+
+            const anagram = anagrams[index];
+            
+            if (currentQuestionText !== anagram.anagram) {
+                currentQuestionText = anagram.anagram;
+                questionSpoken = false;
+            }
+
+            document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${anagram.anagram}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Trouvez le mot correspondant à cet anagramme :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
+                <button class="btn btn-success" onclick="submitAnagramAnswer(${index})">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            updateGamePlayers();
+            
+            if (!questionSpoken && audioEnabled) {
+                speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
+                questionSpoken = true;
+            }
+        }
+
+        async function submitAnagramAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
+            const anagram = anagrams[index];
+            const isCorrect = anagram.solutions.includes(userAnswer);
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            hasAnswered: true,
+                            score: p.score + (isCorrect ? 10 : 0)
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Excellent ! Anagramme trouvé ! 10 points !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText(`Presque ! Les solutions étaient: ${anagram.solutions.join(', ')}`);
+                    showScorePopup("+0", false);
+                }
+
+                const onlinePlayers = players.filter(p => p.isOnline);
+                const allAnswered = onlinePlayers.every(p => p.hasAnswered);
+                
+                if (allAnswered && isHost) {
+                    setTimeout(() => nextQuestion(), 2000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission:", error);
+                showError("Erreur lors de l'envoi de la réponse");
+            }
+        }
+
+        async function nextQuestion() {
+            if (!isHost) return;
+
+            try {
+                questionSpoken = false;
+                currentQuestionText = "";
+                
+                await db.collection('sessions').doc(currentSession).update({
+                    currentQuestion: currentQuestionIndex + 1,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false
+                    })),
+                    timer: 12,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur question suivante:", error);
+                showError("Erreur lors du passage à la question suivante");
+            }
+        }
+
+        async function nextSpellingType(currentType) {
+            if (!isHost) return;
+
+            const nextTypes = {
+                'dictionary': 'spelling_initiation',
+                'initiation': 'spelling_bible', 
+                'bible': 'anagram'
+            };
+
+            const nextType = nextTypes[currentType];
+            
+            try {
+                questionSpoken = false;
+                currentQuestionText = "";
+                
+                await db.collection('sessions').doc(currentSession).update({
+                    gameState: nextType,
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false
+                    })),
+                    timer: 12,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur changement type:", error);
+                showError("Erreur lors du changement de type de jeu");
+            }
+        }
+
+        function handleTimer(sessionData) {
+            const timerElement = document.getElementById('gameTimer');
+            if (!timerElement || !sessionData.timerStart) return;
+
+            const startTime = sessionData.timerStart.toDate().getTime();
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(0, (sessionData.timer || 12) - elapsed);
+
+            timerElement.textContent = remaining;
+
+            timerElement.classList.remove('warning', 'danger');
+            if (remaining <= 5) {
+                timerElement.classList.add('danger');
+            } else if (remaining <= 8) {
+                timerElement.classList.add('warning');
+            }
+
+            if (gameTimer) clearInterval(gameTimer);
+            
+            gameTimer = setInterval(() => {
+                const newRemaining = Math.max(0, remaining - 1);
+                timerElement.textContent = newRemaining;
+                
+                if (newRemaining <= 0) {
+                    clearInterval(gameTimer);
+                    if (isHost) {
+                        handleTimeUp();
+                    }
+                }
+            }, 1000);
+        }
+
+        async function handleTimeUp() {
+            if (!isHost) return;
+
+            const onlinePlayers = players.filter(p => p.isOnline);
+            const allAnswered = onlinePlayers.every(p => p.hasAnswered);
+            
+            if (allAnswered) {
+                await nextQuestion();
+            } else {
+                showFunMessage("Temps écoulé ! En attente des autres joueurs... ⏳", "warning");
+            }
+        }
+
+        function showScorePopup(points, isSuccess) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = points;
+            popup.style.color = isSuccess ? '#4ecdc4' : '#ff6b6b';
+            popup.style.left = '50%';
+            popup.style.top = '50%';
+            
+            document.getElementById('gameContent').appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 1000);
+        }
+
+        function updateGamePlayers() {
+            const container = document.getElementById('gamePlayers');
+            if (!container) return;
+            
             container.innerHTML = players.map(player => `
                 <div class="player-card ${player.id === playerId ? 'active' : ''}">
                     <div class="player-header">
@@ -919,38 +1671,424 @@
                         <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
                     </div>
                     <div class="player-score">${player.score} pts</div>
+                    <div class="player-status">
+                        ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' : '❌ Raté') : 
+                         player.hasAnswered ? '✅ Répondu' : '⏳ En jeu'}
+                    </div>
                 </div>
             `).join('');
         }
 
-        function generateSessionCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 4; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+        // ============================
+        // FONCTIONS DE GESTION DE LA PARTIE
+        // ============================
+        async function endFirstHalf() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'halftime',
+                    players: players.map(p => ({
+                        ...p,
+                        halftimeScore: p.score,
+                        readyForSecondHalf: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur mi-temps:", error);
+                showError("Erreur lors du passage à la mi-temps");
             }
-            return result;
+        }
+
+        function showHalftime(sessionData) {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('halftimeSection').style.display = 'block';
+
+            const container = document.getElementById('halftimePlayers');
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">${player.halftimeScore} points</div>
+                    <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
+                </div>
+            `).join('');
+
+            speakText("Mi-temps ! Voici les scores actuels.");
+            showFunMessage("Mi-temps ! Repose-toi un peu ! 🎯", "info");
+        }
+
+        async function continueToSecondHalf() {
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? { ...p, readyForSecondHalf: true } : p
+                    )
+                });
+
+                const allReady = players.every(p => p.readyForSecondHalf);
+                if (allReady && isHost) {
+                    startSecondHalf();
+                }
+            } catch (error) {
+                console.error("Erreur préparation 2ème mi-temps:", error);
+                showError("Erreur lors de la préparation de la deuxième mi-temps");
+            }
+        }
+
+        async function startSecondHalf() {
+            if (!isHost) return;
+
+            try {
+                questionSpoken = false;
+                currentQuestionText = "";
+                
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'second_half',
+                    gameState: 'math',
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    })),
+                    timer: 12,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur début 2ème mi-temps:", error);
+                showError("Erreur lors du début de la deuxième mi-temps");
+            }
+        }
+
+        function handleSecondHalf(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState === 'math') {
+                showMathQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'lexical') {
+                showLexicalQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function showMathQuestion(index) {
+            if (index >= mathQuestions.length) {
+                if (isHost) startLexicalGame();
+                return;
+            }
+
+            const question = mathQuestions[index];
+            const hasQuickAnswer = players.some(p => p.quickAnswer);
+
+            document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
+            
+            let content = `
+                <div class="question">${question.problem}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Résolvez rapidement cette opération !
+                </p>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            if (!hasQuickAnswer) {
+                content += `
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
+                    <button class="btn btn-success" onclick="submitMathAnswer(${index})">Répondre ! ⚡</button>
+                `;
+            } else {
+                const quickPlayer = players.find(p => p.quickAnswer);
+                content += `
+                    <div class="game-status">
+                        ${quickPlayer.isCorrect ? 
+                            `✅ ${quickPlayer.name} a répondu correctement ! +20 points` : 
+                            `❌ ${quickPlayer.name} a répondu incorrectement`
+                        }
+                    </div>
+                `;
+            }
+
+            document.getElementById('gameContent').innerHTML = content;
+            updateGamePlayers();
+
+            if (!hasQuickAnswer && isHost) {
+                startTimer(question.time);
+            }
+        }
+
+        async function submitMathAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const question = mathQuestions[index];
+            const isCorrect = userAnswer === question.solution;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            quickAnswer: true,
+                            score: p.score + (isCorrect ? 20 : 0),
+                            isCorrect: isCorrect
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Génial ! Calcul réussi ! 20 points !");
+                    showScorePopup("+20", true);
+                    createConfetti(15);
+                } else {
+                    speakText("Dommage ! La réponse était " + question.solution);
+                    showScorePopup("+0", false);
+                }
+
+                if (isHost) {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission maths:", error);
+                showError("Erreur lors de l'envoi de la réponse");
+            }
+        }
+
+        async function startLexicalGame() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    gameState: 'lexical',
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }))
+                });
+            } catch (error) {
+                console.error("Erreur début lexical:", error);
+                showError("Erreur lors du début du jeu lexical");
+            }
+        }
+
+        function showLexicalQuestion(index) {
+            if (index >= lexicalFields.length) {
+                if (isHost) endGame();
+                return;
+            }
+
+            const question = lexicalFields[index];
+            const hasQuickAnswer = players.some(p => p.quickAnswer);
+
+            document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
+            
+            let content = `
+                <div class="question">${question.hint}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Tous les mots commencent par la lettre: 
+                    <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
+                </p>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            if (!hasQuickAnswer) {
+                content += `
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}">
+                    <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
+                `;
+            } else {
+                const quickPlayer = players.find(p => p.quickAnswer);
+                content += `
+                    <div class="game-status">
+                        ${quickPlayer.isCorrect ? 
+                            `✅ ${quickPlayer.name} a trouvé le mot ! +10 points` : 
+                            `❌ ${quickPlayer.name} n'a pas trouvé`
+                        }
+                    </div>
+                    <div class="game-status">Le mot était: <strong style="color: #4ecdc4;">${question.theme}</strong></div>
+                `;
+            }
+
+            document.getElementById('gameContent').innerHTML = content;
+            updateGamePlayers();
+
+            speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
+        }
+
+        async function submitLexicalAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        p.id === playerId ? {
+                            ...p,
+                            quickAnswer: true,
+                            score: p.score + (isCorrect ? 10 : 0),
+                            isCorrect: isCorrect
+                        } : p
+                    )
+                });
+
+                if (isCorrect) {
+                    speakText("Bravo ! Mot trouvé ! 10 points !");
+                    showScorePopup("+10", true);
+                    createConfetti(10);
+                } else {
+                    speakText(`Presque ! Le mot était: ${correctAnswer}`);
+                    showScorePopup("+0", false);
+                }
+
+                if (isHost) {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            } catch (error) {
+                console.error("Erreur soumission lexical:", error);
+                showError("Erreur lors de l'envoi de la réponse");
+            }
+        }
+
+        function startTimer(seconds) {
+            if (!isHost) return;
+
+            db.collection('sessions').doc(currentSession).update({
+                timer: seconds,
+                timerStart: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function endGame() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'finished'
+                });
+            } catch (error) {
+                console.error("Erreur fin de jeu:", error);
+                showError("Erreur lors de la fin de la partie");
+            }
+        }
+
+        function showFinalResults(sessionData) {
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const winner = sortedPlayers[0];
+            
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${winner.name} remporte la partie !</div>
+                <div class="players-container">
+                    ${sortedPlayers.map((player, index) => `
+                        <div class="player-card ${player.id === winner.id ? 'active' : ''}">
+                            <div class="player-header">
+                                <div class="player-name">${player.name}</div>
+                                <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                            </div>
+                            <div class="player-score">${player.score} points</div>
+                            <div class="player-status">${index + 1}ère place</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-success" onclick="resetInterface()">Rejouer ! 🔄</button>
+            `;
+
+            speakText(`Félicitations à ${winner.name} qui gagne avec ${winner.score} points !`);
+            createConfetti(50);
+            showFunMessage(`Bravo ${winner.name} ! Tu es le champion ! 🏆`, "success");
+        }
+
+        // ============================
+        // FONCTIONS UTILITAIRES
+        // ============================
+        async function leaveSession() {
+            if (currentSession) {
+                try {
+                    await updatePresence(false);
+                    
+                    if (isHost) {
+                        await db.collection('sessions').doc(currentSession).delete();
+                        showFunMessage("Salle fermée ! À bientôt ! 👋", "info");
+                    } else {
+                        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
+                        if (sessionDoc.exists) {
+                            const sessionData = sessionDoc.data();
+                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId);
+                            
+                            await db.collection('sessions').doc(currentSession).update({
+                                players: updatedPlayers
+                            });
+                        }
+                        showFunMessage("À bientôt ! 👋", "info");
+                    }
+                } catch (error) {
+                    console.error("Erreur déconnexion:", error);
+                    showError("Erreur lors de la déconnexion");
+                }
+            }
+            
+            resetInterface();
         }
 
         function resetInterface() {
+            console.log("🔄 Réinitialisation interface");
+            
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+            
+            if (presenceInterval) {
+                clearInterval(presenceInterval);
+                presenceInterval = null;
+            }
+            
+            if (sessionUnsubscribe) {
+                sessionUnsubscribe();
+                sessionUnsubscribe = null;
+            }
+            
             const interfaces = [
-                'createSessionInterface', 'gameArea', 'multiplayerInterface',
-                'joinInterface', 'nameInputArea'
+                'createSessionInterface', 'gameArea', 'halftimeSection', 
+                'multiplayerInterface', 'joinInterface', 'nameInputArea'
             ];
+            
             interfaces.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) element.style.display = 'none';
             });
-
+            
             document.getElementById('gameMode').style.display = 'grid';
+            document.getElementById('onlineStatus').style.display = 'none';
+            
+            currentSession = null;
+            players = [];
+            isHost = false;
+            questionSpoken = false;
+            currentQuestionText = "";
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            
+            showFunMessage("Retour au menu principal ! 🏠", "info");
         }
 
-        function showError(message) {
-            alert(message);
-        }
-
-        function showFunMessage(message) {
-            alert(message);
+        function startSoloGame() {
+            document.getElementById('gameMode').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">Mode Solo en développement</div>
+                <p style="font-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
+                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode multijoueur ! 🎮
+                </p>
+                <button class="btn" onclick="resetInterface()">Retour au Menu</button>
+            `;
         }
     </script>
 </body>
