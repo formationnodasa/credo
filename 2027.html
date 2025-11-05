@@ -841,6 +841,7 @@
         let gameTimer = null;
         let presenceInterval = null;
         let sessionUnsubscribe = null;
+        let lastSpokenQuestion = null; // Variable pour suivre la dernière question énoncée
 
         // ============================
         // INITIALISATION
@@ -1262,7 +1263,13 @@
             `;
 
             updateGamePlayers();
-            speakText(`Épelez le mot: ${word}`);
+            
+            // Énoncer le mot UNE SEULE FOIS par question
+            const currentQuestionKey = `spelling_${type}_${index}`;
+            if (lastSpokenQuestion !== currentQuestionKey) {
+                speakText(`Épelez le mot: ${word}`);
+                lastSpokenQuestion = currentQuestionKey;
+            }
         }
 
         async function submitSpellingAnswer(correctAnswer) {
@@ -1317,7 +1324,13 @@
             `;
 
             updateGamePlayers();
-            speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
+            
+            // Énoncer l'anagramme UNE SEULE FOIS par question
+            const currentQuestionKey = `anagram_${index}`;
+            if (lastSpokenQuestion !== currentQuestionKey) {
+                speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
+                lastSpokenQuestion = currentQuestionKey;
+            }
         }
 
         async function submitAnagramAnswer(index) {
@@ -1363,7 +1376,9 @@
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false
-                    }))
+                    })),
+                    timer: 15,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Erreur question suivante:", error);
@@ -1388,7 +1403,9 @@
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false
-                    }))
+                    })),
+                    timer: 15,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Erreur changement type:", error);
@@ -1468,7 +1485,9 @@
                         hasAnswered: false,
                         quickAnswer: false,
                         isCorrect: false
-                    }))
+                    })),
+                    timer: 10,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Erreur début 2ème mi-temps:", error);
@@ -1524,6 +1543,13 @@
             document.getElementById('gameContent').innerHTML = content;
             updateGamePlayers();
 
+            // Énoncer la question mathématique UNE SEULE FOIS
+            const currentQuestionKey = `math_${index}`;
+            if (lastSpokenQuestion !== currentQuestionKey) {
+                speakText(`Résolvez: ${question.problem}`);
+                lastSpokenQuestion = currentQuestionKey;
+            }
+
             if (!hasQuickAnswer && isHost) {
                 startTimer(question.time);
             }
@@ -1575,7 +1601,9 @@
                         hasAnswered: false,
                         quickAnswer: false,
                         isCorrect: false
-                    }))
+                    })),
+                    timer: 15,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Erreur début lexical:", error);
@@ -1623,7 +1651,12 @@
             document.getElementById('gameContent').innerHTML = content;
             updateGamePlayers();
 
-            speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
+            // Énoncer la question lexicale UNE SEULE FOIS
+            const currentQuestionKey = `lexical_${index}`;
+            if (lastSpokenQuestion !== currentQuestionKey) {
+                speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
+                lastSpokenQuestion = currentQuestionKey;
+            }
         }
 
         async function submitLexicalAnswer(correctAnswer) {
@@ -1660,7 +1693,7 @@
         }
 
         // ============================
-        // GESTION DU CHRONOMÈTRE - MODIFICATION DEMANDÉE
+        // GESTION DU CHRONOMÈTRE - CORRECTION
         // ============================
 
         function handleTimer(sessionData) {
@@ -1672,8 +1705,10 @@
             const elapsed = Math.floor((now - startTime) / 1000);
             const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
 
+            // Mettre à jour l'affichage du timer
             timerElement.textContent = remaining;
 
+            // Mettre à jour les classes visuelles
             timerElement.classList.remove('warning', 'danger');
             if (remaining <= 5) {
                 timerElement.classList.add('danger');
@@ -1681,36 +1716,39 @@
                 timerElement.classList.add('warning');
             }
 
-            // Nettoyer l'ancien timer
-            if (gameTimer) clearInterval(gameTimer);
-            
-            // Nouveau timer qui se met à jour chaque seconde
+            // Nettoyer l'ancien timer s'il existe
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+
+            // Créer un nouveau timer qui se met à jour chaque seconde
             gameTimer = setInterval(() => {
                 const currentRemaining = parseInt(timerElement.textContent);
                 if (currentRemaining > 0) {
-                    timerElement.textContent = currentRemaining - 1;
+                    const newRemaining = currentRemaining - 1;
+                    timerElement.textContent = newRemaining;
                     
                     // Mettre à jour les classes pour l'affichage visuel
                     timerElement.classList.remove('warning', 'danger');
-                    if (currentRemaining - 1 <= 5) {
+                    if (newRemaining <= 5) {
                         timerElement.classList.add('danger');
-                    } else if (currentRemaining - 1 <= 10) {
+                    } else if (newRemaining <= 10) {
                         timerElement.classList.add('warning');
                     }
                 } else {
                     clearInterval(gameTimer);
                     // Le chronomètre est à zéro, vérifier si on peut passer à la question suivante
-                    checkTimerEnd(sessionData);
+                    checkTimerEnd();
                 }
             }, 1000);
         }
 
-        function checkTimerEnd(sessionData) {
+        function checkTimerEnd() {
             // Vérifier si tous les joueurs ont répondu
             const allPlayersAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
             
             // Si tous les joueurs ont répondu OU le chrono est à zéro ET on est l'hôte
-            if ((allPlayersAnswered || parseInt(document.getElementById('gameTimer').textContent) === 0) && isHost) {
+            if (isHost && (allPlayersAnswered || parseInt(document.getElementById('gameTimer').textContent) === 0)) {
                 handleTimeUp();
             }
         }
@@ -1900,6 +1938,7 @@
             currentSession = null;
             players = [];
             isHost = false;
+            lastSpokenQuestion = null;
             
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
