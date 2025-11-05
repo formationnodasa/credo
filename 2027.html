@@ -4,424 +4,482 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match en Ligne - Jeu Éducatif Multijoueur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* STYLES GÉNÉRAUX */
-        :root {
-            --primary: #3498db;
-            --secondary: #2980b9;
-            --accent: #e74c3c;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-        }
-        
+        /* RESET ET STYLES GÉNÉRAUX */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Comic Sans MS', cursive, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
             min-height: 100vh;
-            padding: 20px;
+            color: #333;
+            overflow-x: hidden;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* HEADER */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: bounce 2s infinite;
-        }
-        
-        .header .status {
-            display: inline-block;
-            padding: 5px 15px;
-            background: var(--success);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            animation: pulse 2s infinite;
-        }
-        
-        /* SECTIONS */
-        .section {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .active {
-            display: block;
-        }
-        
+
         /* CARTES ET BOUTONS */
         .card {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
             padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            cursor: pointer;
+            margin: 15px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: #ffcc00;
         }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .card:hover::before {
-            left: 100%;
-        }
-        
-        .card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .card p {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
+
         .btn {
-            background: var(--accent);
+            display: inline-block;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
             color: white;
             border: none;
             padding: 12px 25px;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 18px;
             cursor: pointer;
+            margin: 10px 5px;
             transition: all 0.3s ease;
-            display: inline-block;
-            margin: 5px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.4);
         }
-        
+
         .btn:hover {
-            background: #c0392b;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn-secondary {
-            background: var(--dark);
-        }
-        
-        .btn-secondary:hover {
-            background: #1a252f;
-        }
-        
-        /* FORMULAIRES */
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        /* JEU */
-        .game-area {
-            text-align: center;
-        }
-        
-        .timer {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 20px 0;
-            animation: pulse 1s infinite;
-        }
-        
-        .timer.warning {
-            color: var(--warning);
-            animation: pulse 0.5s infinite;
-        }
-        
-        .timer.danger {
-            color: var(--accent);
-            animation: pulse 0.2s infinite;
-        }
-        
-        .question {
-            font-size: 1.8rem;
-            margin: 20px 0;
-            min-height: 80px;
-        }
-        
-        .answers {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .answer-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .answer-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 94, 98, 0.6);
         }
-        
-        .score-board {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            flex-wrap: wrap;
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
         }
-        
-        .player-score {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin: 5px;
-            min-width: 150px;
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
         }
-        
-        .player-score.active {
-            background: rgba(46, 204, 113, 0.3);
-            border: 2px solid var(--success);
+
+        /* HEADER ET ANIMATIONS */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
         }
-        
-        /* ANIMATIONS */
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rainbow-bar {
+            height: 8px;
+            width: 100%;
+            background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: rainbow 3s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff5e62;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-        
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #56ab2f;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* SECTIONS D'INTERFACE */
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* FORMULAIRES ET INPUTS */
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 50px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff5e62;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 94, 98, 0.3);
+        }
+
+        /* ZONE DE JEU */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff5e62;
+            animation: pulse 1s infinite;
+        }
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .timer.warning {
+            color: orange;
         }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+        .timer.danger {
+            color: red;
         }
-        
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+
+        .question-container {
+            text-align: center;
+            margin: 20px 0;
         }
-        
-        /* AUDIO CONTROL */
+
+        .question {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #5b86e5, #36d1dc);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(54, 209, 220, 0.5);
+        }
+
+        /* LISTE DES JOUEURS */
+        .players-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            min-width: 150px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-card.active {
+            border: 2px solid #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: bold;
+        }
+
+        .player-score {
+            color: #ff5e62;
+            font-weight: bold;
+        }
+
+        /* ANIMATIONS DE CONFETTIS */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* BOUTON AUDIO */
         .audio-control {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
             width: 50px;
             height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             z-index: 100;
-            transition: all 0.3s ease;
+            font-size: 24px;
+            color: #ff5e62;
         }
-        
-        .audio-control:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
+
+        /* MESSAGES */
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+            display: none;
         }
-        
+
+        .message.active {
+            display: block;
+            animation: float 0.5s ease;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -60%); opacity: 0; }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
             .answers {
                 grid-template-columns: 1fr;
             }
             
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .card h2 {
-                font-size: 1.3rem;
+            .player-card {
+                min-width: 120px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- CONTRÔLE AUDIO -->
-    <div class="audio-control" id="audioControl">🔊</div>
-    
-    <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>🎯 Match en Ligne</h1>
-            <div class="status" id="onlineStatus">🟢 En ligne</div>
-        </div>
-        
-        <!-- MENU PRINCIPAL -->
-        <div class="section active" id="gameMode">
-            <div class="card" onclick="selectMode('solo')">
-                <h2>🎯 Mode Solo</h2>
-                <p>Entraîne-toi seul</p>
-            </div>
-            <div class="card" onclick="selectMode('multiplayer')">
-                <h2>👥 Mode Multiplayer</h2>
-                <p>Joue avec tes amis</p>
-            </div>
-        </div>
-        
-        <!-- SAISIE DU NOM -->
-        <div class="section" id="nameInputArea">
-            <div class="input-group">
-                <label for="playerName">Choisis ton pseudo :</label>
-                <input type="text" id="playerName" placeholder="SuperJoueur" maxlength="15">
-            </div>
-            <button class="btn" onclick="validateName()">Valider</button>
-            <button class="btn btn-secondary" onclick="resetInterface()">Retour</button>
-        </div>
-        
-        <!-- INTERFACE MULTIJOUEUR -->
-        <div class="section" id="multiplayerInterface">
-            <div class="card" onclick="showCreateSessionInterface()">
-                <h2>🏠 Créer une salle</h2>
-                <p>Crée une nouvelle partie</p>
-            </div>
-            <div class="card" onclick="showJoinInterface()">
-                <h2>🔗 Rejoindre une salle</h2>
-                <p>Rejoins une partie existante</p>
-            </div>
-            <button class="btn btn-secondary" onclick="resetInterface()">Retour</button>
-        </div>
-        
-        <!-- REJOINDRE UNE SALLE -->
-        <div class="section" id="joinInterface">
-            <div class="input-group">
-                <label for="sessionCode">Code de la salle (4 lettres) :</label>
-                <input type="text" id="sessionCode" placeholder="ABCD" maxlength="4" style="text-transform:uppercase">
-            </div>
-            <button class="btn" onclick="joinSession()">Rejoindre</button>
-            <button class="btn btn-secondary" onclick="showMultiplayerInterface()">Retour</button>
-        </div>
-        
-        <!-- CRÉATION DE SALLE -->
-        <div class="section" id="createSessionInterface">
-            <h2>🏠 Salle créée !</h2>
-            <p>Partage ce code avec tes amis :</p>
-            <div class="session-code" id="sessionCodeDisplay" style="font-size: 3rem; font-weight: bold; margin: 20px 0; letter-spacing: 10px;"></div>
-            
-            <div class="players-list" id="playersList">
-                <h3>Joueurs connectés :</h3>
-                <!-- Liste des joueurs générée dynamiquement -->
-            </div>
-            
-            <button class="btn" id="startGameBtn" onclick="startGame()" disabled>Démarrer la partie</button>
-            <button class="btn btn-secondary" onclick="leaveSession()">Quitter la salle</button>
-        </div>
-        
-        <!-- ZONE DE JEU -->
-        <div class="section" id="gameArea">
-            <h2 id="gameTitle">Jeu en cours</h2>
-            <div class="timer" id="gameTimer">12</div>
-            
-            <div class="question" id="gameQuestion">
-                Question apparaîtra ici
-            </div>
-            
-            <div class="answers" id="gameAnswers">
-                <!-- Réponses générées dynamiquement -->
-            </div>
-            
-            <div class="score-board" id="scoreBoard">
-                <!-- Scores des joueurs générés dynamiquement -->
-            </div>
-        </div>
-        
-        <!-- MI-TEMPS -->
-        <div class="section" id="halftimeSection">
-            <h2>⏸️ Mi-temps !</h2>
-            <div class="score-board" id="halftimeScores">
-                <!-- Classement intermédiaire généré dynamiquement -->
-            </div>
-            <button class="btn" onclick="continueGame()">Continuer</button>
-        </div>
-        
-        <!-- RÉSULTATS FINAUX -->
-        <div class="section" id="finalResults">
-            <h2>🏆 Résultats finaux !</h2>
-            <div class="score-board" id="finalScores">
-                <!-- Classement final généré dynamiquement -->
-            </div>
-            <button class="btn" onclick="resetInterface()">Retour au menu</button>
-        </div>
+    <!-- Contrôle audio -->
+    <div class="audio-control" id="audioControl">
+        <i class="fas fa-volume-up"></i>
     </div>
 
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="rainbow-bar"></div>
+                <h1>🎯 Match en Ligne</h1>
+                <div class="status">En ligne: <span id="onlineCount">0</span> joueurs</div>
+            </div>
+        </header>
+
+        <!-- Sections d'interface -->
+        
+        <!-- Menu principal -->
+        <section id="gameMode" class="section active">
+            <div class="card">
+                <h2>Choisis ton mode de jeu</h2>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="selectMode('solo')">
+                        <i class="fas fa-user"></i> Mode Solo
+                    </button>
+                    <button class="btn btn-secondary" onclick="selectMode('multiplayer')">
+                        <i class="fas fa-users"></i> Mode Multijoueur
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Saisie du nom -->
+        <section id="nameInputArea" class="section">
+            <div class="card">
+                <h2>Comment veux-tu t'appeler ?</h2>
+                <input type="text" id="playerNameInput" placeholder="Ton super pseudo..." maxlength="15">
+                <button class="btn btn-success" onclick="validateName()">Valider</button>
+                <button class="btn btn-secondary" onclick="resetInterface()">Retour</button>
+            </div>
+        </section>
+
+        <!-- Interface multijoueur -->
+        <section id="multiplayerInterface" class="section">
+            <div class="card">
+                <h2>Mode Multijoueur</h2>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="showCreateSessionInterface()">
+                        <i class="fas fa-home"></i> Créer une salle
+                    </button>
+                    <button class="btn btn-secondary" onclick="showJoinInterface()">
+                        <i class="fas fa-link"></i> Rejoindre une salle
+                    </button>
+                    <button class="btn" onclick="resetInterface()">Retour</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interface rejoindre -->
+        <section id="joinInterface" class="section">
+            <div class="card">
+                <h2>Rejoindre une salle</h2>
+                <p>Entre le code de la salle :</p>
+                <input type="text" id="sessionCodeInput" placeholder="Code à 4 lettres" maxlength="4" style="text-transform: uppercase;">
+                <button class="btn btn-success" onclick="joinSession()">Rejoindre</button>
+                <button class="btn" onclick="showMultiplayerInterface()">Retour</button>
+            </div>
+        </section>
+
+        <!-- Interface création salle -->
+        <section id="createSessionInterface" class="section">
+            <div class="card">
+                <h2>Créer une salle</h2>
+                <p>Partage ce code avec tes amis :</p>
+                <div style="text-align: center; font-size: 3rem; font-weight: bold; margin: 20px 0; color: #ff5e62;" id="sessionCodeDisplay">----</div>
+                
+                <h3>Joueurs connectés :</h3>
+                <div class="players-list" id="playersList">
+                    <!-- Liste des joueurs dynamique -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" id="startGameBtn" onclick="startGame()" disabled>Démarrer la partie</button>
+                    <button class="btn" onclick="leaveSession()">Quitter la salle</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Zone de jeu -->
+        <section id="gameArea" class="section">
+            <div class="card">
+                <div class="game-header">
+                    <div id="gameTitle">Épellation</div>
+                    <div class="timer" id="gameTimer">12</div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question" id="questionText">Épelez le mot: <strong>CHAT</strong></div>
+                    
+                    <div class="answers" id="answersContainer">
+                        <!-- Réponses dynamiques -->
+                    </div>
+                </div>
+                
+                <div class="players-list" id="gamePlayersList">
+                    <!-- Liste des joueurs en jeu -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section mi-temps -->
+        <section id="halftimeSection" class="section">
+            <div class="card">
+                <h2>Mi-temps !</h2>
+                <p>Voici le classement intermédiaire :</p>
+                
+                <div id="halftimeRanking">
+                    <!-- Classement dynamique -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="continueGame()">Continuer</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Messages et notifications -->
+    <div class="message" id="messagePopup">
+        <h3 id="messageTitle">Message</h3>
+        <p id="messageText">Texte du message</p>
+        <button class="btn" onclick="hideMessage()">OK</button>
+    </div>
+
+    <!-- Confettis -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- Scripts -->
     <script>
-        // CONFIGURATION FIREBASE
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
             authDomain: "match-en-ligne.firebaseapp.com",
@@ -431,13 +489,56 @@
             appId: "1:706011207623:web:17374990a6202b64f0abe2",
             measurementId: "G-D9XYRE3W2M"
         };
-        
-        // Initialisation Firebase (à décommenter une fois les SDK importés)
-        // const app = firebase.initializeApp(firebaseConfig);
-        // const analytics = firebase.getAnalytics(app);
-        // const db = firebase.firestore();
-        
-        // VARIABLES GLOBALES
+
+        // Données des jeux
+        const gameData = {
+            spelling: {
+                dictionary: [
+                    { word: "CHAT", category: "Animaux" },
+                    { word: "MAISON", category: "Lieux" },
+                    { word: "SOLEIL", category: "Nature" },
+                    { word: "JARDIN", category: "Lieux" },
+                    { word: "TABLE", category: "Objets" }
+                ],
+                common: [
+                    { word: "BONJOUR", category: "Salutations" },
+                    { word: "MERCI", category: "Politesse" },
+                    { word: "AU REVOIR", category: "Salutations" },
+                    { word: "S'IL VOUS PLAÎT", category: "Politesse" },
+                    { word: "EXCUSEZ-MOI", category: "Politesse" }
+                ],
+                difficult: [
+                    { word: "ANTICONSTITUTIONNELLEMENT", category: "Longs mots" },
+                    { word: "INCOMPREHENSIBILITE", category: "Longs mots" },
+                    { word: "PARALLELEPIPEDE", category: "Géométrie" },
+                    { word: "PHARMACOLOGIE", category: "Sciences" },
+                    { word: "PSYCHOLOGIE", category: "Sciences" }
+                ]
+            },
+            anagrams: [
+                { scrambled: "CHIEN", solution: "NIEC", word: "NIEC" },
+                { scrambled: "MAISON", solution: "SIONAM", word: "SIONAM" },
+                { scrambled: "JARDIN", solution: "RADIJN", word: "RADIJN" },
+                { scrambled: "TABLE", solution: "BETAL", word: "BETAL" },
+                { scrambled: "CHAISE", solution: "HACISE", word: "HACISE" }
+            ],
+            math: [
+                { question: "5 + 7 = ?", answer: "12", options: ["10", "12", "14", "11"] },
+                { question: "9 × 6 = ?", answer: "54", options: ["54", "56", "52", "58"] },
+                { question: "15 - 8 = ?", answer: "7", options: ["6", "7", "8", "9"] },
+                { question: "72 ÷ 8 = ?", answer: "9", options: ["8", "9", "10", "7"] },
+                { question: "13 + 19 = ?", answer: "32", options: ["31", "32", "33", "30"] }
+            ],
+            lexical: [
+                { theme: "Animaux de la ferme", words: ["VACHE", "COCHON", "MOUTON", "POULET"] },
+                { theme: "Fruits", words: ["POMME", "BANANE", "ORANGE", "FRAISE"] },
+                { theme: "Couleurs", words: ["ROUGE", "VERT", "BLEU", "JAUNE"] },
+                { theme: "Métiers", words: ["DOCTEUR", "ENSEIGNANT", "POMPIER", "POLICIER"] },
+                { theme: "Sports", words: ["FOOTBALL", "BASKETBALL", "TENNIS", "NATATION"] }
+            ]
+        };
+
+        // Variables globales
         let currentSession = null;
         let players = [];
         let playerId = null;
@@ -446,45 +547,25 @@
         let audioEnabled = true;
         let currentGameState = "waiting";
         let gameTimer = null;
-        
-        // DONNÉES DES JEUX
-        const gameData = {
-            spelling: {
-                dictionary: ["ordinateur", "programmation", "algorithm", "développement", "interface"],
-                animals: ["éléphant", "kangourou", "crocodile", "papillon", "hippopotame"],
-                geography: ["montagne", "océan", "continent", "péninsule", "archipel"]
-            },
-            anagrams: [
-                { word: "CHIEN", solution: "NIECH" },
-                { word: "TABLE", solution: "BELAT" },
-                { word: "MAISON", solution: "SIONAM" },
-                { word: "JARDIN", solution: "NIDRAJ" },
-                { word: "VOITURE", solution: "RUETOIV" }
-            ],
-            math: [
-                { question: "5 + 7 = ?", answer: 12, options: [10, 12, 14, 8] },
-                { question: "15 - 8 = ?", answer: 7, options: [5, 7, 9, 6] },
-                { question: "3 × 6 = ?", answer: 18, options: [15, 18, 12, 21] },
-                { question: "24 ÷ 4 = ?", answer: 6, options: [4, 6, 8, 5] },
-                { question: "9 + 13 = ?", answer: 22, options: [20, 22, 24, 21] }
-            ],
-            lexical: [
-                { theme: "Fruits", words: ["pomme", "banane", "orange", "fraise", "kiwi"] },
-                { theme: "Couleurs", words: ["rouge", "bleu", "vert", "jaune", "violet"] },
-                { theme: "Sports", words: ["football", "basketball", "tennis", "natation", "cyclisme"] },
-                { theme: "Pays", words: ["France", "Allemagne", "Italie", "Espagne", "Portugal"] },
-                { theme: "Métiers", words: ["médecin", "enseignant", "ingénieur", "cuisinier", "artiste"] }
-            ]
-        };
-        
-        // FONCTIONS DE NAVIGATION
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-        }
-        
+        let presenceInterval = null;
+        let sessionUnsubscribe = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Générer un ID unique pour le joueur
+            playerId = generatePlayerId();
+            
+            // Configurer le contrôle audio
+            setupAudio();
+            
+            // Mettre à jour le compteur de joueurs en ligne
+            updateOnlineStatus();
+            
+            // Afficher le menu principal
+            showSection('gameMode');
+        });
+
+        // Fonctions de navigation
         function selectMode(mode) {
             if (mode === 'solo') {
                 startSoloGame();
@@ -492,426 +573,720 @@
                 showSection('nameInputArea');
             }
         }
-        
+
         function validateName() {
-            const nameInput = document.getElementById('playerName');
+            const nameInput = document.getElementById('playerNameInput');
             const name = nameInput.value.trim();
             
             if (name.length < 2) {
-                alert("Le pseudo doit contenir au moins 2 caractères !");
+                showMessage("Erreur", "Ton pseudo doit avoir au moins 2 caractères !");
                 return;
             }
             
             playerName = name;
             showSection('multiplayerInterface');
         }
-        
+
         function showMultiplayerInterface() {
             showSection('multiplayerInterface');
         }
-        
+
         function showJoinInterface() {
             showSection('joinInterface');
         }
-        
+
         function showCreateSessionInterface() {
-            // Générer un code de session
+            createSession();
+        }
+
+        function resetInterface() {
+            if (currentSession) {
+                leaveSession();
+            }
+            showSection('gameMode');
+        }
+
+        // Fonctions de session
+        function createSession() {
             const sessionCode = generateSessionCode();
-            document.getElementById('sessionCodeDisplay').textContent = sessionCode;
             
-            // Simuler la création de session (à remplacer par Firebase)
+            // Simuler la création d'une session (dans un vrai projet, on utiliserait Firebase)
             currentSession = {
                 code: sessionCode,
                 host: playerId,
-                players: [{ id: playerId, name: playerName, score: 0, isOnline: true }],
-                status: 'waiting'
+                players: [
+                    {
+                        id: playerId,
+                        name: playerName,
+                        score: 0,
+                        halftimeScore: 0,
+                        isOnline: true,
+                        hasAnswered: false,
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }
+                ],
+                status: "waiting",
+                gameState: "spelling_dictionary",
+                currentQuestion: 0,
+                timer: 12,
+                timerStart: Date.now(),
+                createdAt: Date.now(),
+                lastActivity: Date.now()
             };
             
-            players = currentSession.players;
             isHost = true;
             
+            // Afficher l'interface de création de session
+            document.getElementById('sessionCodeDisplay').textContent = sessionCode;
             updatePlayersList();
             showSection('createSessionInterface');
             
-            // Activer le bouton de démarrage quand il y a au moins 2 joueurs
-            document.getElementById('startGameBtn').disabled = players.length < 2;
+            // Activer le bouton de démarrage
+            document.getElementById('startGameBtn').disabled = false;
+            
+            // Simuler l'écoute des changements de session
+            listenToSessionChanges();
         }
-        
+
         function joinSession() {
-            const sessionCode = document.getElementById('sessionCode').value.trim().toUpperCase();
+            const codeInput = document.getElementById('sessionCodeInput');
+            const sessionCode = codeInput.value.trim().toUpperCase();
             
             if (sessionCode.length !== 4) {
-                alert("Le code de session doit contenir exactement 4 lettres !");
+                showMessage("Erreur", "Le code doit contenir exactement 4 lettres !");
                 return;
             }
             
-            // Simuler la connexion à une session (à remplacer par Firebase)
+            // Simuler la connexion à une session (dans un vrai projet, on vérifierait avec Firebase)
             currentSession = {
                 code: sessionCode,
-                host: "autreJoueur",
+                host: "host123", // ID de l'hôte simulé
                 players: [
-                    { id: "autreJoueur", name: "Autre Joueur", score: 0, isOnline: true },
-                    { id: playerId, name: playerName, score: 0, isOnline: true }
+                    {
+                        id: "host123",
+                        name: "SuperHéros",
+                        score: 0,
+                        halftimeScore: 0,
+                        isOnline: true,
+                        hasAnswered: false,
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    },
+                    {
+                        id: playerId,
+                        name: playerName,
+                        score: 0,
+                        halftimeScore: 0,
+                        isOnline: true,
+                        hasAnswered: false,
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }
                 ],
-                status: 'waiting'
+                status: "waiting",
+                gameState: "spelling_dictionary",
+                currentQuestion: 0,
+                timer: 12,
+                timerStart: Date.now(),
+                createdAt: Date.now(),
+                lastActivity: Date.now()
             };
             
-            players = currentSession.players;
             isHost = false;
             
+            // Afficher l'interface de création de session
+            document.getElementById('sessionCodeDisplay').textContent = sessionCode;
             updatePlayersList();
             showSection('createSessionInterface');
+            
+            // Désactiver le bouton de démarrage (seul l'hôte peut démarrer)
+            document.getElementById('startGameBtn').disabled = true;
+            
+            // Simuler l'écoute des changements de session
+            listenToSessionChanges();
+            
+            showMessage("Succès", `Tu as rejoint la salle ${sessionCode} !`);
         }
-        
+
         function leaveSession() {
+            // Simuler la déconnexion d'une session
+            if (sessionUnsubscribe) {
+                clearInterval(sessionUnsubscribe);
+                sessionUnsubscribe = null;
+            }
+            
             currentSession = null;
-            players = [];
             isHost = false;
+            
             showSection('multiplayerInterface');
         }
-        
+
         function startGame() {
-            if (!isHost || players.length < 2) return;
+            if (!isHost) return;
             
-            // Simuler le début du jeu (à remplacer par Firebase)
-            currentSession.status = 'playing';
-            currentGameState = 'spelling_dictionary';
+            // Simuler le démarrage du jeu
+            currentSession.status = "playing";
+            currentSession.gameState = "spelling_dictionary";
+            currentSession.currentQuestion = 0;
+            currentSession.timer = 12;
+            currentSession.timerStart = Date.now();
             
-            showGameQuestion();
+            // Afficher la zone de jeu
+            showGameArea();
+            
+            // Démarrer la première question
+            showSpellingQuestion();
+        }
+
+        function showGameArea() {
             showSection('gameArea');
+            updateGamePlayers();
+        }
+
+        // Fonctions de jeu
+        function showSpellingQuestion() {
+            const category = currentSession.gameState.split('_')[1];
+            const questions = gameData.spelling[category];
+            const questionIndex = currentSession.currentQuestion % questions.length;
+            const question = questions[questionIndex];
+            
+            document.getElementById('gameTitle').textContent = "Épellation";
+            document.getElementById('questionText').innerHTML = `Épelez le mot: <strong>${question.word}</strong>`;
+            
+            // Vider le conteneur de réponses
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            // Pour l'épellation, on affiche un champ de saisie
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'spellingAnswer';
+            input.placeholder = 'Tape le mot ici...';
+            answersContainer.appendChild(input);
+            
+            const button = document.createElement('button');
+            button.className = 'btn btn-success';
+            button.textContent = 'Valider';
+            button.onclick = submitSpellingAnswer;
+            answersContainer.appendChild(button);
             
             // Démarrer le timer
             startTimer(12);
         }
-        
-        function continueGame() {
-            if (currentGameState === 'halftime') {
-                currentGameState = 'math';
-                showGameQuestion();
-                showSection('gameArea');
-                startTimer(12);
-            }
-        }
-        
-        function resetInterface() {
-            currentSession = null;
-            players = [];
-            isHost = false;
-            showSection('gameMode');
-        }
-        
-        // FONCTIONS DE JEU
-        function showGameQuestion() {
-            const questionElement = document.getElementById('gameQuestion');
-            const answersElement = document.getElementById('gameAnswers');
+
+        function submitSpellingAnswer() {
+            const input = document.getElementById('spellingAnswer');
+            const answer = input.value.trim().toUpperCase();
+            const category = currentSession.gameState.split('_')[1];
+            const questions = gameData.spelling[category];
+            const questionIndex = currentSession.currentQuestion % questions.length;
+            const question = questions[questionIndex];
             
-            // Vider les réponses précédentes
-            answersElement.innerHTML = '';
+            const isCorrect = answer === question.word;
             
-            let questionText = '';
-            let answers = [];
-            
-            switch (currentGameState) {
-                case 'spelling_dictionary':
-                    const word = gameData.spelling.dictionary[Math.floor(Math.random() * gameData.spelling.dictionary.length)];
-                    questionText = `Épelle le mot : <strong>${word}</strong>`;
-                    answers = [word, "Autre réponse", "Mauvaise réponse", "Encore une autre"];
-                    break;
-                    
-                case 'anagram':
-                    const anagram = gameData.anagrams[Math.floor(Math.random() * gameData.anagrams.length)];
-                    questionText = `Trouve l'anagramme de : <strong>${anagram.word}</strong>`;
-                    answers = [anagram.solution, "Autre réponse", "Mauvaise réponse", "Encore une autre"];
-                    break;
-                    
-                case 'math':
-                    const math = gameData.math[Math.floor(Math.random() * gameData.math.length)];
-                    questionText = math.question;
-                    answers = math.options.map(opt => opt.toString());
-                    break;
-                    
-                case 'lexical':
-                    const lexical = gameData.lexical[Math.floor(Math.random() * gameData.lexical.length)];
-                    questionText = `Trouve un mot du champ lexical : <strong>${lexical.theme}</strong>`;
-                    answers = lexical.words;
-                    break;
-                    
-                case 'halftime':
-                    showSection('halftimeSection');
-                    updateHalftimeScores();
-                    return;
-                    
-                default:
-                    questionText = "Question non définie";
-                    answers = ["Réponse 1", "Réponse 2", "Réponse 3", "Réponse 4"];
+            if (isCorrect) {
+                showScorePopup(10);
+                updatePlayerScore(10);
+            } else {
+                showMessage("Dommage !", `La bonne orthographe était: ${question.word}`);
             }
             
-            questionElement.innerHTML = questionText;
+            // Passer à la question suivante après un délai
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            currentSession.currentQuestion++;
             
-            // Mélanger les réponses
-            shuffleArray(answers);
+            // Changer de type de question après 5 questions
+            if (currentSession.currentQuestion >= 5) {
+                if (currentSession.gameState === "spelling_dictionary") {
+                    currentSession.gameState = "anagram";
+                    showAnagramQuestion();
+                } else if (currentSession.gameState === "anagram") {
+                    endFirstHalf();
+                } else if (currentSession.gameState === "math") {
+                    currentSession.gameState = "lexical";
+                    showLexicalQuestion();
+                } else if (currentSession.gameState === "lexical") {
+                    endGame();
+                }
+            } else {
+                // Continuer avec le même type de question
+                if (currentSession.gameState.startsWith("spelling_")) {
+                    showSpellingQuestion();
+                } else if (currentSession.gameState === "anagram") {
+                    showAnagramQuestion();
+                } else if (currentSession.gameState === "math") {
+                    showMathQuestion();
+                } else if (currentSession.gameState === "lexical") {
+                    showLexicalQuestion();
+                }
+            }
+        }
+
+        function showAnagramQuestion() {
+            const questions = gameData.anagrams;
+            const questionIndex = currentSession.currentQuestion % questions.length;
+            const question = questions[questionIndex];
             
-            // Créer les boutons de réponse
-            answers.forEach(answer => {
+            document.getElementById('gameTitle').textContent = "Anagrammes";
+            document.getElementById('questionText').innerHTML = `Trouve l'anagramme de: <strong>${question.scrambled}</strong>`;
+            
+            // Vider le conteneur de réponses
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            // Mélanger les options
+            const options = [...question.options];
+            shuffleArray(options);
+            
+            // Ajouter les boutons de réponse
+            options.forEach(option => {
                 const button = document.createElement('button');
                 button.className = 'answer-btn';
-                button.textContent = answer;
-                button.onclick = () => submitAnswer(answer);
-                answersElement.appendChild(button);
+                button.textContent = option;
+                button.onclick = function() {
+                    submitAnagramAnswer(option, question.solution);
+                };
+                answersContainer.appendChild(button);
             });
             
-            // Mettre à jour le titre du jeu
-            document.getElementById('gameTitle').textContent = getGameTitle(currentGameState);
-            
-            // Mettre à jour les scores
-            updateScoreBoard();
+            // Démarrer le timer
+            startTimer(12);
         }
-        
-        function submitAnswer(answer) {
-            // Simuler la soumission d'une réponse (à remplacer par Firebase)
-            const currentPlayer = players.find(p => p.id === playerId);
-            if (currentPlayer) {
-                currentPlayer.score += 10;
-            }
+
+        function submitAnagramAnswer(answer, solution) {
+            const isCorrect = answer === solution;
             
-            // Afficher un message de feedback
-            showFunMessage("Bonne réponse ! +10 points", "success");
-            
-            // Passer à la question suivante
-            setTimeout(() => {
-                nextQuestion();
-            }, 1500);
-        }
-        
-        function nextQuestion() {
-            // Logique pour passer à la question suivante
-            // Pour la démo, on alterne entre les types de questions
-            const states = ['spelling_dictionary', 'anagram', 'math', 'lexical'];
-            const currentIndex = states.indexOf(currentGameState);
-            
-            if (currentIndex < states.length - 1) {
-                currentGameState = states[currentIndex + 1];
+            if (isCorrect) {
+                showScorePopup(10);
+                updatePlayerScore(10);
             } else {
-                // Fin de la partie
-                showFinalResults();
-                return;
+                showMessage("Dommage !", `La bonne réponse était: ${solution}`);
             }
             
-            // Vérifier si c'est la mi-temps
-            if (currentGameState === 'math') {
-                currentGameState = 'halftime';
-                showSection('halftimeSection');
-                updateHalftimeScores();
-            } else {
-                showGameQuestion();
-                startTimer(12);
-            }
+            // Passer à la question suivante après un délai
+            setTimeout(nextQuestion, 2000);
         }
-        
-        function showFinalResults() {
-            // Trier les joueurs par score
-            players.sort((a, b) => b.score - a.score);
+
+        function showMathQuestion() {
+            const questions = gameData.math;
+            const questionIndex = currentSession.currentQuestion % questions.length;
+            const question = questions[questionIndex];
+            
+            document.getElementById('gameTitle').textContent = "Mathématiques";
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Vider le conteneur de réponses
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            // Mélanger les options
+            const options = [...question.options];
+            shuffleArray(options);
+            
+            // Ajouter les boutons de réponse
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn';
+                button.textContent = option;
+                button.onclick = function() {
+                    submitMathAnswer(option, question.answer);
+                };
+                answersContainer.appendChild(button);
+            });
+            
+            // Démarrer le timer
+            startTimer(15);
+        }
+
+        function submitMathAnswer(answer, solution) {
+            const isCorrect = answer === solution;
+            
+            if (isCorrect) {
+                showScorePopup(20);
+                updatePlayerScore(20);
+            } else {
+                showMessage("Dommage !", `La bonne réponse était: ${solution}`);
+            }
+            
+            // Passer à la question suivante après un délai
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function showLexicalQuestion() {
+            const questions = gameData.lexical;
+            const questionIndex = currentSession.currentQuestion % questions.length;
+            const question = questions[questionIndex];
+            
+            document.getElementById('gameTitle').textContent = "Champ Lexical";
+            document.getElementById('questionText').innerHTML = `Trouve un mot du champ lexical: <strong>${question.theme}</strong>`;
+            
+            // Vider le conteneur de réponses
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            // Créer un champ de saisie
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'lexicalAnswer';
+            input.placeholder = 'Tape un mot ici...';
+            answersContainer.appendChild(input);
+            
+            const button = document.createElement('button');
+            button.className = 'btn btn-success';
+            button.textContent = 'Valider';
+            button.onclick = function() {
+                submitLexicalAnswer(input.value.trim().toUpperCase(), question.words);
+            };
+            answersContainer.appendChild(button);
+            
+            // Démarrer le timer
+            startTimer(12);
+        }
+
+        function submitLexicalAnswer(answer, validWords) {
+            const isCorrect = validWords.includes(answer);
+            
+            if (isCorrect) {
+                showScorePopup(10);
+                updatePlayerScore(10);
+            } else {
+                showMessage("Dommage !", `Les mots acceptés étaient: ${validWords.join(', ')}`);
+            }
+            
+            // Passer à la question suivante après un délai
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function endFirstHalf() {
+            currentSession.status = "halftime";
+            showHalftimeSection();
+        }
+
+        function showHalftimeSection() {
+            // Mettre à jour les scores de mi-temps
+            players.forEach(player => {
+                player.halftimeScore = player.score;
+            });
+            
+            // Afficher le classement
+            updateHalftimeRanking();
+            
+            showSection('halftimeSection');
+        }
+
+        function continueGame() {
+            currentSession.status = "second_half";
+            currentSession.gameState = "math";
+            currentSession.currentQuestion = 0;
+            
+            showGameArea();
+            showMathQuestion();
+        }
+
+        function endGame() {
+            currentSession.status = "finished";
             
             // Afficher les résultats finaux
-            const finalScoresElement = document.getElementById('finalScores');
-            finalScoresElement.innerHTML = '';
-            
-            players.forEach((player, index) => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player-score';
-                if (player.id === playerId) playerElement.classList.add('active');
-                
-                playerElement.innerHTML = `
-                    <h3>${index + 1}. ${player.name}</h3>
-                    <p>Score: ${player.score} points</p>
-                `;
-                
-                finalScoresElement.appendChild(playerElement);
-            });
-            
-            showSection('finalResults');
-            
-            // Animation de célébration
-            createConfetti();
+            showFinalResults();
         }
-        
-        // FONCTIONS UTILITAIRES
-        function generateSessionCode() {
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let code = "";
-            for (let i = 0; i < 4; i++) {
-                code += letters.charAt(Math.floor(Math.random() * letters.length));
-            }
-            return code;
-        }
-        
-        function updatePlayersList() {
-            const playersListElement = document.getElementById('playersList');
-            playersListElement.innerHTML = '<h3>Joueurs connectés :</h3>';
-            
-            players.forEach(player => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player-score';
-                if (player.id === playerId) playerElement.classList.add('active');
-                
-                playerElement.innerHTML = `
-                    <h3>${player.name} ${player.id === currentSession.host ? '👑' : ''}</h3>
-                    <p>Score: ${player.score} points</p>
-                `;
-                
-                playersListElement.appendChild(playerElement);
-            });
-            
-            // Mettre à jour le bouton de démarrage
-            if (isHost) {
-                document.getElementById('startGameBtn').disabled = players.length < 2;
-            }
-        }
-        
-        function updateScoreBoard() {
-            const scoreBoardElement = document.getElementById('scoreBoard');
-            scoreBoardElement.innerHTML = '';
-            
-            players.forEach(player => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player-score';
-                if (player.id === playerId) playerElement.classList.add('active');
-                
-                playerElement.innerHTML = `
-                    <h3>${player.name}</h3>
-                    <p>${player.score} points</p>
-                `;
-                
-                scoreBoardElement.appendChild(playerElement);
-            });
-        }
-        
-        function updateHalftimeScores() {
-            const halftimeScoresElement = document.getElementById('halftimeScores');
-            halftimeScoresElement.innerHTML = '';
-            
+
+        function showFinalResults() {
             // Trier les joueurs par score
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
             
+            // Afficher le classement final
+            let html = '<div style="text-align: center;">';
             sortedPlayers.forEach((player, index) => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player-score';
-                if (player.id === playerId) playerElement.classList.add('active');
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                html += `
+                    <div class="player-card" style="margin: 10px auto; max-width: 300px;">
+                        <div class="player-avatar">${medal}</div>
+                        <div class="player-info">
+                            <div class="player-name">${player.name}</div>
+                            <div class="player-score">${player.score} points</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            document.getElementById('halftimeRanking').innerHTML = html;
+            
+            // Modifier le titre
+            document.querySelector('#halftimeSection h2').textContent = "Partie Terminée !";
+            document.querySelector('#halftimeSection p').textContent = "Voici le classement final :";
+            
+            // Modifier le bouton
+            const button = document.querySelector('#halftimeSection button');
+            button.textContent = "Rejouer";
+            button.onclick = function() {
+                leaveSession();
+                resetInterface();
+            };
+            
+            // Lancer les confettis
+            createConfetti();
+            
+            showSection('halftimeSection');
+        }
+
+        // Fonctions utilitaires
+        function showSection(sectionId) {
+            // Cacher toutes les sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Afficher la section demandée
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function generatePlayerId() {
+            return 'player_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function generateSessionCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function updatePlayersList() {
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = '';
+            
+            players = currentSession.players;
+            
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                if (player.id === playerId) {
+                    playerCard.classList.add('active');
+                }
                 
-                playerElement.innerHTML = `
-                    <h3>${index + 1}. ${player.name}</h3>
-                    <p>${player.score} points</p>
+                playerCard.innerHTML = `
+                    <div class="player-avatar">${player.name.charAt(0)}</div>
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-score">${player.score} pts</div>
+                    </div>
                 `;
                 
-                halftimeScoresElement.appendChild(playerElement);
+                playersList.appendChild(playerCard);
             });
         }
-        
-        function getGameTitle(gameState) {
-            switch (gameState) {
-                case 'spelling_dictionary': return '🎯 Épellation';
-                case 'anagram': return '🔤 Anagrammes';
-                case 'math': return '🧮 Mathématiques';
-                case 'lexical': return '📚 Champ Lexical';
-                default: return 'Jeu';
-            }
+
+        function updateGamePlayers() {
+            const gamePlayersList = document.getElementById('gamePlayersList');
+            gamePlayersList.innerHTML = '';
+            
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                if (player.id === playerId) {
+                    playerCard.classList.add('active');
+                }
+                
+                playerCard.innerHTML = `
+                    <div class="player-avatar">${player.name.charAt(0)}</div>
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-score">${player.score} pts</div>
+                    </div>
+                `;
+                
+                gamePlayersList.appendChild(playerCard);
+            });
         }
-        
+
+        function updateHalftimeRanking() {
+            const halftimeRanking = document.getElementById('halftimeRanking');
+            
+            // Trier les joueurs par score
+            const sortedPlayers = [...players].sort((a, b) => b.halftimeScore - a.halftimeScore);
+            
+            let html = '<div style="text-align: center;">';
+            sortedPlayers.forEach((player, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                html += `
+                    <div class="player-card" style="margin: 10px auto; max-width: 300px;">
+                        <div class="player-avatar">${medal}</div>
+                        <div class="player-info">
+                            <div class="player-name">${player.name}</div>
+                            <div class="player-score">${player.halftimeScore} points</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            halftimeRanking.innerHTML = html;
+        }
+
         function startTimer(seconds) {
             const timerElement = document.getElementById('gameTimer');
             timerElement.textContent = seconds;
             timerElement.className = 'timer';
             
             if (seconds <= 5) {
+                timerElement.classList.add('danger');
+            } else if (seconds <= 8) {
                 timerElement.classList.add('warning');
             }
             
-            if (seconds <= 3) {
-                timerElement.classList.add('danger');
-            }
+            let timeLeft = seconds;
             
-            if (seconds > 0) {
-                setTimeout(() => {
-                    startTimer(seconds - 1);
-                }, 1000);
-            } else {
-                handleTimeUp();
-            }
-        }
-        
-        function handleTimeUp() {
-            showFunMessage("Temps écoulé !", "warning");
-            setTimeout(() => {
-                nextQuestion();
-            }, 1500);
-        }
-        
-        function showFunMessage(message, type) {
-            // Créer un élément de message temporaire
-            const messageElement = document.createElement('div');
-            messageElement.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: ${type === 'success' ? 'rgba(46, 204, 113, 0.9)' : 'rgba(243, 156, 18, 0.9)'};
-                color: white;
-                padding: 20px 30px;
-                border-radius: 10px;
-                font-size: 1.5rem;
-                font-weight: bold;
-                z-index: 1000;
-                animation: fadeIn 0.3s, fadeOut 0.3s 1.2s;
-            `;
-            messageElement.textContent = message;
-            
-            document.body.appendChild(messageElement);
-            
-            // Supprimer le message après l'animation
-            setTimeout(() => {
-                document.body.removeChild(messageElement);
-            }, 1500);
-        }
-        
-        function createConfetti() {
-            // Animation de confettis simplifiée
-            const confettiCount = 50;
-            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
-            
-            for (let i = 0; i < confettiCount; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.style.cssText = `
-                        position: fixed;
-                        width: 10px;
-                        height: 10px;
-                        background: ${colors[Math.floor(Math.random() * colors.length)]};
-                        top: -10px;
-                        left: ${Math.random() * 100}vw;
-                        border-radius: 50%;
-                        animation: confetti-fall ${1 + Math.random() * 2}s linear forwards;
-                    `;
-                    
-                    document.body.appendChild(confetti);
-                    
-                    // Supprimer après l'animation
-                    setTimeout(() => {
-                        document.body.removeChild(confetti);
-                    }, 3000);
-                }, i * 100);
-            }
-            
-            // Ajouter l'animation CSS pour les confettis
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes confetti-fall {
-                    0% { transform: translateY(0) rotate(0deg); }
-                    100% { transform: translateY(100vh) rotate(360deg); }
+            const timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 5) {
+                    timerElement.classList.add('danger');
+                } else if (timeLeft <= 8) {
+                    timerElement.classList.add('warning');
                 }
-            `;
-            document.head.appendChild(style);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeUp();
+                }
+            }, 1000);
+            
+            // Stocker l'ID du timer pour pouvoir l'arrêter si nécessaire
+            gameTimer = timer;
         }
-        
+
+        function handleTimeUp() {
+            showMessage("Temps écoulé !", "Tu n'as pas répondu à temps.");
+            
+            // Passer à la question suivante après un délai
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function updatePlayerScore(points) {
+            const player = players.find(p => p.id === playerId);
+            if (player) {
+                player.score += points;
+                updateGamePlayers();
+            }
+        }
+
+        function showScorePopup(points) {
+            showMessage("Bonne réponse !", `+${points} points !`);
+        }
+
+        function showMessage(title, text) {
+            document.getElementById('messageTitle').textContent = title;
+            document.getElementById('messageText').textContent = text;
+            document.getElementById('messagePopup').classList.add('active');
+        }
+
+        function hideMessage() {
+            document.getElementById('messagePopup').classList.remove('active');
+        }
+
+        function createConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function setupAudio() {
+            const audioControl = document.getElementById('audioControl');
+            audioControl.addEventListener('click', function() {
+                audioEnabled = !audioEnabled;
+                const icon = audioControl.querySelector('i');
+                if (audioEnabled) {
+                    icon.className = 'fas fa-volume-up';
+                    speakText("Audio activé");
+                } else {
+                    icon.className = 'fas fa-volume-mute';
+                }
+            });
+        }
+
+        function speakText(text) {
+            if (!audioEnabled) return;
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function updateOnlineStatus() {
+            // Simuler la mise à jour du statut en ligne
+            const onlineCount = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('onlineCount').textContent = onlineCount;
+        }
+
+        function listenToSessionChanges() {
+            // Simuler l'écoute des changements de session
+            sessionUnsubscribe = setInterval(() => {
+                // Dans un vrai projet, on mettrait à jour les données depuis Firebase
+                updatePlayersList();
+                
+                if (currentSession && currentSession.status === "playing") {
+                    updateGamePlayers();
+                }
+            }, 2000);
+        }
+
+        function startSoloGame() {
+            // Mode solo simplifié
+            playerName = "Joueur Solo";
+            playerId = "solo_player";
+            
+            currentSession = {
+                code: "SOLO",
+                host: playerId,
+                players: [
+                    {
+                        id: playerId,
+                        name: playerName,
+                        score: 0,
+                        halftimeScore: 0,
+                        isOnline: true,
+                        hasAnswered: false,
+                        readyForSecondHalf: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }
+                ],
+                status: "playing",
+                gameState: "spelling_dictionary",
+                currentQuestion: 0,
+                timer: 12,
+                timerStart: Date.now(),
+                createdAt: Date.now(),
+                lastActivity: Date.now()
+            };
+            
+            isHost = true;
+            players = currentSession.players;
+            
+            showGameArea();
+            showSpellingQuestion();
+            
+            showMessage("Mode Solo", "Tu joues en mode entraînement. Amuse-toi bien !");
+        }
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -919,39 +1294,9 @@
             }
             return array;
         }
-        
-        function startSoloGame() {
-            // Mode solo simplifié pour la démo
-            playerName = "Joueur Solo";
-            playerId = "soloPlayer";
-            
-            currentSession = {
-                code: "SOLO",
-                host: playerId,
-                players: [{ id: playerId, name: playerName, score: 0, isOnline: true }],
-                status: 'playing'
-            };
-            
-            players = currentSession.players;
-            isHost = true;
-            currentGameState = 'spelling_dictionary';
-            
-            showGameQuestion();
-            showSection('gameArea');
-            startTimer(12);
-        }
-        
-        // INITIALISATION
-        window.onload = function() {
-            // Générer un ID unique pour le joueur
-            playerId = 'player_' + Math.random().toString(36).substr(2, 9);
-            
-            // Configurer le contrôle audio
-            document.getElementById('audioControl').addEventListener('click', function() {
-                audioEnabled = !audioEnabled;
-                this.textContent = audioEnabled ? '🔊' : '🔇';
-            });
-        };
+
+        // Simuler la configuration Firebase (dans un vrai projet, on initialiserait Firebase)
+        console.log("Configuration Firebase:", firebaseConfig);
     </script>
 </body>
 </html>
