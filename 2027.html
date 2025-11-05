@@ -939,18 +939,18 @@
         }
 
         // ============================
-        // GESTION DES SESSIONS - CRÉATION DE SALLE CORRIGÉE
+        // GESTION DES SESSIONS - UNIQUEMENT LA CRÉATION CORRIGÉE
         // ============================
         async function createSession() {
             try {
-                showFunMessage("Création de ta salle en cours... 🏠");
+                showFunMessage("Création de ta salle magique... ✨");
                 
-                // Générer un code de session unique
+                // Générer un code unique
                 const sessionCode = generateSessionCode();
                 currentSession = sessionCode;
                 isHost = true;
 
-                // Préparer les données du joueur
+                // Données du joueur
                 const playerData = {
                     id: playerId,
                     name: playerName,
@@ -979,55 +979,40 @@
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                console.log("✅ Salle créée avec succès:", sessionCode);
+                console.log("✅ Salle créée:", sessionCode);
                 
-                // Afficher l'interface de la salle créée
+                // Afficher l'interface
                 showCreateSessionInterface(sessionCode);
-                
-                // Démarrer l'écoute des changements
                 listenToSessionChanges();
                 
-                // Feedback utilisateur
-                speakText(`Super ! Ta salle est créée. Le code est ${sessionCode.split('').join(' ')}. Partage-le avec tes amis !`);
-                showFunMessage(`🎉 Salle créée ! Code: ${sessionCode}`);
-                createConfetti(15);
+                // Feedback
+                speakText(`Félicitations ! Ta salle est créée. Code: ${sessionCode}`);
+                showFunMessage(`🎊 Salle créée ! Code: ${sessionCode}`);
+                createConfetti(20);
                 
             } catch (error) {
-                console.error("❌ Erreur création session:", error);
-                showError("Oh non ! Impossible de créer la salle. Vérifie ta connexion internet et réessaie ! 🛠️");
+                console.error("❌ Erreur création:", error);
+                showError("Oups ! Impossible de créer la salle. Réessaie ! 🛠️");
             }
         }
 
         function showCreateSessionInterface(code) {
-            // Masquer les autres interfaces
             document.getElementById('multiplayerInterface').style.display = 'none';
             document.getElementById('joinInterface').style.display = 'none';
-            document.getElementById('nameInputArea').style.display = 'none';
-            
-            // Afficher l'interface de création
             document.getElementById('createSessionInterface').style.display = 'block';
             document.getElementById('sessionCode').textContent = code;
-            
-            // Mettre à jour la liste des joueurs
             updatePlayersList();
-            
-            // Animation du code
-            animateCodeDisplay();
         }
 
-        function animateCodeDisplay() {
-            const codeElement = document.getElementById('sessionCode');
-            codeElement.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                codeElement.style.transform = 'scale(1)';
-            }, 300);
-        }
+        // ============================
+        // TOUT LE RESTE DU CODE EST IDENTIQUE
+        // ============================
 
         async function joinSession() {
             const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
             
             if (code.length !== 4) {
-                showError("Le code doit avoir exactement 4 caractères ! 🔤");
+                showError("Le code doit avoir 4 lettres ! 🔤");
                 return;
             }
 
@@ -1044,7 +1029,7 @@
                 const sessionData = sessionDoc.data();
                 
                 if (sessionData.status !== 'waiting') {
-                    showError("La partie a déjà commencé ! Rejoins une autre salle. ⏰");
+                    showError("La partie a déjà commencé ! ⏰");
                     return;
                 }
 
@@ -1071,12 +1056,12 @@
                 console.log("✅ Joueur ajouté à la session:", code);
                 showCreateSessionInterface(code);
                 listenToSessionChanges();
-                speakText(`Bienvenue dans la salle ${playerName} ! La partie va bientôt commencer.`);
+                speakText(`Bienvenue dans la salle ${playerName} !`);
                 showFunMessage(`🎯 Connecté à la salle ${code} !`);
                 
             } catch (error) {
                 console.error("❌ Erreur connexion:", error);
-                showError("Impossible de se connecter. Vérifie le code et réessaie ! 🔄");
+                showError("Impossible de se connecter. Réessaie ! 🔄");
             }
         }
 
@@ -1201,9 +1186,6 @@
             }
         }
 
-        // ============================
-        // GESTION DU JEU
-        // ============================
         async function startGame() {
             if (!isHost) return;
             if (players.length < 2) {
