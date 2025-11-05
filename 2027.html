@@ -135,6 +135,18 @@
             box-shadow: 0 12px 30px rgba(78, 205, 196, 0.6);
         }
 
+        .btn:disabled {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
         .code-display {
             font-size: 5rem;
             letter-spacing: 20px;
@@ -175,6 +187,11 @@
             background: #4ecdc4;
             box-shadow: 0 0 15px #4ecdc4;
             animation: pulse 2s infinite;
+        }
+
+        .presence-offline {
+            background: #ff6b6b;
+            box-shadow: 0 0 15px #ff6b6b;
         }
 
         .status-text {
@@ -303,6 +320,7 @@
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .code-display { font-size: 3rem; letter-spacing: 10px; }
+            .btn { padding: 15px 25px; font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -327,7 +345,7 @@
                 <span class="status-text">1/1 joueurs en ligne</span>
             </div>
             <div class="players-container" id="playersList"></div>
-            <button class="btn btn-success" onclick="startGame()" id="startBtn">Démarrer la Partie ! 🚀</button>
+            <button class="btn btn-success" onclick="startGame()" id="startBtn" disabled>Démarrer la Partie ! 🚀</button>
             <button class="btn" onclick="leaveSession()">Quitter</button>
         </div>
     </div>
@@ -361,7 +379,7 @@
         let currentSession = null;
         let players = [];
         let playerId = Math.random().toString(36).substr(2, 9);
-        let playerName = "SuperJoueur";
+        let playerName = "SuperJoueur" + Math.floor(Math.random() * 1000);
         let isHost = false;
         let sessionUnsubscribe = null;
 
@@ -459,6 +477,7 @@
                     }
                 } else {
                     showFunMessage("La salle a été fermée ! 🏠");
+                    document.getElementById('createSessionInterface').style.display = 'none';
                 }
             }, (error) => {
                 console.error("❌ Erreur écoute session:", error);
@@ -493,18 +512,12 @@
             const globalStatus = document.getElementById('onlineStatus');
             if (globalStatus) {
                 globalStatus.style.display = 'flex';
-                globalStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
+                globalStatus.querySelector('.status-text').textContent = `${onlinePlayers}/${totalPlayers} joueurs en ligne`;
             }
             
             const sessionStatus = document.getElementById('sessionOnlineStatus');
             if (sessionStatus) {
-                sessionStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
+                sessionStatus.querySelector('.status-text').textContent = `${onlinePlayers}/${totalPlayers} joueurs en ligne`;
             }
         }
 
@@ -539,9 +552,18 @@
                     if (isHost) {
                         await db.collection('sessions').doc(currentSession).delete();
                         showFunMessage("Salle fermée ! À bientôt ! 👋");
+                    } else {
+                        // Si c'est un joueur, le retirer de la liste
+                        const updatedPlayers = players.filter(p => p.id !== playerId);
+                        await db.collection('sessions').doc(currentSession).update({
+                            players: updatedPlayers
+                        });
+                        showFunMessage("Tu as quitté la salle ! 👋");
                     }
+                    document.getElementById('createSessionInterface').style.display = 'none';
                 } catch (error) {
                     console.error("Erreur déconnexion:", error);
+                    showError("Erreur lors de la déconnexion");
                 }
             }
         }
