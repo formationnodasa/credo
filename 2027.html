@@ -841,7 +841,8 @@
         let gameTimer = null;
         let presenceInterval = null;
         let sessionUnsubscribe = null;
-        let lastSpokenQuestion = null; // Variable pour suivre la dernière question énoncée
+        let lastSpokenQuestion = null; // CORRECTION 1: Mémoire pour le vocal
+        let timerActive = false; // CORRECTION 4: Contrôle du chronomètre
 
         // ============================
         // INITIALISATION
@@ -1264,7 +1265,7 @@
 
             updateGamePlayers();
             
-            // Énoncer le mot UNE SEULE FOIS par question
+            // CORRECTION 1: Énoncer le mot UNE SEULE FOIS par question
             const currentQuestionKey = `spelling_${type}_${index}`;
             if (lastSpokenQuestion !== currentQuestionKey) {
                 speakText(`Épelez le mot: ${word}`);
@@ -1296,10 +1297,8 @@
                     showScorePopup("+0", false);
                 }
 
-                const allAnswered = players.every(p => p.hasAnswered);
-                if (allAnswered && isHost) {
-                    setTimeout(() => nextQuestion(), 2000);
-                }
+                // CORRECTION 2: Ne pas passer automatiquement à la question suivante
+                // La question suivante sera gérée par le chronomètre ou manuellement par l'hôte
             } catch (error) {
                 console.error("Erreur soumission:", error);
             }
@@ -1325,7 +1324,7 @@
 
             updateGamePlayers();
             
-            // Énoncer l'anagramme UNE SEULE FOIS par question
+            // CORRECTION 1: Énoncer l'anagramme UNE SEULE FOIS par question
             const currentQuestionKey = `anagram_${index}`;
             if (lastSpokenQuestion !== currentQuestionKey) {
                 speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
@@ -1358,10 +1357,7 @@
                     showScorePopup("+0", false);
                 }
 
-                const allAnswered = players.every(p => p.hasAnswered);
-                if (allAnswered && isHost) {
-                    setTimeout(() => nextQuestion(), 2000);
-                }
+                // CORRECTION 2: Ne pas passer automatiquement à la question suivante
             } catch (error) {
                 console.error("Erreur soumission:", error);
             }
@@ -1413,19 +1409,23 @@
         }
 
         // ============================
-        // MI-TEMPS
+        // MI-TEMPS - CORRECTION 3
         // ============================
         async function endFirstHalf() {
             if (!isHost) return;
 
             try {
+                // CORRECTION 3: S'assurer que tous les scores sont sauvegardés
+                const halftimeScores = players.map(p => ({
+                    ...p,
+                    halftimeScore: p.score,
+                    readyForSecondHalf: false,
+                    hasAnswered: false
+                }));
+
                 await db.collection('sessions').doc(currentSession).update({
                     status: 'halftime',
-                    players: players.map(p => ({
-                        ...p,
-                        halftimeScore: p.score,
-                        readyForSecondHalf: false
-                    }))
+                    players: halftimeScores
                 });
             } catch (error) {
                 console.error("Erreur mi-temps:", error);
@@ -1437,13 +1437,14 @@
             document.getElementById('halftimeSection').style.display = 'block';
 
             const container = document.getElementById('halftimePlayers');
+            // CORRECTION 3: Afficher correctement les scores de mi-temps
             container.innerHTML = players.map(player => `
                 <div class="player-card ${player.id === playerId ? 'active' : ''}">
                     <div class="player-header">
                         <div class="player-name">${player.name}</div>
                         <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
                     </div>
-                    <div class="player-score">${player.halftimeScore} points</div>
+                    <div class="player-score">${player.halftimeScore || player.score} points</div>
                     <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
                 </div>
             `).join('');
@@ -1460,9 +1461,10 @@
                     )
                 });
 
+                // CORRECTION 3: Vérifier que tous les joueurs sont prêts
                 const allReady = players.every(p => p.readyForSecondHalf);
                 if (allReady && isHost) {
-                    startSecondHalf();
+                    setTimeout(() => startSecondHalf(), 1000);
                 }
             } catch (error) {
                 console.error("Erreur préparation 2ème mi-temps:", error);
@@ -1543,7 +1545,7 @@
             document.getElementById('gameContent').innerHTML = content;
             updateGamePlayers();
 
-            // Énoncer la question mathématique UNE SEULE FOIS
+            // CORRECTION 1: Énoncer la question mathématique UNE SEULE FOIS
             const currentQuestionKey = `math_${index}`;
             if (lastSpokenQuestion !== currentQuestionKey) {
                 speakText(`Résolvez: ${question.problem}`);
@@ -1581,9 +1583,7 @@
                     showScorePopup("+0", false);
                 }
 
-                if (isHost) {
-                    setTimeout(() => nextQuestion(), 3000);
-                }
+                // CORRECTION 2: Ne pas passer automatiquement
             } catch (error) {
                 console.error("Erreur soumission maths:", error);
             }
@@ -1651,7 +1651,7 @@
             document.getElementById('gameContent').innerHTML = content;
             updateGamePlayers();
 
-            // Énoncer la question lexicale UNE SEULE FOIS
+            // CORRECTION 1: Énoncer la question lexicale UNE SEULE FOIS
             const currentQuestionKey = `lexical_${index}`;
             if (lastSpokenQuestion !== currentQuestionKey) {
                 speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
@@ -1684,16 +1684,14 @@
                     showScorePopup("+0", false);
                 }
 
-                if (isHost) {
-                    setTimeout(() => nextQuestion(), 3000);
-                }
+                // CORRECTION 2: Ne pas passer automatiquement
             } catch (error) {
                 console.error("Erreur soumission lexical:", error);
             }
         }
 
         // ============================
-        // GESTION DU CHRONOMÈTRE - CORRECTION
+        // GESTION DU CHRONOMÈTRE - CORRECTION 4
         // ============================
 
         function handleTimer(sessionData) {
@@ -1705,7 +1703,7 @@
             const elapsed = Math.floor((now - startTime) / 1000);
             const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
 
-            // Mettre à jour l'affichage du timer
+            // Mettre à jour l'affichage
             timerElement.textContent = remaining;
 
             // Mettre à jour les classes visuelles
@@ -1716,45 +1714,47 @@
                 timerElement.classList.add('warning');
             }
 
-            // Nettoyer l'ancien timer s'il existe
+            // CORRECTION 4: Nettoyer l'ancien timer et en créer un nouveau
             if (gameTimer) {
                 clearInterval(gameTimer);
             }
 
-            // Créer un nouveau timer qui se met à jour chaque seconde
-            gameTimer = setInterval(() => {
-                const currentRemaining = parseInt(timerElement.textContent);
-                if (currentRemaining > 0) {
-                    const newRemaining = currentRemaining - 1;
-                    timerElement.textContent = newRemaining;
-                    
-                    // Mettre à jour les classes pour l'affichage visuel
-                    timerElement.classList.remove('warning', 'danger');
-                    if (newRemaining <= 5) {
-                        timerElement.classList.add('danger');
-                    } else if (newRemaining <= 10) {
-                        timerElement.classList.add('warning');
+            // Démarrer le nouveau timer seulement si pas déjà actif
+            if (!timerActive && remaining > 0) {
+                timerActive = true;
+                gameTimer = setInterval(() => {
+                    const currentRemaining = parseInt(timerElement.textContent);
+                    if (currentRemaining > 0) {
+                        const newRemaining = currentRemaining - 1;
+                        timerElement.textContent = newRemaining;
+                        
+                        // Mettre à jour les classes
+                        timerElement.classList.remove('warning', 'danger');
+                        if (newRemaining <= 5) {
+                            timerElement.classList.add('danger');
+                        } else if (newRemaining <= 10) {
+                            timerElement.classList.add('warning');
+                        }
+                    } else {
+                        // CORRECTION 4: Timer terminé
+                        timerActive = false;
+                        clearInterval(gameTimer);
+                        if (isHost) {
+                            handleTimeUp();
+                        }
                     }
-                } else {
-                    clearInterval(gameTimer);
-                    // Le chronomètre est à zéro, vérifier si on peut passer à la question suivante
-                    checkTimerEnd();
-                }
-            }, 1000);
-        }
-
-        function checkTimerEnd() {
-            // Vérifier si tous les joueurs ont répondu
-            const allPlayersAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
-            
-            // Si tous les joueurs ont répondu OU le chrono est à zéro ET on est l'hôte
-            if (isHost && (allPlayersAnswered || parseInt(document.getElementById('gameTimer').textContent) === 0)) {
-                handleTimeUp();
+                }, 1000);
             }
         }
 
         function startTimer(seconds) {
             if (!isHost) return;
+
+            // CORRECTION 4: Réinitialiser l'état du timer
+            timerActive = false;
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
 
             db.collection('sessions').doc(currentSession).update({
                 timer: seconds,
@@ -1765,25 +1765,30 @@
         async function handleTimeUp() {
             if (!isHost) return;
 
-            // Marquer tous les joueurs qui n'ont pas répondu comme ayant répondu (mais incorrect)
-            await db.collection('sessions').doc(currentSession).update({
-                players: players.map(p => 
-                    !p.hasAnswered && !p.quickAnswer ? {
-                        ...p,
-                        hasAnswered: true,
-                        isCorrect: false
-                    } : p
-                )
-            });
+            // CORRECTION 2: Vérifier si tous les joueurs ont répondu
+            const allPlayersAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
+            
+            if (allPlayersAnswered || parseInt(document.getElementById('gameTimer').textContent) === 0) {
+                // Marquer les joueurs qui n'ont pas répondu
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        !p.hasAnswered && !p.quickAnswer ? {
+                            ...p,
+                            hasAnswered: true,
+                            isCorrect: false
+                        } : p
+                    )
+                });
 
-            // Attendre un court instant pour laisser le temps aux mises à jour de se propager
-            setTimeout(() => {
-                nextQuestion();
-            }, 1000);
+                // Attendre puis passer à la question suivante
+                setTimeout(() => {
+                    nextQuestion();
+                }, 2000);
+            }
         }
 
         // ============================
-        // FONCTIONS UTILITAIRES AMÉLIORÉES
+        // FONCTIONS UTILITAIRES
         // ============================
         function updateGamePlayers() {
             const container = document.getElementById('gamePlayers');
@@ -1918,7 +1923,10 @@
         }
 
         function resetInterface() {
-            if (gameTimer) clearInterval(gameTimer);
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                timerActive = false;
+            }
             if (presenceInterval) clearInterval(presenceInterval);
             if (sessionUnsubscribe) sessionUnsubscribe();
             
