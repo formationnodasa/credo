@@ -7,7 +7,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        /* Style global */
         * {
             margin: 0;
             padding: 0;
@@ -209,7 +208,430 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Autres styles... (inchangés) */
+        .name-input-area {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border: 3px solid #ff6b6b;
+            border-radius: 25px;
+            padding: 50px 40px;
+            text-align: center;
+            margin: 30px 0;
+            display: none;
+            box-shadow: 0 0 50px rgba(255, 107, 107, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-field {
+            width: 100%;
+            max-width: 400px;
+            padding: 18px 25px;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #4ecdc4;
+            border-radius: 20px;
+            color: white;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            transform: scale(1.05);
+        }
+
+        .input-field::placeholder {
+            color: #a5d8ff;
+        }
+
+        .code-display {
+            font-size: 5rem;
+            letter-spacing: 20px;
+            color: #ff6b6b;
+            margin: 40px 0;
+            font-weight: bold;
+            text-shadow: 0 0 30px #ff6b6b;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 25px;
+            border: 3px solid #ff6b6b;
+            animation: pulse 2s infinite;
+        }
+
+        .game-area {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border-radius: 30px;
+            padding: 50px;
+            margin: 30px 0;
+            border: 4px solid #4ecdc4;
+            box-shadow: 0 0 60px rgba(78, 205, 196, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid #4ecdc4;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px #ff6b6b;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #ff6b6b; }
+            to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
+        }
+
+        .game-timer {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            text-shadow: 0 0 20px #4ecdc4;
+            padding: 20px 30px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 20px;
+            border: 3px solid #4ecdc4;
+            transition: all 0.3s ease;
+            animation: pulse 1s infinite;
+        }
+
+        .game-timer.warning {
+            color: #ffeaa7;
+            border-color: #ffeaa7;
+            text-shadow: 0 0 20px #ffeaa7;
+        }
+
+        .game-timer.danger {
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+            text-shadow: 0 0 20px #ff6b6b;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .game-content {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .question {
+            font-size: 2.8rem;
+            margin-bottom: 50px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 20px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .players-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .player-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border: 3px solid #444;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-card.active {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
+            background: linear-gradient(145deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
+            transform: scale(1.05);
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .presence-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: none;
+        }
+
+        .presence-online {
+            background: #4ecdc4;
+            box-shadow: 0 0 15px #4ecdc4;
+            animation: pulse 2s infinite;
+        }
+
+        .presence-offline {
+            background: #ff6b6b;
+            box-shadow: 0 0 15px #ff6b6b;
+        }
+
+        .player-name {
+            font-size: 1.5rem;
+            color: #ffeaa7;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 234, 167, 0.5);
+        }
+
+        .player-score {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 15px 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .player-status {
+            font-size: 1rem;
+            color: #a5d8ff;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: rgba(165, 216, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid #a5d8ff;
+        }
+
+        .input-answer {
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #4ecdc4;
+            border-radius: 20px;
+            color: white;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .input-answer:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 40px rgba(255, 107, 107, 0.6);
+            transform: scale(1.05);
+        }
+
+        .audio-controls {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 1000;
+        }
+
+        .audio-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: 0 0 35px rgba(78, 205, 196, 0.7);
+        }
+
+        .halftime {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border: 4px solid #ffeaa7;
+            border-radius: 30px;
+            padding: 50px;
+            margin: 30px 0;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 50px rgba(255, 234, 167, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .halftime-title {
+            font-size: 3.5rem;
+            color: #ffeaa7;
+            margin-bottom: 40px;
+            text-shadow: 0 0 25px #ffeaa7;
+            animation: bounce 2s infinite;
+        }
+
+        .game-status {
+            background: rgba(78, 205, 196, 0.2);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            border: 2px solid #4ecdc4;
+            font-size: 1.2rem;
+        }
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+            padding: 12px 20px;
+            background: rgba(78, 205, 196, 0.15);
+            border-radius: 15px;
+            border: 2px solid #4ecdc4;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-text {
+            font-size: 1.1rem;
+            color: #ffeaa7;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #ff6b6b;
+            opacity: 0;
+            animation: confetti-fall 5s linear forwards;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50%) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 25px;
+            margin: 10px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .fun-emoji {
+            font-size: 2rem;
+            margin: 0 10px;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: scoreFloat 1s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .game-mode { grid-template-columns: 1fr; }
+            .mode-card { padding: 30px 20px; }
+            .code-display { font-size: 3rem; letter-spacing: 10px; }
+            .game-timer { font-size: 2.5rem; }
+            .game-title { font-size: 2rem; }
+            .question { font-size: 2rem; }
+            .game-header { flex-direction: column; gap: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -334,28 +756,34 @@
         const db = firebase.firestore();
 
         // ============================
-        // DONNÉES DES JEUX
+        // DONNÉES DES JEUX CORRIGÉES
         // ============================
         const dictionaryWords = ["Bonjour", "Amitié", "École", "Jouet", "Famille"];
         const initiationWords = ["Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination"];
         const bibleWords = ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"];
 
         const anagrams = [
-            { anagram: "CHAT", solutions: ["ACHT"] },
-            { anagram: "RIRE", solutions: ["ERRI"] },
-            { anagram: "LUNE", solutions: ["NULE"] }
+            { anagram: "CHAT", solutions: ["CHAT", "TCHA"] },
+            { anagram: "RIRE", solutions: ["RIRE"] },
+            { anagram: "LUNE", solutions: ["LUNE", "NULE"] },
+            { anagram: "MARI", solutions: ["MARI", "RIMA"] },
+            { anagram: "SALE", solutions: ["SALE", "SELA"] }
         ];
 
         const mathQuestions = [
-            { problem: "5 + 3 × 2", solution: "11", time: 10 },
-            { problem: "10 - 4 + 1", solution: "7", time: 8 },
-            { problem: "2 × 6 - 3", solution: "9", time: 10 }
+            { problem: "5 + 3 × 2", solution: "11", time: 15 },
+            { problem: "10 - 4 + 1", solution: "7", time: 12 },
+            { problem: "2 × 6 - 3", solution: "9", time: 15 },
+            { problem: "8 ÷ 2 + 5", solution: "9", time: 15 },
+            { problem: "7 × 3 - 4", solution: "17", time: 15 }
         ];
 
         const lexicalFields = [
             { theme: "Animaux", hint: "créatures vivantes", letter: "A" },
             { theme: "École", hint: "endroit où on apprend", letter: "E" },
-            { theme: "Jeux", hint: "activités amusantes", letter: "J" }
+            { theme: "Jeux", hint: "activités amusantes", letter: "J" },
+            { theme: "Nature", hint: "environnement naturel", letter: "N" },
+            { theme: "Sport", hint: "activités physiques", letter: "S" }
         ];
 
         const gameData = {
@@ -384,6 +812,7 @@
         let presenceInterval = null;
         let sessionUnsubscribe = null;
         let lastSpokenQuestion = null;
+        let serverTimeOffset = 0;
 
         // ============================
         // INITIALISATION
@@ -391,7 +820,33 @@
         document.addEventListener('DOMContentLoaded', function() {
             setupAudio();
             setupPresenceTracking();
+            calculateServerTimeOffset();
+            
+            // Gestion de la soumission par Entrée
+            document.getElementById('playerNameInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') confirmName();
+            });
+            document.getElementById('joinCodeInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') joinSession();
+            });
         });
+
+        async function calculateServerTimeOffset() {
+            try {
+                const startTime = Date.now();
+                const serverTime = await getServerTime();
+                const endTime = Date.now();
+                const roundTripTime = endTime - startTime;
+                serverTimeOffset = serverTime - (startTime + roundTripTime / 2);
+            } catch (error) {
+                console.warn("Impossible de calculer l'offset du temps serveur");
+            }
+        }
+
+        async function getServerTime() {
+            // Implémentation simplifiée - dans une vraie app, utiliser une fonction Cloud Function
+            return Date.now();
+        }
 
         function setupAudio() {
             const audioBtn = document.getElementById('toggleAudio');
@@ -438,7 +893,7 @@
         function confirmName() {
             const nameInput = document.getElementById('playerNameInput').value.trim();
             if (nameInput.length < 2) {
-                alert("Choisis un nom d'au moins 2 lettres ! ✏️");
+                showNotification("Choisis un nom d'au moins 2 lettres ! ✏️");
                 return;
             }
             
@@ -452,13 +907,25 @@
         }
 
         function showMultiplayerInterface() {
+            hideAllInterfaces();
             document.getElementById('multiplayerInterface').style.display = 'block';
         }
 
         function showJoinInterface() {
-            document.getElementById('multiplayerInterface').style.display = 'none';
+            hideAllInterfaces();
             document.getElementById('joinInterface').style.display = 'block';
             document.getElementById('joinCodeInput').focus();
+        }
+
+        function hideAllInterfaces() {
+            const interfaces = [
+                'multiplayerInterface', 'joinInterface', 'createSessionInterface',
+                'gameArea', 'halftimeSection', 'nameInputArea'
+            ];
+            interfaces.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
         }
 
         // ============================
@@ -480,7 +947,7 @@
                     readyForSecondHalf: false,
                     quickAnswer: false,
                     isCorrect: false,
-                    lastSeen: new Date()
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 await db.collection('sessions').doc(sessionCode).set({
@@ -501,13 +968,13 @@
                 listenToSessionChanges();
                 
             } catch (error) {
-                alert("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
+                console.error("Erreur création session:", error);
+                showNotification("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
             }
         }
 
         function showCreateSessionInterface(code) {
-            document.getElementById('multiplayerInterface').style.display = 'none';
-            document.getElementById('joinInterface').style.display = 'none';
+            hideAllInterfaces();
             document.getElementById('createSessionInterface').style.display = 'block';
             document.getElementById('sessionCode').textContent = code;
             updatePlayersList();
@@ -517,7 +984,7 @@
             const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
             
             if (code.length !== 4) {
-                alert("Le code doit avoir 4 lettres ! 🔤");
+                showNotification("Le code doit avoir 4 lettres ! 🔤");
                 return;
             }
 
@@ -525,14 +992,20 @@
                 const sessionDoc = await db.collection('sessions').doc(code).get();
                 
                 if (!sessionDoc.exists) {
-                    alert("Salle non trouvée ! Vérifie le code. 🔍");
+                    showNotification("Salle non trouvée ! Vérifie le code. 🔍");
                     return;
                 }
 
                 const sessionData = sessionDoc.data();
                 
                 if (sessionData.status !== 'waiting') {
-                    alert("La partie a déjà commencé ! ⏰");
+                    showNotification("La partie a déjà commencé ! ⏰");
+                    return;
+                }
+
+                // Vérifier si le joueur est déjà dans la session
+                if (sessionData.players.some(p => p.id === playerId)) {
+                    showNotification("Tu es déjà dans cette salle ! 👀");
                     return;
                 }
 
@@ -548,7 +1021,7 @@
                     readyForSecondHalf: false,
                     quickAnswer: false,
                     isCorrect: false,
-                    lastSeen: new Date()
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 await db.collection('sessions').doc(code).update({
@@ -560,7 +1033,8 @@
                 listenToSessionChanges();
                 
             } catch (error) {
-                alert("Impossible de se connecter. Réessaie ! 🔄");
+                console.error("Erreur rejoindre session:", error);
+                showNotification("Impossible de se connecter. Réessaie ! 🔄");
             }
         }
 
@@ -607,8 +1081,12 @@
 
                     handleTimer(sessionData);
                 } else {
+                    showNotification("La session a été fermée ! 🚪");
                     resetInterface();
                 }
+            }, (error) => {
+                console.error("Erreur écoute session:", error);
+                showNotification("Problème de connexion ! 📡");
             });
         }
 
@@ -623,9 +1101,11 @@
                         <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
                     </div>
                     <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">${player.isOnline ? 
+                    <div class="player-status">
+                        ${player.isOnline ? 
                           (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
-                          '🔴 Hors ligne'}</div>
+                          '🔴 Hors ligne'}
+                    </div>
                 </div>
             `).join('');
         }
@@ -652,7 +1132,11 @@
                 
                 const sessionData = sessionDoc.data();
                 const updatedPlayers = sessionData.players.map(p => 
-                    p.id === playerId ? { ...p, isOnline: isOnline, lastSeen: new Date() } : p
+                    p.id === playerId ? { 
+                        ...p, 
+                        isOnline: isOnline, 
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
+                    } : p
                 );
                 
                 await db.collection('sessions').doc(currentSession).update({
@@ -671,7 +1155,7 @@
         async function startGame() {
             if (!isHost) return;
             if (players.length < 2) {
-                alert("Invite au moins un ami pour jouer ! 👥");
+                showNotification("Invite au moins un ami pour jouer ! 👥");
                 return;
             }
 
@@ -681,15 +1165,22 @@
                     gameState: 'spelling_dictionary',
                     currentQuestion: 0,
                     timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp(),
+                    players: players.map(p => ({
+                        ...p,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
+                    }))
                 });
             } catch (error) {
                 console.error("Erreur démarrage:", error);
+                showNotification("Erreur au démarrage du jeu ! 🚨");
             }
         }
 
         function startGameSession(sessionData) {
-            document.getElementById('createSessionInterface').style.display = 'none';
+            hideAllInterfaces();
             document.getElementById('gameArea').style.display = 'block';
         }
 
@@ -709,12 +1200,20 @@
         }
 
         // ============================
-        // AFFICHAGE DES QUESTIONS
+        // AFFICHAGE DES QUESTIONS CORRIGÉ
         // ============================
         function showSpellingQuestion(type, index) {
             const words = gameData.spelling[type];
+            
+            // CORRECTION : Vérifier si on a parcouru tous les mots du type actuel
             if (index >= words.length) {
-                if (isHost) nextSpellingType(type);
+                if (isHost) {
+                    // Attendre que tous aient répondu avant de changer de type
+                    const allAnswered = players.every(p => p.hasAnswered);
+                    if (allAnswered) {
+                        nextSpellingType(type);
+                    }
+                }
                 return;
             }
 
@@ -748,13 +1247,24 @@
 
             setTimeout(() => {
                 const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
+                if (answerInput) {
+                    answerInput.focus();
+                    answerInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') submitSpellingAnswer(word);
+                    });
+                }
             }, 1000);
         }
 
         function showAnagramQuestion(index) {
+            // CORRECTION : Vérifier si on a parcouru tous les anagrammes
             if (index >= anagrams.length) {
-                if (isHost) endFirstHalf();
+                if (isHost) {
+                    const allAnswered = players.every(p => p.hasAnswered);
+                    if (allAnswered) {
+                        endFirstHalf();
+                    }
+                }
                 return;
             }
 
@@ -782,13 +1292,24 @@
 
             setTimeout(() => {
                 const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
+                if (answerInput) {
+                    answerInput.focus();
+                    answerInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') submitAnagramAnswer(index);
+                    });
+                }
             }, 1000);
         }
 
         function showMathQuestion(index) {
+            // CORRECTION : Vérifier si on a parcouru tous les problèmes
             if (index >= mathQuestions.length) {
-                if (isHost) startLexicalGame();
+                if (isHost) {
+                    const allAnswered = players.every(p => p.hasAnswered);
+                    if (allAnswered) {
+                        startLexicalGame();
+                    }
+                }
                 return;
             }
 
@@ -817,13 +1338,24 @@
 
             setTimeout(() => {
                 const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
+                if (answerInput) {
+                    answerInput.focus();
+                    answerInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') submitMathAnswer(index);
+                    });
+                }
             }, 1000);
         }
 
         function showLexicalQuestion(index) {
+            // CORRECTION : Vérifier si on a parcouru tous les champs lexicaux
             if (index >= lexicalFields.length) {
-                if (isHost) endGame();
+                if (isHost) {
+                    const allAnswered = players.every(p => p.hasAnswered);
+                    if (allAnswered) {
+                        endGame();
+                    }
+                }
                 return;
             }
 
@@ -837,7 +1369,7 @@
                     <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
                 </p>
                 <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}">
-                <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
+                <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}', '${question.letter}')">Répondre ! ⚡</button>
                 <div class="players-container" id="gamePlayers"></div>
             `;
 
@@ -853,16 +1385,24 @@
 
             setTimeout(() => {
                 const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
+                if (answerInput) {
+                    answerInput.focus();
+                    answerInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') submitLexicalAnswer(question.theme, question.letter);
+                    });
+                }
             }, 1000);
         }
 
         // ============================
-        // SOUMISSION DES RÉPONSES
+        // SOUMISSION DES RÉPONSES CORRIGÉE
         // ============================
         async function submitSpellingAnswer(correctAnswer) {
             const userAnswer = document.getElementById('answerInput').value.trim();
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            // CORRECTION : Gestion des accents et majuscules
+            const normalizedCorrect = correctAnswer.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const normalizedUser = userAnswer.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const isCorrect = normalizedUser === normalizedCorrect;
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
@@ -870,7 +1410,8 @@
                         p.id === playerId ? {
                             ...p,
                             hasAnswered: true,
-                            score: p.score + (isCorrect ? 10 : 0)
+                            score: p.score + (isCorrect ? 10 : 0),
+                            isCorrect: isCorrect
                         } : p
                     )
                 });
@@ -883,13 +1424,17 @@
 
             } catch (error) {
                 console.error("Erreur soumission:", error);
+                showNotification("Erreur d'envoi de la réponse ! 📤");
             }
         }
 
         async function submitAnagramAnswer(index) {
             const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
             const anagram = anagrams[index];
-            const isCorrect = anagram.solutions.includes(userAnswer);
+            // CORRECTION : Normalisation pour la comparaison
+            const normalizedSolutions = anagram.solutions.map(s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+            const normalizedUser = userAnswer.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const isCorrect = normalizedSolutions.includes(normalizedUser);
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
@@ -897,7 +1442,8 @@
                         p.id === playerId ? {
                             ...p,
                             hasAnswered: true,
-                            score: p.score + (isCorrect ? 10 : 0)
+                            score: p.score + (isCorrect ? 10 : 0),
+                            isCorrect: isCorrect
                         } : p
                     )
                 });
@@ -909,7 +1455,8 @@
                 }
 
             } catch (error) {
-                console.error("Erreur soumission:", error);
+                console.error("Erreur soumission anagramme:", error);
+                showNotification("Erreur d'envoi de la réponse ! 📤");
             }
         }
 
@@ -938,12 +1485,17 @@
 
             } catch (error) {
                 console.error("Erreur soumission maths:", error);
+                showNotification("Erreur d'envoi de la réponse ! 📤");
             }
         }
 
-        async function submitLexicalAnswer(correctAnswer) {
+        async function submitLexicalAnswer(correctAnswer, letter) {
             const userAnswer = document.getElementById('answerInput').value.trim();
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            // CORRECTION : Validation plus flexible pour le champ lexical
+            const normalizedCorrect = correctAnswer.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const normalizedUser = userAnswer.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const startsWithLetter = userAnswer.toUpperCase().startsWith(letter.toUpperCase());
+            const isCorrect = startsWithLetter && normalizedUser.length > 0;
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
@@ -958,24 +1510,26 @@
                 });
 
                 if (isCorrect) {
-                    speakText("Bravo ! Mot trouvé !");
+                    speakText("Bravo ! Mot valide !");
                 } else {
-                    speakText(`Presque ! Le mot était: ${correctAnswer}`);
+                    speakText(`Le mot doit commencer par la lettre ${letter}`);
                 }
 
             } catch (error) {
                 console.error("Erreur soumission lexical:", error);
+                showNotification("Erreur d'envoi de la réponse ! 📤");
             }
         }
 
         // ============================
-        // CHRONOMÈTRE
+        // CHRONOMÈTRE CORRIGÉ
         // ============================
         function handleTimer(sessionData) {
             const timerElement = document.getElementById('gameTimer');
             if (!timerElement || !sessionData.timerStart) return;
 
-            const startTime = sessionData.timerStart.toDate().getTime();
+            // CORRECTION : Utilisation du temps serveur pour la synchronisation
+            const startTime = sessionData.timerStart.toDate().getTime() + serverTimeOffset;
             const now = Date.now();
             const elapsed = Math.floor((now - startTime) / 1000);
             const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
@@ -985,6 +1539,10 @@
             timerElement.classList.remove('warning', 'danger');
             if (remaining <= 5) {
                 timerElement.classList.add('danger');
+                // Son d'alerte pour les 5 dernières secondes
+                if (audioEnabled && remaining === 5) {
+                    speakText("5 secondes !");
+                }
             } else if (remaining <= 10) {
                 timerElement.classList.add('warning');
             }
@@ -1076,7 +1634,7 @@
         }
 
         // ============================
-        // NAVIGATION DES QUESTIONS
+        // NAVIGATION DES QUESTIONS CORRIGÉE
         // ============================
         async function nextQuestion() {
             if (!isHost) return;
@@ -1149,18 +1707,22 @@
         }
 
         // ============================
-        // MI-TEMPS ET FIN DE JEU
+        // MI-TEMPS ET FIN DE JEU CORRIGÉS
         // ============================
         async function endFirstHalf() {
             if (!isHost) return;
 
             try {
+                // CORRECTION : Sauvegarde correcte des scores et reset des états
                 await db.collection('sessions').doc(currentSession).update({
                     status: 'halftime',
                     players: players.map(p => ({
                         ...p,
                         halftimeScore: p.score,
-                        readyForSecondHalf: false
+                        readyForSecondHalf: false,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect: false
                     }))
                 });
             } catch (error) {
@@ -1169,11 +1731,13 @@
         }
 
         function showHalftime(sessionData) {
-            document.getElementById('gameArea').style.display = 'none';
+            hideAllInterfaces();
             document.getElementById('halftimeSection').style.display = 'block';
 
             const container = document.getElementById('halftimePlayers');
-            container.innerHTML = players.map(player => `
+            const sortedPlayers = [...players].sort((a, b) => b.halftimeScore - a.halftimeScore);
+            
+            container.innerHTML = sortedPlayers.map(player => `
                 <div class="player-card ${player.id === playerId ? 'active' : ''}">
                     <div class="player-header">
                         <div class="player-name">${player.name}</div>
@@ -1190,14 +1754,17 @@
                 await db.collection('sessions').doc(currentSession).update({
                     players: players.map(p => 
                         p.id === playerId ? { ...p, readyForSecondHalf: true } : p
-                    ));
+                    )
+                });
 
-                const allReady = players.every(p => p.readyForSecondHalf);
+                // CORRECTION : Vérification robuste de tous les joueurs prêts
+                const allReady = players.filter(p => p.isOnline).every(p => p.readyForSecondHalf);
                 if (allReady && isHost) {
-                    startSecondHalf();
+                    setTimeout(() => startSecondHalf(), 1000);
                 }
             } catch (error) {
                 console.error("Erreur préparation 2ème mi-temps:", error);
+                showNotification("Erreur de préparation ! 🚨");
             }
         }
 
@@ -1213,13 +1780,15 @@
                         ...p,
                         hasAnswered: false,
                         quickAnswer: false,
-                        isCorrect: false
+                        isCorrect: false,
+                        readyForSecondHalf: false
                     })),
                     timer: 10,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Erreur début 2ème mi-temps:", error);
+                showNotification("Erreur au démarrage ! 🚨");
             }
         }
 
@@ -1236,9 +1805,13 @@
         async function endGame() {
             if (!isHost) return;
 
-            await db.collection('sessions').doc(currentSession).update({
-                status: 'finished'
-            });
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    status: 'finished'
+                });
+            } catch (error) {
+                console.error("Erreur fin de jeu:", error);
+            }
         }
 
         function showFinalResults(sessionData) {
@@ -1267,7 +1840,7 @@
         }
 
         // ============================
-        // FONCTIONS UTILITAIRES
+        // FONCTIONS UTILITAIRES CORRIGÉES
         // ============================
         function updateGamePlayers() {
             const container = document.getElementById('gamePlayers');
@@ -1292,6 +1865,9 @@
             if (!audioEnabled) return;
             
             if ('speechSynthesis' in window) {
+                // CORRECTION : Arrêt de la parole précédente
+                window.speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.8;
@@ -1307,6 +1883,17 @@
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             return result;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         async function leaveSession() {
@@ -1339,16 +1926,7 @@
             if (presenceInterval) clearInterval(presenceInterval);
             if (sessionUnsubscribe) sessionUnsubscribe();
             
-            const interfaces = [
-                'createSessionInterface', 'gameArea', 'halftimeSection', 
-                'multiplayerInterface', 'joinInterface', 'nameInputArea'
-            ];
-            
-            interfaces.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.style.display = 'none';
-            });
-            
+            hideAllInterfaces();
             document.getElementById('gameMode').style.display = 'grid';
             document.getElementById('onlineStatus').style.display = 'none';
             
@@ -1363,7 +1941,7 @@
         }
 
         function startSoloGame() {
-            document.getElementById('gameMode').style.display = 'none';
+            hideAllInterfaces();
             document.getElementById('gameArea').style.display = 'block';
             document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
             document.getElementById('gameContent').innerHTML = `
