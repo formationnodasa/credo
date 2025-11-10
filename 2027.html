@@ -1,4 +1,227 @@
-mnpm create vite@latest galactic-edu-game --template react
-cd galactic-edu-game
-npm install firebase gsap framer-motion tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Éducatif Multijoueur</title>
+  <style>
+    /* Styles de base */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .game-container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      background-color: #1e1e1e;
+      width: 80%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .scoreboard {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .question-area {
+      margin-top: 20px;
+      background-color: #444;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .question-area p {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .animation-area {
+      margin-top: 30px;
+      position: relative;
+      width: 100%;
+      height: 300px;
+    }
+
+    .galaxy {
+      position: absolute;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      animation: rotate 15s linear infinite;
+    }
+
+    .animation-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      color: #FFEB3B;
+      font-weight: bold;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .button {
+      padding: 10px 20px;
+      background-color: #FFEB3B;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .button:hover {
+      background-color: #FFD600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-container">
+    <h1>Jeu Multijoueur Éducatif</h1>
+
+    <div id="game-board">
+      <div class="scoreboard">
+        <h2>Scores</h2>
+        <ul id="score-list">
+          <!-- Player Scores will be displayed here -->
+        </ul>
+      </div>
+
+      <div class="question-area">
+        <h2>Question du jeu</h2>
+        <p id="question-text">Cliquez pour afficher une question</p>
+        <button class="button" onclick="showQuestion()">Obtenir une Question</button>
+      </div>
+
+      <div class="animation-area">
+        <div class="galaxy"></div>
+        <div class="animation-text">Répondez rapidement pour obtenir plus de points!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
+      authDomain: "match-en-ligne.firebaseapp.com",
+      projectId: "match-en-ligne",
+      storageBucket: "match-en-ligne.firebasestorage.app",
+      messagingSenderId: "706011207623",
+      appId: "1:706011207623:web:17374990a6202b64f0abe2",
+      measurementId: "G-D9XYRE3W2M"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Initialize game variables
+    let players = [];  // Array to store player data
+    let gameInProgress = false;
+    let currentQuestion = null;
+
+    // Game Setup
+    function setupGame() {
+      console.log('Jeu en préparation...');
+      addPlayer("Alice");
+      addPlayer("Bob");
+    }
+
+    // Function to add a player
+    function addPlayer(playerName) {
+      players.push({ name: playerName, score: 0 });
+      updateScoreboard();
+      console.log(`${playerName} a rejoint le jeu.`);
+    }
+
+    // Update scoreboard
+    function updateScoreboard() {
+      const scoreList = document.getElementById("score-list");
+      scoreList.innerHTML = '';
+      players.forEach(player => {
+        const li = document.createElement("li");
+        li.textContent = `${player.name}: ${player.score} points`;
+        scoreList.appendChild(li);
+      });
+    }
+
+    // Show random question
+    function showQuestion() {
+      const questionText = document.getElementById('question-text');
+      const question = getRandomQuestion();
+      currentQuestion = question;
+      questionText.innerText = `Épelez ce mot: ${question}`;
+    }
+
+    // Function to get a random question
+    function getRandomQuestion() {
+      const dictionaryWords = ["Bonjour", "Amitié", "École", "Jouet", "Famille"];
+      const initiationWords = ["Curiosité", "Découverte", "Apprentissage"];
+      const bibleWords = ["Partage", "Gentillesse", "Espoir"];
+
+      // Randomly pick the type of question
+      const types = ["Dictionnaire", "Initiation", "Bible"];
+      const type = types[Math.floor(Math.random() * types.length)];
+      let questionList = [];
+
+      if (type === "Dictionnaire") questionList = dictionaryWords;
+      else if (type === "Initiation") questionList = initiationWords;
+      else if (type === "Bible") questionList = bibleWords;
+
+      const randomIndex = Math.floor(Math.random() * questionList.length);
+      return questionList[randomIndex];
+    }
+
+    // Handle scoring logic
+    function updateScores(playerName, points) {
+      const player = players.find(p => p.name === playerName);
+      if (player) {
+        player.score += points;
+        updateScoreboard();
+        console.log(`${playerName} a marqué ${points} points. Score total: ${player.score}`);
+      }
+    }
+
+    // Function to start the game
+    document.addEventListener('DOMContentLoaded', () => {
+      setupGame();
+    });
+  </script>
+</body>
+</html>
