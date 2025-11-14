@@ -976,7 +976,7 @@
         }
 
         // ============================
-        // GESTION DES SESSIONS - CORRIGÉ
+        // GESTION DES SESSIONS - SYNCHRONISATION AUTORISÉE
         // ============================
         async function createSession() {
             try {
@@ -1047,11 +1047,7 @@
 
                 const sessionData = sessionDoc.data();
                 
-                if (sessionData.status !== 'waiting') {
-                    alert("La partie a déjà commencé ! ⏰");
-                    return;
-                }
-
+                // AUTORISATION DE SYNCHRONISATION - TOUS LES STATUTS AUTORISÉS
                 currentSession = code;
                 isHost = false;
                 
@@ -1112,6 +1108,7 @@
                         }
                     }
 
+                    // SYNCHRONISATION AUTORISÉE POUR TOUS LES STATUTS
                     switch(sessionData.status) {
                         case 'playing':
                             if (document.getElementById('createSessionInterface').style.display === 'block') {
@@ -1195,7 +1192,7 @@
         }
 
         // ============================
-        // GESTION DU JEU - CORRIGÉ
+        // GESTION DU JEU - SYNCHRONISATION AUTORISÉE
         // ============================
         async function startGame() {
             if (!isHost) {
@@ -1401,7 +1398,7 @@
         }
 
         // ============================
-        // SOUMISSION DES RÉPONSES - CORRIGÉ
+        // SOUMISSION DES RÉPONSES - SYNCHRONISATION AUTORISÉE
         // ============================
         async function submitSpellingAnswer(correctAnswer) {
             const userAnswer = document.getElementById('answerInput').value.trim();
@@ -1511,7 +1508,7 @@
         }
 
         // ============================
-        // CHRONOMÈTRE AMÉLIORÉ
+        // CHRONOMÈTRE AMÉLIORÉ - SYNCHRONISATION AUTORISÉE
         // ============================
         function handleTimer(sessionData) {
             const timerElement = document.getElementById('gameTimer');
@@ -1620,7 +1617,7 @@
         }
 
         // ============================
-        // NAVIGATION DES QUESTIONS
+        // NAVIGATION DES QUESTIONS - SYNCHRONISATION AUTORISÉE
         // ============================
         async function nextQuestion() {
             if (!isHost) return;
@@ -1696,7 +1693,7 @@
         }
 
         // ============================
-        // MI-TEMPS ET FIN DE JEU
+        // MI-TEMPS ET FIN DE JEU - SYNCHRONISATION AUTORISÉE
         // ============================
         async function endFirstHalf() {
             if (!isHost) return;
