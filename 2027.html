@@ -897,6 +897,7 @@
         let lastSpokenQuestion = null;
         let timerStartTime = null;
         let timerDuration = 15;
+        let usedQuestions = new Set();
 
         // ============================
         // INITIALISATION
@@ -975,7 +976,7 @@
         }
 
         // ============================
-        // GESTION DES SESSIONS
+        // GESTION DES SESSIONS - CORRIGÉ
         // ============================
         async function createSession() {
             try {
@@ -1015,6 +1016,7 @@
                 listenToSessionChanges();
                 
             } catch (error) {
+                console.error("Erreur création session:", error);
                 alert("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
             }
         }
@@ -1051,6 +1053,7 @@
                 }
 
                 currentSession = code;
+                isHost = false;
                 
                 const playerData = {
                     id: playerId,
@@ -1074,6 +1077,7 @@
                 listenToSessionChanges();
                 
             } catch (error) {
+                console.error("Erreur rejoindre session:", error);
                 alert("Impossible de se connecter. Réessaie ! 🔄");
             }
         }
@@ -1094,12 +1098,18 @@
                     updatePlayersList();
                     updateOnlineStatus();
 
+                    // CORRECTION : Afficher le bouton démarrer seulement pour l'hôte
                     const startBtn = document.getElementById('startBtn');
                     if (startBtn) {
-                        startBtn.disabled = players.length < 2;
-                        startBtn.textContent = players.length < 2 ? 
-                            `En attente d'amis... (${players.length}/2)` : 
-                            'Démarrer la Partie ! 🚀';
+                        if (isHost) {
+                            startBtn.style.display = 'block';
+                            startBtn.disabled = players.length < 2;
+                            startBtn.textContent = players.length < 2 ? 
+                                `En attente d'amis... (${players.length}/2)` : 
+                                'Démarrer la Partie ! 🚀';
+                        } else {
+                            startBtn.style.display = 'none';
+                        }
                     }
 
                     switch(sessionData.status) {
@@ -1124,6 +1134,8 @@
                 } else {
                     resetInterface();
                 }
+            }, (error) => {
+                console.error("Erreur écoute session:", error);
             });
         }
 
@@ -1183,16 +1195,23 @@
         }
 
         // ============================
-        // GESTION DU JEU
+        // GESTION DU JEU - CORRIGÉ
         // ============================
         async function startGame() {
-            if (!isHost) return;
+            if (!isHost) {
+                alert("Seul l'hôte peut démarrer la partie ! 👑");
+                return;
+            }
+            
             if (players.length < 2) {
                 alert("Invite au moins un ami pour jouer ! 👥");
                 return;
             }
 
             try {
+                // Réinitialiser les questions utilisées
+                usedQuestions.clear();
+                
                 await db.collection('sessions').doc(currentSession).update({
                     status: 'playing',
                     gameState: 'spelling_dictionary',
@@ -1203,6 +1222,7 @@
                 });
             } catch (error) {
                 console.error("Erreur démarrage:", error);
+                alert("Erreur lors du démarrage de la partie ! 🚨");
             }
         }
 
@@ -1227,11 +1247,36 @@
         }
 
         // ============================
-        // AFFICHAGE DES QUESTIONS
+        // AFFICHAGE DES QUESTIONS - ALÉATOIRE
         // ============================
+        function getRandomQuestion(questions, currentIndex) {
+            // Si on a utilisé toutes les questions, on réinitialise
+            if (usedQuestions.size >= questions.length) {
+                usedQuestions.clear();
+            }
+            
+            let randomIndex;
+            let attempts = 0;
+            
+            // Trouver une question non utilisée
+            do {
+                randomIndex = Math.floor(Math.random() * questions.length);
+                attempts++;
+                
+                // Éviter la boucle infinie
+                if (attempts > 100) {
+                    usedQuestions.clear();
+                    break;
+                }
+            } while (usedQuestions.has(randomIndex));
+            
+            usedQuestions.add(randomIndex);
+            return questions[randomIndex];
+        }
+
         function showSpellingQuestion(type, index) {
             const words = gameData.spelling[type];
-            const word = words[index % words.length];
+            const word = getRandomQuestion(words, index);
             const typeNames = {
                 'dictionary': 'Dictionnaire 📚',
                 'initiation': 'Découverte 🔍', 
@@ -1266,7 +1311,7 @@
         }
 
         function showAnagramQuestion(index) {
-            const anagram = gameData.anagrams[index % gameData.anagrams.length];
+            const anagram = getRandomQuestion(gameData.anagrams, index);
             document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
             document.getElementById('gameContent').innerHTML = `
                 <div class="question">${anagram.anagram}</div>
@@ -1274,7 +1319,7 @@
                     Trouvez le mot correspondant à cet anagramme :
                 </p>
                 <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
-                <button class="btn btn-success" onclick="submitAnagramAnswer(${index % gameData.anagrams.length})">Valider ✨</button>
+                <button class="btn btn-success" onclick="submitAnagramAnswer('${anagram.anagram}')">Valider ✨</button>
                 <div class="players-container" id="gamePlayers"></div>
             `;
 
@@ -1295,7 +1340,7 @@
         }
 
         function showMathQuestion(index) {
-            const question = gameData.math[index % gameData.math.length];
+            const question = getRandomQuestion(gameData.math, index);
             document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
             
             document.getElementById('gameContent').innerHTML = `
@@ -1304,7 +1349,7 @@
                     Résolvez rapidement cette opération !
                 </p>
                 <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
-                <button class="btn btn-success" onclick="submitMathAnswer(${index % gameData.math.length})">Répondre ! ⚡</button>
+                <button class="btn btn-success" onclick="submitMathAnswer('${question.solution}')">Répondre ! ⚡</button>
                 <div class="players-container" id="gamePlayers"></div>
             `;
 
@@ -1325,7 +1370,7 @@
         }
 
         function showLexicalQuestion(index) {
-            const question = gameData.lexical[index % gameData.lexical.length];
+            const question = getRandomQuestion(gameData.lexical, index);
             document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
             
             document.getElementById('gameContent').innerHTML = `
@@ -1356,7 +1401,7 @@
         }
 
         // ============================
-        // SOUMISSION DES RÉPONSES
+        // SOUMISSION DES RÉPONSES - CORRIGÉ
         // ============================
         async function submitSpellingAnswer(correctAnswer) {
             const userAnswer = document.getElementById('answerInput').value.trim();
@@ -1384,10 +1429,10 @@
             }
         }
 
-        async function submitAnagramAnswer(index) {
+        async function submitAnagramAnswer(correctAnagram) {
             const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
-            const anagram = gameData.anagrams[index];
-            const isCorrect = anagram.solutions.includes(userAnswer);
+            const anagram = gameData.anagrams.find(a => a.anagram === correctAnagram);
+            const isCorrect = anagram && anagram.solutions.includes(userAnswer);
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
@@ -1411,10 +1456,9 @@
             }
         }
 
-        async function submitMathAnswer(index) {
+        async function submitMathAnswer(correctSolution) {
             const userAnswer = document.getElementById('answerInput').value.trim();
-            const question = gameData.math[index];
-            const isCorrect = userAnswer === question.solution;
+            const isCorrect = userAnswer === correctSolution;
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
@@ -1431,7 +1475,7 @@
                 if (isCorrect) {
                     speakText("Génial ! Calcul réussi !");
                 } else {
-                    speakText("Dommage ! La réponse était " + question.solution);
+                    speakText("Dommage ! La réponse était " + correctSolution);
                 }
 
             } catch (error) {
@@ -1861,6 +1905,7 @@
             players = [];
             isHost = false;
             lastSpokenQuestion = null;
+            usedQuestions.clear();
             
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
