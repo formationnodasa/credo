@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -758,28 +756,117 @@
         const db = firebase.firestore();
 
         // ============================
-        // DONNÉES DES JEUX
+        // DONNÉES DES JEUX - TOUS LES MOTS DISPONIBLES
         // ============================
-        const dictionaryWords = ["Bonjour", "Amitié", "École", "Jouet", "Famille"];
-        const initiationWords = ["Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination"];
-        const bibleWords = ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"];
+        const dictionaryWords = [
+            "Bonjour", "Amitié", "École", "Jouet", "Famille", "Maison", "Jardin", 
+            "Soleil", "Livre", "Crayon", "Table", "Chaise", "Fenêtre", "Porte",
+            "Fleur", "Arbre", "Oiseau", "Chat", "Chien", "Vélo", "Ballon", "Musique",
+            "Danse", "Chant", "Couleur", "Dessin", "Peinture", "Histoire", "Géographie",
+            "Mathématiques", "Science", "Sport", "Jeu", "Amitié", "Partage", "Gentillesse",
+            "Bonheur", "Joie", "Rire", "Sourire", "Câlin", "Cadeau", "Fête", "Anniversaire",
+            "Noël", "Vacances", "Mer", "Montagne", "Forêt", "Rivière", "Étoile", "Lune",
+            "Nuage", "Pluie", "Arc-en-ciel", "Vent", "Neige", "Glace", "Feu", "Eau", "Terre",
+            "Air", "Nature", "Animal", "Fruit", "Légume", "Nourriture", "Boisson", "Gâteau",
+            "Bonbon", "Glace", "Chocolat", "Fromage", "Pain", "Lait", "Jus", "Eau", "Thé",
+            "Café", "Énergie", "Force", "Vitesse", "Temps", "Espace", "Monde", "Pays", "Ville",
+            "Village", "Rue", "Route", "Voiture", "Train", "Avion", "Bateau", "Bus", "Vélo",
+            "Moto", "Camion", "Maison", "Appartement", "Immeuble", "École", "Bibliothèque",
+            "Parc", "Jardin", "Stade", "Piscine", "Cinéma", "Théâtre", "Musée", "Magasin",
+            "Marché", "Restaurant", "Hôtel", "Hôpital", "Docteur", "Infirmière", "Professeur",
+            "Élève", "Parent", "Enfant", "Ami", "Frère", "Sœur", "Famille", "Grand-père",
+            "Grand-mère", "Oncle", "Tante", "Cousin", "Cousine", "Voisin", "Voisine"
+        ];
+
+        const initiationWords = [
+            "Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination",
+            "Exploration", "Aventure", "Mystère", "Secret", "Trésor", "Carte", "Boussole",
+            "Voyage", "Destination", "Horizon", "Lointain", "Inconnu", "Nouveau", "Ancien",
+            "Tradition", "Innovation", "Progrès", "Évolution", "Transformation", "Changement",
+            "Développement", "Croissance", "Maturation", "Expérience", "Connaissance",
+            "Savoir", "Compétence", "Talent", "Don", "Capacité", "Potentialité", "Possibilité",
+            "Opportunité", "Chance", "Destin", "Fortune", "Succès", "Réussite", "Victoire",
+            "Triomphe", "Gloire", "Honneur", "Mérite", "Récompense", "Prix", "Médaille",
+            "Trophée", "Diplôme", "Certificat", "Attestation", "Reconnaissance", "Estime",
+            "Considération", "Respect", "Admiration", "Appréciation", "Gratitude", "Merci",
+            "Félicitations", "Bravo", "Excellent", "Parfait", "Magnifique", "Superbe",
+            "Splendide", "Merveilleux", "Formidable", "Extraordinaire", "Exceptionnel",
+            "Remarquable", "Impressionnant", "Étonnant", "Surprenant", "Incroyable",
+            "Fantastique", "Fabulieux", "Mythique", "Légendaire", "Héroïque", "Courageux",
+            "Vaillant", "Intrépide", "Audacieux", "Bold", "Déterminé", "Persévérant",
+            "Tenace", "Obstiné", "Opiniâtre", "Constant", "Fidèle", "Loyal", "Sincère",
+            "Honnête", "Intègre", "Droit", "Juste", "Équitable", "Impartial", "Neutre"
+        ];
+
+        const bibleWords = [
+            "Partage", "Gentillesse", "Espoir", "Paix", "Joie", "Amour", "Charité",
+            "Compassion", "Miséricorde", "Pardon", "Réconciliation", "Harmonie", "Unité",
+            "Communion", "Fraternité", "Solidarité", "Entraide", "Support", "Soutien",
+            "Assistance", "Aide", "Secours", "Protection", "Défense", "Sauvetage", "Salut",
+            "Rédemption", "Délivrance", "Libération", "Affranchissement", "Émancipation",
+            "Indépendance", "Liberté", "Autonomie", "Souveraineté", "Autorité", "Pouvoir",
+            "Gouvernement", "Règne", "Royaume", "Empire", "Nation", "Peuple", "Population",
+            "Communauté", "Société", "Civilisation", "Culture", "Religion", "Foi", "Croyance",
+            "Conviction", "Certitude", "Confiance", "Assurance", "Sécurité", "Stabilité",
+            "Permanence", "Durabilité", "Éternité", "Infini", "Absolu", "Parfait", "Divin",
+            "Sacré", "Saint", "Béni", "Consacré", "Dédié", "Voué", "Offert", "Sacrifié",
+            "Immolé", "Racheté", "Acheté", "Vendu", "Trahi", "Renoncé", "Abandonné",
+            "Quitté", "Laissé", "Perdu", "Trouvé", "Retrouvé", "Rendu", "Restitué",
+            "Remboursé", "Payé", "Donné", "Reçu", "Accepté", "Refusé", "Rejeté", "Exclu"
+        ];
 
         const anagrams = [
-            { anagram: "CHAT", solutions: ["ACHT"] },
-            { anagram: "RIRE", solutions: ["ERRI"] },
-            { anagram: "LUNE", solutions: ["NULE"] }
+            { anagram: "CHAT", solutions: ["CHAT", "TCHA"] },
+            { anagram: "RIRE", solutions: ["RIRE", "ERRI"] },
+            { anagram: "LUNE", solutions: ["LUNE", "NULE"] },
+            { anagram: "CIEL", solutions: ["CIEL", "LICÉ"] },
+            { anagram: "FLEUR", solutions: ["FLEUR", "FLUER"] },
+            { anagram: "TABLE", solutions: ["TABLE", "BATEL", "BLATE"] },
+            { anagram: "CHAISE", solutions: ["CHAISE", "CHEISA"] },
+            { anagram: "MAISON", solutions: ["MAISON", "AMIONS", "MANIOS"] },
+            { anagram: "JARDIN", solutions: ["JARDIN", "RADJIN"] },
+            { anagram: "SOLEIL", solutions: ["SOLEIL", "OILLES"] },
+            { anagram: "LIVRE", solutions: ["LIVRE", "VILER", "LIVER"] },
+            { anagram: "CRAYON", solutions: ["CRAYON", "CRAYNO", "RACONY"] },
+            { anagram: "AMITIÉ", solutions: ["AMITIÉ", "ÉMITIA", "TIAÉMI"] },
+            { anagram: "FAMILLE", solutions: ["FAMILLE", "FILLAME", "MILLEFA"] },
+            { anagram: "BONJOUR", solutions: ["BONJOUR", "JOURBON", "BOUJORN"] }
         ];
 
         const mathQuestions = [
-            { problem: "5 + 3 × 2", solution: "11", time: 10 },
-            { problem: "10 - 4 + 1", solution: "7", time: 8 },
-            { problem: "2 × 6 - 3", solution: "9", time: 10 }
+            { problem: "5 + 3 × 2", solution: "11", time: 15 },
+            { problem: "10 - 4 + 1", solution: "7", time: 12 },
+            { problem: "2 × 6 - 3", solution: "9", time: 15 },
+            { problem: "8 ÷ 2 + 5", solution: "9", time: 15 },
+            { problem: "7 × 3 - 4", solution: "17", time: 15 },
+            { problem: "12 + 8 ÷ 4", solution: "14", time: 15 },
+            { problem: "9 - 3 × 2", solution: "3", time: 15 },
+            { problem: "15 ÷ 3 + 6", solution: "11", time: 15 },
+            { problem: "4 × 5 - 7", solution: "13", time: 15 },
+            { problem: "20 ÷ 4 × 3", solution: "15", time: 15 },
+            { problem: "6 + 9 ÷ 3", solution: "9", time: 15 },
+            { problem: "11 - 4 × 2", solution: "3", time: 15 },
+            { problem: "8 × 2 + 5", solution: "21", time: 15 },
+            { problem: "18 ÷ 3 - 2", solution: "4", time: 15 },
+            { problem: "7 + 6 × 2", solution: "19", time: 15 }
         ];
 
         const lexicalFields = [
             { theme: "Animaux", hint: "créatures vivantes", letter: "A" },
             { theme: "École", hint: "endroit où on apprend", letter: "E" },
-            { theme: "Jeux", hint: "activités amusantes", letter: "J" }
+            { theme: "Jeux", hint: "activités amusantes", letter: "J" },
+            { theme: "Maison", hint: "endroit où on habite", letter: "M" },
+            { theme: "Nature", hint: "tout ce qui nous entoure", letter: "N" },
+            { theme: "Famille", hint: "personnes proches", letter: "F" },
+            { theme: "Couleurs", hint: "teintes et nuances", letter: "C" },
+            { theme: "Nourriture", hint: "ce qu'on mange", letter: "N" },
+            { theme: "Sports", hint: "activités physiques", letter: "S" },
+            { theme: "Musique", hint: "art des sons", letter: "M" },
+            { theme: "Voyage", hint: "se déplacer", letter: "V" },
+            { theme: "Technologie", hint: "outils modernes", letter: "T" },
+            { theme: "Santé", hint: "bien-être du corps", letter: "S" },
+            { theme: "Art", hint: "expression créative", letter: "A" },
+            { theme: "Science", hint: "étude du monde", letter: "S" }
         ];
 
         const gameData = {
@@ -808,6 +895,8 @@
         let presenceInterval = null;
         let sessionUnsubscribe = null;
         let lastSpokenQuestion = null;
+        let timerStartTime = null;
+        let timerDuration = 15;
 
         // ============================
         // INITIALISATION
@@ -916,7 +1005,8 @@
                     currentQuestion: 0,
                     currentGameType: null,
                     timer: 15,
-                    timerStart: null,
+                    timerStart: firebase.firestore.FieldValue.serverTimestamp(),
+                    timerDuration: 15,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -999,6 +1089,7 @@
                     players = sessionData.players || [];
                     currentGameState = sessionData.gameState;
                     currentQuestionIndex = sessionData.currentQuestion || 0;
+                    timerDuration = sessionData.timerDuration || 15;
 
                     updatePlayersList();
                     updateOnlineStatus();
@@ -1107,6 +1198,7 @@
                     gameState: 'spelling_dictionary',
                     currentQuestion: 0,
                     timer: 15,
+                    timerDuration: 15,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -1139,12 +1231,7 @@
         // ============================
         function showSpellingQuestion(type, index) {
             const words = gameData.spelling[type];
-            if (index >= words.length) {
-                if (isHost) nextSpellingType(type);
-                return;
-            }
-
-            const word = words[index];
+            const word = words[index % words.length];
             const typeNames = {
                 'dictionary': 'Dictionnaire 📚',
                 'initiation': 'Découverte 🔍', 
@@ -1179,12 +1266,7 @@
         }
 
         function showAnagramQuestion(index) {
-            if (index >= anagrams.length) {
-                if (isHost) endFirstHalf();
-                return;
-            }
-
-            const anagram = anagrams[index];
+            const anagram = gameData.anagrams[index % gameData.anagrams.length];
             document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
             document.getElementById('gameContent').innerHTML = `
                 <div class="question">${anagram.anagram}</div>
@@ -1192,7 +1274,7 @@
                     Trouvez le mot correspondant à cet anagramme :
                 </p>
                 <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
-                <button class="btn btn-success" onclick="submitAnagramAnswer(${index})">Valider ✨</button>
+                <button class="btn btn-success" onclick="submitAnagramAnswer(${index % gameData.anagrams.length})">Valider ✨</button>
                 <div class="players-container" id="gamePlayers"></div>
             `;
 
@@ -1213,12 +1295,7 @@
         }
 
         function showMathQuestion(index) {
-            if (index >= mathQuestions.length) {
-                if (isHost) startLexicalGame();
-                return;
-            }
-
-            const question = mathQuestions[index];
+            const question = gameData.math[index % gameData.math.length];
             document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
             
             document.getElementById('gameContent').innerHTML = `
@@ -1227,7 +1304,7 @@
                     Résolvez rapidement cette opération !
                 </p>
                 <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
-                <button class="btn btn-success" onclick="submitMathAnswer(${index})">Répondre ! ⚡</button>
+                <button class="btn btn-success" onclick="submitMathAnswer(${index % gameData.math.length})">Répondre ! ⚡</button>
                 <div class="players-container" id="gamePlayers"></div>
             `;
 
@@ -1248,12 +1325,7 @@
         }
 
         function showLexicalQuestion(index) {
-            if (index >= lexicalFields.length) {
-                if (isHost) endGame();
-                return;
-            }
-
-            const question = lexicalFields[index];
+            const question = gameData.lexical[index % gameData.lexical.length];
             document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
             
             document.getElementById('gameContent').innerHTML = `
@@ -1314,7 +1386,7 @@
 
         async function submitAnagramAnswer(index) {
             const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
-            const anagram = anagrams[index];
+            const anagram = gameData.anagrams[index];
             const isCorrect = anagram.solutions.includes(userAnswer);
 
             try {
@@ -1341,7 +1413,7 @@
 
         async function submitMathAnswer(index) {
             const userAnswer = document.getElementById('answerInput').value.trim();
-            const question = mathQuestions[index];
+            const question = gameData.math[index];
             const isCorrect = userAnswer === question.solution;
 
             try {
@@ -1395,51 +1467,53 @@
         }
 
         // ============================
-        // CHRONOMÈTRE
+        // CHRONOMÈTRE AMÉLIORÉ
         // ============================
         function handleTimer(sessionData) {
             const timerElement = document.getElementById('gameTimer');
             if (!timerElement || !sessionData.timerStart) return;
 
-            const startTime = sessionData.timerStart.toDate().getTime();
-            const now = Date.now();
-            const elapsed = Math.floor((now - startTime) / 1000);
-            const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
-
-            timerElement.textContent = remaining;
-
-            timerElement.classList.remove('warning', 'danger');
-            if (remaining <= 5) {
-                timerElement.classList.add('danger');
-            } else if (remaining <= 10) {
-                timerElement.classList.add('warning');
-            }
-
+            // Arrêter le timer précédent
             if (gameTimer) {
                 clearInterval(gameTimer);
             }
 
-            gameTimer = setInterval(() => {
-                const currentRemaining = parseInt(timerElement.textContent);
-                if (currentRemaining > 0) {
-                    const newRemaining = currentRemaining - 1;
-                    timerElement.textContent = newRemaining;
-                    
-                    timerElement.classList.remove('warning', 'danger');
-                    if (newRemaining <= 5) {
-                        timerElement.classList.add('danger');
-                    } else if (newRemaining <= 10) {
-                        timerElement.classList.add('warning');
-                    }
-                    
-                    checkAllPlayersAnswered();
-                } else {
+            const startTime = sessionData.timerStart.toDate().getTime();
+            const duration = sessionData.timerDuration || 15;
+            
+            // Fonction pour mettre à jour le timer
+            const updateTimer = () => {
+                const now = Date.now();
+                const elapsed = Math.floor((now - startTime) / 1000);
+                const remaining = Math.max(0, duration - elapsed);
+
+                timerElement.textContent = remaining;
+
+                // Mise à jour des couleurs d'alerte
+                timerElement.classList.remove('warning', 'danger');
+                if (remaining <= 5) {
+                    timerElement.classList.add('danger');
+                } else if (remaining <= 10) {
+                    timerElement.classList.add('warning');
+                }
+
+                // Vérifier si le temps est écoulé
+                if (remaining <= 0) {
                     clearInterval(gameTimer);
                     if (isHost) {
                         handleTimeUp();
                     }
                 }
-            }, 1000);
+
+                // Vérifier si tous les joueurs ont répondu
+                checkAllPlayersAnswered();
+            };
+
+            // Mettre à jour immédiatement
+            updateTimer();
+
+            // Démarrer l'intervalle pour les mises à jour
+            gameTimer = setInterval(updateTimer, 1000);
         }
 
         function checkAllPlayersAnswered() {
@@ -1517,6 +1591,7 @@
                         isCorrect: false
                     })),
                     timer: 15,
+                    timerDuration: 15,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -1546,6 +1621,7 @@
                         isCorrect: false
                     })),
                     timer: 15,
+                    timerDuration: 15,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -1567,6 +1643,7 @@
                         isCorrect: false
                     })),
                     timer: 15,
+                    timerDuration: 15,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -1642,7 +1719,8 @@
                         quickAnswer: false,
                         isCorrect: false
                     })),
-                    timer: 10,
+                    timer: 15,
+                    timerDuration: 15,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
