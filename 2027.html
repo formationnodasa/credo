@@ -1,227 +1,1395 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match Éducatif Multijoueur</title>
-  <style>
-    /* Styles de base */
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #121212;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match en Ligne - Jeu Éducatif</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        /* VOTRE CSS EXISTANT - Je garde tout votre style actuel */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .game-container {
-      text-align: center;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      background-color: #1e1e1e;
-      width: 80%;
-    }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    .scoreboard {
-      margin-top: 20px;
-      background-color: #333;
-      padding: 10px;
-      border-radius: 8px;
-    }
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            margin-bottom: 30px;
+            border: 3px solid #00ccff;
+            box-shadow: 0 0 40px rgba(0, 204, 255, 0.4);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .question-area {
-      margin-top: 20px;
-      background-color: #444;
-      padding: 15px;
-      border-radius: 8px;
-    }
+        /* ... TOUT VOTRE CSS ACTUEL ... */
 
-    .question-area p {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
 
-    .animation-area {
-      margin-top: 30px;
-      position: relative;
-      width: 100%;
-      height: 300px;
-    }
+        .status-connected {
+            background: #4ecdc4;
+            color: white;
+        }
 
-    .galaxy {
-      position: absolute;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      animation: rotate 15s linear infinite;
-    }
+        .status-disconnected {
+            background: #ff6b6b;
+            color: white;
+        }
 
-    .animation-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.5rem;
-      color: #FFEB3B;
-      font-weight: bold;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-    }
-
-    @keyframes rotate {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .button {
-      padding: 10px 20px;
-      background-color: #FFEB3B;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .button:hover {
-      background-color: #FFD600;
-    }
-  </style>
+        .status-connecting {
+            background: #ffeaa7;
+            color: #333;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="game-container">
-    <h1>Jeu Multijoueur Éducatif</h1>
-
-    <div id="game-board">
-      <div class="scoreboard">
-        <h2>Scores</h2>
-        <ul id="score-list">
-          <!-- Player Scores will be displayed here -->
-        </ul>
-      </div>
-
-      <div class="question-area">
-        <h2>Question du jeu</h2>
-        <p id="question-text">Cliquez pour afficher une question</p>
-        <button class="button" onclick="showQuestion()">Obtenir une Question</button>
-      </div>
-
-      <div class="animation-area">
-        <div class="galaxy"></div>
-        <div class="animation-text">Répondez rapidement pour obtenir plus de points!</div>
-      </div>
+    <div class="connection-status status-connecting" id="connectionStatus">
+        🔄 Connexion...
     </div>
-  </div>
 
-  <!-- Firebase -->
-  <script type="module">
-    // Firebase Configuration
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    <div class="audio-controls">
+        <button class="audio-btn" id="toggleAudio" title="Activer/Désactiver le son">🔊</button>
+    </div>
 
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
-      authDomain: "match-en-ligne.firebaseapp.com",
-      projectId: "match-en-ligne",
-      storageBucket: "match-en-ligne.firebasestorage.app",
-      messagingSenderId: "706011207623",
-      appId: "1:706011207623:web:17374990a6202b64f0abe2",
-      measurementId: "G-D9XYRE3W2M"
-    };
+    <div class="container">
+        <header>
+            <h1>🎮 MATCH EN LIGNE 🎮</h1>
+            <p class="subtitle">✨ Apprends en t'amusant avec tes amis ! ✨</p>
+            <div class="online-status" id="onlineStatus" style="display: none;">
+                <div class="presence-indicator presence-online"></div>
+                <span class="status-text">0/0 joueurs en ligne</span>
+            </div>
+        </header>
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getFirestore(app);
+        <!-- Menu Principal -->
+        <div class="game-mode" id="gameMode">
+            <div class="mode-card" onclick="selectMode('solo')">
+                <div class="mode-icon">🎯</div>
+                <h3>Mode Solo</h3>
+                <p>Entraîne-toi seul et deviens un champion ! 💪</p>
+                <button class="btn">Jouer en Solo</button>
+            </div>
+            <div class="mode-card" onclick="selectMode('multiplayer')">
+                <div class="mode-icon">👥</div>
+                <h3>Mode Multiplayer</h3>
+                <p>Joue avec tes amis et défie-les ! 🏆</p>
+                <button class="btn">Jouer à Plusieurs</button>
+            </div>
+        </div>
 
-    // Initialize game variables
-    let players = [];  // Array to store player data
-    let gameInProgress = false;
-    let currentQuestion = null;
+        <!-- Saisie du nom -->
+        <div class="name-input-area" id="nameInputArea">
+            <h3>👤 Choisis ton nom de super héros !</h3>
+            <p>Comment veux-tu qu'on t'appelle ?</p>
+            <input type="text" class="input-field" id="playerNameInput" placeholder="Ex: SuperJoueur123" maxlength="20">
+            <button class="btn btn-success" onclick="confirmName()">C'est parti ! 🚀</button>
+        </div>
 
-    // Game Setup
-    function setupGame() {
-      console.log('Jeu en préparation...');
-      addPlayer("Alice");
-      addPlayer("Bob");
+        <!-- Interface Multiplayer -->
+        <div class="session-interface" id="multiplayerInterface">
+            <div class="mode-card" onclick="createSession()">
+                <div class="mode-icon">🏠</div>
+                <h3>Créer une Salle</h3>
+                <p>Crée ta propre salle et invite tes amis ! 📨</p>
+                <button class="btn">Créer une Salle</button>
+            </div>
+            <div class="mode-card" onclick="showJoinInterface()">
+                <div class="mode-icon">🔗</div>
+                <h3>Rejoindre une Salle</h3>
+                <p>Rejoins une salle avec le code de ton ami ! 🔢</p>
+                <button class="btn">Rejoindre</button>
+            </div>
+            <button class="btn" onclick="showMainMenu()">Retour au menu</button>
+        </div>
+
+        <!-- Interface Rejoindre -->
+        <div class="session-interface" id="joinInterface">
+            <h3>🔗 Rejoindre une Salle</h3>
+            <p>Entre le code de la salle de ton ami :</p>
+            <input type="text" class="input-field" id="joinCodeInput" placeholder="4 lettres (ex: ABCD)" maxlength="4" style="text-transform: uppercase;">
+            <button class="btn btn-success" onclick="joinSession()">Rejoindre la partie ! 🎉</button>
+            <button class="btn" onclick="showMultiplayerInterface()">Retour</button>
+        </div>
+
+        <!-- Interface Création de Salle -->
+        <div class="session-interface" id="createSessionInterface">
+            <h3>🎉 Super ! Ta salle est créée !</h3>
+            <p>Partage ce code magique avec tes amis :</p>
+            <div class="code-display" id="sessionCode">----</div>
+            <div class="online-status" id="sessionOnlineStatus">
+                <div class="presence-indicator presence-online"></div>
+                <span class="status-text">1/1 joueurs en ligne</span>
+            </div>
+            <div class="players-container" id="playersList"></div>
+            <button class="btn btn-success" onclick="startGame()" id="startBtn">Démarrer la Partie ! 🚀</button>
+            <button class="btn" onclick="leaveSession()">Quitter</button>
+        </div>
+
+        <!-- Zone de Jeu -->
+        <div class="game-area" id="gameArea">
+            <div class="game-header">
+                <h2 class="game-title" id="gameTitle">Chargement... ⏳</h2>
+                <div class="game-timer" id="gameTimer">15</div>
+            </div>
+            <div class="game-content" id="gameContent">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+
+        <!-- Section Mi-temps -->
+        <div class="halftime" id="halftimeSection">
+            <h2 class="halftime-title">⏸️ MI-TEMPS ⏸️</h2>
+            <div class="players-container" id="halftimePlayers"></div>
+            <p>Voici les scores après la première partie ! 📊</p>
+            <button class="btn btn-success" onclick="continueToSecondHalf()">Continuer l'aventure ! 🎯</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================
+        // SYSTÈME DE JEU AVEC WEBSOCKETS
+        // ============================
+        
+        class GameClient {
+            constructor() {
+                this.socket = null;
+                this.playerId = this.generateId();
+                this.playerName = "";
+                this.currentSession = null;
+                this.isHost = false;
+                this.players = [];
+                this.currentGameState = null;
+                this.currentQuestionIndex = 0;
+                this.gameTimer = null;
+                this.audioEnabled = true;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                
+                this.init();
+            }
+
+            init() {
+                this.setupAudio();
+                this.connectToServer();
+                this.setupEventListeners();
+            }
+
+            generateId() {
+                return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            }
+
+            connectToServer() {
+                try {
+                    this.updateConnectionStatus('connecting', '🔄 Connexion...');
+                    
+                    // Connexion au serveur WebSocket
+                    this.socket = io({
+                        transports: ['websocket', 'polling'],
+                        timeout: 10000,
+                        reconnectionAttempts: 5,
+                        reconnectionDelay: 1000
+                    });
+
+                    this.setupSocketEvents();
+                    
+                } catch (error) {
+                    console.error('Erreur connexion:', error);
+                    this.handleConnectionError();
+                }
+            }
+
+            setupSocketEvents() {
+                this.socket.on('connect', () => {
+                    console.log('✅ Connecté au serveur');
+                    this.updateConnectionStatus('connected', '✅ Connecté');
+                    this.reconnectAttempts = 0;
+                });
+
+                this.socket.on('disconnect', (reason) => {
+                    console.log('❌ Déconnecté:', reason);
+                    this.updateConnectionStatus('disconnected', '❌ Déconnecté');
+                    this.attemptReconnection();
+                });
+
+                this.socket.on('session-created', (data) => {
+                    this.handleSessionCreated(data);
+                });
+
+                this.socket.on('session-joined', (data) => {
+                    this.handleSessionJoined(data);
+                });
+
+                this.socket.on('player-joined', (data) => {
+                    this.handlePlayerJoined(data);
+                });
+
+                this.socket.on('player-left', (data) => {
+                    this.handlePlayerLeft(data);
+                });
+
+                this.socket.on('game-state-updated', (data) => {
+                    this.handleGameStateUpdate(data);
+                });
+
+                this.socket.on('player-answered', (data) => {
+                    this.handlePlayerAnswered(data);
+                });
+
+                this.socket.on('error', (error) => {
+                    this.showNotification(`Erreur: ${error.message}`);
+                });
+
+                this.socket.on('session-not-found', () => {
+                    this.showNotification('Salle non trouvée !');
+                });
+
+                this.socket.on('session-full', () => {
+                    this.showNotification('Salle pleine !');
+                });
+            }
+
+            attemptReconnection() {
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    const delay = Math.min(1000 * this.reconnectAttempts, 10000);
+                    
+                    setTimeout(() => {
+                        this.updateConnectionStatus('connecting', `🔄 Reconnexion (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+                        this.socket.connect();
+                    }, delay);
+                } else {
+                    this.updateConnectionStatus('disconnected', '❌ Hors ligne - Rechargez la page');
+                }
+            }
+
+            updateConnectionStatus(status, message) {
+                const statusElement = document.getElementById('connectionStatus');
+                if (statusElement) {
+                    statusElement.className = `connection-status status-${status}`;
+                    statusElement.textContent = message;
+                }
+            }
+
+            // ============================
+            // GESTION DES SESSIONS
+            // ============================
+
+            async createSession() {
+                if (!this.socket.connected) {
+                    this.showNotification('Pas de connexion au serveur');
+                    return;
+                }
+
+                try {
+                    this.socket.emit('create-session', {
+                        playerId: this.playerId,
+                        playerName: this.playerName
+                    });
+                } catch (error) {
+                    this.showNotification('Erreur création salle');
+                }
+            }
+
+            async joinSession(roomCode) {
+                if (!this.socket.connected) {
+                    this.showNotification('Pas de connexion au serveur');
+                    return;
+                }
+
+                try {
+                    this.socket.emit('join-session', {
+                        roomCode: roomCode.toUpperCase(),
+                        playerId: this.playerId,
+                        playerName: this.playerName
+                    });
+                } catch (error) {
+                    this.showNotification('Erreur connexion salle');
+                }
+            }
+
+            handleSessionCreated(data) {
+                this.currentSession = data.roomCode;
+                this.isHost = true;
+                this.players = data.players;
+                this.showCreateSessionInterface(data.roomCode);
+            }
+
+            handleSessionJoined(data) {
+                this.currentSession = data.roomCode;
+                this.isHost = false;
+                this.players = data.players;
+                this.showCreateSessionInterface(data.roomCode);
+            }
+
+            handlePlayerJoined(data) {
+                this.players = data.players;
+                this.updatePlayersList();
+                this.showNotification(`${data.playerName} a rejoint la partie !`);
+            }
+
+            handlePlayerLeft(data) {
+                this.players = data.players;
+                this.updatePlayersList();
+                this.showNotification(`${data.playerName} a quitté la partie`);
+            }
+
+            handleGameStateUpdate(data) {
+                this.currentGameState = data.gameState;
+                this.currentQuestionIndex = data.currentQuestion;
+                
+                switch(data.status) {
+                    case 'waiting':
+                        this.updatePlayersList();
+                        break;
+                    case 'playing':
+                        this.startGameSession(data);
+                        this.handleGameState(data);
+                        break;
+                    case 'halftime':
+                        this.showHalftime(data);
+                        break;
+                    case 'second_half':
+                        this.handleSecondHalf(data);
+                        break;
+                    case 'finished':
+                        this.showFinalResults(data);
+                        break;
+                }
+
+                this.handleTimer(data);
+            }
+
+            handlePlayerAnswered(data) {
+                this.players = data.players;
+                this.updateGamePlayers();
+                
+                // Vérifier si tous ont répondu
+                const allAnswered = this.players.every(p => p.hasAnswered || p.quickAnswer);
+                if (allAnswered && this.isHost) {
+                    setTimeout(() => this.nextQuestion(), 2000);
+                }
+            }
+
+            // ============================
+            // INTERFACE UTILISATEUR
+            // ============================
+
+            showCreateSessionInterface(roomCode) {
+                this.hideAllInterfaces();
+                document.getElementById('createSessionInterface').style.display = 'block';
+                document.getElementById('sessionCode').textContent = roomCode;
+                this.updatePlayersList();
+            }
+
+            updatePlayersList() {
+                const container = document.getElementById('playersList');
+                if (!container) return;
+                
+                const onlinePlayers = this.players.filter(p => p.isOnline).length;
+                const totalPlayers = this.players.length;
+                
+                // Mettre à jour le statut en ligne
+                const statusElement = document.getElementById('sessionOnlineStatus');
+                if (statusElement) {
+                    statusElement.innerHTML = `
+                        <div class="presence-indicator presence-online"></div>
+                        <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
+                    `;
+                }
+
+                // Mettre à jour la liste des joueurs
+                container.innerHTML = this.players.map(player => `
+                    <div class="player-card ${player.id === this.playerId ? 'active' : ''}">
+                        <div class="player-header">
+                            <div class="player-name">${player.name} ${player.id === this.playerId ? '(Toi)' : ''}</div>
+                            <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                        </div>
+                        <div class="player-score">${player.score} pts</div>
+                        <div class="player-status">
+                            ${player.isOnline ? 
+                              (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
+                              '🔴 Hors ligne'}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Mettre à jour le bouton start
+                const startBtn = document.getElementById('startBtn');
+                if (startBtn) {
+                    startBtn.disabled = this.players.length < 2;
+                    startBtn.textContent = this.players.length < 2 ? 
+                        `En attente d'amis... (${this.players.length}/2)` : 
+                        'Démarrer la Partie ! 🚀';
+                }
+            }
+
+            updateGamePlayers() {
+                const container = document.getElementById('gamePlayers');
+                if (!container) return;
+                
+                container.innerHTML = this.players.map(player => `
+                    <div class="player-card ${player.id === this.playerId ? 'active' : ''}">
+                        <div class="player-header">
+                            <div class="player-name">${player.name}</div>
+                            <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                        </div>
+                        <div class="player-score">${player.score} pts</div>
+                        <div class="player-status">
+                            ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' : '❌ Raté') : 
+                             player.hasAnswered ? '✅ Répondu' : '⏳ En jeu'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // ============================
+            // GESTION DU JEU (VOS FONCTIONS EXISTANTES ADAPTÉES)
+            // ============================
+
+            startGame() {
+                if (!this.isHost) return;
+                if (this.players.length < 2) {
+                    this.showNotification("Invite au moins un ami pour jouer ! 👥");
+                    return;
+                }
+
+                this.socket.emit('start-game', {
+                    roomCode: this.currentSession
+                });
+            }
+
+            startGameSession(data) {
+                this.hideAllInterfaces();
+                document.getElementById('gameArea').style.display = 'block';
+            }
+
+            submitAnswer(answerType, data) {
+                this.socket.emit('player-answer', {
+                    roomCode: this.currentSession,
+                    playerId: this.playerId,
+                    answerType: answerType,
+                    answerData: data
+                });
+            }
+
+            nextQuestion() {
+                if (!this.isHost) return;
+                this.socket.emit('next-question', {
+                    roomCode: this.currentSession
+                });
+            }
+
+            continueToSecondHalf() {
+                this.socket.emit('player-ready', {
+                    roomCode: this.currentSession,
+                    playerId: this.playerId
+                });
+            }
+
+            // ============================
+            // FONCTIONS UTILITAIRES
+            // ============================
+
+            hideAllInterfaces() {
+                const interfaces = [
+                    'gameMode', 'nameInputArea', 'multiplayerInterface', 
+                    'joinInterface', 'createSessionInterface', 'gameArea', 'halftimeSection'
+                ];
+                
+                interfaces.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.style.display = 'none';
+                });
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            setupAudio() {
+                const audioBtn = document.getElementById('toggleAudio');
+                audioBtn.addEventListener('click', () => {
+                    this.audioEnabled = !this.audioEnabled;
+                    audioBtn.textContent = this.audioEnabled ? '🔊' : '🔇';
+                    audioBtn.style.background = this.audioEnabled ? 
+                        'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 
+                        'linear-gradient(45deg, #666, #999)';
+                });
+            }
+
+            setupEventListeners() {
+                // Gestion de la visibilité de la page
+                document.addEventListener('visibilitychange', () => {
+                    if (this.currentSession) {
+                        this.socket.emit('player-presence', {
+                            roomCode: this.currentSession,
+                            playerId: this.playerId,
+                            isOnline: !document.hidden
+                        });
+                    }
+                });
+
+                // Reconnexion manuelle
+                document.getElementById('connectionStatus').addEventListener('click', () => {
+                    if (!this.socket.connected) {
+                        this.connectToServer();
+                    }
+                });
+            }
+
+            handleConnectionError() {
+                this.showNotification('Impossible de se connecter au serveur de jeu');
+                this.updateConnectionStatus('disconnected', '❌ Serveur hors ligne');
+            }
+
+            leaveSession() {
+                if (this.currentSession) {
+                    this.socket.emit('leave-session', {
+                        roomCode: this.currentSession,
+                        playerId: this.playerId
+                    });
+                }
+                this.resetInterface();
+            }
+
+            resetInterface() {
+                this.hideAllInterfaces();
+                document.getElementById('gameMode').style.display = 'grid';
+                this.currentSession = null;
+                this.isHost = false;
+                this.players = [];
+                
+                if (this.gameTimer) {
+                    clearInterval(this.gameTimer);
+                }
+            }
+        }
+
+        // ============================
+        // DONNÉES DES JEUX (CONSERVÉES)
+        // ============================
+        const gameData = {
+            spelling: {
+                'dictionary': ["Bonjour", "Amitié", "École", "Jouet", "Famille"],
+                'initiation': ["Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination"],
+                'bible': ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"]
+            },
+            anagrams: [
+                { anagram: "CHAT", solutions: ["ACHT"] },
+                { anagram: "RIRE", solutions: ["ERRI"] },
+                { anagram: "LUNE", solutions: ["NULE"] }
+            ],
+            mathQuestions: [
+                { problem: "5 + 3 × 2", solution: "11", time: 10 },
+                { problem: "10 - 4 + 1", solution: "7", time: 8 },
+                { problem: "2 × 6 - 3", solution: "9", time: 10 }
+            ],
+            lexicalFields: [
+                { theme: "Animaux", hint: "créatures vivantes", letter: "A" },
+                { theme: "École", hint: "endroit où on apprend", letter: "E" },
+                { theme: "Jeux", hint: "activités amusantes", letter: "J" }
+            ]
+        };
+
+        // ============================
+        // INITIALISATION ET FONCTIONS GLOBALES
+        // ============================
+        let gameClient;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            gameClient = new GameClient();
+        });
+
+        // Fonctions globales pour l'interface
+        function selectMode(mode) {
+            document.getElementById('gameMode').style.display = 'none';
+            if (mode === 'multiplayer') {
+                showNameInput();
+            } else {
+                startSoloGame();
+            }
+        }
+
+        function showNameInput() {
+            document.getElementById('nameInputArea').style.display = 'block';
+            document.getElementById('playerNameInput').focus();
+        }
+
+        function confirmName() {
+            const nameInput = document.getElementById('playerNameInput').value.trim();
+            if (nameInput.length < 2) {
+                alert("Choisis un nom d'au moins 2 lettres ! ✏️");
+                return;
+            }
+            
+            gameClient.playerName = nameInput;
+            document.getElementById('nameInputArea').style.display = 'none';
+            showMultiplayerInterface();
+        }
+
+        function showMultiplayerInterface() {
+            document.getElementById('multiplayerInterface').style.display = 'block';
+        }
+
+        function showJoinInterface() {
+            document.getElementById('multiplayerInterface').style.display = 'none';
+            document.getElementById('joinInterface').style.display = 'block';
+            document.getElementById('joinCodeInput').focus();
+        }
+
+        function createSession() {
+            gameClient.createSession();
+        }
+
+        function joinSession() {
+            const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
+            if (code.length !== 4) {
+                alert("Le code doit avoir 4 lettres ! 🔤");
+                return;
+            }
+            gameClient.joinSession(code);
+        }
+
+        function startGame() {
+            gameClient.startGame();
+        }
+
+        function leaveSession() {
+            gameClient.leaveSession();
+        }
+
+        function showMainMenu() {
+            gameClient.resetInterface();
+        }
+
+        function continueToSecondHalf() {
+            gameClient.continueToSecondHalf();
+        }
+
+        function startSoloGame() {
+            document.getElementById('gameMode').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">Mode Solo en développement</div>
+                <p style="font-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
+                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode multijoueur ! 🎮
+                </p>
+                <button class="btn" onclick="showMainMenu()">Retour au Menu</button>
+            `;
+        }
+
+        // Fonctions de jeu (à adapter selon votre logique existante)
+        function submitSpellingAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            gameClient.submitAnswer('spelling', {
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer
+            });
+        }
+
+        function submitAnagramAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
+            const anagram = gameData.anagrams[index];
+            gameClient.submitAnswer('anagram', {
+                userAnswer: userAnswer,
+                solutions: anagram.solutions
+            });
+        }
+
+        function submitMathAnswer(index) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const question = gameData.mathQuestions[index];
+            gameClient.submitAnswer('math', {
+                userAnswer: userAnswer,
+                solution: question.solution
+            });
+        }
+
+        function submitLexicalAnswer(correctAnswer) {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            gameClient.submitAnswer('lexical', {
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer
+            });
+        }
+
+        // Fonctions d'affichage des questions (vos fonctions existantes)
+        function showSpellingQuestion(type, index) {
+            const words = gameData.spelling[type];
+            if (index >= words.length) return;
+
+            const word = words[index];
+            const typeNames = {
+                'dictionary': 'Dictionnaire 📚',
+                'initiation': 'Découverte 🔍', 
+                'bible': 'Bons Moments 🌟'
+            };
+
+            document.getElementById('gameTitle').textContent = `Épellation - ${typeNames[type]}`;
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${word}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Épelez ce mot correctement :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Tape ta réponse ici...">
+                <button class="btn btn-success" onclick="submitSpellingAnswer('${word}')">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            gameClient.updateGamePlayers();
+            setTimeout(() => document.getElementById('answerInput')?.focus(), 1000);
+        }
+
+        function showAnagramQuestion(index) {
+            if (index >= gameData.anagrams.length) return;
+
+            const anagram = gameData.anagrams[index];
+            document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${anagram.anagram}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Trouvez le mot correspondant à cet anagramme :
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
+                <button class="btn btn-success" onclick="submitAnagramAnswer(${index})">Valider ✨</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            gameClient.updateGamePlayers();
+            setTimeout(() => document.getElementById('answerInput')?.focus(), 1000);
+        }
+
+        function showMathQuestion(index) {
+            if (index >= gameData.mathQuestions.length) return;
+
+            const question = gameData.mathQuestions[index];
+            document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${question.problem}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Résolvez rapidement cette opération !
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
+                <button class="btn btn-success" onclick="submitMathAnswer(${index})">Répondre ! ⚡</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            gameClient.updateGamePlayers();
+            setTimeout(() => document.getElementById('answerInput')?.focus(), 1000);
+        }
+
+        function showLexicalQuestion(index) {
+            if (index >= gameData.lexicalFields.length) return;
+
+            const question = gameData.lexicalFields[index];
+            document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${question.hint}</div>
+                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
+                    Tous les mots commencent par la lettre: 
+                    <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
+                </p>
+                <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}">
+                <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
+                <div class="players-container" id="gamePlayers"></div>
+            `;
+
+            gameClient.updateGamePlayers();
+            setTimeout(() => document.getElementById('answerInput')?.focus(), 1000);
+        }
+
+        // Gestionnaire de timer
+        function handleTimer(sessionData) {
+            const timerElement = document.getElementById('gameTimer');
+            if (!timerElement || !sessionData.timerStart) return;
+
+            const startTime = new Date(sessionData.timerStart).getTime();
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
+
+            timerElement.textContent = remaining;
+
+            timerElement.classList.remove('warning', 'danger');
+            if (remaining <= 5) {
+                timerElement.classList.add('danger');
+            } else if (remaining <= 10) {
+                timerElement.classList.add('warning');
+            }
+
+            if (gameClient.gameTimer) {
+                clearInterval(gameClient.gameTimer);
+            }
+
+            gameClient.gameTimer = setInterval(() => {
+                const currentRemaining = parseInt(timerElement.textContent);
+                if (currentRemaining > 0) {
+                    const newRemaining = currentRemaining - 1;
+                    timerElement.textContent = newRemaining;
+                    
+                    timerElement.classList.remove('warning', 'danger');
+                    if (newRemaining <= 5) {
+                        timerElement.classList.add('danger');
+                    } else if (newRemaining <= 10) {
+                        timerElement.classList.add('warning');
+                    }
+                } else {
+                    clearInterval(gameClient.gameTimer);
+                    if (gameClient.isHost) {
+                        gameClient.nextQuestion();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Gestion des états de jeu
+        function handleGameState(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState.startsWith('spelling_')) {
+                const type = gameState.split('_')[1];
+                showSpellingQuestion(type, sessionData.currentQuestion);
+            } else if (gameState === 'anagram') {
+                showAnagramQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'math') {
+                showMathQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'lexical') {
+                showLexicalQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function handleSecondHalf(sessionData) {
+            const gameState = sessionData.gameState;
+            
+            if (gameState === 'math') {
+                showMathQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'lexical') {
+                showLexicalQuestion(sessionData.currentQuestion);
+            }
+        }
+
+        function showHalftime(sessionData) {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('halftimeSection').style.display = 'block';
+
+            const container = document.getElementById('halftimePlayers');
+            container.innerHTML = gameClient.players.map(player => `
+                <div class="player-card ${player.id === gameClient.playerId ? 'active' : ''}">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">${player.halftimeScore} points</div>
+                    <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
+                </div>
+            `).join('');
+        }
+
+        function showFinalResults(sessionData) {
+            const sortedPlayers = [...gameClient.players].sort((a, b) => b.score - a.score);
+            const winner = sortedPlayers[0];
+            
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">${winner.name} remporte la partie !</div>
+                <div class="players-container">
+                    ${sortedPlayers.map((player, index) => `
+                        <div class="player-card ${player.id === winner.id ? 'active' : ''}">
+                            <div class="player-header">
+                                <div class="player-name">${player.name}</div>
+                                <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                            </div>
+                            <div class="player-score">${player.score} points</div>
+                            <div class="player-status">${index + 1}ère place</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-success" onclick="showMainMenu()">Rejouer ! 🔄</button>
+            `;
+        }
+    </script>
+    
+    
+    const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
     }
+});
 
-    // Function to add a player
-    function addPlayer(playerName) {
-      players.push({ name: playerName, score: 0 });
-      updateScoreboard();
-      console.log(`${playerName} a rejoint le jeu.`);
+// Servir les fichiers statiques
+app.use(express.static(path.join(__dirname)));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Stockage en mémoire (remplace Firebase)
+const gameSessions = new Map();
+const playerConnections = new Map();
+
+// Génération de code de salle
+function generateRoomCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return result;
+}
 
-    // Update scoreboard
-    function updateScoreboard() {
-      const scoreList = document.getElementById("score-list");
-      scoreList.innerHTML = '';
-      players.forEach(player => {
-        const li = document.createElement("li");
-        li.textContent = `${player.name}: ${player.score} points`;
-        scoreList.appendChild(li);
-      });
+// Nettoyage des salles inactives
+setInterval(() => {
+    const now = Date.now();
+    for (const [roomCode, session] of gameSessions.entries()) {
+        if (now - session.lastActivity > 3600000) { // 1 heure
+            gameSessions.delete(roomCode);
+            console.log(`Salle ${roomCode} nettoyée (inactive)`);
+        }
     }
+}, 60000); // Vérifier toutes les minutes
 
-    // Show random question
-    function showQuestion() {
-      const questionText = document.getElementById('question-text');
-      const question = getRandomQuestion();
-      currentQuestion = question;
-      questionText.innerText = `Épelez ce mot: ${question}`;
-    }
+io.on('connection', (socket) => {
+    console.log('🔗 Nouvelle connexion:', socket.id);
 
-    // Function to get a random question
-    function getRandomQuestion() {
-      const dictionaryWords = ["Bonjour", "Amitié", "École", "Jouet", "Famille"];
-      const initiationWords = ["Curiosité", "Découverte", "Apprentissage"];
-      const bibleWords = ["Partage", "Gentillesse", "Espoir"];
+    // Créer une salle
+    socket.on('create-session', (data) => {
+        try {
+            const roomCode = generateRoomCode();
+            
+            const newSession = {
+                roomCode: roomCode,
+                host: data.playerId,
+                players: [{
+                    id: data.playerId,
+                    name: data.playerName,
+                    score: 0,
+                    halftimeScore: 0,
+                    isOnline: true,
+                    hasAnswered: false,
+                    readyForSecondHalf: false,
+                    quickAnswer: false,
+                    isCorrect: false,
+                    lastSeen: new Date()
+                }],
+                status: 'waiting',
+                gameState: 'lobby',
+                currentQuestion: 0,
+                currentGameType: null,
+                timer: 15,
+                timerStart: null,
+                createdAt: new Date(),
+                lastActivity: new Date()
+            };
 
-      // Randomly pick the type of question
-      const types = ["Dictionnaire", "Initiation", "Bible"];
-      const type = types[Math.floor(Math.random() * types.length)];
-      let questionList = [];
+            gameSessions.set(roomCode, newSession);
+            playerConnections.set(socket.id, roomCode);
+            socket.join(roomCode);
 
-      if (type === "Dictionnaire") questionList = dictionaryWords;
-      else if (type === "Initiation") questionList = initiationWords;
-      else if (type === "Bible") questionList = bibleWords;
+            socket.emit('session-created', newSession);
+            console.log(`🎮 Salle créée: ${roomCode} par ${data.playerName}`);
 
-      const randomIndex = Math.floor(Math.random() * questionList.length);
-      return questionList[randomIndex];
-    }
-
-    // Handle scoring logic
-    function updateScores(playerName, points) {
-      const player = players.find(p => p.name === playerName);
-      if (player) {
-        player.score += points;
-        updateScoreboard();
-        console.log(`${playerName} a marqué ${points} points. Score total: ${player.score}`);
-      }
-    }
-
-    // Function to start the game
-    document.addEventListener('DOMContentLoaded', () => {
-      setupGame();
+        } catch (error) {
+            console.error('Erreur création salle:', error);
+            socket.emit('error', { message: 'Erreur création salle' });
+        }
     });
-  </script>
+
+    // Rejoindre une salle
+    socket.on('join-session', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            
+            if (!session) {
+                socket.emit('session-not-found');
+                return;
+            }
+
+            if (session.status !== 'waiting') {
+                socket.emit('session-full');
+                return;
+            }
+
+            // Vérifier si le joueur existe déjà
+            const existingPlayer = session.players.find(p => p.id === data.playerId);
+            if (!existingPlayer) {
+                session.players.push({
+                    id: data.playerId,
+                    name: data.playerName,
+                    score: 0,
+                    halftimeScore: 0,
+                    isOnline: true,
+                    hasAnswered: false,
+                    readyForSecondHalf: false,
+                    quickAnswer: false,
+                    isCorrect: false,
+                    lastSeen: new Date()
+                });
+            } else {
+                existingPlayer.isOnline = true;
+                existingPlayer.lastSeen = new Date();
+            }
+
+            session.lastActivity = new Date();
+            playerConnections.set(socket.id, data.roomCode);
+            socket.join(data.roomCode);
+
+            socket.emit('session-joined', session);
+            io.to(data.roomCode).emit('player-joined', {
+                players: session.players,
+                playerName: data.playerName
+            });
+
+            console.log(`👥 ${data.playerName} a rejoint ${data.roomCode}`);
+
+        } catch (error) {
+            console.error('Erreur join session:', error);
+            socket.emit('error', { message: 'Erreur connexion salle' });
+        }
+    });
+
+    // Démarrer le jeu
+    socket.on('start-game', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session || session.host !== getPlayerId(socket.id)) return;
+
+            session.status = 'playing';
+            session.gameState = 'spelling_dictionary';
+            session.currentQuestion = 0;
+            session.timer = 15;
+            session.timerStart = new Date();
+            session.lastActivity = new Date();
+
+            // Réinitialiser les états des joueurs
+            session.players.forEach(player => {
+                player.hasAnswered = false;
+                player.quickAnswer = false;
+                player.isCorrect = false;
+            });
+
+            io.to(data.roomCode).emit('game-state-updated', session);
+            console.log(`🚀 Jeu démarré dans ${data.roomCode}`);
+
+        } catch (error) {
+            console.error('Erreur start game:', error);
+        }
+    });
+
+    // Réponse du joueur
+    socket.on('player-answer', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === data.playerId);
+            if (!player) return;
+
+            session.lastActivity = new Date();
+
+            switch (data.answerType) {
+                case 'spelling':
+                    const isCorrectSpelling = data.answerData.userAnswer.toLowerCase() === 
+                                           data.answerData.correctAnswer.toLowerCase();
+                    player.hasAnswered = true;
+                    player.isCorrect = isCorrectSpelling;
+                    player.score += isCorrectSpelling ? 10 : 0;
+                    break;
+
+                case 'anagram':
+                    const isCorrectAnagram = data.answerData.solutions.includes(data.answerData.userAnswer);
+                    player.hasAnswered = true;
+                    player.isCorrect = isCorrectAnagram;
+                    player.score += isCorrectAnagram ? 10 : 0;
+                    break;
+
+                case 'math':
+                    const isCorrectMath = data.answerData.userAnswer === data.answerData.solution;
+                    player.quickAnswer = true;
+                    player.isCorrect = isCorrectMath;
+                    player.score += isCorrectMath ? 20 : 0;
+                    break;
+
+                case 'lexical':
+                    const isCorrectLexical = data.answerData.userAnswer.toLowerCase() === 
+                                           data.answerData.correctAnswer.toLowerCase();
+                    player.quickAnswer = true;
+                    player.isCorrect = isCorrectLexical;
+                    player.score += isCorrectLexical ? 10 : 0;
+                    break;
+            }
+
+            io.to(data.roomCode).emit('player-answered', {
+                players: session.players
+            });
+
+        } catch (error) {
+            console.error('Erreur player answer:', error);
+        }
+    });
+
+    // Question suivante
+    socket.on('next-question', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session || session.host !== getPlayerId(socket.id)) return;
+
+            session.currentQuestion += 1;
+            session.timer = 15;
+            session.timerStart = new Date();
+            session.lastActivity = new Date();
+
+            // Réinitialiser les réponses des joueurs
+            session.players.forEach(player => {
+                player.hasAnswered = false;
+                player.quickAnswer = false;
+                player.isCorrect = false;
+            });
+
+            // Logique de progression du jeu
+            if (session.gameState.startsWith('spelling_')) {
+                const type = session.gameState.split('_')[1];
+                const words = getSpellingWords(type);
+                if (session.currentQuestion >= words.length) {
+                    const nextState = getNextSpellingType(type);
+                    if (nextState) {
+                        session.gameState = nextState;
+                        session.currentQuestion = 0;
+                    } else {
+                        session.status = 'halftime';
+                        session.players.forEach(p => p.halftimeScore = p.score);
+                    }
+                }
+            } else if (session.gameState === 'anagram' && session.currentQuestion >= 3) {
+                session.status = 'halftime';
+                session.players.forEach(p => p.halftimeScore = p.score);
+            }
+
+            io.to(data.roomCode).emit('game-state-updated', session);
+
+        } catch (error) {
+            console.error('Erreur next question:', error);
+        }
+    });
+
+    // Joueur prêt pour la 2ème mi-temps
+    socket.on('player-ready', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === data.playerId);
+            if (player) {
+                player.readyForSecondHalf = true;
+                session.lastActivity = new Date();
+            }
+
+            // Vérifier si tous sont prêts
+            const allReady = session.players.every(p => p.readyForSecondHalf);
+            if (allReady && session.host === getPlayerId(socket.id)) {
+                session.status = 'second_half';
+                session.gameState = 'math';
+                session.currentQuestion = 0;
+                session.timer = 10;
+                session.timerStart = new Date();
+
+                session.players.forEach(p => {
+                    p.hasAnswered = false;
+                    p.quickAnswer = false;
+                    p.isCorrect = false;
+                    p.readyForSecondHalf = false;
+                });
+
+                io.to(data.roomCode).emit('game-state-updated', session);
+            } else {
+                io.to(data.roomCode).emit('game-state-updated', session);
+            }
+
+        } catch (error) {
+            console.error('Erreur player ready:', error);
+        }
+    });
+
+    // Présence du joueur
+    socket.on('player-presence', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === data.playerId);
+            if (player) {
+                player.isOnline = data.isOnline;
+                player.lastSeen = new Date();
+                session.lastActivity = new Date();
+
+                io.to(data.roomCode).emit('game-state-updated', session);
+            }
+        } catch (error) {
+            console.error('Erreur presence:', error);
+        }
+    });
+
+    // Quitter une salle
+    socket.on('leave-session', (data) => {
+        try {
+            const session = gameSessions.get(data.roomCode);
+            if (!session) return;
+
+            session.players = session.players.filter(p => p.id !== data.playerId);
+            session.lastActivity = new Date();
+
+            if (session.players.length === 0) {
+                gameSessions.delete(data.roomCode);
+                console.log(`🗑️ Salle ${data.roomCode} supprimée (vide)`);
+            } else {
+                // Transférer l'hôte si nécessaire
+                if (session.host === data.playerId && session.players.length > 0) {
+                    session.host = session.players[0].id;
+                }
+
+                io.to(data.roomCode).emit('player-left', {
+                    players: session.players,
+                    playerName: data.playerName
+                });
+            }
+
+            playerConnections.delete(socket.id);
+            socket.leave(data.roomCode);
+
+        } catch (error) {
+            console.error('Erreur leave session:', error);
+        }
+    });
+
+    // Déconnexion
+    socket.on('disconnect', (reason) => {
+        console.log(`❌ Déconnexion: ${socket.id} - ${reason}`);
+        
+        const roomCode = playerConnections.get(socket.id);
+        if (roomCode) {
+            const session = gameSessions.get(roomCode);
+            if (session) {
+                const player = session.players.find(p => 
+                    p.id === getPlayerId(socket.id)
+                );
+                
+                if (player) {
+                    player.isOnline = false;
+                    player.lastSeen = new Date();
+                    session.lastActivity = new Date();
+
+                    io.to(roomCode).emit('game-state-updated', session);
+                }
+            }
+            playerConnections.delete(socket.id);
+        }
+    });
+
+    // Fonction utilitaire pour obtenir l'ID joueur
+    function getPlayerId(socketId) {
+        const session = Array.from(gameSessions.values()).find(session =>
+            session.players.some(player => 
+                playerConnections.get(socketId) === session.roomCode
+            )
+        );
+        
+        if (session) {
+            const player = session.players.find(p => 
+                playerConnections.get(socketId) === session.roomCode
+            );
+            return player ? player.id : null;
+        }
+        return null;
+    }
+});
+
+// Données du jeu
+function getSpellingWords(type) {
+    const words = {
+        'dictionary': ["Bonjour", "Amitié", "École", "Jouet", "Famille"],
+        'initiation': ["Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination"],
+        'bible': ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"]
+    };
+    return words[type] || [];
+}
+
+function getNextSpellingType(currentType) {
+    const progression = {
+        'dictionary': 'spelling_initiation',
+        'initiation': 'spelling_bible',
+        'bible': 'anagram'
+    };
+    return progression[currentType];
+}
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🎮 Serveur de jeu démarré sur le port ${PORT}`);
+    console.log(`📍 Accédez au jeu: http://localhost:${PORT}`);
+});
+
+{
+  "name": "match-en-ligne",
+  "version": "1.0.0",
+  "description": "Jeu éducatif multijoueur en temps réel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
 </body>
 </html>
