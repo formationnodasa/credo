@@ -1,1227 +1,1250 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match Lexical - Jeu Multijoueur</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            text-align: center;
-            padding: 30px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            margin-bottom: 30px;
-            border: 3px solid #00ccff;
-            box-shadow: 0 0 40px rgba(0, 204, 255, 0.4);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-            animation: rainbow 3s linear infinite;
-        }
-
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            color: #a5d8ff;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(165, 216, 255, 0.5);
-        }
-
-        .game-mode {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .mode-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid;
-            border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4) 1;
-            border-radius: 25px;
-            padding: 40px 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mode-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .mode-card:hover::before {
-            left: 100%;
-        }
-
-        .mode-card:hover {
-            transform: translateY(-15px) scale(1.05);
-            box-shadow: 0 20px 50px rgba(0, 204, 255, 0.6);
-        }
-
-        .mode-icon {
-            font-size: 5rem;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 0 15px currentColor);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .mode-card h3 {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: #4ecdc4;
-            text-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
-        }
-
-        .mode-card p {
-            color: #e9ecef;
-            line-height: 1.7;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            color: white;
-            border: none;
-            padding: 18px 35px;
-            font-size: 1.3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #4ecdc4, #67e6dc);
-            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 12px 30px rgba(78, 205, 196, 0.6);
-        }
-
-        .session-interface {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #4ecdc4;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: none;
-            box-shadow: 0 0 50px rgba(78, 205, 196, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .name-input-area {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #ff6b6b;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: none;
-            box-shadow: 0 0 50px rgba(255, 107, 107, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .input-field {
-            width: 100%;
-            max-width: 400px;
-            padding: 18px 25px;
-            font-size: 1.3rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #4ecdc4;
-            border-radius: 20px;
-            color: white;
-            margin: 25px 0;
-            text-align: center;
-            box-shadow: 0 0 25px rgba(78, 205, 196, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            transform: scale(1.05);
-        }
-
-        .input-field::placeholder {
-            color: #a5d8ff;
-        }
-
-        .code-display {
-            font-size: 5rem;
-            letter-spacing: 20px;
-            color: #ff6b6b;
-            margin: 40px 0;
-            font-weight: bold;
-            text-shadow: 0 0 30px #ff6b6b;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            border-radius: 25px;
-            border: 3px solid #ff6b6b;
-            animation: pulse 2s infinite;
-        }
-
-        .game-area {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border-radius: 30px;
-            padding: 50px;
-            margin: 30px 0;
-            border: 4px solid #4ecdc4;
-            box-shadow: 0 0 60px rgba(78, 205, 196, 0.5);
-            backdrop-filter: blur(10px);
-            display: none;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 3px solid #4ecdc4;
-        }
-
-        .game-title {
-            font-size: 3rem;
-            color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px #ff6b6b; }
-            to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
-        }
-
-        .game-timer {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #4ecdc4;
-            text-shadow: 0 0 20px #4ecdc4;
-            padding: 20px 30px;
-            background: rgba(78, 205, 196, 0.1);
-            border-radius: 20px;
-            border: 3px solid #4ecdc4;
-            transition: all 0.3s ease;
-            animation: pulse 1s infinite;
-        }
-
-        .game-timer.warning {
-            color: #ffeaa7;
-            border-color: #ffeaa7;
-            text-shadow: 0 0 20px #ffeaa7;
-        }
-
-        .game-timer.danger {
-            color: #ff6b6b;
-            border-color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
-            animation: pulse 0.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% { 
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
-        }
-
-        .game-content {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .question {
-            font-size: 2.8rem;
-            margin-bottom: 50px;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            padding: 20px;
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .players-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
-        }
-
-        .player-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #444;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-
-        .player-card.active {
-            border-color: #4ecdc4;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
-            background: linear-gradient(145deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
-            transform: scale(1.05);
-        }
-
-        .player-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .presence-indicator {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            position: relative;
-            animation: none;
-        }
-
-        .presence-online {
-            background: #4ecdc4;
-            box-shadow: 0 0 15px #4ecdc4;
-            animation: pulse 2s infinite;
-        }
-
-        .presence-offline {
-            background: #ff6b6b;
-            box-shadow: 0 0 15px #ff6b6b;
-        }
-
-        .player-name {
-            font-size: 1.5rem;
-            color: #ffeaa7;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 234, 167, 0.5);
-        }
-
-        .player-score {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #ffffff;
-            margin: 15px 0;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .player-status {
-            font-size: 1rem;
-            color: #a5d8ff;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background: rgba(165, 216, 255, 0.1);
-            border-radius: 10px;
-            border: 1px solid #a5d8ff;
-        }
-
-        .input-answer {
-            width: 100%;
-            max-width: 500px;
-            padding: 25px;
-            font-size: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #4ecdc4;
-            border-radius: 20px;
-            color: white;
-            margin: 30px 0;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .input-answer:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 40px rgba(255, 107, 107, 0.6);
-            transform: scale(1.05);
-        }
-
-        .online-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 15px 0;
-            padding: 12px 20px;
-            background: rgba(78, 205, 196, 0.15);
-            border-radius: 15px;
-            border: 2px solid #4ecdc4;
-            backdrop-filter: blur(10px);
-        }
-
-        .status-text {
-            font-size: 1.1rem;
-            color: #ffeaa7;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .game-mode { grid-template-columns: 1fr; }
-            .mode-card { padding: 30px 20px; }
-            .code-display { font-size: 3rem; letter-spacing: 10px; }
-            .game-timer { font-size: 2.5rem; }
-            .game-title { font-size: 2rem; }
-            .question { font-size: 2rem; }
-            .game-header { flex-direction: column; gap: 20px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Champs Lexicaux – Jeu Multijoueur</title>
+  <style>
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --card: rgba(255,255,255,.12);
+      --glass: blur(12px);
+      --txt:#fff; --accent:#fff; --brand:#2575fc;
+      --ok:#00e676; --ko:#ff5252;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, var(--bg1), var(--bg2), var(--bg1));
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: var(--txt);
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+    @keyframes gradientAnimation{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .container{
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      width: min(1200px, 94vw);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: fadeIn .9s ease;
+    }
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap
+    }
+    h1{
+      font-weight:800; margin:0; font-size: clamp(26px, 3.4vw, 40px);
+      text-shadow: 0 3px 8px rgba(0,0,0,.3);
+      letter-spacing:.3px;
+    }
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-weight:600;
+      opacity:.95;
+    }
+    .pill{
+      padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size:.95rem
+    }
+    .display{
+      margin:24px 0 10px; display:grid; gap:10px;
+    }
+    #prefixDisplay{
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight:900; letter-spacing:.18em; text-align:center;
+      text-shadow: 0 3px 8px rgba(0,0,0,.28);
+    }
+    #definitionDisplay{
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height:1.6; text-align:center;
+      background: rgba(0,0,0,.16);
+      border-radius:14px; padding:16px 18px;
+    }
+    .controls{
+      display:grid; grid-template-columns: repeat(6,1fr); gap:10px; margin:12px 0 6px;
+    }
+    button{
+      padding:12px; font-size:1.1rem; font-weight:700; border-radius:14px; border:none;
+      cursor:pointer; background:#fff; color:var(--brand);
+      transition:.25s; box-shadow:0 4px 10px rgba(0,0,0,.1);
+    }
+    button:hover{ background:var(--brand); color:#fff; box-shadow:0 0 12px #ffffff99, 0 0 18px #2575fcaa }
+    button:disabled{opacity:.55; cursor:not-allowed}
+    input[type="text"]{
+      font-size:1.2rem; padding:14px 16px; border-radius:12px; border:none; width:100%;
+      margin:10px 0 14px; background:#fff; color:#222; outline:none; transition:.25s;
+    }
+    input[type="text"]:focus{ box-shadow:0 0 10px var(--brand); caret-color:var(--brand) }
+    #message{ min-height:28px; font-size:1.1rem; font-weight:700; text-align:center; margin:6px 0 0 }
+    .divider{ height:1px; background:rgba(255,255,255,.18); margin:18px 0 }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    }
+    .bank button{
+      background:rgba(255,255,255,.12); color:#fff; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .bank button.active{ background:#fff; color:var(--brand) }
+    .footnote{
+      margin-top:10px; text-align:center; opacity:.85; font-size:.95rem
+    }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+    
+    /* Styles multijoueur */
+    .multiplayer-panel {
+      background: rgba(0,0,0,0.2);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .player {
+      background: rgba(255,255,255,0.1);
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .player-score {
+      background: var(--brand);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    .timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 10px 0;
+      color: #fff;
+    }
+    .session-code {
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 0.2em;
+      margin: 10px 0;
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .multiplayer-controls {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .multiplayer-controls button {
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎮 MATCH LEXICAL 🎮</h1>
-            <p class="subtitle">✨ Trouve les mots qui commencent par la même lettre ! ✨</p>
-            <div class="online-status" id="onlineStatus" style="display: none;">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">0/0 joueurs en ligne</span>
-            </div>
-        </header>
+  <div class="container">
+    <header>
+      <h1>Champs lexicaux – Jeu Multijoueur</h1>
+      <div class="status">
+        <span class="pill" id="progressPill">0 / 0</span>
+        <span class="pill" id="speedPill">Vitesse ×1.00</span>
+        <span class="pill" id="hintPill">Toutes les réponses commencent par&nbsp;<b id="hintPrefix">– –</b></span>
+      </div>
+    </header>
 
-        <!-- Menu Principal -->
-        <div class="game-mode" id="gameMode">
-            <div class="mode-card" onclick="selectMode('multiplayer')">
-                <div class="mode-icon">👥</div>
-                <h3>Mode Multijoueur</h3>
-                <p>Joue avec tes amis et défie-les ! 🏆</p>
-                <button class="btn">Jouer à Plusieurs</button>
-            </div>
-        </div>
-
-        <!-- Saisie du nom -->
-        <div class="name-input-area" id="nameInputArea">
-            <h3>👤 Choisis ton nom de super héros !</h3>
-            <p>Comment veux-tu qu'on t'appelle ?</p>
-            <input type="text" class="input-field" id="playerNameInput" placeholder="Ex: SuperJoueur123" maxlength="20">
-            <button class="btn btn-success" onclick="confirmName()">C'est parti ! 🚀</button>
-        </div>
-
-        <!-- Interface Multiplayer -->
-        <div class="session-interface" id="multiplayerInterface">
-            <div class="mode-card" onclick="createSession()">
-                <div class="mode-icon">🏠</div>
-                <h3>Créer une Salle</h3>
-                <p>Crée ta propre salle et invite tes amis ! 📨</p>
-                <button class="btn">Créer une Salle</button>
-            </div>
-            <div class="mode-card" onclick="showJoinInterface()">
-                <div class="mode-icon">🔗</div>
-                <h3>Rejoindre une Salle</h3>
-                <p>Rejoins une salle avec le code de ton ami ! 🔢</p>
-                <button class="btn">Rejoindre</button>
-            </div>
-            <button class="btn" onclick="showMainMenu()">Retour au menu</button>
-        </div>
-
-        <!-- Interface Rejoindre -->
-        <div class="session-interface" id="joinInterface">
-            <h3>🔗 Rejoindre une Salle</h3>
-            <p>Entre le code de la salle de ton ami :</p>
-            <input type="text" class="input-field" id="joinCodeInput" placeholder="4 lettres (ex: ABCD)" maxlength="4" style="text-transform: uppercase;">
-            <button class="btn btn-success" onclick="joinSession()">Rejoindre la partie ! 🎉</button>
-            <button class="btn" onclick="showMultiplayerInterface()">Retour</button>
-        </div>
-
-        <!-- Interface Création de Salle -->
-        <div class="session-interface" id="createSessionInterface">
-            <h3>🎉 Super ! Ta salle est créée !</h3>
-            <p>Partage ce code magique avec tes amis :</p>
-            <div class="code-display" id="sessionCode">----</div>
-            <div class="online-status" id="sessionOnlineStatus">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">1/1 joueurs en ligne</span>
-            </div>
-            <div class="players-container" id="playersList"></div>
-            <button class="btn btn-success" onclick="startGame()" id="startBtn">Démarrer la Partie ! 🚀</button>
-            <button class="btn" onclick="leaveSession()">Quitter</button>
-        </div>
-
-        <!-- Zone de Jeu -->
-        <div class="game-area" id="gameArea">
-            <div class="game-header">
-                <h2 class="game-title" id="gameTitle">Champ Lexical 📝</h2>
-                <div class="game-timer" id="gameTimer">15</div>
-            </div>
-            <div class="game-content" id="gameContent">
-                <!-- Contenu dynamique -->
-            </div>
-        </div>
+    <!-- Panneau multijoueur -->
+    <div class="multiplayer-panel" id="multiplayerPanel" style="display: none;">
+      <div class="session-code" id="sessionCodeDisplay">----</div>
+      <div class="timer" id="timerDisplay">15s</div>
+      <div class="player-list" id="playerList"></div>
+      <div class="multiplayer-controls">
+        <button id="btnCopyCode">📋 Copier code</button>
+        <button id="btnLeaveGame">🚪 Quitter</button>
+      </div>
     </div>
 
-    <script>
-        // ============================
-        // CONFIGURATION FIREBASE
-        // ============================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
-            authDomain: "match-en-ligne.firebaseapp.com",
-            projectId: "match-en-ligne",
-            storageBucket: "match-en-ligne.firebasestorage.app",
-            messagingSenderId: "706011207623",
-            appId: "1:706011207623:web:17374990a6202b64f0abe2",
-            measurementId: "G-D9XYRE3W2M"
+    <div class="display">
+      <div id="prefixDisplay">– –</div>
+      <div id="definitionDisplay">Clique une initiale ci-dessous ou appuie sur ▶️ Jouer.</div>
+    </div>
+
+    <input type="text" id="answer" placeholder="Écris le mot correct (même initiales) et appuie sur Entrée…" autocomplete="off" />
+
+    <div class="controls" role="group" aria-label="Commandes">
+      <button id="btnPlay">▶️ Jouer</button>
+      <button id="btnSlow">🐢 Ralentir</button>
+      <button id="btnFast">🐇 Accélérer</button>
+      <button id="btnRepeat">🔁 Répéter</button>
+      <button id="btnSkip">⏭ Passer</button>
+      <button id="btnBack">⬅️ Retour</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+
+    <div class="divider"></div>
+
+    <div class="bank" id="initialBank" aria-label="Liste d'initiales (sélection rapide)"></div>
+    <div class="footnote">Astuce : tu peux changer la vitesse et répéter la définition à volonté.</div>
+  </div>
+
+  <!-- Modales pour le multijoueur -->
+  <div id="multiplayerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: var(--card); backdrop-filter: var(--glass); padding: 30px; border-radius: 20px; max-width: 500px; width: 90%;">
+      <h2 style="margin-top: 0;">Mode Multijoueur</h2>
+      <div style="display: flex; gap: 10px; margin: 20px 0;">
+        <button id="btnCreateGame" style="flex: 1;">Créer une partie</button>
+        <button id="btnJoinGame" style="flex: 1;">Rejoindre une partie</button>
+      </div>
+      <div id="joinForm" style="display: none;">
+        <input type="text" id="joinCode" placeholder="Code à 4 lettres" maxlength="4" style="width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.2em;">
+        <input type="text" id="playerName" placeholder="Ton nom" style="width: 100%; margin-top: 10px;">
+        <button id="btnConfirmJoin" style="width: 100%; margin-top: 10px;">Rejoindre</button>
+      </div>
+      <button id="btnCloseModal" style="width: 100%; margin-top: 10px;">Fermer</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Données : champs lexicaux nettoyés (entrées sans définition ou buggées retirées) ---
+    // Rappel: Chaque item = { mot: "Mot", def: "Définition" } ; la réponse attendue commence par les deux lettres du champ.
+    const FIELDS = {
+      "Pr": [
+        {mot:"Précision", def:"Le fait de donner des détails exacts et précis sur quelque chose."},
+        {mot:"Profond", def:"Qui se rapporte à la profondeur ou à une intensité importante."},
+        {mot:"Profession", def:"Domaine d'activité ou métier dans lequel une personne travaille."},
+        {mot:"Progrès", def:"Avancement ou amélioration dans une situation ou un domaine."},
+        {mot:"Promesse", def:"Engagement ou parole donnée de faire quelque chose."},
+        {mot:"Proverbe", def:"Expression populaire qui contient une sagesse ou un conseil."},
+        {mot:"Précieux", def:"Qui a une grande valeur ou importance."},
+        {mot:"Préparation", def:"Action de se préparer en vue d'une activité."},
+        {mot:"Précaution", def:"Mesure prise pour éviter un danger ou un problème."},
+        {mot:"Privilège", def:"Avantage ou droit spécial accordé à certaines personnes."}
+      ],
+      "Se": [
+        {mot:"Sensation", def:"Perception ou ressenti d'un stimulus par les sens."},
+        {mot:"Séduction", def:"Charme ou pouvoir d'attraction envers quelqu'un."},
+        {mot:"Sérénité", def:"État de calme et de tranquillité."},
+        {mot:"Secret", def:"Quelque chose qui est caché ou inconnu du public."},
+        {mot:"Séparation", def:"Acte de se séparer ou de se diviser."},
+        {mot:"Sérieux", def:"État de responsabilité et de gravité."},
+        {mot:"Sentiment", def:"Émotion ou affection ressentie envers quelqu'un ou quelque chose."},
+        {mot:"Service", def:"Action d'aider ou d'assister quelqu'un."},
+        {mot:"Seconde", def:"Unité de temps ou rang après la première."},
+        {mot:"Septième", def:"Position dans une série après le sixième."}
+      ],
+      "Tr": [
+        {mot:"Transformation", def:"Changement ou métamorphose d'une chose en une autre."},
+        {mot:"Tristesse", def:"État de chagrin ou de mélancolie."},
+        {mot:"Travail", def:"Emploi ou activité professionnelle."},
+        {mot:"Traitement", def:"Action de soigner ou de procéder à une procédure médicale."},
+        {mot:"Tradition", def:"Coutume transmise de génération en génération."},
+        {mot:"Tragédie", def:"Drame qui provoque de la tristesse ou du désespoir."},
+        {mot:"Trentième", def:"Position dans une série après le vingt-neuvième."},
+        {mot:"Triomphe", def:"Victoire éclatante à l'issue d'une lutte."},
+        {mot:"Transparence", def:"Clarté d'une substance ou d'une situation."},
+        {mot:"Trésor", def:"Richesse ou bien précieux à valeur sentimentale ou matérielle."}
+      ],
+      "Ac": [
+        {mot:"Accompagnement", def:"Soutien ou aide fournie à quelqu'un."},
+        {mot:"Accès", def:"Possibilité d'entrer dans un lieu ou d'obtenir quelque chose."},
+        {mot:"Action", def:"Acte de faire quelque chose."},
+        {mot:"Activité", def:"Occupation ou exercice d'une action."},
+        {mot:"Achat", def:"Acquisition d'un bien."},
+        {mot:"Accident", def:"Événement imprévu, souvent tragique."},
+        {mot:"Accord", def:"Entente ou consensus entre plusieurs personnes."},
+        {mot:"Acquisition", def:"Obtention d'une chose."},
+        {mot:"Acteur", def:"Personne qui joue un rôle au théâtre ou au cinéma."},
+        {mot:"Acclamation", def:"Applaudissements ou éloges enthousiastes."},
+        {mot:"Acrimonie", def:"Mauvaise humeur qui s'exprime par des propos acerbes."}
+      ],
+      "Ca": [
+        {mot:"Caractère", def:"Ensemble de traits distinctifs d'une personne ou d'une chose."},
+        {mot:"Carte", def:"Document représentant une région ou un territoire."},
+        {mot:"Cascade", def:"Chute d'eau sur une pente."},
+        {mot:"Cadeau", def:"Objet offert pour une occasion ou par affection."},
+        {mot:"Caisse", def:"Contenant destiné au transport d'objets."},
+        {mot:"Caméra", def:"Appareil pour prendre des photos ou filmer."},
+        {mot:"Campagne", def:"Région rurale, éloignée de la ville."},
+        {mot:"Canal", def:"Voie d'eau artificielle pour le transport."},
+        {mot:"Capacité", def:"Aptitude à faire, comprendre ou apprendre."},
+        {mot:"Capitale", def:"Ville principale d'un pays ou d'une région."}
+      ],
+      "Me": [
+        {mot:"Mémoire", def:"Capacité de se souvenir et de rappeler des informations."},
+        {mot:"Méthode", def:"Manière spécifique d'effectuer une tâche."},
+        {mot:"Mélodie", def:"Séquence agréable de notes musicales."},
+        {mot:"Menu", def:"Liste de plats ou d'options dans un programme."},
+        {mot:"Mécontentement", def:"Sentiment de ne pas être satisfait."},
+        {mot:"Mesure", def:"Quantité ou échelle pour évaluer quelque chose."},
+        {mot:"Merveille", def:"Chose très impressionnante ou étonnante."},
+        {mot:"Méditation", def:"Pratique de relaxation et de concentration."},
+        {mot:"Messagerie", def:"Système d'envoi et de réception de messages."},
+        {mot:"Mémorable", def:"Qui mérite d'être rappelé."},
+        {mot:"Météo", def:"Conditions atmosphériques à un moment précis."}
+      ],
+      "Di": [
+        {mot:"Direction", def:"Position ou trajectoire d'un mouvement."},
+        {mot:"Difficulté", def:"Obstacle ou défi qui complique quelque chose."},
+        {mot:"Discipline", def:"Obéissance à des règles pour atteindre un objectif."},
+        {mot:"Dialogue", def:"Conversation entre deux personnes ou plus."},
+        {mot:"Diversité", def:"Variété dans un groupe ou une société."},
+        {mot:"Diplomatie", def:"Art de négocier et résoudre les conflits."},
+        {mot:"Dictionnaire", def:"Livre listant les mots et leurs définitions."},
+        {mot:"Disparition", def:"Fait de ne plus être présent ou visible."},
+        {mot:"Dimension", def:"Mesure de la taille ou de la portée d'un objet."},
+        {mot:"Directionnel", def:"Relatif à la direction ou l'orientation."},
+        {mot:"Divertissement", def:"Ce qui procure du plaisir ou de l'amusement."},
+        {mot:"Diamètre", def:"Segment passant par le centre d'un cercle entre deux points de la circonférence."},
+        {mot:"Discothèque", def:"Lieu où l'on danse au son d'une musique enregistrée."}
+      ],
+      "Em": [
+        {mot:"Emotion", def:"Réaction affective intense."},
+        {mot:"Empathie", def:"Capacité de comprendre et partager les sentiments d'autrui."},
+        {mot:"Emploi", def:"Travail ou occupation rémunéré."},
+        {mot:"Empreinte", def:"Marque laissée par un objet ou une personne."},
+        {mot:"Émotionnel", def:"Lié aux émotions."},
+        {mot:"Empire", def:"Vaste territoire gouverné par un seul souverain."},
+        {mot:"Emblème", def:"Symbole représentant une idée ou une organisation."},
+        {mot:"Empoisonnement", def:"État d'intoxication."},
+        {mot:"Émérite", def:"Qui a acquis une reconnaissance particulière dans un domaine."},
+        {mot:"Empressement", def:"Enthousiasme à faire quelque chose rapidement."},
+        {mot:"Émergence", def:"Processus par lequel quelque chose devient visible."},
+        {mot:"Émancipation", def:"Fait de se libérer de contraintes pour plus d'autonomie."}
+      ],
+      "No": [
+        {mot:"Nourriture", def:"Substances consommées pour se nourrir."},
+        {mot:"Nouvelle", def:"Information sur des événements récents."},
+        {mot:"Nostalgie", def:"Désir ou tristesse envers le passé."},
+        {mot:"Normalité", def:"État conforme aux normes."},
+        {mot:"Notoriété", def:"Renommée d'une personne ou d'une chose."},
+        {mot:"Notre", def:"Qui appartient à « nous »."},
+        {mot:"Nocif", def:"Qui peut causer des dommages."},
+        {mot:"Novice", def:"Personne inexpérimentée."},
+        {mot:"Nourrir", def:"Donner à manger."},
+        {mot:"Nomade", def:"Qui se déplace souvent sans domicile fixe."}
+      ],
+      "La": [
+        {mot:"Langage", def:"Système de communication humaine."},
+        {mot:"Labyrinthe", def:"Dédale complexe de passages."},
+        {mot:"Lampe", def:"Appareil d'éclairage."},
+        {mot:"Laconique", def:"Qui s'exprime de manière brève."},
+        {mot:"Larme", def:"Goutte d'eau produite par les glandes lacrymales."},
+        {mot:"Lavage", def:"Action de nettoyer avec de l'eau."},
+        {mot:"Laconisme", def:"Style de discours succinct."},
+        {mot:"Lancinant", def:"Douleur vive et persistante."},
+        {mot:"Laconiquement", def:"De manière concise."},
+        {mot:"Languissant", def:"Faible ou manquant d'énergie."}
+      ],
+      "Ch": [
+        {mot:"Chaleur", def:"Sensation de température élevée."},
+        {mot:"Chambre", def:"Pièce où l'on dort."},
+        {mot:"Chanson", def:"Composition musicale avec paroles."},
+        {mot:"Chapeau", def:"Coiffure protégeant du soleil ou de la pluie."},
+        {mot:"Charité", def:"Aide apportée aux personnes dans le besoin."},
+        {mot:"Chat", def:"Animal domestique qui miaule."},
+        {mot:"Château", def:"Bâtiment fortifié, résidence noble."},
+        {mot:"Chauffage", def:"Système pour chauffer une pièce."},
+        {mot:"Chaussure", def:"Accessoire qui recouvre le pied."},
+        {mot:"Chiffre", def:"Symbole numérique."},
+        {mot:"Chocolat", def:"Produit alimentaire à base de cacao."},
+        {mot:"Choix", def:"Action de choisir."},
+        {mot:"Chômage", def:"Situation d'une personne sans travail."},
+        {mot:"Chute", def:"Action de tomber."},
+        {mot:"Chèvre", def:"Animal domestique élevé pour son lait."},
+        {mot:"Chimie", def:"Science de la composition des substances."},
+        {mot:"Chirurgie", def:"Branche de la médecine utilisant des opérations."},
+        {mot:"Chouette", def:"Oiseau nocturne associé à la sagesse."}
+      ],
+      "Ci": [
+        {mot:"Ciel", def:"Espace atmosphérique au-dessus de la Terre."},
+        {mot:"Cire", def:"Substance solide pour bougies ou polir."},
+        {mot:"Cigogne", def:"Grand oiseau migrateur aux longues pattes."},
+        {mot:"Ciseaux", def:"Outil tranchant pour couper."},
+        {mot:"Ciment", def:"Poudre liant des matériaux de construction."},
+        {mot:"Cité", def:"Zone urbaine avec bâtiments et population."},
+        {mot:"Citation", def:"Phrase ou extrait tiré d'un texte."},
+        {mot:"Circulation", def:"Mouvement des véhicules et piétons."},
+        {mot:"Citadelle", def:"Forteresse sur une hauteur."},
+        {mot:"Cigarette", def:"Petit cylindre de tabac à fumer."},
+        {mot:"Cible", def:"Objet à atteindre au tir ou lancer."},
+        {mot:"Cinéma", def:"Art et projection des films."}
+      ],
+      "Jo": [
+        {mot:"Jovial", def:"Enjoué, gai, plein d'entrain."},
+        {mot:"Joli", def:"Agréable à regarder."},
+        {mot:"Jouet", def:"Objet de divertissement."},
+        {mot:"Journée", def:"Période de vingt-quatre heures."},
+        {mot:"Joie", def:"État de bonheur."},
+        {mot:"Journal", def:"Document rapportant des informations."},
+        {mot:"Joueur", def:"Personne qui participe à un jeu ou sport."},
+        {mot:"Jogging", def:"Course à rythme lent."},
+        {mot:"Joaillerie", def:"Art de fabriquer des bijoux."},
+        {mot:"Jonquille", def:"Plante à fleurs jaunes du printemps."},
+        {mot:"Journaliste", def:"Personne qui recueille et publie des informations."}
+      ],
+      "In": [
+        {mot:"Insecte", def:"Petit animal à six pattes, souvent ailé."},
+        {mot:"Inconnu", def:"Qui n'est pas reconnu ou identifié."},
+        {mot:"Innovant", def:"Qui apporte des idées ou méthodes nouvelles."},
+        {mot:"Innovation", def:"Introduction de nouvelles idées ou produits."},
+        {mot:"Injustice", def:"Absence d'équité."},
+        {mot:"Information", def:"Faits ou connaissances sur un sujet."},
+        {mot:"Inspection", def:"Action d'examiner attentivement."},
+        {mot:"Intégrité", def:"Respect de principes moraux."},
+        {mot:"Inviter", def:"Demander à quelqu'un de venir."},
+        {mot:"Industrie", def:"Activités de production de biens et services."},
+        {mot:"Informatique", def:"Science du traitement automatique de l'information."},
+        {mot:"Infirmerie", def:"Lieu de soins médicaux légers."},
+        {mot:"Infini", def:"Qui n'a pas de limite."},
+        {mot:"Invention", def:"Création d'une chose nouvelle."},
+        {mot:"Invitation", def:"Demande de participer à quelque chose."},
+        {mot:"Inédit", def:"Jamais publié ou monté."},
+        {mot:"Interlocuteur", def:"Personne avec qui l'on discute."},
+        {mot:"Interdit", def:"Non autorisé."},
+        {mot:"Intervention", def:"Action d'intervenir pour aider."}
+      ],
+      "Ge": [
+        {mot:"Géant", def:"Très grand ou imposant."},
+        {mot:"Géographie", def:"Étude de la Terre et de ses habitants."},
+        {mot:"Gérer", def:"S'occuper de, diriger une situation."},
+        {mot:"Géologie", def:"Étude des roches et de la structure de la Terre."},
+        {mot:"Genre", def:"Catégorie de choses similaires."},
+        {mot:"Géométrie", def:"Branche des mathématiques des formes."},
+        {mot:"Géantisme", def:"Croissance corporelle excessive."},
+        {mot:"Générosité", def:"Qualité de donner sans attendre en retour."},
+        {mot:"Gestion", def:"Action de diriger une organisation."},
+        {mot:"Génétique", def:"Étude des gènes et de l'hérédité."}
+      ],
+      "Fa": [
+        {mot:"Famille", def:"Groupe de personnes liées par le sang ou l'adoption."},
+        {mot:"Fabuleux", def:"Incroyablement merveilleux."},
+        {mot:"Facteur", def:"Variable qui influence un résultat."},
+        {mot:"Façon", def:"Manière dont quelque chose est fait."},
+        {mot:"Face", def:"Partie antérieure de la tête humaine."},
+        {mot:"Fabrication", def:"Production de biens à grande échelle."},
+        {mot:"Faculté", def:"Unité d'enseignement d'une université."},
+        {mot:"Fable", def:"Court récit imaginaire avec une morale."},
+        {mot:"Faim", def:"Sensation de besoin de nourriture."},
+        {mot:"Faune", def:"Ensemble des animaux d'une région."}
+      ],
+      "Ce": [
+        {mot:"Céréale", def:"Plante cultivée pour ses graines comestibles."},
+        {mot:"Cérémonie", def:"Rites solennels d'un événement."},
+        {mot:"Cétacé", def:"Animal marin à nageoires, comme la baleine."},
+        {mot:"Célibataire", def:"Personne non mariée."},
+        {mot:"Cercle", def:"Figure géométrique fermée."},
+        {mot:"César", def:"Titre des empereurs romains."},
+        {mot:"Césium", def:"Élément chimique, symbole Cs, n°55."},
+        {mot:"Césure", def:"Pause dans le vers poétique."},
+        {mot:"Cession", def:"Action de céder quelque chose."},
+        {mot:"Cénotaphe", def:"Monument funéraire sans corps."},
+        {mot:"Ceinture", def:"Bande autour de la taille pour maintenir un vêtement."}
+      ],
+      "Cl": [
+        {mot:"Classe", def:"Groupe partageant une fonction ou idéologie."},
+        {mot:"Clavier", def:"Ensemble de touches d'un appareil."},
+        {mot:"Climat", def:"Conditions atmosphériques d'une région."},
+        {mot:"Clinique", def:"Établissement de soins médicaux."},
+        {mot:"Clonage", def:"Technique de reproduction de clones."},
+        {mot:"Cloche", def:"Instrument produisant un son."},
+        {mot:"Clou", def:"Petit objet pointu pour fixer."},
+        {mot:"Club", def:"Association de personnes aux intérêts communs."},
+        {mot:"Clown", def:"Personnage comique de cirque."},
+        {mot:"Clôture", def:"Barrière délimitant une propriété."},
+        {mot:"Clémentine", def:"Fruit hybride entre mandarine et orange."}
+      ],
+      "Be": [
+        {mot:"Bébé", def:"Enfant en très bas âge."},
+        {mot:"Beauté", def:"Qualité d'être beau."},
+        {mot:"Bélier", def:"Signe astrologique; aussi l'animal."},
+        {mot:"Béguin", def:"Attirance amoureuse passagère."},
+        {mot:"Berceau", def:"Lit pour bébé."},
+        {mot:"Besoin", def:"Nécessité ou exigence."},
+        {mot:"Bête", def:"Animal; par extension, qui manque de jugement."},
+        {mot:"Beurre", def:"Produit laitier de la crème."},
+        {mot:"Bénéfice", def:"Profit ou avantage tiré d'une activité."},
+        {mot:"Béatitude", def:"Bonheur parfait et durable."}
+      ],
+      "Bl": [
+        {mot:"Blague", def:"Histoire drôle ou plaisanterie."},
+        {mot:"Blanc", def:"Couleur somme de toutes les couleurs (lumière)."},
+        {mot:"Blazer", def:"Veste de costume sportive."},
+        {mot:"Blessure", def:"Lésion physique ou morale."},
+        {mot:"Blocage", def:"Action de bloquer."},
+        {mot:"Blog", def:"Site personnel de publications."},
+        {mot:"Blondeur", def:"Qualité d'être blond(e)."},
+        {mot:"Blouse", def:"Vêtement de travail ample."},
+        {mot:"Bluff", def:"Attitude pour impressionner sans moyens réels."},
+        {mot:"Blancheur", def:"Qualité d'être blanc."}
+      ],
+      "Bo": [
+        {mot:"Bonbon", def:"Petite sucrerie."},
+        {mot:"Bonheur", def:"État de contentement."},
+        {mot:"Boîte", def:"Récipient rigide."},
+        {mot:"Bouteille", def:"Récipient pour liquides."},
+        {mot:"Boussole", def:"Instrument indiquant le nord magnétique."},
+        {mot:"Bougie", def:"Objet en cire servant à éclairer."},
+        {mot:"Boule", def:"Objet sphérique."},
+        {mot:"Bouquet", def:"Ensemble de fleurs arrangées."},
+        {mot:"Bouton", def:"Pièce en relief pour fermer un vêtement."},
+        {mot:"Boxe", def:"Sport de combat aux poings."},
+        {mot:"Bois", def:"Matériau provenant des arbres."}
+      ],
+      "Bi": [
+        {mot:"Bibliothèque", def:"Lieu de conservation des livres."},
+        {mot:"Bicyclette", def:"Véhicule à deux roues à pédales."},
+        {mot:"Biographie", def:"Récit de la vie d'une personne."},
+        {mot:"Bijou", def:"Objet ornemental porté sur le corps."},
+        {mot:"Bilan", def:"État des lieux ou compte rendu."},
+        {mot:"Bilingue", def:"Qui parle deux langues."},
+        {mot:"Biologie", def:"Science des êtres vivants."},
+        {mot:"Bisou", def:"Baiser amical ou affectueux."},
+        {mot:"Biscuit", def:"Petit gâteau sec."},
+        {mot:"Bistrot", def:"Petit restaurant ou café."},
+        {mot:"Bipède", def:"Animal qui marche sur deux pattes."}
+      ],
+      "Cr": [
+        {mot:"Crayon", def:"Instrument d'écriture ou de dessin."},
+        {mot:"Crème", def:"Substance onctueuse pour hydrater la peau."},
+        {mot:"Croissant", def:"Pâtisserie en forme de croissant."},
+        {mot:"Cravate", def:"Accessoire vestimentaire pour le cou."},
+        {mot:"Créativité", def:"Capacité à imaginer et inventer."},
+        {mot:"Crédit", def:"Somme d'argent empruntée."},
+        {mot:"Crise", def:"Période difficile ou de changement."},
+        {mot:"Crier", def:"Émettre un son fort."},
+        {mot:"Cristal", def:"Matériau transparent et brillant."},
+        {mot:"Crocodile", def:"Grand reptile semi-aquatique."}
+      ],
+
+  "Cu": [
+    {mot:"Cube", def:"Solide à six faces carrées égales."},
+    {mot:"Cuillère", def:"Ustensile pour manger/mesurer."},
+    {mot:"Culture", def:"Pratiques et valeurs d'une société."},
+    {mot:"Cuisson", def:"Action de cuire des aliments."},
+    {mot:"Cuir", def:"Peau d'animal tannée."},
+    {mot:"Cuisine", def:"Pièce où l'on prépare les repas."},
+    {mot:"Cuisse", def:"Partie du corps entre hanche et genou."},
+    {mot:"Cuivre", def:"Métal rougeâtre conducteur."},
+    {mot:"Curiosité", def:"Désir d'apprendre ou de découvrir."},
+    {mot:"Curseur", def:"Contrôle graphique pour déplacer un pointeur."},
+    {mot:"Cuvette", def:"Récipient pour se laver."},
+    {mot:"Cuvée", def:"Quantité de vin d'une même récolte."}
+  ],
+
+  "Cy": [
+    {mot:"Cycle", def:"Suite d'événements se répétant régulièrement."},
+    {mot:"Cyclone", def:"Perturbation avec vents violents."},
+    {mot:"Cylindre", def:"Solide à base circulaire et surface courbe."},
+    {mot:"Cynisme", def:"Attitude méprisante envers les valeurs morales."},
+    {mot:"Cynique", def:"Qui manifeste du cynisme."},
+    {mot:"Cygne", def:"Grand oiseau aquatique au long cou."},
+    {mot:"Cyprès", def:"Arbre à feuillage persistant."},
+    {mot:"Cystite", def:"Inflammation de la vessie."},
+    {mot:"Cybernétique", def:"Science des systèmes de contrôle/communication."},
+    {mot:"Cyberespace", def:"Espace virtuel des réseaux informatiques."},
+    {mot:"Cyclisme", def:"Sport consistant à faire du vélo."},
+    {mot:"Cycliste", def:"Personne pratiquant le cyclisme."},
+    {mot:"Cyprinidé", def:"Famille de poissons d'eau douce."},
+    {mot:"Cytologie", def:"Étude des cellules."},
+    {mot:"Cytométrie", def:"Mesure des caractéristiques cellulaires."}
+  ],
+
+  "Bu": [
+    {mot:"Budget", def:"Prévision des recettes et dépenses."},
+    {mot:"Buffle", def:"Grand bovidés domestiques ou sauvages."},
+    {mot:"Bureau", def:"Pièce ou meuble pour travailler."},
+    {mot:"Bus", def:"Transport en commun routier."},
+    {mot:"Buse", def:"Rapace diurne."},
+    {mot:"But", def:"Objectif à atteindre."},
+    {mot:"Butoir", def:"Dispositif qui arrête un mouvement."},
+    {mot:"Bouton", def:"Petite protubérance; organe de commande."},
+    {mot:"Bûche", def:"Morceau de bois pour le feu."},
+    {mot:"Buisson", def:"Groupe d'arbustes."},
+    {mot:"Buvette", def:"Petit lieu de restauration/boissons."},
+    {mot:"Buvard", def:"Papier absorbant pour encre."},
+    {mot:"Bungalow", def:"Petite maison de plain-pied."},
+    {mot:"Buanderie", def:"Pièce destinée à la lessive."}
+  ],
+
+  "Do": [
+    {mot:"Domaine", def:"Ensemble de connaissances; champ d'activité."},
+    {mot:"Docteur", def:"Titulaire du plus haut grade universitaire; médecin."},
+    {mot:"Document", def:"Support d'information écrit/visuel."},
+    {mot:"Doctrine", def:"Ensemble de principes d'un système de pensée."},
+    {mot:"Domicile", def:"Lieu de résidence."},
+    {mot:"Dose", def:"Quantité mesurée d'une substance."},
+    {mot:"Dossier", def:"Ensemble de documents relatifs à un sujet."},
+    {mot:"Douane", def:"Service contrôlant marchandises aux frontières."},
+    {mot:"Doublage", def:"Substitution des voix dans un film."},
+    {mot:"Douleur", def:"Sensation physique désagréable."},
+    {mot:"Doute", def:"Incertitude, hésitation."},
+    {mot:"Doux", def:"Agréable au toucher/goût; aimable."},
+    {mot:"Données", def:"Informations structurées en informatique."},
+    {mot:"Douloureux", def:"Qui cause de la douleur."}
+  ],
+
+  "Fl": [
+    {mot:"Fleur", def:"Organe reproducteur des plantes à fleurs."},
+    {mot:"Flamme", def:"Partie lumineuse d'un feu."},
+    {mot:"Flegme", def:"Calme, impassibilité."},
+    {mot:"Flocon", def:"Cristal de neige."},
+    {mot:"Fleurir", def:"Produire des fleurs."},
+    {mot:"Fleurissement", def:"Action d'orner de fleurs."},
+    {mot:"Fluide", def:"Qui s'écoule facilement; liquide/gaz."},
+    {mot:"Fluctuer", def:"Varier, être instable."},
+    {mot:"Flotte", def:"Ensemble de navires."},
+    {mot:"Fluctuation", def:"Variation plus ou moins régulière."},
+    {mot:"Flegmatique", def:"D'un calme imperturbable."},
+    {mot:"Flore", def:"Ensemble des végétaux d'une région."},
+    {mot:"Fléau", def:"Grande calamité; instrument ancien de battage."},
+    {mot:"Flop", def:"Échec retentissant."},
+    {mot:"Flétrir", def:"Se dessécher et faner; déshonorer (fig.)."}
+  ],
+
+  "J": [
+    {mot:"Joker", def:"Carte spéciale remplaçant une autre carte."},
+    {mot:"Jubilation", def:"Grande joie, allégresse."},
+    {mot:"Juxtaposition", def:"Disposition côte à côte sans mélange."},
+    {mot:"Juteux", def:"Plein de jus; très rentable."},
+    {mot:"Jingle", def:"Courte mélodie publicitaire."},
+    {mot:"Juxtaposer", def:"Mettre côte à côte pour comparer."},
+    {mot:"Jovial", def:"Gai, enjoué."},
+    {mot:"Jodhpurs", def:"Pantalon d'équitation évasé aux cuisses."},
+    {mot:"Jardinage", def:"Entretien et culture d'un jardin."},
+    {mot:"Jument", def:"Femelle du cheval."},
+    {mot:"Jumelage", def:"Coopération entre deux villes/régions."},
+    {mot:"Jouissance", def:"Plaisir intense; bénéfice juridique."},
+    {mot:"Jungle", def:"Forêt dense tropicale."}
+  ],
+
+  "Ic": [
+    {mot:"Icône", def:"Image symbolique d'une personne/chose."},
+    {mot:"Iceberg", def:"Masse de glace flottante."},
+    {mot:"Icône pop", def:"Figure majeure de la culture populaire."},
+    {mot:"Icarien", def:"Relatif au mythe d'Icare."},
+    {mot:"Icône religieuse", def:"Image sacrée d'un saint ou d'une divinité."},
+    {mot:"Brise-glace", def:"Navire « icebreaker » ouvrant les voies dans la glace."},
+    {mot:"Crème glacée", def:"Dessert froid à base de lait/sucre (ice cream)."},
+    {mot:"Postictal", def:"Période suivant une crise d'épilepsie."},
+    {mot:"Icône de mode", def:"Personnalité influente en mode."},
+    {mot:"Icône numérique", def:"Symbole d'application/fonction sur écran."},
+    {mot:"Thé glacé", def:"Boisson froide à base de thé (ice tea)."},
+    {mot:"Icône culturelle", def:"Symbole représentatif d'une culture."},
+    {mot:"Hockey sur glace", def:"Sport collectif sur patinoire (ice hockey)."},
+    {mot:"Icône de cinéma", def:"Acteur/actrice aux rôles emblématiques."},
+    {mot:"Iconographie", def:"Étude/ensemble des représentations visuelles."},
+    {mot:"Ichtyologie", def:"Branche de la zoologie sur les poissons."}
+  ],
+
+  "Ig": [
+    {mot:"Ignorer", def:"Ne pas tenir compte de."},
+    {mot:"Igloo", def:"Abri de neige en dôme."},
+    {mot:"Ignoble", def:"Très méprisable, indigne."},
+    {mot:"Igname", def:"Tubercule comestible tropical."},
+    {mot:"Ignifuge", def:"Qui résiste au feu."},
+    {mot:"Ingénieur", def:"Spécialiste en ingénierie (corrige « Igénieur »)."},
+    {mot:"Ignition", def:"Mise à feu d'un moteur/carburant."},
+    {mot:"Ingéniosité", def:"Aptitude à inventer, astuce (corrige « Igéniosité »)."},
+    {mot:"Igné", def:"Relatif au feu (roche ignée)."},
+    {mot:"Ignifuger", def:"Rendre résistant au feu."},
+    {mot:"Igname sauvage", def:"Espèce d'igname non cultivée."},
+    {mot:"Ignominie", def:"Honte publique, infamie."},
+    {mot:"Ingénierie", def:"Discipline de conception technique (corrige « Igénierie »)."}
+  ],
+
+  "Ne": [
+    {mot:"Nectar", def:"Liquide sucré produit par les fleurs."},
+    {mot:"Nébuleuse", def:"Nuage interstellaire de gaz et poussières."},
+    {mot:"Néologisme", def:"Mot ou expression nouvellement créé."},
+    {mot:"Nénuphar", def:"Plante aquatique à larges feuilles flottantes."},
+    {mot:"Nécrologie", def:"Rubrique listant les personnes décédées."},
+    {mot:"Nectarine", def:"Fruit proche de la pêche, à peau lisse."},
+    {mot:"Néophyte", def:"Personne débutante dans un domaine."},
+    {mot:"Nettoyer", def:"Ôter la saleté, purifier."},
+    {mot:"Néogène", def:"Période géologique du Cénozoïque."},
+    {mot:"Néerlandais", def:"Relatif aux Pays-Bas ou à la langue."},
+    {mot:"Néonatal", def:"Relatif au nouveau-né."},
+    {mot:"Néant", def:"Rien; absence d'existence."},
+    {mot:"Nerveux", def:"Relatif aux nerfs; agité."},
+    {mot:"Néophyte en informatique", def:"Débutant en technologies numériques."},
+    {mot:"Népotisme", def:"Faveur accordée aux proches."},
+    {mot:"Néologisme linguistique", def:"Mot nouveau introduit dans une langue."}
+  ]
+};
+
+    // --- Éléments DOM ---
+    const prefixDisplay = document.getElementById("prefixDisplay");
+    const definitionDisplay = document.getElementById("definitionDisplay");
+    const answerInput = document.getElementById("answer");
+    const message = document.getElementById("message");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnSlow = document.getElementById("btnSlow");
+    const btnFast = document.getElementById("btnFast");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnBack = document.getElementById("btnBack");
+    const initialBank = document.getElementById("initialBank");
+    const progressPill = document.getElementById("progressPill");
+    const speedPill = document.getElementById("speedPill");
+    const hintPrefix = document.getElementById("hintPrefix");
+
+    // --- Éléments multijoueur ---
+    const multiplayerPanel = document.getElementById("multiplayerPanel");
+    const sessionCodeDisplay = document.getElementById("sessionCodeDisplay");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const playerList = document.getElementById("playerList");
+    const btnCopyCode = document.getElementById("btnCopyCode");
+    const btnLeaveGame = document.getElementById("btnLeaveGame");
+    const multiplayerModal = document.getElementById("multiplayerModal");
+    const btnCreateGame = document.getElementById("btnCreateGame");
+    const btnJoinGame = document.getElementById("btnJoinGame");
+    const joinForm = document.getElementById("joinForm");
+    const joinCode = document.getElementById("joinCode");
+    const playerName = document.getElementById("playerName");
+    const btnConfirmJoin = document.getElementById("btnConfirmJoin");
+    const btnCloseModal = document.getElementById("btnCloseModal");
+
+    // --- État du jeu ---
+    let currentPrefix = null;
+    let currentIndex = 0;
+    let speechRate = 1;
+    
+    // --- État multijoueur ---
+    let isMultiplayer = false;
+    let sessionCode = null;
+    let players = [];
+    let timer = 15;
+    let timerInterval = null;
+    let currentQuestion = null;
+    let playerId = null;
+    let playerScores = {};
+
+    // --- Simulation de serveur (à remplacer par un vrai backend) ---
+    const mockServer = {
+      games: {},
+      
+      createGame() {
+        const code = this.generateCode();
+        this.games[code] = {
+          players: [],
+          currentQuestion: null,
+          questionIndex: 0,
+          isActive: false,
+          scores: {}
         };
-
-        // Initialisation Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.log("Firebase déjà initialisé");
-        }
-        const db = firebase.firestore();
-
-        // ============================
-        // DONNÉES DES CHAMPS LEXICAUX
-        // ============================
-        const lexicalFields = [
-            { theme: "Animaux", hint: "créatures vivantes", letter: "A" },
-            { theme: "École", hint: "endroit où on apprend", letter: "E" },
-            { theme: "Jeux", hint: "activités amusantes", letter: "J" },
-            { theme: "Maison", hint: "endroit où on habite", letter: "M" },
-            { theme: "Nature", hint: "tout ce qui nous entoure", letter: "N" },
-            { theme: "Famille", hint: "personnes proches", letter: "F" },
-            { theme: "Couleurs", hint: "teintes et nuances", letter: "C" },
-            { theme: "Nourriture", hint: "ce qu'on mange", letter: "N" },
-            { theme: "Sports", hint: "activités physiques", letter: "S" },
-            { theme: "Musique", hint: "art des sons", letter: "M" },
-            { theme: "Voyage", hint: "se déplacer", letter: "V" },
-            { theme: "Technologie", hint: "outils modernes", letter: "T" },
-            { theme: "Santé", hint: "bien-être du corps", letter: "S" },
-            { theme: "Art", hint: "expression créative", letter: "A" },
-            { theme: "Science", hint: "étude du monde", letter: "S" }
-        ];
-
-        // ============================
-        // VARIABLES GLOBALES
-        // ============================
-        let currentSession = null;
-        let players = [];
-        let playerId = Math.random().toString(36).substr(2, 9);
-        let playerName = "";
-        let isHost = false;
-        let currentQuestionIndex = 0;
-        let gameTimer = null;
-        let presenceInterval = null;
-        let sessionUnsubscribe = null;
-        let usedQuestions = new Set();
-
-        // ============================
-        // INITIALISATION
-        // ============================
-        document.addEventListener('DOMContentLoaded', function() {
-            setupKeyboardHandling();
+        return code;
+      },
+      
+      joinGame(code, playerName) {
+        if (!this.games[code]) return false;
+        
+        const playerId = Math.random().toString(36).substring(2, 9);
+        this.games[code].players.push({
+          id: playerId,
+          name: playerName,
+          score: 0
         });
-
-        // ============================
-        // GESTION CLAVIER
-        // ============================
-        function setupKeyboardHandling() {
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    const answerInput = document.getElementById('answerInput');
-                    if (answerInput && answerInput.style.display !== 'none') {
-                        event.preventDefault();
-                        handleEnterKey();
-                    }
-                }
-            });
+        
+        return playerId;
+      },
+      
+      startGame(code) {
+        if (!this.games[code]) return false;
+        this.games[code].isActive = true;
+        
+        // Sélectionner une question aléatoire
+        const prefixes = Object.keys(FIELDS);
+        const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const questions = FIELDS[randomPrefix];
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+        
+        this.games[code].currentQuestion = {
+          prefix: randomPrefix,
+          definition: randomQuestion.def,
+          answer: randomQuestion.mot
+        };
+        
+        return this.games[code].currentQuestion;
+      },
+      
+      submitAnswer(code, playerId, answer) {
+        if (!this.games[code] || !this.games[code].currentQuestion) return false;
+        
+        const game = this.games[code];
+        const isCorrect = this.normalize(answer) === this.normalize(game.currentQuestion.answer);
+        
+        if (isCorrect) {
+          if (!game.scores[playerId]) game.scores[playerId] = 0;
+          game.scores[playerId] += 10;
+          
+          // Mettre à jour le score du joueur dans la liste des joueurs
+          const player = game.players.find(p => p.id === playerId);
+          if (player) player.score = game.scores[playerId];
         }
-
-        function handleEnterKey() {
-            const currentQuestion = document.getElementById('gameTitle').textContent;
-            if (currentQuestion.includes("Lexical")) {
-                submitLexicalAnswer();
-            }
+        
+        return isCorrect;
+      },
+      
+      nextQuestion(code) {
+        if (!this.games[code]) return false;
+        
+        // Sélectionner une nouvelle question aléatoire
+        const prefixes = Object.keys(FIELDS);
+        const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const questions = FIELDS[randomPrefix];
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+        
+        this.games[code].currentQuestion = {
+          prefix: randomPrefix,
+          definition: randomQuestion.def,
+          answer: randomQuestion.mot
+        };
+        
+        return this.games[code].currentQuestion;
+      },
+      
+      getGameState(code) {
+        return this.games[code];
+      },
+      
+      generateCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
+        for (let i = 0; i < 4; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+        return result;
+      },
+      
+      normalize(s) {
+        return s
+          .toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+          .replace(/[^a-z\-' ]/g,'')
+          .trim();
+      }
+    };
 
-        function focusAnswerInput() {
-            setTimeout(() => {
-                const answerInput = document.getElementById('answerInput');
-                if (answerInput) {
-                    answerInput.focus();
-                    answerInput.select();
-                }
-            }, 500);
+    // --- Utilitaires ---
+    const normalize = s => s
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z\-' ]/g,'')
+      .trim();
+
+    function updatePills(){
+      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
+      progressPill.textContent = total ? `${currentIndex+1} / ${total}` : `0 / 0`;
+      speedPill.textContent = `Vitesse ×${speechRate.toFixed(2)}`;
+      hintPrefix.textContent = currentPrefix || "– –";
+    }
+
+    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+    function speak(text, rate=speechRate){
+      if(!('speechSynthesis' in window)) { return; }
+      ttsCancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = rate;
+      speechSynthesis.speak(u);
+    }
+
+    function announce(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
+      const def  = item.def;
+      speak(`${intro} Définition : ${def}`);
+    }
+
+    function renderCard(){
+      if(!currentPrefix){
+        prefixDisplay.textContent = "– –";
+        definitionDisplay.textContent = "Choisis un champ lexical ci-dessous pour commencer, ou appuie sur ▶️ Jouer pour démarrer au premier.";
+        updatePills();
+        return;
+      }
+      const item = FIELDS[currentPrefix][currentIndex];
+      prefixDisplay.textContent = currentPrefix;
+      definitionDisplay.textContent = item.def;
+      message.textContent = "Écris le mot correspondant. (Il doit commencer par " + currentPrefix + ")";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.placeholder = `Un mot qui commence par « ${currentPrefix} »…`;
+      answerInput.disabled = false;
+      updatePills();
+    }
+
+    function setPrefix(prefix){
+      if(!FIELDS[prefix]) return;
+      currentPrefix = prefix;
+      currentIndex = 0;
+      highlightBank(prefix);
+      renderCard();
+      announce();
+      answerInput.focus();
+    }
+
+    function next(){
+      if(!currentPrefix) return;
+      currentIndex++;
+      const list = FIELDS[currentPrefix];
+      if(currentIndex >= list.length){
+        // Fin du champ courant -> message de bravo
+        currentIndex = list.length-1;
+        message.textContent = `🎉 Bravo ! Tu as terminé le champ lexical ${currentPrefix}. Choisis une autre initiale ci-dessous.`;
+        message.style.color = "#00e676";
+        answerInput.disabled = true;
+        ttsCancel();
+        speak(`Bravo ! Tu as terminé le champ lexical ${currentPrefix}.`);
+        return;
+      }
+      renderCard();
+      announce();
+      answerInput.focus();
+    }
+
+    function back(){
+      if(!currentPrefix) return;
+      if(currentIndex > 0){
+        currentIndex--;
+        renderCard();
+        announce();
+        answerInput.focus();
+      }
+    }
+
+    function repeat(){ announce(); }
+
+    function slower(){
+      speechRate = Math.max(0.5, speechRate - 0.25);
+      updatePills();
+      announce();
+    }
+    function faster(){
+      speechRate = Math.min(2, speechRate + 0.25);
+      updatePills();
+      announce();
+    }
+
+    function check(){
+      if(!currentPrefix) return;
+      const item = FIELDS[currentPrefix][currentIndex];
+      const user = normalize(answerInput.value);
+      const target = normalize(item.mot);
+
+      // Doit commencer par le préfixe ET correspondre à la définition visée
+      if(user && user.startsWith(normalize(currentPrefix)) && user === target){
+        message.textContent = "✅ Correct ! Bien joué.";
+        message.style.color = "#00e676";
+        speak("Correct ! Bien joué.");
+        setTimeout(next, 900);
+      }else{
+        message.textContent = `❌ Incorrect. Il fallait penser à : ${item.mot}.`;
+        message.style.color = "#ff5252";
+        speak(`Incorrect. Il fallait penser à : ${item.mot}.`);
+      }
+    }
+
+    // --- Banque d'initiales cliquables ---
+    function buildBank(){
+      const keys = Object.keys(FIELDS);
+      keys.sort((a,b)=>a.localeCompare(b,'fr'));
+      initialBank.innerHTML = "";
+      for(const k of keys){
+        const btn = document.createElement("button");
+        btn.textContent = k.toUpperCase();
+        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
+        btn.addEventListener("click", ()=> setPrefix(k));
+        initialBank.appendChild(btn);
+      }
+    }
+    function highlightBank(k){
+      [...initialBank.children].forEach(b=>{
+        b.classList.toggle('active', b.textContent === k.toUpperCase());
+      });
+    }
+
+    // --- Fonctions multijoueur ---
+    function showMultiplayerModal() {
+      multiplayerModal.style.display = "flex";
+    }
+    
+    function hideMultiplayerModal() {
+      multiplayerModal.style.display = "none";
+    }
+    
+    function createGame() {
+      sessionCode = mockServer.createGame();
+      playerName.value = "Joueur " + Math.floor(Math.random() * 1000);
+      playerId = mockServer.joinGame(sessionCode, playerName.value);
+      
+      if (playerId) {
+        sessionCodeDisplay.textContent = sessionCode;
+        multiplayerPanel.style.display = "block";
+        isMultiplayer = true;
+        hideMultiplayerModal();
+        updatePlayerList();
+        
+        // Démarrer la partie après 3 secondes
+        setTimeout(startMultiplayerGame, 3000);
+      }
+    }
+    
+    function joinGame() {
+      const code = joinCode.value.toUpperCase();
+      const name = playerName.value || "Joueur " + Math.floor(Math.random() * 1000);
+      
+      if (code.length !== 4) {
+        alert("Le code doit contenir 4 lettres");
+        return;
+      }
+      
+      playerId = mockServer.joinGame(code, name);
+      
+      if (playerId) {
+        sessionCode = code;
+        sessionCodeDisplay.textContent = sessionCode;
+        multiplayerPanel.style.display = "block";
+        isMultiplayer = true;
+        hideMultiplayerModal();
+        updatePlayerList();
+        
+        // Synchroniser avec la partie existante
+        syncWithGame();
+      } else {
+        alert("Code de partie invalide ou partie introuvable");
+      }
+    }
+    
+    function startMultiplayerGame() {
+      currentQuestion = mockServer.startGame(sessionCode);
+      if (currentQuestion) {
+        displayMultiplayerQuestion();
+        startTimer();
+      }
+    }
+    
+    function displayMultiplayerQuestion() {
+      if (!currentQuestion) return;
+      
+      prefixDisplay.textContent = currentQuestion.prefix;
+      definitionDisplay.textContent = currentQuestion.definition;
+      message.textContent = "Trouve le mot qui correspond à cette définition (commence par " + currentQuestion.prefix + ")";
+      message.style.color = "#fff";
+      answerInput.value = "";
+      answerInput.placeholder = `Un mot qui commence par « ${currentQuestion.prefix} »…`;
+      answerInput.disabled = false;
+      
+      // Mettre à jour les indices
+      hintPrefix.textContent = currentQuestion.prefix;
+      progressPill.textContent = "Multijoueur";
+      speedPill.textContent = "En ligne";
+      
+      // Annoncer la question
+      const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentQuestion.prefix}.`;
+      speak(`${intro} Définition : ${currentQuestion.definition}`);
+    }
+    
+    function startTimer() {
+      timer = 15;
+      timerDisplay.textContent = timer + "s";
+      
+      if (timerInterval) clearInterval(timerInterval);
+      
+      timerInterval = setInterval(() => {
+        timer--;
+        timerDisplay.textContent = timer + "s";
+        
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          nextMultiplayerQuestion();
         }
-
-        // ============================
-        // GESTION DE LA NAVIGATION
-        // ============================
-        function selectMode(mode) {
-            document.getElementById('gameMode').style.display = 'none';
-            showNameInput();
+      }, 1000);
+    }
+    
+    function checkMultiplayer() {
+      if (!currentQuestion || !isMultiplayer) return;
+      
+      const isCorrect = mockServer.submitAnswer(sessionCode, playerId, answerInput.value);
+      
+      if (isCorrect) {
+        message.textContent = "✅ Correct ! +10 points";
+        message.style.color = "#00e676";
+        speak("Correct ! Bien joué.");
+        updatePlayerList();
+        
+        // Passer à la question suivante après un délai
+        setTimeout(nextMultiplayerQuestion, 2000);
+      } else {
+        message.textContent = "❌ Incorrect. Essaie encore !";
+        message.style.color = "#ff5252";
+      }
+    }
+    
+    function nextMultiplayerQuestion() {
+      currentQuestion = mockServer.nextQuestion(sessionCode);
+      if (currentQuestion) {
+        displayMultiplayerQuestion();
+        startTimer();
+      }
+    }
+    
+    function updatePlayerList() {
+      const gameState = mockServer.getGameState(sessionCode);
+      if (!gameState) return;
+      
+      playerList.innerHTML = "";
+      
+      // Trier les joueurs par score (décroissant)
+      const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+      
+      sortedPlayers.forEach(player => {
+        const playerEl = document.createElement("div");
+        playerEl.className = "player";
+        
+        const scoreEl = document.createElement("div");
+        scoreEl.className = "player-score";
+        scoreEl.textContent = player.score;
+        
+        const nameEl = document.createElement("span");
+        nameEl.textContent = player.name;
+        
+        playerEl.appendChild(scoreEl);
+        playerEl.appendChild(nameEl);
+        
+        // Mettre en évidence le joueur actuel
+        if (player.id === playerId) {
+          playerEl.style.background = "rgba(37, 117, 252, 0.3)";
         }
+        
+        playerList.appendChild(playerEl);
+      });
+    }
+    
+    function syncWithGame() {
+      const gameState = mockServer.getGameState(sessionCode);
+      if (!gameState) return;
+      
+      players = gameState.players;
+      currentQuestion = gameState.currentQuestion;
+      playerScores = gameState.scores;
+      
+      if (gameState.isActive && currentQuestion) {
+        displayMultiplayerQuestion();
+        startTimer();
+      }
+      
+      updatePlayerList();
+    }
+    
+    function leaveGame() {
+      isMultiplayer = false;
+      multiplayerPanel.style.display = "none";
+      
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
+      // Revenir au mode solo
+      currentPrefix = null;
+      currentIndex = 0;
+      renderCard();
+    }
 
-        function showNameInput() {
-            document.getElementById('nameInputArea').style.display = 'block';
-            document.getElementById('playerNameInput').focus();
+    // --- Écouteurs ---
+    btnPlay.addEventListener("click", ()=>{
+      if (isMultiplayer) {
+        // En mode multijoueur, le bouton Jouer sert à répéter la question
+        if (currentQuestion) {
+          const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentQuestion.prefix}.`;
+          speak(`${intro} Définition : ${currentQuestion.definition}`);
         }
-
-        function confirmName() {
-            const nameInput = document.getElementById('playerNameInput').value.trim();
-            if (nameInput.length < 2) {
-                alert("Choisis un nom d'au moins 2 lettres ! ✏️");
-                return;
-            }
-            
-            playerName = nameInput;
-            document.getElementById('nameInputArea').style.display = 'none';
-            showMultiplayerInterface();
+      } else {
+        // Mode solo
+        if(!currentPrefix){
+          // Démarrage: premier champ par ordre alphabétique
+          const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
+          setPrefix(first);
+        }else{
+          announce();
         }
+      }
+    });
+    
+    btnSlow.addEventListener("click", slower);
+    btnFast.addEventListener("click", faster);
+    btnRepeat.addEventListener("click", repeat);
+    btnSkip.addEventListener("click", ()=>{
+      if (isMultiplayer) {
+        nextMultiplayerQuestion();
+      } else {
+        next();
+      }
+    });
+    btnBack.addEventListener("click", back);
 
-        function showMainMenu() {
-            resetInterface();
+    answerInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") {
+        if (isMultiplayer) {
+          checkMultiplayer();
+        } else {
+          check();
         }
+      }
+    });
 
-        function showMultiplayerInterface() {
-            document.getElementById('multiplayerInterface').style.display = 'block';
-        }
+    // Écouteurs multijoueur
+    btnCreateGame.addEventListener("click", createGame);
+    btnJoinGame.addEventListener("click", () => {
+      joinForm.style.display = "block";
+    });
+    btnConfirmJoin.addEventListener("click", joinGame);
+    btnCloseModal.addEventListener("click", hideMultiplayerModal);
+    btnCopyCode.addEventListener("click", () => {
+      navigator.clipboard.writeText(sessionCode);
+      alert("Code copié dans le presse-papier !");
+    });
+    btnLeaveGame.addEventListener("click", leaveGame);
 
-        function showJoinInterface() {
-            document.getElementById('multiplayerInterface').style.display = 'none';
-            document.getElementById('joinInterface').style.display = 'block';
-            document.getElementById('joinCodeInput').focus();
-        }
+    // Ajouter un bouton pour accéder au mode multijoueur
+    const multiplayerButton = document.createElement("button");
+    multiplayerButton.textContent = "🎮 Multijoueur";
+    multiplayerButton.style.marginTop = "10px";
+    multiplayerButton.style.width = "100%";
+    multiplayerButton.addEventListener("click", showMultiplayerModal);
+    document.querySelector(".controls").parentNode.insertBefore(multiplayerButton, document.querySelector(".controls"));
 
-        // ============================
-        // GESTION DES SESSIONS
-        // ============================
-        async function createSession() {
-            try {
-                const sessionCode = generateSessionCode();
-                currentSession = sessionCode;
-                isHost = true;
-
-                const playerData = {
-                    id: playerId,
-                    name: playerName,
-                    score: 0,
-                    isOnline: true,
-                    hasAnswered: false,
-                    isCorrect: false,
-                    lastSeen: new Date()
-                };
-
-                await db.collection('sessions').doc(sessionCode).set({
-                    code: sessionCode,
-                    host: playerId,
-                    players: [playerData],
-                    status: 'waiting',
-                    gameState: 'lobby',
-                    currentQuestion: 0,
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showCreateSessionInterface(sessionCode);
-                listenToSessionChanges();
-                
-            } catch (error) {
-                console.error("Erreur création session:", error);
-                alert("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
-            }
-        }
-
-        function showCreateSessionInterface(code) {
-            document.getElementById('multiplayerInterface').style.display = 'none';
-            document.getElementById('joinInterface').style.display = 'none';
-            document.getElementById('createSessionInterface').style.display = 'block';
-            document.getElementById('sessionCode').textContent = code;
-            updatePlayersList();
-        }
-
-        async function joinSession() {
-            const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
-            
-            if (code.length !== 4) {
-                alert("Le code doit avoir 4 lettres ! 🔤");
-                return;
-            }
-
-            try {
-                const sessionDoc = await db.collection('sessions').doc(code).get();
-                
-                if (!sessionDoc.exists) {
-                    alert("Salle non trouvée ! Vérifie le code. 🔍");
-                    return;
-                }
-
-                const sessionData = sessionDoc.data();
-                
-                if (sessionData.status !== 'waiting') {
-                    alert("La partie a déjà commencé ! ⏰");
-                    return;
-                }
-
-                currentSession = code;
-                isHost = false;
-                
-                const playerData = {
-                    id: playerId,
-                    name: playerName,
-                    score: 0,
-                    isOnline: true,
-                    hasAnswered: false,
-                    isCorrect: false,
-                    lastSeen: new Date()
-                };
-
-                await db.collection('sessions').doc(code).update({
-                    players: firebase.firestore.FieldValue.arrayUnion(playerData),
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showCreateSessionInterface(code);
-                listenToSessionChanges();
-                
-            } catch (error) {
-                console.error("Erreur rejoindre session:", error);
-                alert("Impossible de se connecter. Réessaie ! 🔄");
-            }
-        }
-
-        function listenToSessionChanges() {
-            if (sessionUnsubscribe) {
-                sessionUnsubscribe();
-            }
-            
-            sessionUnsubscribe = db.collection('sessions').doc(currentSession).onSnapshot((doc) => {
-                if (doc.exists) {
-                    const sessionData = doc.data();
-                    players = sessionData.players || [];
-                    currentQuestionIndex = sessionData.currentQuestion || 0;
-
-                    updatePlayersList();
-                    updateOnlineStatus();
-
-                    const startBtn = document.getElementById('startBtn');
-                    if (startBtn) {
-                        if (isHost) {
-                            startBtn.style.display = 'block';
-                            startBtn.disabled = players.length < 2;
-                            startBtn.textContent = players.length < 2 ? 
-                                `En attente d'amis... (${players.length}/2)` : 
-                                'Démarrer la Partie ! 🚀';
-                        } else {
-                            startBtn.style.display = 'none';
-                        }
-                    }
-
-                    if (sessionData.status === 'playing') {
-                        if (document.getElementById('createSessionInterface').style.display === 'block') {
-                            startGameSession(sessionData);
-                        }
-                        showLexicalQuestion(sessionData.currentQuestion);
-                    }
-
-                    handleTimer(sessionData);
-                } else {
-                    resetInterface();
-                }
-            }, (error) => {
-                console.error("Erreur écoute session:", error);
-            });
-        }
-
-        function updatePlayersList() {
-            const container = document.getElementById('playersList');
-            if (!container) return;
-            
-            container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name} ${player.id === playerId ? '(Toi)' : ''}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
-                    </div>
-                    <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">
-                        ${player.isOnline ? 
-                          (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
-                          '🔴 Hors ligne'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateOnlineStatus() {
-            const onlinePlayers = players.filter(p => p.isOnline).length;
-            const totalPlayers = players.length;
-            
-            const sessionStatus = document.getElementById('sessionOnlineStatus');
-            if (sessionStatus) {
-                sessionStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
-            }
-        }
-
-        async function updatePresence(isOnline) {
-            if (!currentSession) return;
-            
-            try {
-                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                if (!sessionDoc.exists) return;
-                
-                const sessionData = sessionDoc.data();
-                const updatedPlayers = sessionData.players.map(p => 
-                    p.id === playerId ? { ...p, isOnline: isOnline, lastSeen: new Date() } : p
-                );
-                
-                await db.collection('sessions').doc(currentSession).update({
-                    players: updatedPlayers,
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-            } catch (error) {
-                console.error("Erreur présence:", error);
-            }
-        }
-
-        // ============================
-        // GESTION DU JEU
-        // ============================
-        async function startGame() {
-            if (!isHost) {
-                alert("Seul l'hôte peut démarrer la partie ! 👑");
-                return;
-            }
-            
-            if (players.length < 2) {
-                alert("Invite au moins un ami pour jouer ! 👥");
-                return;
-            }
-
-            try {
-                usedQuestions.clear();
-                
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'playing',
-                    gameState: 'lexical',
-                    currentQuestion: 0,
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur démarrage:", error);
-                alert("Erreur lors du démarrage de la partie ! 🚨");
-            }
-        }
-
-        function startGameSession(sessionData) {
-            document.getElementById('createSessionInterface').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-        }
-
-        // ============================
-        // QUESTIONS ALÉATOIRES
-        // ============================
-        function getRandomQuestion(currentIndex) {
-            if (usedQuestions.size >= lexicalFields.length) {
-                usedQuestions.clear();
-            }
-            
-            let randomIndex;
-            let attempts = 0;
-            
-            do {
-                randomIndex = Math.floor(Math.random() * lexicalFields.length);
-                attempts++;
-                
-                if (attempts > 100) {
-                    usedQuestions.clear();
-                    break;
-                }
-            } while (usedQuestions.has(randomIndex));
-            
-            usedQuestions.add(randomIndex);
-            return lexicalFields[randomIndex];
-        }
-
-        function showLexicalQuestion(index) {
-            const question = getRandomQuestion(index);
-            document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
-            
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${question.hint}</div>
-                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
-                    Tous les mots commencent par la lettre: 
-                    <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
-                </p>
-                <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}" autocomplete="off">
-                <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
-                <div class="players-container" id="gamePlayers"></div>
-            `;
-
-            updateGamePlayers();
-            focusAnswerInput();
-        }
-
-        // ============================
-        // SOUMISSION DES RÉPONSES
-        // ============================
-        async function submitLexicalAnswer(correctAnswer) {
-            const userAnswer = document.getElementById('answerInput').value.trim();
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? {
-                            ...p,
-                            hasAnswered: true,
-                            score: p.score + (isCorrect ? 10 : 0),
-                            isCorrect: isCorrect
-                        } : p
-                    )
-                });
-
-                if (isCorrect) {
-                    showMessage("Bravo ! Mot trouvé !", "success");
-                } else {
-                    showMessage(`Presque ! Le mot était: ${correctAnswer}`, "error");
-                }
-
-            } catch (error) {
-                console.error("Erreur soumission:", error);
-            }
-        }
-
-        function showMessage(text, type) {
-            const message = document.createElement('div');
-            message.textContent = text;
-            message.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: ${type === 'success' ? '#4ecdc4' : '#ff6b6b'};
-                color: white;
-                padding: 20px 30px;
-                border-radius: 15px;
-                font-size: 1.2rem;
-                font-weight: bold;
-                z-index: 1000;
-                animation: fadeIn 0.3s ease;
-            `;
-            document.body.appendChild(message);
-            
-            setTimeout(() => {
-                message.remove();
-            }, 2000);
-        }
-
-        // ============================
-        // CHRONOMÈTRE
-        // ============================
-        function handleTimer(sessionData) {
-            const timerElement = document.getElementById('gameTimer');
-            if (!timerElement || !sessionData.timerStart) return;
-
-            if (gameTimer) {
-                clearInterval(gameTimer);
-            }
-
-            const startTime = sessionData.timerStart.toDate().getTime();
-            const duration = 15;
-            
-            const updateTimer = () => {
-                const now = Date.now();
-                const elapsed = Math.floor((now - startTime) / 1000);
-                const remaining = Math.max(0, duration - elapsed);
-
-                timerElement.textContent = remaining;
-
-                timerElement.classList.remove('warning', 'danger');
-                if (remaining <= 5) {
-                    timerElement.classList.add('danger');
-                } else if (remaining <= 10) {
-                    timerElement.classList.add('warning');
-                }
-
-                if (remaining <= 0) {
-                    clearInterval(gameTimer);
-                    if (isHost) {
-                        handleTimeUp();
-                    }
-                }
-
-                checkAllPlayersAnswered();
-            };
-
-            updateTimer();
-            gameTimer = setInterval(updateTimer, 1000);
-        }
-
-        function checkAllPlayersAnswered() {
-            if (!isHost) return;
-            
-            const allPlayersAnswered = players.every(p => p.hasAnswered);
-            
-            if (allPlayersAnswered) {
-                clearInterval(gameTimer);
-                setTimeout(() => {
-                    handleAllPlayersAnswered();
-                }, 1000);
-            }
-        }
-
-        async function handleAllPlayersAnswered() {
-            if (!isHost) return;
-            
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        !p.hasAnswered ? {
-                            ...p,
-                            hasAnswered: true,
-                            isCorrect: false
-                        } : p
-                    )
-                });
-
-                setTimeout(() => {
-                    nextQuestion();
-                }, 2000);
-                
-            } catch (error) {
-                console.error("Erreur tous joueurs répondus:", error);
-            }
-        }
-
-        async function handleTimeUp() {
-            if (!isHost) return;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        !p.hasAnswered ? {
-                            ...p,
-                            hasAnswered: true,
-                            isCorrect: false
-                        } : p
-                    )
-                });
-
-                setTimeout(() => {
-                    nextQuestion();
-                }, 2000);
-                
-            } catch (error) {
-                console.error("Erreur temps écoulé:", error);
-            }
-        }
-
-        // ============================
-        // NAVIGATION DES QUESTIONS
-        // ============================
-        async function nextQuestion() {
-            if (!isHost) return;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    currentQuestion: currentQuestionIndex + 1,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        isCorrect: false
-                    })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur question suivante:", error);
-            }
-        }
-
-        // ============================
-        // FONCTIONS UTILITAIRES
-        // ============================
-        function updateGamePlayers() {
-            const container = document.getElementById('gamePlayers');
-            if (!container) return;
-            
-            container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
-                    </div>
-                    <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">
-                        ${player.hasAnswered ? 
-                         (player.isCorrect ? '✅ Correct' : '❌ Incorrect') : 
-                         '⏳ En jeu'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function generateSessionCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 4; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        async function leaveSession() {
-            if (currentSession) {
-                try {
-                    await updatePresence(false);
-                    
-                    if (isHost) {
-                        await db.collection('sessions').doc(currentSession).delete();
-                    } else {
-                        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                        if (sessionDoc.exists) {
-                            const sessionData = sessionDoc.data();
-                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId);
-                            await db.collection('sessions').doc(currentSession).update({
-                                players: updatedPlayers
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error("Erreur déconnexion:", error);
-                }
-            }
-            
-            resetInterface();
-        }
-
-        function resetInterface() {
-            if (gameTimer) clearInterval(gameTimer);
-            if (presenceInterval) clearInterval(presenceInterval);
-            if (sessionUnsubscribe) sessionUnsubscribe();
-            
-            const interfaces = [
-                'createSessionInterface', 'gameArea', 
-                'multiplayerInterface', 'joinInterface', 'nameInputArea'
-            ];
-            
-            interfaces.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.style.display = 'none';
-            });
-            
-            document.getElementById('gameMode').style.display = 'grid';
-            document.getElementById('onlineStatus').style.display = 'none';
-            
-            currentSession = null;
-            players = [];
-            isHost = false;
-            usedQuestions.clear();
-        }
-    </script>
+    // --- Démarrage ---
+    window.addEventListener("load", ()=>{
+      buildBank();
+      renderCard();
+      // Message d'accessibilité si pas de TTS
+      if(!('speechSynthesis' in window)){
+        message.innerHTML = "ℹ️ La synthèse vocale n'est pas disponible sur ce navigateur.";
+      }
+    });
+  </script>
 </body>
 </html>
