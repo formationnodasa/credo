@@ -1,11 +1,9 @@
-m
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match en Ligne - Jeu Éducatif</title>
+    <title>Test Multijoueur - Synchronisation Temps Réel</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
@@ -13,571 +11,209 @@ m
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
         }
 
-        header {
-            text-align: center;
-            padding: 30px 0;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            margin-bottom: 30px;
-            border: 3px solid #00ccff;
-            box-shadow: 0 0 40px rgba(0, 204, 255, 0.4);
+            border-radius: 20px;
+            padding: 30px;
             backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-            animation: rainbow 3s linear infinite;
-        }
-
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            color: #a5d8ff;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(165, 216, 255, 0.5);
-        }
-
-        .game-mode {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .mode-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid;
-            border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4) 1;
-            border-radius: 25px;
-            padding: 40px 30px;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .mode-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .mode-card:hover::before {
-            left: 100%;
-        }
-
-        .mode-card:hover {
-            transform: translateY(-15px) scale(1.05);
-            box-shadow: 0 20px 50px rgba(0, 204, 255, 0.6);
-        }
-
-        .mode-icon {
-            font-size: 5rem;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 0 15px currentColor);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .mode-card h3 {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: #4ecdc4;
-            text-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
-        }
-
-        .mode-card p {
-            color: #e9ecef;
-            line-height: 1.7;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
+        .menu {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
             border: none;
-            padding: 18px 35px;
-            font-size: 1.3rem;
+            padding: 15px 30px;
+            font-size: 1.2rem;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin: 10px;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
         .btn-success {
-            background: linear-gradient(45deg, #4ecdc4, #67e6dc);
-            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 12px 30px rgba(78, 205, 196, 0.6);
+            background: linear-gradient(45deg, #00b894, #00a085);
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, #45b7d1, #67c1e6);
-            box-shadow: 0 8px 20px rgba(69, 183, 209, 0.4);
-        }
-
-        .session-interface {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #4ecdc4;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: none;
-            box-shadow: 0 0 50px rgba(78, 205, 196, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .name-input-area {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #ff6b6b;
-            border-radius: 25px;
-            padding: 50px 40px;
-            text-align: center;
-            margin: 30px 0;
-            display: none;
-            box-shadow: 0 0 50px rgba(255, 107, 107, 0.4);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(45deg, #0984e3, #074b83);
         }
 
         .input-field {
             width: 100%;
-            max-width: 400px;
-            padding: 18px 25px;
-            font-size: 1.3rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #4ecdc4;
-            border-radius: 20px;
-            color: white;
-            margin: 25px 0;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #0984e3;
+            border-radius: 10px;
+            color: #333;
+            margin: 15px 0;
             text-align: center;
-            box-shadow: 0 0 25px rgba(78, 205, 196, 0.3);
-            transition: all 0.3s ease;
         }
 
-        .input-field:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            transform: scale(1.05);
-        }
-
-        .input-field::placeholder {
-            color: #a5d8ff;
-        }
-
-        .code-display {
-            font-size: 5rem;
-            letter-spacing: 20px;
-            color: #ff6b6b;
-            margin: 40px 0;
-            font-weight: bold;
-            text-shadow: 0 0 30px #ff6b6b;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            border-radius: 25px;
-            border: 3px solid #ff6b6b;
-            animation: pulse 2s infinite;
-        }
-
-        .game-area {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border-radius: 30px;
-            padding: 50px;
-            margin: 30px 0;
-            border: 4px solid #4ecdc4;
-            box-shadow: 0 0 60px rgba(78, 205, 196, 0.5);
-            backdrop-filter: blur(10px);
-            display: none;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 3px solid #4ecdc4;
-        }
-
-        .game-title {
-            font-size: 3rem;
-            color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px #ff6b6b; }
-            to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
-        }
-
-        .game-timer {
+        .session-code {
             font-size: 4rem;
             font-weight: bold;
-            color: #4ecdc4;
-            text-shadow: 0 0 20px #4ecdc4;
-            padding: 20px 30px;
-            background: rgba(78, 205, 196, 0.1);
-            border-radius: 20px;
-            border: 3px solid #4ecdc4;
-            transition: all 0.3s ease;
-            animation: pulse 1s infinite;
-        }
-
-        .game-timer.warning {
             color: #ffeaa7;
-            border-color: #ffeaa7;
-            text-shadow: 0 0 20px #ffeaa7;
-        }
-
-        .game-timer.danger {
-            color: #ff6b6b;
-            border-color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
-            animation: pulse 0.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% { 
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
-        }
-
-        .game-content {
             text-align: center;
-            padding: 40px;
-        }
-
-        .question {
-            font-size: 2.8rem;
-            margin-bottom: 50px;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(255, 234, 167, 0.5);
+            background: rgba(0, 0, 0, 0.3);
             padding: 20px;
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 3px solid #ffeaa7;
         }
 
         .players-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
         }
 
         .player-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 3px solid #444;
-            border-radius: 20px;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            position: relative;
-            backdrop-filter: blur(10px);
         }
 
         .player-card.active {
-            border-color: #4ecdc4;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
-            background: linear-gradient(145deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
+            border-color: #00b894;
+            background: rgba(0, 184, 148, 0.2);
             transform: scale(1.05);
-        }
-
-        .player-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .presence-indicator {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            position: relative;
-            animation: none;
-        }
-
-        .presence-online {
-            background: #4ecdc4;
-            box-shadow: 0 0 15px #4ecdc4;
-            animation: pulse 2s infinite;
-        }
-
-        .presence-offline {
-            background: #ff6b6b;
-            box-shadow: 0 0 15px #ff6b6b;
         }
 
         .player-name {
-            font-size: 1.5rem;
-            color: #ffeaa7;
+            font-size: 1.3rem;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 234, 167, 0.5);
+            margin-bottom: 10px;
+            color: #ffeaa7;
         }
 
         .player-score {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: #ffffff;
-            margin: 15px 0;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            margin: 10px 0;
         }
 
-        .player-status {
-            font-size: 1rem;
-            color: #a5d8ff;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background: rgba(165, 216, 255, 0.1);
-            border-radius: 10px;
-            border: 1px solid #a5d8ff;
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
         }
 
-        .input-answer {
-            width: 100%;
-            max-width: 500px;
-            padding: 25px;
-            font-size: 1.5rem;
+        .online { background: #00b894; box-shadow: 0 0 10px #00b894; }
+        .offline { background: #ff6b6b; }
+
+        .game-area {
             background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #4ecdc4;
-            border-radius: 20px;
-            color: white;
-            margin: 30px 0;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
-            transition: all 0.3s ease;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .input-answer:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 40px rgba(255, 107, 107, 0.6);
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
 
-        .audio-controls {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            z-index: 1000;
-        }
-
-        .audio-btn {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            border: none;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            color: white;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 25px rgba(255, 107, 107, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        .audio-btn:hover {
-            transform: scale(1.15) rotate(15deg);
-            box-shadow: 0 0 35px rgba(78, 205, 196, 0.7);
-        }
-
-        .halftime {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border: 4px solid #ffeaa7;
-            border-radius: 30px;
-            padding: 50px;
-            margin: 30px 0;
-            text-align: center;
-            display: none;
-            box-shadow: 0 0 50px rgba(255, 234, 167, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .halftime-title {
-            font-size: 3.5rem;
-            color: #ffeaa7;
-            margin-bottom: 40px;
-            text-shadow: 0 0 25px #ffeaa7;
-            animation: bounce 2s infinite;
-        }
-
-        .game-status {
-            background: rgba(78, 205, 196, 0.2);
-            padding: 20px 30px;
-            border-radius: 15px;
+        .chat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
             margin: 20px 0;
-            font-style: italic;
-            border: 2px solid #4ecdc4;
-            font-size: 1.2rem;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .online-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 15px 0;
-            padding: 12px 20px;
-            background: rgba(78, 205, 196, 0.15);
-            border-radius: 15px;
-            border: 2px solid #4ecdc4;
-            backdrop-filter: blur(10px);
+        .chat-message {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #0984e3;
         }
 
-        .status-text {
-            font-size: 1.1rem;
-            color: #ffeaa7;
+        .message-sender {
             font-weight: bold;
+            color: #ffeaa7;
         }
 
-        .loading {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #4ecdc4;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .confetti {
-            position: fixed;
-            width: 15px;
-            height: 15px;
-            background: #ff6b6b;
-            opacity: 0;
-            animation: confetti-fall 5s linear forwards;
-            z-index: 1000;
-        }
-
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+        .hidden {
+            display: none;
         }
 
         .notification {
             position: fixed;
-            top: 20%;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-            font-size: 1.2rem;
-            font-weight: bold;
-            animation: slideIn 0.5s ease-out;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideDown 0.5s ease-out;
         }
 
-        @keyframes slideIn {
+        @keyframes slideDown {
             from {
                 transform: translateX(-50%) translateY(-50px);
                 opacity: 0;
@@ -588,150 +224,98 @@ m
             }
         }
 
-        .category-badge {
-            display: inline-block;
-            padding: 10px 20px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            border-radius: 25px;
-            margin: 10px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .fun-emoji {
-            font-size: 2rem;
-            margin: 0 10px;
-            animation: bounce 2s infinite;
-            display: inline-block;
-        }
-
-        .score-popup {
-            position: absolute;
-            font-size: 1.5rem;
-            font-weight: bold;
-            animation: scoreFloat 1s ease-out forwards;
-            z-index: 100;
-        }
-
-        @keyframes scoreFloat {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .game-mode { grid-template-columns: 1fr; }
-            .mode-card { padding: 30px 20px; }
-            .code-display { font-size: 3rem; letter-spacing: 10px; }
-            .game-timer { font-size: 2.5rem; }
-            .game-title { font-size: 2rem; }
-            .question { font-size: 2rem; }
-            .game-header { flex-direction: column; gap: 20px; }
+        .online-counter {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            color: #ffeaa7;
         }
     </style>
 </head>
 <body>
-    <div class="audio-controls">
-        <button class="audio-btn" id="toggleAudio" title="Activer/Désactiver le son">🔊</button>
-    </div>
-
     <div class="container">
-        <header>
-            <h1>🎮 MATCH EN LIGNE 🎮</h1>
-            <p class="subtitle">✨ Apprends en t'amusant avec tes amis ! ✨</p>
-            <div class="online-status" id="onlineStatus" style="display: none;">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">0/0 joueurs en ligne</span>
-            </div>
-        </header>
-
+        <h1>🎮 Test Multijoueur Temps Réel</h1>
+        
         <!-- Menu Principal -->
-        <div class="game-mode" id="gameMode">
-            <div class="mode-card" onclick="selectMode('solo')">
-                <div class="mode-icon">🎯</div>
-                <h3>Mode Solo</h3>
-                <p>Entraîne-toi seul et deviens un champion ! 💪</p>
-                <button class="btn">Jouer en Solo</button>
-            </div>
-            <div class="mode-card" onclick="selectMode('multiplayer')">
-                <div class="mode-icon">👥</div>
-                <h3>Mode Multiplayer</h3>
-                <p>Joue avec tes amis et défie-les ! 🏆</p>
-                <button class="btn">Jouer à Plusieurs</button>
-            </div>
+        <div id="mainMenu" class="menu">
+            <p style="margin-bottom: 20px; font-size: 1.2rem;">
+                Testez la synchronisation en temps réel entre plusieurs joueurs !
+            </p>
+            <button class="btn" onclick="showNameInput()">Démarrer le Test</button>
         </div>
 
         <!-- Saisie du nom -->
-        <div class="name-input-area" id="nameInputArea">
-            <h3>👤 Choisis ton nom de super héros !</h3>
-            <p>Comment veux-tu qu'on t'appelle ?</p>
-            <input type="text" class="input-field" id="playerNameInput" placeholder="Ex: SuperJoueur123" maxlength="20">
-            <button class="btn btn-success" onclick="confirmName()">C'est parti ! 🚀</button>
+        <div id="nameInput" class="menu hidden">
+            <h3>Quel est votre nom ?</h3>
+            <input type="text" class="input-field" id="playerNameInput" placeholder="Votre nom" maxlength="15">
+            <br>
+            <button class="btn btn-success" onclick="setPlayerName()">Continuer</button>
         </div>
 
-        <!-- Interface Multiplayer -->
-        <div class="session-interface" id="multiplayerInterface">
-            <div class="mode-card" onclick="createSession()">
-                <div class="mode-icon">🏠</div>
-                <h3>Créer une Salle</h3>
-                <p>Crée ta propre salle et invite tes amis ! 📨</p>
-                <button class="btn">Créer une Salle</button>
-            </div>
-            <div class="mode-card" onclick="showJoinInterface()">
-                <div class="mode-icon">🔗</div>
-                <h3>Rejoindre une Salle</h3>
-                <p>Rejoins une salle avec le code de ton ami ! 🔢</p>
-                <button class="btn">Rejoindre</button>
-            </div>
-            <button class="btn" onclick="showMainMenu()">Retour au menu</button>
+        <!-- Menu Multijoueur -->
+        <div id="multiplayerMenu" class="menu hidden">
+            <button class="btn btn-primary" onclick="createSession()">Créer une Session</button>
+            <button class="btn btn-primary" onclick="showJoinSession()">Rejoindre une Session</button>
         </div>
 
-        <!-- Interface Rejoindre -->
-        <div class="session-interface" id="joinInterface">
-            <h3>🔗 Rejoindre une Salle</h3>
-            <p>Entre le code de la salle de ton ami :</p>
-            <input type="text" class="input-field" id="joinCodeInput" placeholder="4 lettres (ex: ABCD)" maxlength="4" style="text-transform: uppercase;">
-            <button class="btn btn-success" onclick="joinSession()">Rejoindre la partie ! 🎉</button>
-            <button class="btn" onclick="showMultiplayerInterface()">Retour</button>
+        <!-- Rejoindre une session -->
+        <div id="joinSession" class="menu hidden">
+            <h3>Rejoindre une Session</h3>
+            <input type="text" class="input-field" id="sessionCodeInput" placeholder="Code session (4 lettres)" maxlength="4" style="text-transform: uppercase;">
+            <br>
+            <button class="btn btn-success" onclick="joinSession()">Rejoindre</button>
+            <button class="btn" onclick="showMultiplayerMenu()">Retour</button>
         </div>
 
-        <!-- Interface Création de Salle -->
-        <div class="session-interface" id="createSessionInterface">
-            <h3>🎉 Super ! Ta salle est créée !</h3>
-            <p>Partage ce code magique avec tes amis :</p>
-            <div class="code-display" id="sessionCode">----</div>
-            <div class="online-status" id="sessionOnlineStatus">
-                <div class="presence-indicator presence-online"></div>
-                <span class="status-text">1/1 joueurs en ligne</span>
+        <!-- Session Créée -->
+        <div id="sessionCreated" class="hidden">
+            <h3>✅ Session Créée !</h3>
+            <p>Partagez ce code avec vos amis :</p>
+            <div class="session-code" id="sessionCodeDisplay">----</div>
+            
+            <div class="online-counter">
+                <span id="onlineCount">1</span>/<span id="maxPlayers">8</span> joueurs connectés
             </div>
-            <div class="players-container" id="playersList"></div>
-            <button class="btn btn-success" onclick="startGame()" id="startBtn">Démarrer la Partie ! 🚀</button>
-            <button class="btn" onclick="leaveSession()">Quitter</button>
+            
+            <div class="players-container" id="playersList">
+                <!-- Liste des joueurs dynamique -->
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" onclick="updatePlayerColor('red')">🔴 Rouge</button>
+                <button class="control-btn" onclick="updatePlayerColor('blue')">🔵 Bleu</button>
+                <button class="control-btn" onclick="updatePlayerColor('green')">🟢 Vert</button>
+                <button class="control-btn" onclick="incrementScore()">➕ Score +1</button>
+                <button class="control-btn" onclick="decrementScore()">➖ Score -1</button>
+                <button class="control-btn" onclick="sendRandomMessage()">💬 Message Test</button>
+            </div>
+
+            <div class="game-area">
+                <h4>Chat en Temps Réel</h4>
+                <div class="chat-box" id="chatBox">
+                    <!-- Messages de chat -->
+                </div>
+                <input type="text" class="input-field" id="chatInput" placeholder="Tapez un message..." style="max-width: 400px;">
+                <button class="btn" onclick="sendChatMessage()">Envoyer</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="leaveSession()">Quitter la Session</button>
+                <button class="btn btn-success" onclick="startGameTest()" id="startGameBtn">Démarrer le Jeu Test</button>
+            </div>
         </div>
 
-        <!-- Zone de Jeu -->
-        <div class="game-area" id="gameArea">
-            <div class="game-header">
-                <h2 class="game-title" id="gameTitle">Chargement... ⏳</h2>
-                <div class="game-timer" id="gameTimer">15</div>
+        <!-- Zone de Jeu Test -->
+        <div id="gameTest" class="hidden">
+            <h3>🎯 Jeu Test Actif</h3>
+            <div class="game-area">
+                <p>Timer synchronisé: <span id="gameTimer">10</span>s</p>
+                <p>État du jeu: <span id="gameState">En attente...</span></p>
+                <div id="gameContent">
+                    <!-- Contenu du jeu dynamique -->
+                </div>
             </div>
-            <div class="game-content" id="gameContent">
-                <!-- Contenu dynamique -->
-            </div>
-        </div>
-
-        <!-- Section Mi-temps -->
-        <div class="halftime" id="halftimeSection">
-            <h2 class="halftime-title">⏸️ MI-TEMPS ⏸️</h2>
-            <div class="players-container" id="halftimePlayers"></div>
-            <p>Voici les scores après la première partie ! 📊</p>
-            <button class="btn btn-success" onclick="continueToSecondHalf()">Continuer l'aventure ! 🎯</button>
+            <button class="btn" onclick="endGameTest()">Arrêter le Jeu</button>
         </div>
     </div>
 
@@ -758,42 +342,6 @@ m
         const db = firebase.firestore();
 
         // ============================
-        // DONNÉES DES JEUX
-        // ============================
-        const dictionaryWords = ["Bonjour", "Amitié", "École", "Jouet", "Famille"];
-        const initiationWords = ["Curiosité", "Découverte", "Apprentissage", "Créativité", "Imagination"];
-        const bibleWords = ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"];
-
-        const anagrams = [
-            { anagram: "CHAT", solutions: ["ACHT"] },
-            { anagram: "RIRE", solutions: ["ERRI"] },
-            { anagram: "LUNE", solutions: ["NULE"] }
-        ];
-
-        const mathQuestions = [
-            { problem: "5 + 3 × 2", solution: "11", time: 10 },
-            { problem: "10 - 4 + 1", solution: "7", time: 8 },
-            { problem: "2 × 6 - 3", solution: "9", time: 10 }
-        ];
-
-        const lexicalFields = [
-            { theme: "Animaux", hint: "créatures vivantes", letter: "A" },
-            { theme: "École", hint: "endroit où on apprend", letter: "E" },
-            { theme: "Jeux", hint: "activités amusantes", letter: "J" }
-        ];
-
-        const gameData = {
-            spelling: {
-                'dictionary': dictionaryWords,
-                'initiation': initiationWords, 
-                'bible': bibleWords
-            },
-            anagrams: anagrams,
-            math: mathQuestions,
-            lexical: lexicalFields
-        };
-
-        // ============================
         // VARIABLES GLOBALES
         // ============================
         let currentSession = null;
@@ -801,88 +349,44 @@ m
         let playerId = Math.random().toString(36).substr(2, 9);
         let playerName = "";
         let isHost = false;
-        let audioEnabled = true;
-        let currentGameState = null;
-        let currentQuestionIndex = 0;
-        let gameTimer = null;
-        let presenceInterval = null;
         let sessionUnsubscribe = null;
-        let lastSpokenQuestion = null;
-
-        // ============================
-        // INITIALISATION
-        // ============================
-        document.addEventListener('DOMContentLoaded', function() {
-            setupAudio();
-            setupPresenceTracking();
-        });
-
-        function setupAudio() {
-            const audioBtn = document.getElementById('toggleAudio');
-            audioBtn.addEventListener('click', function() {
-                audioEnabled = !audioEnabled;
-                this.textContent = audioEnabled ? '🔊' : '🔇';
-                this.style.background = audioEnabled ? 
-                    'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 
-                    'linear-gradient(45deg, #666, #999)';
-            });
-        }
-
-        function setupPresenceTracking() {
-            document.addEventListener('visibilitychange', function() {
-                if (currentSession) {
-                    updatePresence(!document.hidden);
-                }
-            });
-
-            presenceInterval = setInterval(() => {
-                if (currentSession) {
-                    updatePresence(!document.hidden);
-                }
-            }, 3000);
-        }
+        let gameTimerInterval = null;
 
         // ============================
         // GESTION DE LA NAVIGATION
         // ============================
-        function selectMode(mode) {
-            document.getElementById('gameMode').style.display = 'none';
-            if (mode === 'multiplayer') {
-                showNameInput();
-            } else {
-                startSoloGame();
-            }
-        }
-
         function showNameInput() {
-            document.getElementById('nameInputArea').style.display = 'block';
+            showSection('nameInput');
             document.getElementById('playerNameInput').focus();
         }
 
-        function confirmName() {
-            const nameInput = document.getElementById('playerNameInput').value.trim();
-            if (nameInput.length < 2) {
-                alert("Choisis un nom d'au moins 2 lettres ! ✏️");
+        function setPlayerName() {
+            const name = document.getElementById('playerNameInput').value.trim();
+            if (name.length < 2) {
+                alert("Choisissez un nom d'au moins 2 caractères");
                 return;
             }
-            
-            playerName = nameInput;
-            document.getElementById('nameInputArea').style.display = 'none';
-            showMultiplayerInterface();
+            playerName = name;
+            showMultiplayerMenu();
         }
 
-        function showMainMenu() {
-            resetInterface();
+        function showMultiplayerMenu() {
+            showSection('multiplayerMenu');
         }
 
-        function showMultiplayerInterface() {
-            document.getElementById('multiplayerInterface').style.display = 'block';
+        function showJoinSession() {
+            showSection('joinSession');
+            document.getElementById('sessionCodeInput').focus();
         }
 
-        function showJoinInterface() {
-            document.getElementById('multiplayerInterface').style.display = 'none';
-            document.getElementById('joinInterface').style.display = 'block';
-            document.getElementById('joinCodeInput').focus();
+        function showSection(sectionId) {
+            // Cacher toutes les sections
+            const sections = ['mainMenu', 'nameInput', 'multiplayerMenu', 'joinSession', 'sessionCreated', 'gameTest'];
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Afficher la section demandée
+            document.getElementById(sectionId).classList.remove('hidden');
         }
 
         // ============================
@@ -898,65 +402,50 @@ m
                     id: playerId,
                     name: playerName,
                     score: 0,
-                    halftimeScore: 0,
+                    color: 'blue',
                     isOnline: true,
-                    hasAnswered: false,
-                    readyForSecondHalf: false,
-                    quickAnswer: false,
-                    isCorrect: false,
                     lastSeen: new Date()
                 };
 
-                await db.collection('sessions').doc(sessionCode).set({
+                await db.collection('test_sessions').doc(sessionCode).set({
                     code: sessionCode,
                     host: playerId,
                     players: [playerData],
                     status: 'waiting',
                     gameState: 'lobby',
-                    currentQuestion: 0,
-                    currentGameType: null,
-                    timer: 15,
-                    timerStart: null,
+                    chatMessages: [],
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showCreateSessionInterface(sessionCode);
+                showSessionCreated(sessionCode);
                 listenToSessionChanges();
+                showNotification("Session créée avec succès !");
                 
             } catch (error) {
-                alert("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
+                console.error("Erreur création session:", error);
+                alert("Erreur lors de la création de la session");
             }
         }
 
-        function showCreateSessionInterface(code) {
-            document.getElementById('multiplayerInterface').style.display = 'none';
-            document.getElementById('joinInterface').style.display = 'none';
-            document.getElementById('createSessionInterface').style.display = 'block';
-            document.getElementById('sessionCode').textContent = code;
-            updatePlayersList();
+        function showSessionCreated(code) {
+            document.getElementById('sessionCodeDisplay').textContent = code;
+            showSection('sessionCreated');
         }
 
         async function joinSession() {
-            const code = document.getElementById('joinCodeInput').value.toUpperCase().trim();
+            const code = document.getElementById('sessionCodeInput').value.toUpperCase().trim();
             
             if (code.length !== 4) {
-                alert("Le code doit avoir 4 lettres ! 🔤");
+                alert("Le code doit avoir 4 caractères");
                 return;
             }
 
             try {
-                const sessionDoc = await db.collection('sessions').doc(code).get();
+                const sessionDoc = await db.collection('test_sessions').doc(code).get();
                 
                 if (!sessionDoc.exists) {
-                    alert("Salle non trouvée ! Vérifie le code. 🔍");
-                    return;
-                }
-
-                const sessionData = sessionDoc.data();
-                
-                if (sessionData.status !== 'waiting') {
-                    alert("La partie a déjà commencé ! ⏰");
+                    alert("Session non trouvée");
                     return;
                 }
 
@@ -966,25 +455,23 @@ m
                     id: playerId,
                     name: playerName,
                     score: 0,
-                    halftimeScore: 0,
+                    color: 'green',
                     isOnline: true,
-                    hasAnswered: false,
-                    readyForSecondHalf: false,
-                    quickAnswer: false,
-                    isCorrect: false,
                     lastSeen: new Date()
                 };
 
-                await db.collection('sessions').doc(code).update({
+                await db.collection('test_sessions').doc(code).update({
                     players: firebase.firestore.FieldValue.arrayUnion(playerData),
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showCreateSessionInterface(code);
+                showSessionCreated(code);
                 listenToSessionChanges();
+                showNotification("Session rejointe avec succès !");
                 
             } catch (error) {
-                alert("Impossible de se connecter. Réessaie ! 🔄");
+                console.error("Erreur rejoindre session:", error);
+                alert("Erreur lors de la connexion à la session");
             }
         }
 
@@ -993,45 +480,33 @@ m
                 sessionUnsubscribe();
             }
             
-            sessionUnsubscribe = db.collection('sessions').doc(currentSession).onSnapshot((doc) => {
+            sessionUnsubscribe = db.collection('test_sessions').doc(currentSession).onSnapshot((doc) => {
                 if (doc.exists) {
                     const sessionData = doc.data();
                     players = sessionData.players || [];
-                    currentGameState = sessionData.gameState;
-                    currentQuestionIndex = sessionData.currentQuestion || 0;
-
+                    
                     updatePlayersList();
-                    updateOnlineStatus();
-
-                    const startBtn = document.getElementById('startBtn');
+                    updateOnlineCounter();
+                    updateChat(sessionData.chatMessages || []);
+                    
+                    // Mettre à jour le bouton de démarrage
+                    const startBtn = document.getElementById('startGameBtn');
                     if (startBtn) {
                         startBtn.disabled = players.length < 2;
                         startBtn.textContent = players.length < 2 ? 
                             `En attente d'amis... (${players.length}/2)` : 
-                            'Démarrer la Partie ! 🚀';
+                            'Démarrer le Jeu Test';
                     }
 
-                    switch(sessionData.status) {
-                        case 'playing':
-                            if (document.getElementById('createSessionInterface').style.display === 'block') {
-                                startGameSession(sessionData);
-                            }
-                            handleGameState(sessionData);
-                            break;
-                        case 'halftime':
-                            showHalftime(sessionData);
-                            break;
-                        case 'second_half':
-                            handleSecondHalf(sessionData);
-                            break;
-                        case 'finished':
-                            showFinalResults(sessionData);
-                            break;
+                    // Gérer les états de jeu
+                    if (sessionData.status === 'playing') {
+                        showGameTest(sessionData);
                     }
-
-                    handleTimer(sessionData);
+                    
                 } else {
+                    // Session supprimée
                     resetInterface();
+                    showNotification("La session a été fermée");
                 }
             });
         }
@@ -1041,694 +516,269 @@ m
             if (!container) return;
             
             container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name} ${player.id === playerId ? '(Toi)' : ''}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                <div class="player-card ${player.id === playerId ? 'active' : ''}" style="border-left-color: ${player.color}">
+                    <div class="player-name">
+                        <span class="status-indicator ${player.isOnline ? 'online' : 'offline'}"></span>
+                        ${player.name} ${player.id === playerId ? '(Vous)' : ''}
+                        ${player.id === players.find(p => p.isHost)?.id ? '👑' : ''}
                     </div>
                     <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">
-                        ${player.isOnline ? 
-                          (player.hasAnswered ? '✅ Répondu' : '⏳ En attente') : 
-                          '🔴 Hors ligne'}
+                    <div style="color: ${player.color}; font-size: 0.9rem;">
+                        Couleur: ${player.color}
                     </div>
                 </div>
             `).join('');
         }
 
-        function updateOnlineStatus() {
+        function updateOnlineCounter() {
             const onlinePlayers = players.filter(p => p.isOnline).length;
-            const totalPlayers = players.length;
-            
-            const sessionStatus = document.getElementById('sessionOnlineStatus');
-            if (sessionStatus) {
-                sessionStatus.innerHTML = `
-                    <div class="presence-indicator presence-online"></div>
-                    <span class="status-text">${onlinePlayers}/${totalPlayers} joueurs en ligne</span>
-                `;
-            }
+            document.getElementById('onlineCount').textContent = onlinePlayers;
         }
 
-        async function updatePresence(isOnline) {
+        // ============================
+        // INTERACTIONS TEMPS RÉEL
+        // ============================
+        async function updatePlayerColor(color) {
             if (!currentSession) return;
             
             try {
-                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                if (!sessionDoc.exists) return;
-                
-                const sessionData = sessionDoc.data();
-                const updatedPlayers = sessionData.players.map(p => 
-                    p.id === playerId ? { ...p, isOnline: isOnline, lastSeen: new Date() } : p
+                const updatedPlayers = players.map(p => 
+                    p.id === playerId ? { ...p, color: color } : p
                 );
                 
-                await db.collection('sessions').doc(currentSession).update({
-                    players: updatedPlayers,
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                await db.collection('test_sessions').doc(currentSession).update({
+                    players: updatedPlayers
                 });
                 
             } catch (error) {
-                console.error("Erreur présence:", error);
+                console.error("Erreur mise à jour couleur:", error);
             }
         }
 
-        // ============================
-        // GESTION DU JEU
-        // ============================
-        async function startGame() {
-            if (!isHost) return;
-            if (players.length < 2) {
-                alert("Invite au moins un ami pour jouer ! 👥");
-                return;
-            }
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'playing',
-                    gameState: 'spelling_dictionary',
-                    currentQuestion: 0,
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur démarrage:", error);
-            }
-        }
-
-        function startGameSession(sessionData) {
-            document.getElementById('createSessionInterface').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-        }
-
-        function handleGameState(sessionData) {
-            const gameState = sessionData.gameState;
-            
-            if (gameState.startsWith('spelling_')) {
-                const type = gameState.split('_')[1];
-                showSpellingQuestion(type, sessionData.currentQuestion);
-            } else if (gameState === 'anagram') {
-                showAnagramQuestion(sessionData.currentQuestion);
-            } else if (gameState === 'math') {
-                showMathQuestion(sessionData.currentQuestion);
-            } else if (gameState === 'lexical') {
-                showLexicalQuestion(sessionData.currentQuestion);
-            }
-        }
-
-        // ============================
-        // AFFICHAGE DES QUESTIONS
-        // ============================
-        function showSpellingQuestion(type, index) {
-            const words = gameData.spelling[type];
-            if (index >= words.length) {
-                if (isHost) nextSpellingType(type);
-                return;
-            }
-
-            const word = words[index];
-            const typeNames = {
-                'dictionary': 'Dictionnaire 📚',
-                'initiation': 'Découverte 🔍', 
-                'bible': 'Bons Moments 🌟'
-            };
-
-            document.getElementById('gameTitle').textContent = `Épellation - ${typeNames[type]}`;
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${word}</div>
-                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
-                    Épelez ce mot correctement :
-                </p>
-                <input type="text" class="input-answer" id="answerInput" placeholder="Tape ta réponse ici...">
-                <button class="btn btn-success" onclick="submitSpellingAnswer('${word}')">Valider ✨</button>
-                <div class="players-container" id="gamePlayers"></div>
-            `;
-
-            updateGamePlayers();
-            
-            const currentQuestionKey = `spelling_${type}_${index}`;
-            if (lastSpokenQuestion !== currentQuestionKey) {
-                setTimeout(() => {
-                    speakText(`Épelez le mot: ${word}`);
-                }, 500);
-                lastSpokenQuestion = currentQuestionKey;
-            }
-
-            setTimeout(() => {
-                const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
-            }, 1000);
-        }
-
-        function showAnagramQuestion(index) {
-            if (index >= anagrams.length) {
-                if (isHost) endFirstHalf();
-                return;
-            }
-
-            const anagram = anagrams[index];
-            document.getElementById('gameTitle').textContent = "Anagrammes 🧩";
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${anagram.anagram}</div>
-                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
-                    Trouvez le mot correspondant à cet anagramme :
-                </p>
-                <input type="text" class="input-answer" id="answerInput" placeholder="Quel est ce mot ?">
-                <button class="btn btn-success" onclick="submitAnagramAnswer(${index})">Valider ✨</button>
-                <div class="players-container" id="gamePlayers"></div>
-            `;
-
-            updateGamePlayers();
-            
-            const currentQuestionKey = `anagram_${index}`;
-            if (lastSpokenQuestion !== currentQuestionKey) {
-                setTimeout(() => {
-                    speakText(`Trouvez l'anagramme de: ${anagram.anagram}`);
-                }, 500);
-                lastSpokenQuestion = currentQuestionKey;
-            }
-
-            setTimeout(() => {
-                const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
-            }, 1000);
-        }
-
-        function showMathQuestion(index) {
-            if (index >= mathQuestions.length) {
-                if (isHost) startLexicalGame();
-                return;
-            }
-
-            const question = mathQuestions[index];
-            document.getElementById('gameTitle').textContent = "Mathématiques 🧮";
-            
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${question.problem}</div>
-                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
-                    Résolvez rapidement cette opération !
-                </p>
-                <input type="text" class="input-answer" id="answerInput" placeholder="Ta réponse...">
-                <button class="btn btn-success" onclick="submitMathAnswer(${index})">Répondre ! ⚡</button>
-                <div class="players-container" id="gamePlayers"></div>
-            `;
-
-            updateGamePlayers();
-
-            const currentQuestionKey = `math_${index}`;
-            if (lastSpokenQuestion !== currentQuestionKey) {
-                setTimeout(() => {
-                    speakText(`Résolvez: ${question.problem}`);
-                }, 500);
-                lastSpokenQuestion = currentQuestionKey;
-            }
-
-            setTimeout(() => {
-                const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
-            }, 1000);
-        }
-
-        function showLexicalQuestion(index) {
-            if (index >= lexicalFields.length) {
-                if (isHost) endGame();
-                return;
-            }
-
-            const question = lexicalFields[index];
-            document.getElementById('gameTitle').textContent = "Champ Lexical 📝";
-            
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${question.hint}</div>
-                <p style="font-size: 1.4rem; color: #ffeaa7; margin-bottom: 30px;">
-                    Tous les mots commencent par la lettre: 
-                    <strong style="font-size: 3rem; color: #ff6b6b;">${question.letter}</strong>
-                </p>
-                <input type="text" class="input-answer" id="answerInput" placeholder="Un mot qui commence par ${question.letter}">
-                <button class="btn btn-success" onclick="submitLexicalAnswer('${question.theme}')">Répondre ! ⚡</button>
-                <div class="players-container" id="gamePlayers"></div>
-            `;
-
-            updateGamePlayers();
-
-            const currentQuestionKey = `lexical_${index}`;
-            if (lastSpokenQuestion !== currentQuestionKey) {
-                setTimeout(() => {
-                    speakText(`${question.hint}. Trouvez un mot commençant par ${question.letter}`);
-                }, 500);
-                lastSpokenQuestion = currentQuestionKey;
-            }
-
-            setTimeout(() => {
-                const answerInput = document.getElementById('answerInput');
-                if (answerInput) answerInput.focus();
-            }, 1000);
-        }
-
-        // ============================
-        // SOUMISSION DES RÉPONSES
-        // ============================
-        async function submitSpellingAnswer(correctAnswer) {
-            const userAnswer = document.getElementById('answerInput').value.trim();
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? {
-                            ...p,
-                            hasAnswered: true,
-                            score: p.score + (isCorrect ? 10 : 0)
-                        } : p
-                    )
-                });
-
-                if (isCorrect) {
-                    speakText("Bravo ! Réponse correcte !");
-                } else {
-                    speakText("Dommage ! La bonne réponse était : " + correctAnswer);
-                }
-
-            } catch (error) {
-                console.error("Erreur soumission:", error);
-            }
-        }
-
-        async function submitAnagramAnswer(index) {
-            const userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
-            const anagram = anagrams[index];
-            const isCorrect = anagram.solutions.includes(userAnswer);
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? {
-                            ...p,
-                            hasAnswered: true,
-                            score: p.score + (isCorrect ? 10 : 0)
-                        } : p
-                    )
-                });
-
-                if (isCorrect) {
-                    speakText("Excellent ! Anagramme trouvé !");
-                } else {
-                    speakText(`Presque ! Les solutions étaient: ${anagram.solutions.join(', ')}`);
-                }
-
-            } catch (error) {
-                console.error("Erreur soumission:", error);
-            }
-        }
-
-        async function submitMathAnswer(index) {
-            const userAnswer = document.getElementById('answerInput').value.trim();
-            const question = mathQuestions[index];
-            const isCorrect = userAnswer === question.solution;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? {
-                            ...p,
-                            quickAnswer: true,
-                            score: p.score + (isCorrect ? 20 : 0),
-                            isCorrect: isCorrect
-                        } : p
-                    )
-                });
-
-                if (isCorrect) {
-                    speakText("Génial ! Calcul réussi !");
-                } else {
-                    speakText("Dommage ! La réponse était " + question.solution);
-                }
-
-            } catch (error) {
-                console.error("Erreur soumission maths:", error);
-            }
-        }
-
-        async function submitLexicalAnswer(correctAnswer) {
-            const userAnswer = document.getElementById('answerInput').value.trim();
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? {
-                            ...p,
-                            quickAnswer: true,
-                            score: p.score + (isCorrect ? 10 : 0),
-                            isCorrect: isCorrect
-                        } : p
-                    )
-                });
-
-                if (isCorrect) {
-                    speakText("Bravo ! Mot trouvé !");
-                } else {
-                    speakText(`Presque ! Le mot était: ${correctAnswer}`);
-                }
-
-            } catch (error) {
-                console.error("Erreur soumission lexical:", error);
-            }
-        }
-
-        // ============================
-        // CHRONOMÈTRE
-        // ============================
-        function handleTimer(sessionData) {
-            const timerElement = document.getElementById('gameTimer');
-            if (!timerElement || !sessionData.timerStart) return;
-
-            const startTime = sessionData.timerStart.toDate().getTime();
-            const now = Date.now();
-            const elapsed = Math.floor((now - startTime) / 1000);
-            const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
-
-            timerElement.textContent = remaining;
-
-            timerElement.classList.remove('warning', 'danger');
-            if (remaining <= 5) {
-                timerElement.classList.add('danger');
-            } else if (remaining <= 10) {
-                timerElement.classList.add('warning');
-            }
-
-            if (gameTimer) {
-                clearInterval(gameTimer);
-            }
-
-            gameTimer = setInterval(() => {
-                const currentRemaining = parseInt(timerElement.textContent);
-                if (currentRemaining > 0) {
-                    const newRemaining = currentRemaining - 1;
-                    timerElement.textContent = newRemaining;
-                    
-                    timerElement.classList.remove('warning', 'danger');
-                    if (newRemaining <= 5) {
-                        timerElement.classList.add('danger');
-                    } else if (newRemaining <= 10) {
-                        timerElement.classList.add('warning');
-                    }
-                    
-                    checkAllPlayersAnswered();
-                } else {
-                    clearInterval(gameTimer);
-                    if (isHost) {
-                        handleTimeUp();
-                    }
-                }
-            }, 1000);
-        }
-
-        function checkAllPlayersAnswered() {
-            if (!isHost) return;
-            
-            const allPlayersAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
-            
-            if (allPlayersAnswered) {
-                clearInterval(gameTimer);
-                setTimeout(() => {
-                    handleAllPlayersAnswered();
-                }, 1000);
-            }
-        }
-
-        async function handleAllPlayersAnswered() {
-            if (!isHost) return;
+        async function incrementScore() {
+            if (!currentSession) return;
             
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        !p.hasAnswered && !p.quickAnswer ? {
-                            ...p,
-                            hasAnswered: true,
-                            isCorrect: false
-                        } : p
-                    )
+                const currentPlayer = players.find(p => p.id === playerId);
+                const updatedPlayers = players.map(p => 
+                    p.id === playerId ? { ...p, score: (p.score || 0) + 1 } : p
+                );
+                
+                await db.collection('test_sessions').doc(currentSession).update({
+                    players: updatedPlayers
                 });
-
-                setTimeout(() => {
-                    nextQuestion();
-                }, 1000);
                 
             } catch (error) {
-                console.error("Erreur tous joueurs répondus:", error);
+                console.error("Erreur incrément score:", error);
             }
         }
 
-        async function handleTimeUp() {
-            if (!isHost) return;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        !p.hasAnswered && !p.quickAnswer ? {
-                            ...p,
-                            hasAnswered: true,
-                            isCorrect: false
-                        } : p
-                    )
-                });
-
-                setTimeout(() => {
-                    nextQuestion();
-                }, 2000);
-                
-            } catch (error) {
-                console.error("Erreur temps écoulé:", error);
-            }
-        }
-
-        // ============================
-        // NAVIGATION DES QUESTIONS
-        // ============================
-        async function nextQuestion() {
-            if (!isHost) return;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    currentQuestion: currentQuestionIndex + 1,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        quickAnswer: false,
-                        isCorrect: false
-                    })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur question suivante:", error);
-            }
-        }
-
-        async function nextSpellingType(currentType) {
-            if (!isHost) return;
-
-            const nextTypes = {
-                'dictionary': 'spelling_initiation',
-                'initiation': 'spelling_bible', 
-                'bible': 'anagram'
-            };
-
-            const nextType = nextTypes[currentType];
+        async function decrementScore() {
+            if (!currentSession) return;
             
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    gameState: nextType,
-                    currentQuestion: 0,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        quickAnswer: false,
-                        isCorrect: false
-                    })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                const updatedPlayers = players.map(p => 
+                    p.id === playerId ? { ...p, score: Math.max(0, (p.score || 0) - 1) } : p
+                );
+                
+                await db.collection('test_sessions').doc(currentSession).update({
+                    players: updatedPlayers
                 });
+                
             } catch (error) {
-                console.error("Erreur changement type:", error);
+                console.error("Erreur décrément score:", error);
             }
         }
 
-        async function startLexicalGame() {
-            if (!isHost) return;
-
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentSession) return;
+            
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    gameState: 'lexical',
-                    currentQuestion: 0,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        quickAnswer: false,
-                        isCorrect: false
-                    })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                const chatMessage = {
+                    sender: playerName,
+                    senderId: playerId,
+                    text: message,
+                    timestamp: new Date()
+                };
+                
+                await db.collection('test_sessions').doc(currentSession).update({
+                    chatMessages: firebase.firestore.FieldValue.arrayUnion(chatMessage)
                 });
+                
+                input.value = ''; // Vider le champ
+                
             } catch (error) {
-                console.error("Erreur début lexical:", error);
+                console.error("Erreur envoi message:", error);
             }
         }
 
-        // ============================
-        // MI-TEMPS ET FIN DE JEU
-        // ============================
-        async function endFirstHalf() {
-            if (!isHost) return;
-
+        async function sendRandomMessage() {
+            const messages = [
+                "Salut tout le monde ! 👋",
+                "La synchronisation fonctionne ! 🎯",
+                "Test de message en temps réel ⚡",
+                "Quelqu'un veut tester les couleurs ? 🎨",
+                "Les scores se mettent à jour en direct ! 📊"
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'halftime',
-                    players: players.map(p => ({
-                        ...p,
-                        halftimeScore: p.score,
-                        readyForSecondHalf: false
-                    }))
+                const chatMessage = {
+                    sender: playerName,
+                    senderId: playerId,
+                    text: randomMessage,
+                    timestamp: new Date()
+                };
+                
+                await db.collection('test_sessions').doc(currentSession).update({
+                    chatMessages: firebase.firestore.FieldValue.arrayUnion(chatMessage)
                 });
+                
             } catch (error) {
-                console.error("Erreur mi-temps:", error);
+                console.error("Erreur envoi message aléatoire:", error);
             }
         }
 
-        function showHalftime(sessionData) {
-            document.getElementById('gameArea').style.display = 'none';
-            document.getElementById('halftimeSection').style.display = 'block';
-
-            const container = document.getElementById('halftimePlayers');
-            container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+        function updateChat(messages) {
+            const chatBox = document.getElementById('chatBox');
+            if (!chatBox) return;
+            
+            chatBox.innerHTML = messages.slice(-20).map(msg => `
+                <div class="chat-message">
+                    <span class="message-sender">${msg.sender}:</span> ${msg.text}
+                    <div style="font-size: 0.8rem; color: #ccc;">
+                        ${new Date(msg.timestamp?.toDate?.() || msg.timestamp).toLocaleTimeString()}
                     </div>
-                    <div class="player-score">${player.halftimeScore} points</div>
-                    <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
                 </div>
             `).join('');
+            
+            // Scroll vers le bas
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        async function continueToSecondHalf() {
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    players: players.map(p => 
-                        p.id === playerId ? { ...p, readyForSecondHalf: true } : p
-                    )
-                });
-
-                const allReady = players.every(p => p.readyForSecondHalf);
-                if (allReady && isHost) {
-                    startSecondHalf();
-                }
-            } catch (error) {
-                console.error("Erreur préparation 2ème mi-temps:", error);
-            }
-        }
-
-        async function startSecondHalf() {
+        // ============================
+        // JEU TEST SYNCHRONISÉ
+        // ============================
+        async function startGameTest() {
             if (!isHost) return;
-
+            
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'second_half',
-                    gameState: 'math',
-                    currentQuestion: 0,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        quickAnswer: false,
-                        isCorrect: false
-                    })),
-                    timer: 10,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                await db.collection('test_sessions').doc(currentSession).update({
+                    status: 'playing',
+                    gameState: 'countdown',
+                    gameTimer: 10,
+                    gameStartTime: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
             } catch (error) {
-                console.error("Erreur début 2ème mi-temps:", error);
+                console.error("Erreur démarrage jeu:", error);
             }
         }
 
-        function handleSecondHalf(sessionData) {
-            const gameState = sessionData.gameState;
+        function showGameTest(sessionData) {
+            showSection('gameTest');
             
-            if (gameState === 'math') {
-                showMathQuestion(sessionData.currentQuestion);
-            } else if (gameState === 'lexical') {
-                showLexicalQuestion(sessionData.currentQuestion);
-            }
-        }
-
-        async function endGame() {
-            if (!isHost) return;
-
-            await db.collection('sessions').doc(currentSession).update({
-                status: 'finished'
-            });
-        }
-
-        function showFinalResults(sessionData) {
-            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-            const winner = sortedPlayers[0];
+            const gameState = sessionData.gameState || 'countdown';
+            const timer = sessionData.gameTimer || 10;
             
-            document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            document.getElementById('gameState').textContent = gameState;
+            document.getElementById('gameTimer').textContent = timer;
             
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">${winner.name} remporte la partie !</div>
-                <div class="players-container">
-                    ${sortedPlayers.map((player, index) => `
-                        <div class="player-card ${player.id === winner.id ? 'active' : ''}">
-                            <div class="player-header">
-                                <div class="player-name">${player.name}</div>
-                                <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
-                            </div>
-                            <div class="player-score">${player.score} points</div>
-                            <div class="player-status">${index + 1}ère place</div>
+            let gameContent = '';
+            
+            switch(gameState) {
+                case 'countdown':
+                    gameContent = `<p>Démarrage dans ${timer} secondes...</p>`;
+                    break;
+                case 'playing':
+                    gameContent = `
+                        <p>🎮 Jeu en cours !</p>
+                        <p>Testez les interactions ci-dessous :</p>
+                        <div class="controls">
+                            <button class="control-btn" onclick="sendGameAction('action1')">Action 1</button>
+                            <button class="control-btn" onclick="sendGameAction('action2')">Action 2</button>
                         </div>
-                    `).join('')}
-                </div>
-                <button class="btn btn-success" onclick="resetInterface()">Rejouer ! 🔄</button>
-            `;
+                    `;
+                    break;
+                case 'finished':
+                    gameContent = `<p>🎉 Jeu terminé !</p>`;
+                    break;
+            }
+            
+            document.getElementById('gameContent').innerHTML = gameContent;
+            
+            // Gérer le timer
+            if (gameTimerInterval) clearInterval(gameTimerInterval);
+            
+            if (gameState === 'countdown' && isHost) {
+                gameTimerInterval = setInterval(async () => {
+                    const newTimer = timer - 1;
+                    
+                    if (newTimer <= 0) {
+                        clearInterval(gameTimerInterval);
+                        await db.collection('test_sessions').doc(currentSession).update({
+                            gameState: 'playing',
+                            gameTimer: 60
+                        });
+                    } else {
+                        await db.collection('test_sessions').doc(currentSession).update({
+                            gameTimer: newTimer
+                        });
+                    }
+                }, 1000);
+            }
+        }
+
+        async function sendGameAction(action) {
+            if (!currentSession) return;
+            
+            try {
+                const actionMessage = {
+                    sender: playerName,
+                    action: action,
+                    timestamp: new Date()
+                };
+                
+                // Ajouter l'action au chat
+                await db.collection('test_sessions').doc(currentSession).update({
+                    chatMessages: firebase.firestore.FieldValue.arrayUnion({
+                        sender: playerName,
+                        senderId: playerId,
+                        text: `🔹 Action: ${action}`,
+                        timestamp: new Date()
+                    })
+                });
+                
+            } catch (error) {
+                console.error("Erreur action jeu:", error);
+            }
+        }
+
+        async function endGameTest() {
+            if (!isHost) return;
+            
+            try {
+                await db.collection('test_sessions').doc(currentSession).update({
+                    status: 'waiting',
+                    gameState: 'lobby'
+                });
+                
+                showSection('sessionCreated');
+                
+            } catch (error) {
+                console.error("Erreur fin jeu:", error);
+            }
         }
 
         // ============================
         // FONCTIONS UTILITAIRES
         // ============================
-        function updateGamePlayers() {
-            const container = document.getElementById('gamePlayers');
-            if (!container) return;
-            
-            container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
-                    <div class="player-header">
-                        <div class="player-name">${player.name}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
-                    </div>
-                    <div class="player-score">${player.score} pts</div>
-                    <div class="player-status">
-                        ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' : '❌ Raté') : 
-                         player.hasAnswered ? '✅ Répondu' : '⏳ En jeu'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function speakText(text) {
-            if (!audioEnabled) return;
-            
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.8;
-                utterance.pitch = 1.1;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
         function generateSessionCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let result = '';
             for (let i = 0; i < 4; i++) {
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -1736,25 +786,30 @@ m
             return result;
         }
 
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
         async function leaveSession() {
             if (currentSession) {
                 try {
-                    await updatePresence(false);
-                    
                     if (isHost) {
-                        await db.collection('sessions').doc(currentSession).delete();
+                        await db.collection('test_sessions').doc(currentSession).delete();
                     } else {
-                        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-                        if (sessionDoc.exists) {
-                            const sessionData = sessionDoc.data();
-                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId);
-                            await db.collection('sessions').doc(currentSession).update({
-                                players: updatedPlayers
-                            });
-                        }
+                        const updatedPlayers = players.filter(p => p.id !== playerId);
+                        await db.collection('test_sessions').doc(currentSession).update({
+                            players: updatedPlayers
+                        });
                     }
                 } catch (error) {
-                    console.error("Erreur déconnexion:", error);
+                    console.error("Erreur départ session:", error);
                 }
             }
             
@@ -1762,45 +817,27 @@ m
         }
 
         function resetInterface() {
-            if (gameTimer) clearInterval(gameTimer);
-            if (presenceInterval) clearInterval(presenceInterval);
+            if (gameTimerInterval) clearInterval(gameTimerInterval);
             if (sessionUnsubscribe) sessionUnsubscribe();
-            
-            const interfaces = [
-                'createSessionInterface', 'gameArea', 'halftimeSection', 
-                'multiplayerInterface', 'joinInterface', 'nameInputArea'
-            ];
-            
-            interfaces.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.style.display = 'none';
-            });
-            
-            document.getElementById('gameMode').style.display = 'grid';
-            document.getElementById('onlineStatus').style.display = 'none';
             
             currentSession = null;
             players = [];
             isHost = false;
-            lastSpokenQuestion = null;
             
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
+            showSection('mainMenu');
         }
 
-        function startSoloGame() {
-            document.getElementById('gameMode').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
-            document.getElementById('gameContent').innerHTML = `
-                <div class="question">Mode Solo en développement</div>
-                <p style="font-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
-                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode multijoueur ! 🎮
-                </p>
-                <button class="btn" onclick="resetInterface()">Retour au Menu</button>
-            `;
-        }
+        // Gestion de la touche Entrée pour le chat
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
