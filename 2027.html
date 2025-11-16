@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -679,13 +682,10 @@
                     lastActivity: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showCreateSessionInterface(sessionCode);
+                                showCreateSessionInterface(sessionCode);
                 listenToSessionChanges();
                 
-                showNotification("🎉 Salle créée avec succès !");
-                
             } catch (error) {
-                console.error("Erreur création session:", error);
                 alert("Oh non ! Impossible de créer la salle. Réessaie ! 🛠️");
             }
         }
@@ -695,6 +695,7 @@
             document.getElementById('joinInterface').style.display = 'none';
             document.getElementById('createSessionInterface').style.display = 'block';
             document.getElementById('sessionCode').textContent = code;
+            updatePlayersList();
         }
 
         async function joinSession() {
@@ -702,6 +703,9 @@
             
             if (code.length !== 4) {
                 alert("Le code doit avoir 4 lettres ! 🔤");
+                return;
+            }
+
                 return;
             }
 
