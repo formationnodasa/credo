@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -767,9 +763,9 @@
         const bibleWords = ["Partage", "Gentillesse", "Espoir", "Paix", "Joie"];
 
         const anagrams = [
-            { anagram: "CHAT", solutions: ["ACHT"] },
-            { anagram: "RIRE", solutions: ["ERRI"] },
-            { anagram: "LUNE", solutions: ["NULE"] }
+            { anagram: "CHAT", solutions: ["CHAT"] },
+            { anagram: "RIRE", solutions: ["RIRE"] },
+            { anagram: "LUNE", solutions: ["LUNE"] }
         ];
 
         const mathQuestions = [
@@ -1447,7 +1443,14 @@
         function checkAllPlayersAnswered() {
             if (!isHost) return;
             
-            const allPlayersAnswered = players.every(p => p.hasAnswered || p.quickAnswer);
+            const allPlayersAnswered = players.every(p => p.hasAnswered || p || p.quickAnswer);
+            
+            if (allPlayersAnswered) {
+                clearInterval(gameTimer);
+                setTimeout(() => {
+                    handleAllPlayersAnswered();
+                }, 1000);
+.quickAnswer);
             
             if (allPlayersAnswered) {
                 clearInterval(gameTimer);
@@ -1455,373 +1458,80 @@
                     handleAllPlayersAnswered();
                 }, 1000);
             }
+            }
         }
 
-// ============================
-// MODIFICATIONS POUR ASSURER LA CONTINUITÉ DES QUESTIONS
-// ============================
-
-// Supprimer toutes les vérifications qui pourraient arrêter le jeu
-async function handleAllPlayersAnswered() {
-    if (!isHost) return;
-    
-    try {
-        // Ne pas réinitialiser les réponses immédiatement
-        // Attendre un court délai puis passer à la question suivante
-        setTimeout(async () => {
-            await nextQuestion();
-        }, 1500); // Réduit à 1.5s au lieu de 2s pour plus de fluidité
-        
-    } catch (error) {
-        console.error("Erreur tous joueurs répondus:", error);
-    }
-}
-
-async function handleTimeUp() {
-    if (!isHost) return;
-
-    try {
-        // Marquer les joueurs qui n'ont pas répondu
-        await db.collection('sessions').doc(currentSession).update({
-            players: players.map(p => 
-                !p.hasAnswered && !p.quickAnswer ? {
-                    ...p,
-                    hasAnswered: true,
-                    isCorrect: false
-                } : p
-            )
-        });
-
-        // Passer directement à la question suivante sans délai long
-        setTimeout(async () => {
-            await nextQuestion();
-        }, 1000); // Réduit à 1s pour continuité immédiate
-        
-    } catch (error) {
-        console.error("Erreur temps écoulé:", error);
-    }
-}
-
-// ============================
-// MODIFICATION DE LA NAVIGATION DES QUESTIONS
-// ============================
-
-async function nextQuestion() {
-    if (!isHost) return;
-
-    try {
-        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
-        if (!sessionDoc.exists) return;
-        
-        const sessionData = sessionDoc.data();
-        const currentGameState = sessionData.gameState;
-        const currentQIndex = sessionData.currentQuestion || 0;
-        
-        // Déterminer automatiquement la prochaine question
-        let nextGameState = currentGameState;
-        let nextQuestionIndex = currentQIndex + 1;
-        let timerDuration = 15; // Durée par défaut
-        
-        // Logique de transition automatique entre les types de jeux
-        if (currentGameState.startsWith('spelling_')) {
-            const type = currentGameState.split('_')[1];
-            const words = gameData.spelling[type];
+        async function handleAllPlayersAnswered() {
+            if (!isHost) return;
             
-            if (nextQuestionIndex >= words.length) {
-                // Passer au type d'épellation suivant
-                const spellingTypes = ['dictionary', 'initiation', 'bible'];
-                const currentIndex = spellingTypes.indexOf(type);
+            try {
+        }
+
+        async function handleAllPlayersAnswered() {
+            if (!isHost) return;
+            
+            try {
+                               setTimeout(async () => {
+                    await nextQuestion();
+                }, 1500);
                 
-                if (currentIndex < spellingTypes.length - 1) {
-                    nextGameState = `spelling_${spellingTypes[currentIndex + 1]}`;
-                    nextQuestionIndex = 0;
-                } else {
-                    // Tous les types d'épellation sont finis, passer aux anagrammes
-                    nextGameState = 'anagram';
-                    nextQuestionIndex = 0;
-                }
-            }
-        } 
-        else if (currentGameState === 'anagram') {
-            if (nextQuestionIndex >= gameData.anagrams.length) {
-                nextGameState = 'math';
-                nextQuestionIndex = 0;
-                timerDuration = 10; // Temps réduit pour les maths
+            } catch (error) {
+ setTimeout(async () => {
+                    await nextQuestion();
+                }, 1500);
+                
+            } catch (error) {
+                console                console.error("Erreur tous joueurs répondus:", error);
             }
         }
-        else if (currentGameState === 'math') {
-            if (nextQuestionIndex >= gameData.math.length) {
-                nextGameState = 'lexical';
-                nextQuestionIndex = 0;
-                timerDuration = 15; // Temps normal pour le lexical
-            } else {
-                timerDuration = gameData.math[nextQuestionIndex]?.time || 10;
+
+       .error("Erreur tous joueurs répondus:", error);
             }
         }
-        else if (currentGameState === 'lexical') {
-            if (nextQuestionIndex >= gameData.lexical.length) {
-                // Recommencer depuis le début pour continuité infinie
-                nextGameState = 'spelling_dictionary';
-                nextQuestionIndex = 0;
-                timerDuration = 15;
+
+        async function handleTimeUp() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        !p.hasAnswered && !p. async function handleTimeUp() {
+            if (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                    players: players.map(p => 
+                        !p.hasAnswered && !p.quickAnswer ? {
+                            ...p,
+                            hasAnswered: true,
+                            isCorrect: false
+                        } : p
+                    )
+                });
+
+                setTimeout(async () => {
+                    await nextQuestion();
+                }, 1000);
+                
+            } catch (error) {
+                console.error("Erreur temps écoulé:", error);
             }
         }
-        
-        // Mettre à jour la session avec la prochaine question
-        await db.collection('sessions').doc(currentSession).update({
-            gameState: nextGameState,
-            currentQuestion: nextQuestionIndex,
-            players: players.map(p => ({
-                ...p,
-                hasAnswered: false,
-                quickAnswer: false,
-                isCorrect: false
-            })),
-            timer: timerDuration,
-            timerStart: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-    } catch (error) {
-        console.error("Erreur question suivante:", error);
-    }
-}
 
-// ============================
-// SUPPRIMER LES FONCTIONS QUI ARRÊTENT LE JEU
-// ============================
+        // ============================
+        // NAVIGATION DES QUESTIONS
+        // ============================
+quickAnswer ? {
+                            ...p,
+                            hasAnswered: true,
+                            isCorrect: false
+                        } : p
+                    )
+                });
 
-// Remplacer les fonctions qui arrêtent le jeu par des transitions automatiques
-async function nextSpellingType(currentType) {
-    // Cette fonction est maintenant intégrée dans nextQuestion()
-    await nextQuestion();
-}
-
-async function startLexicalGame() {
-    // Cette fonction est maintenant intégrée dans nextQuestion()
-    await nextQuestion();
-}
-
-async function endFirstHalf() {
-    // Au lieu de s'arrêter à la mi-temps, continuer directement
-    if (!isHost) return;
-
-    try {
-        // Passer directement aux maths (2ème partie)
-        await db.collection('sessions').doc(currentSession).update({
-            gameState: 'math',
-            currentQuestion: 0,
-            players: players.map(p => ({
-                ...p,
-                halftimeScore: p.score, // Sauvegarder le score pour référence
-                hasAnswered: false,
-                quickAnswer: false,
-                isCorrect: false
-            })),
-            timer: 10,
-            timerStart: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    } catch (error) {
-        console.error("Erreur transition vers 2ème partie:", error);
-    }
-}
-
-// ============================
-// MODIFICATION DU CHRONOMÈTRE POUR SYNCHRONISATION PARFAITE
-// ============================
-
-function handleTimer(sessionData) {
-    const timerElement = document.getElementById('gameTimer');
-    if (!timerElement || !sessionData.timerStart) return;
-
-    const startTime = sessionData.timerStart.toDate().getTime();
-    const now = Date.now();
-    const elapsed = Math.floor((now - startTime) / 1000);
-    const remaining = Math.max(0, (sessionData.timer || 15) - elapsed);
-
-    timerElement.textContent = remaining;
-
-    timerElement.classList.remove('warning', 'danger');
-    if (remaining <= 5) {
-        timerElement.classList.add('danger');
-        // Son d'avertissement pour les 5 dernières secondes
-        if (audioEnabled && remaining === 5) {
-            speakText("5 secondes");
-        }
-    } else if (remaining <= 10) {
-        timerElement.classList.add('warning');
-    }
-
-    if (gameTimer) {
-        clearInterval(gameTimer);
-    }
-
-    gameTimer = setInterval(() => {
-        const currentRemaining = parseInt(timerElement.textContent);
-        if (currentRemaining > 0) {
-            const newRemaining = currentRemaining - 1;
-            timerElement.textContent = newRemaining;
-            
-            timerElement.classList.remove('warning', 'danger');
-            if (newRemaining <= 5) {
-                timerElement.classList.add('danger');
-                // Son d'avertissement pour les dernières secondes
-                if (audioEnabled && newRemaining === 3) {
-                    speakText("3");
-                }
-                if (audioEnabled && newRemaining === 2) {
-                    speakText("2");
-                }
-                if (audioEnabled && newRemaining === 1) {
-                    speakText("1");
-                }
-            } else if (newRemaining <= 10) {
-                timerElement.classList.add('warning');
-            }
-            
-            // Vérifier si tous les joueurs ont répondu pour accélérer la transition
-            checkAllPlayersAnswered();
-        } else {
-            clearInterval(gameTimer);
-            if (audioEnabled) {
-                speakText("Temps écoulé");
-            }
-            if (isHost) {
-                handleTimeUp();
-            }
-        }
-    }, 1000);
-}
-
-// ============================
-// AMÉLIORATION DE LA SYNCHRONISATION
-// ============================
-
-function listenToSessionChanges() {
-    if (sessionUnsubscribe) {
-        sessionUnsubscribe();
-    }
-    
-    sessionUnsubscribe = db.collection('sessions').doc(currentSession).onSnapshot((doc) => {
-        if (doc.exists) {
-            const sessionData = doc.data();
-            players = sessionData.players || [];
-            currentGameState = sessionData.gameState;
-            currentQuestionIndex = sessionData.currentQuestion || 0;
-
-            updatePlayersList();
-            updateOnlineStatus();
-
-            const startBtn = document.getElementById('startBtn');
-            if (startBtn) {
-                startBtn.disabled = players.length < 2;
-                startBtn.textContent = players.length < 2 ? 
-                    `En attente d'amis... (${players.length}/2)` : 
-                    'Démarrer la Partie ! 🚀';
-            }
-
-            // Gestion unifiée des états du jeu
-            switch(sessionData.status) {
-                case 'playing':
-                    if (document.getElementById('createSessionInterface').style.display === 'block') {
-                        startGameSession(sessionData);
-                    }
-                    handleGameState(sessionData);
-                    handleTimer(sessionData); // Synchronisation du timer
-                    break;
-                case 'halftime':
-                    // Remplacé par transition automatique
-                    break;
-                case 'second_half':
-                    handleGameState(sessionData);
-                    handleTimer(sessionData);
-                    break;
-                case 'finished':
-                    // Au lieu de s'arrêter, redémarrer une nouvelle partie
-                    restartGame();
-                    break;
-            }
-        } else {
-            resetInterface();
-        }
-    }, (error) => {
-        console.error("Erreur écoute session:", error);
-        // Reconnexion automatique en cas d'erreur
-        setTimeout(() => {
-            if (currentSession) {
-                listenToSessionChanges();
-            }
-        }, 2000);
-    });
-}
-
-// ============================
-// FONCTION POUR REDÉMARRER AUTOMATIQUEMENT
-// ============================
-
-async function restartGame() {
-    if (!isHost) return;
-    
-    try {
-        // Réinitialiser les scores ou les conserver selon préférence
-        const resetPlayers = players.map(p => ({
-            ...p,
-            score: 0, // Remettre à zéro ou garder les scores : p.score
-            halftimeScore: 0,
-            hasAnswered: false,
-            quickAnswer: false,
-            isCorrect: false,
-            readyForSecondHalf: false
-        }));
-        
-        await db.collection('sessions').doc(currentSession).update({
-            status: 'playing',
-            gameState: 'spelling_dictionary',
-            currentQuestion: 0,
-            players: resetPlayers,
-            timer: 15,
-            timerStart: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-    } catch (error) {
-        console.error("Erreur redémarrage:", error);
-    }
-}
-
-// ============================
-// AMÉLIORATION DE L'AFFICHAGE DES QUESTIONS
-// ============================
-
-function handleGameState(sessionData) {
-    const gameState = sessionData.gameState;
-    const questionIndex = sessionData.currentQuestion || 0;
-    
-    // Assurer que l'interface de jeu est visible
-    if (document.getElementById('gameArea').style.display === 'none') {
-        document.getElementById('createSessionInterface').style.display = 'none';
-        document.getElementById('gameArea').style.display = 'block';
-    }
-    
-    if (gameState.startsWith('spelling_')) {
-        const type = gameState.split('_')[1];
-        showSpellingQuestion(type, questionIndex);
-    } else if (gameState === 'anagram') {
-        showAnagramQuestion(questionIndex);
-    } else if (gameState === 'math') {
-        showMathQuestion(questionIndex);
-    } else if (gameState === 'lexical') {
-        showLexicalQuestion(questionIndex);
-    }
-    
-    // Focus automatique sur le champ de réponse
-    setTimeout(() => {
-        const answerInput = document.getElementById('answerInput');
-        if (answerInput) {
-            answerInput.focus();
-            answerInput.value = ''; // Vider le champ précédent
-        }
-    }, 500);
-}
-
+                setTimeout(async () => {
+                    await nextQuestion();
+                }, 1000);
                 
             } catch (error) {
                 console.error("Erreur temps écoulé:", error);
@@ -1835,106 +1545,249 @@ function handleGameState(sessionData) {
             if (!isHost) return;
 
             try {
-                await db.collection('sessions').doc(currentSession).update({
-                    currentQuestion: currentQuestionIndex + 1,
+                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
+                       async function nextQuestion() {
+            if (!isHost) return;
+
+            try {
+                const sessionDoc = await db.collection('sessions').doc(currentSession).get();
+                if (!sessionDoc.exists) return;
+                
+ if (!sessionDoc.exists) return;
+                
+                const sessionData = sessionDoc.data();
+                const                const sessionData = sessionDoc.data();
+                const currentGameState = sessionData.gameState;
+                const currentQIndex currentGameState = sessionData.gameState;
+                const currentQIndex = sessionData.currentQuestion || 0;
+ = sessionData.currentQuestion || 0;
+                
+                let nextGameState = currentGameState;
+                
+                let nextGameState = currentGameState;
+                let nextQuestionIndex = currentQIndex +                let nextQuestionIndex = currentQIndex + 1;
+                let timerDuration = 15 1;
+                let timerDuration = 15;
+                
+;
+                
+                if (currentGameState.startsWith('spelling_')) {
+                    const                if (currentGameState.startsWith('spelling_')) {
+                    const type = currentGameState.split('_')[1];
+                    const words type = currentGameState.split('_')[1];
+                    const words = gameData.spelling[type];
+                    
+                    if ( = gameData.spelling[type];
+                    
+                    if (nextQuestionIndex >= words.length) {
+nextQuestionIndex >= words.length) {
+                        const spellingTypes = ['dictionary', '                        const spellingTypes = ['dictionary', 'initiation', 'bible'];
+                        const currentinitiation', 'bible'];
+                        const currentIndex = spellingTypes.indexOf(type);
+                        
+Index = spellingTypes.indexOf(type);
+                        
+                        if (currentIndex < spellingTypes.length - 1                        if (currentIndex < spellingTypes.length - 1) {
+                            nextGameState = `) {
+                            nextGameState = `spelling_${spellingTypes[currentspelling_${spellingTypes[currentIndex + 1]}`;
+                           Index + 1]}`;
+                            nextQuestionIndex = 0;
+                        } else {
+                            nextQuestionIndex = 0;
+                        } else {
+                            nextGameState = 'anagram';
+ nextGameState = 'anagram';
+                            nextQuestionIndex = 0                            nextQuestionIndex = 0;
+                        }
+                    }
+                } 
+                else if;
+                        }
+                    }
+                } 
+                (currentGameState === 'anagram') {
+                    if (nextQuestionIndex else if (currentGameState === 'anagram') {
+                    if (nextQuestionIndex >= gameData.anagrams.length) {
+                        nextGameState = 'math >= gameData.anagrams.length) {
+                        nextGameState = 'math';
+                        nextQuestionIndex = 0;
+                        timerDuration';
+                        nextQuestionIndex = 0;
+                        timerDuration = 10;
+                    }
+ = 10;
+                    }
+                }
+                else if (currentGameState === 'math')                }
+                else if (currentGameState === 'math') {
+                    if (nextQuestionIndex >= gameData.math.length) {
+                        nextGameState = 'lexical';
+                        next {
+                    if (nextQuestionIndex >= gameData.math.length) {
+                        nextGameState = 'lexical';
+                        nextQuestionIndex = 0;
+                        timerQuestionIndex = 0;
+                        timerDuration = 15;
+                   Duration = 15;
+                    } else {
+                        timerDuration = gameData.math[nextQuestionIndex } else {
+                        timerDuration = gameData.math[nextQuestionIndex]?.time || 10;
+                    }
+                }
+]?.time || 10;
+                    }
+                }
+                else if (current                else if (currentGameState === 'lexical') {
+                    if (nextQuestionGameState === 'lexical') {
+                    if (nextQuestionIndex >= gameData.Index >= gameData.lexical.length) {
+                        nextlexical.length) {
+                        nextGameState = 'spelling_dictionary';
+                        nextQuestionIndex = 0;
+                        timerDuration = 15;
+GameState = 'spelling_dictionary';
+                        nextQuestionIndex = 0;
+                        timerDuration = 15;
+                    }
+                }
+                
+                await db                    }
+                }
+                
+                await db.collection('sessions')..collection('sessions').doc(currentSession).update({
+                    gameState: nextGameState,
+                    currentdoc(currentSession).update({
+                    gameState: nextGameState,
+                    currentQuestion: nextQuestionIndex,
+Question: nextQuestionIndex,
                     players: players.map(p => ({
+                        ...p,
+                                           players: players.map(p => ({
                         ...p,
                         hasAnswered: false,
                         quickAnswer: false,
+ hasAnswered: false,
+                        quickAnswer: false,
                         isCorrect: false
+                    })                        isCorrect: false
                     })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                    timer: timerDuration,
+                    timerStart: fire),
+                    timer: timerDuration,
+                    timerStart: firebase.firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
+           store.FieldValue.serverTimestamp()
+                });
+                
             } catch (error) {
-                console.error("Erreur question suivante:", error);
+                console.error("Erre } catch (error) {
+                console.error("ur question suivante:", error);
+            }
+        }
+
+        async function nextSpellingType(currentTypeErreur question suivante:", error);
             }
         }
 
         async function nextSpellingType(currentType) {
-            if (!isHost) return;
-
-            const nextTypes = {
-                'dictionary': 'spelling_initiation',
-                'initiation': 'spelling_bible', 
-                'bible': 'anagram'
-            };
-
-            const nextType = nextTypes[currentType];
-            
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    gameState: nextType,
-                    currentQuestion: 0,
-                    players: players.map(p => ({
-                        ...p,
-                        hasAnswered: false,
-                        quickAnswer: false,
-                        isCorrect: false
-                    })),
-                    timer: 15,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Erreur changement type:", error);
-            }
+            await) {
+            await nextQuestion();
         }
 
         async function startLexicalGame() {
+ nextQuestion();
+        }
+
+        async function startLexicalGame() {
+            await nextQuestion();
+        }
+
+        async function end            await nextQuestion();
+        }
+
+        async function endFirstHalf() {
+            ifFirstHalf() {
             if (!isHost) return;
 
             try {
                 await db.collection('sessions').doc(currentSession).update({
-                    gameState: 'lexical',
+ (!isHost) return;
+
+            try {
+                await db.collection('sessions').doc(currentSession).update({
+                                       gameState: 'math',
+                    currentQuestion: 0,
+                    players: players.map gameState: 'math',
                     currentQuestion: 0,
                     players: players.map(p => ({
                         ...p,
+                        halftimeScore: p.score,
+                        hasAnswered: false,
+                        quickAnswer: false,
+                        isCorrect:(p => ({
+                        ...p,
+                        halftimeScore: p.score,
                         hasAnswered: false,
                         quickAnswer: false,
                         isCorrect: false
+ false
                     })),
-                    timer: 15,
+                    timer: 10,
+                    timerStart: firebase                    })),
+                    timer: 10,
                     timerStart: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            } catch (error) {
-                console.error("Erreur début lexical:", error);
-            }
-        }
-
-        // ============================
-        // MI-TEMPS ET FIN DE JEU
-        // ============================
-        async function endFirstHalf() {
-            if (!isHost) return;
-
-            try {
-                await db.collection('sessions').doc(currentSession).update({
-                    status: 'halftime',
-                    players: players.map(p => ({
-                        ...p,
-                        halftimeScore: p.score,
-                        readyForSecondHalf: false
-                    }))
+           .firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
-                console.error("Erreur mi-temps:", error);
+                console.error } catch (error) {
+                console.error("Erreur transition vers 2ème partie("Erreur transition vers 2ème partie:", error);
             }
         }
 
+        //:", error);
+            }
+        }
+
+        // ============================
+        // MI-TEM ============================
+        // MI-TEMPS ET FIN DE JEU
+       PS ET FIN DE JEU
+        // ============================
+        function showHalftime // ============================
         function showHalftime(sessionData) {
+            document.getElementById('gameArea').style.display = '(sessionData) {
             document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('halftimeSectionnone';
             document.getElementById('halftimeSection').style.display = 'block';
 
+            const').style.display = 'block';
+
             const container = document.getElementById('halftimePlayers');
+            container = document.getElementById('halftimePlayers');
             container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                container.innerHTML = players.map(player => `
+                <div class="player <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div-card ${player.id === playerId ? 'active' : ''}">
                     <div class="player-header">
-                        <div class="player-name">${player.name}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                        <div class="player class="player-header">
+                        <div class="player-name-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online ? 'presence-online' : 'presence-offline'}"></div' : 'presence-offline'}"></div>
+                    </div>
+                    <div class="player-score">>
                     </div>
                     <div class="player-score">${player.halftimeScore} points</div>
-                    <div class="player-status">${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'}</div>
+                    <div class="player-status">${player.halftimeScore} points</div>
+                    <div class="player-status">${player.readyForSecondHalf ? '✅ Pr${player.readyForSecondHalf ? '✅ Prêt' : '⏳ En attente'êt' : '⏳ En attente'}</div>
                 </div>
+           }</div>
+                </div `).join('');
+        }
+
+        async function continueToSecondHalf() {
+            try {
+                await db.collection('s>
             `).join('');
         }
 
@@ -1942,81 +1795,161 @@ function handleGameState(sessionData) {
             try {
                 await db.collection('sessions').doc(currentSession).update({
                     players: players.map(p => 
+                        p.id === playerId ? { ...p, readyForessions').doc(currentSession).update({
+                    players: players.map(p => 
                         p.id === playerId ? { ...p, readyForSecondHalf: true } : p
                     )
                 });
 
-                const allReady = players.every(p => p.readyForSecondHalf);
+SecondHalf: true } : p
+                    )
+                });
+
+                const allReady = players                const allReady = players.every(p => p.readyForSecondHalf);
+                if (.every(p => p.readyForSecondHalf);
                 if (allReady && isHost) {
+                    startSecondallReady && isHost) {
                     startSecondHalf();
                 }
+            } catch (Half();
+                }
             } catch (error) {
+                console.error("Erreurerror) {
                 console.error("Erreur préparation 2ème mi-temps:", error);
+            }
+        préparation 2ème mi-temps:", error);
             }
         }
 
+        async function }
+
         async function startSecondHalf() {
+            if (!isHost) return startSecondHalf() {
             if (!isHost) return;
 
             try {
+                await db.collection('sessions').doc;
+
+            try {
                 await db.collection('sessions').doc(currentSession).update({
-                    status: 'second_half',
+                    status: 'second_h(currentSession).update({
+                    status: 'second_halfalf',
+                    gameState: '',
                     gameState: 'math',
+                    currentQuestion: 0,
+                    players: players.map(p => ({
+                        ...pmath',
                     currentQuestion: 0,
                     players: players.map(p => ({
                         ...p,
                         hasAnswered: false,
+                        quickAnswer,
+                        hasAnswered: false,
                         quickAnswer: false,
                         isCorrect: false
                     })),
+                    timer: false,
+                        isCorrect: false
+                    })),
                     timer: 10,
-                    timerStart: firebase.firestore.FieldValue.serverTimestamp()
+                    timerStart: firebase.fire: 10,
+                    timerStart: firebase.firestorestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
-                console.error("Erreur début 2ème mi-temps:", error);
+                console.error("Erreur début.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur début 2ème mi-temps:", error 2ème mi-temps:", error);
+            }
+       );
             }
         }
 
         function handleSecondHalf(sessionData) {
+            const gameState }
+
+        function handleSecondHalf(sessionData) {
             const gameState = sessionData.gameState;
             
+            if (gameState === = sessionData.gameState;
+            
             if (gameState === 'math') {
+                showMathQuestion(session 'math') {
                 showMathQuestion(sessionData.currentQuestion);
+            } else if (gameState === 'lexData.currentQuestion);
             } else if (gameState === 'lexical') {
-                showLexicalQuestion(sessionData.currentQuestion);
+               ical') {
+                showLex showLexicalQuestion(sessionData.currentQuestion);
+            }
+       icalQuestion(sessionData.currentQuestion);
             }
         }
 
         async function endGame() {
             if (!isHost) return;
 
+ }
+
+        async function endGame() {
+            if (!isHost) return;
+
             await db.collection('sessions').doc(currentSession).update({
+                status            await db.collection('sessions').doc(currentSession).update({
                 status: 'finished'
+            });
+: 'finished'
             });
         }
 
         function showFinalResults(sessionData) {
-            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const sortedPlayers = [...        }
+
+        function showFinalResults(sessionData) {
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.scoreplayers].sort((a, b) => b.score - a.score);
+            const winner = sortedPlayers[0];
+);
             const winner = sortedPlayers[0];
             
+            document.getElementById('game            
             document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            document.getElementById('Area').style.display = 'block';
+            document.getElementById('gameTitle').textContent = "gameTitle').textContent = "🏆 Résultats Finaux 🏆";
+            
+            document.getElementById('gameContent').inner🏆 Résultats Finaux 🏆";
             
             document.getElementById('gameContent').innerHTML = `
-                <div class="question">${winner.name} remporte la partie !</div>
+                <div class="question">HTML = `
+                <div class="question">${winner${winner.name} remporte la partie !</div>
                 <div class="players-container">
-                    ${sortedPlayers.map((player, index) => `
+                    ${.name} remporte la partie !</div>
+                <div class="players-container">
+                    ${sortedPlayers.map((player,sortedPlayers.map((player, index) => `
+                        <div class="player-card ${ index) => `
                         <div class="player-card ${player.id === winner.id ? 'active' : ''}">
+                           player.id === winner.id ? 'active' : ''}">
                             <div class="player-header">
+                                <div class=" <div class="player-header">
                                 <div class="player-name">${player.name}</div>
-                                <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                                <divplayer-name">${player.name}</div>
+                                <div class="presence-indicator ${player.isOnline ? class="presence-indicator ${player.isOnline ? 'presence-online' 'presence-online' : 'presence-offline'} : 'presence-offline'}"></div>
+                            </div>
+                            <div class="player-score">${player.score}"></div>
                             </div>
                             <div class="player-score">${player.score} points</div>
-                            <div class="player-status">${index + 1}ère place</div>
+                            <div class=" points</div>
+                            <div class="player-status">${index + 1}èreplayer-status">${index + 1}ère place</div>
+                        </div>
+                    `).join('') place</div>
                         </div>
                     `).join('')}
                 </div>
-                <button class="btn btn-success" onclick="resetInterface()">Rejouer ! 🔄</button>
+                <button class="btn btn}
+                </div>
+                <button class="btn btn-success" onclick="reset-success" onclick="resetInterfaceInterface()">Rejouer !()">Rejouer ! 🔄</button>
+            `;
+        }
+
+        // ========================= 🔄</button>
             `;
         }
 
@@ -2024,69 +1957,137 @@ function handleGameState(sessionData) {
         // FONCTIONS UTILITAIRES
         // ============================
         function updateGamePlayers() {
+            const===
+        // FONCTIONS UTILITAIRES
+        // ============================
+        function updateGamePlayers() {
             const container = document.getElementById('gamePlayers');
+            if (! container = document.getElementById('gamePlayers');
             if (!container) return;
             
             container.innerHTML = players.map(player => `
-                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+container) return;
+            
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${player.id                <div class="player-card ${player.id === playerId ? 'active' : ''}">
+                    <div === playerId ? 'active' : ''}">
                     <div class="player-header">
-                        <div class="player-name">${player.name}</div>
-                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'presence-offline'}"></div>
+                        <div class=" class="player-header">
+                        <div class="player-name">${player.name}</divplayer-name">${player.name}</div>
+                        <div class="presence-indicator ${player.isOnline ? 'pres>
+                        <div class="presence-indicator ${player.isOnline ? 'presence-online' : 'ence-online' : 'presence-offline'}presence-offline'}"></div>
                     </div>
-                    <div class="player-score">${player.score} pts</div>
+                    <div class="player-score">${player.score} pts"></div>
+                    </div>
+                    <div class="player-score">${player.score</div>
                     <div class="player-status">
-                        ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' : '❌ Raté') : 
+                        ${player.quickAnswer ? (player.isCorrect} pts</div>
+                    <div class="player-status">
+                        ${player.quickAnswer ? (player.isCorrect ? '✅ Premier' ? '✅ Premier' : ' : '❌ Raté') : 
+                         player.hasAnswered ? '✅ Répondu' : '⏳❌ Raté') : 
                          player.hasAnswered ? '✅ Répondu' : '⏳ En jeu'}
+                    </div>
+                </div>
+            En jeu'}
                     </div>
                 </div>
             `).join('');
         }
 
         function speakText(text) {
+            if (! `).join('');
+        }
+
+       audioEnabled) return;
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new Speech function speakText(text) {
             if (!audioEnabled) return;
             
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'fr-FR';
+               SynthesisUtterance(text);
+                utterance.lang = 'fr-F utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.R';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.1;
-                window.speechSynthesis.speak(utterance);
+                window.speechSynthesis1;
+                window.speechSynthesis.speak(.speak(utterance);
+            }
+       utterance);
             }
         }
 
         function generateSessionCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345 }
+
+        function generateSessionCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
+            for (6789';
+            let result = '';
             for (let i = 0; i < 4; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+() * chars.length));
             }
             return result;
         }
 
         async function leaveSession() {
+            if        }
+
+        async function leaveSession() {
             if (currentSession) {
+                try {
+ (currentSession) {
                 try {
                     await updatePresence(false);
                     
                     if (isHost) {
-                        await db.collection('sessions').doc(currentSession).delete();
+                        await db.col                    await updatePresence(false);
+                    
+                    if (isHost) {
+                        await db.collection('sessions').doclection('sessions').doc(currentSession).delete();
                     } else {
-                        const sessionDoc = await db.collection('sessions').doc(currentSession).get();
+                        const sessionDoc = await db.collection(currentSession).delete();
+                    } else {
+                        const sessionDoc = await db.collection('sessions').doc(currentSession('sessions').doc(currentSession).get();
+                        if (sessionDoc.exists) {
+                           ).get();
                         if (sessionDoc.exists) {
                             const sessionData = sessionDoc.data();
-                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId);
+                            const updatedPlayers = const sessionData = sessionDoc.data();
+                            const updatedPlayers = sessionData.players.filter(p => p.id !== playerId sessionData.players.filter(p => p.id !== playerId);
+                            await db.collection('sessions').doc(currentSession);
                             await db.collection('sessions').doc(currentSession).update({
+                                players: updatedPlayers
+                            });
+).update({
                                 players: updatedPlayers
                             });
                         }
                     }
                 } catch (error) {
-                    console.error("Erreur déconnexion:", error);
+                    console.error("Er                        }
+                    }
+                } catch (error) {
+                    console.error("Erreur déconnexion:", errorreur déconnexion:", error);
+                }
+            }
+            
+            resetInterface();
+);
                 }
             }
             
             resetInterface();
         }
+
+        function        }
 
         function resetInterface() {
             if (gameTimer) clearInterval(gameTimer);
@@ -2094,7 +2095,13 @@ function handleGameState(sessionData) {
             if (sessionUnsubscribe) sessionUnsubscribe();
             
             const interfaces = [
-                'createSessionInterface', 'gameArea', 'halftimeSection', 
+                'create resetInterface() {
+            if (gameTimer) clearInterval(gameTimer);
+            if (presenceInterval) clearInterval(presenceInterval);
+            if (sessionUnsubscribe) sessionUnsubscribe();
+            
+            const interfaces = [
+                'createSessionSessionInterface', 'gameArea', 'halftimeSection', 
                 'multiplayerInterface', 'joinInterface', 'nameInputArea'
             ];
             
@@ -2118,12 +2125,47 @@ function handleGameState(sessionData) {
 
         function startSoloGame() {
             document.getElementById('gameMode').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameInterface', 'gameArea', 'halftimeSection', 
+                'multiplayerInterface', 'joinInterface', 'nameInputArea'
+            ];
+            
+            interfaces.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+            
+            document.getElementById('gameMode').style.display = 'grid';
+            document.getElementById('onlineStatus').style.display = 'none';
+            
+            currentSession = null;
+            players = [];
+            isHost = false;
+            lastSpokenQuestion = null;
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function startSoloGame() {
+            document.getElementById('gameMode').style.display = 'none';
+            document.getElementById('gameArea').Area').style.display = 'block';
             document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
             document.getElementById('gameContent').innerHTML = `
                 <div class="question">Mode Solo en développement</div>
-                <p style="font-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
-                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode multijoueur ! 🎮
+                <p style="fontstyle.display = 'block';
+            document.getElementById('gameTitle').textContent = "Mode Solo 🎯";
+            document.getElementById('gameContent').innerHTML = `
+                <div class="question">Mode Solo en développement</div>
+                <p style="font-size:-size: 1.2rem; margin: 20px 0; color: #a5d8ff;">
+ 1.2rem; margin: 20px 0; color: #a5d8ff;">
+                    Bientôt disponible ! En attendant,                    Bientôt disponible ! En attendant, amuse-toi avec tes amis en mode amuse-toi avec tes amis en mode multijoueur ! 🎮
+                </p>
+                <button multijoueur ! 🎮 class="btn" onclick="resetInterface()">Retour au Menu</button>
+            `;
+        }
+    </script>
+
                 </p>
                 <button class="btn" onclick="resetInterface()">Retour au Menu</button>
             `;
