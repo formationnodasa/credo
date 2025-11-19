@@ -1,102 +1,964 @@
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, onValue, set, push, update } from "firebase/database";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Master - Devenez un Dieu de l'Épellation</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #f72585, #4cc9f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--success);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .training-section {
+            margin-bottom: 3rem;
+        }
+        
+        .training-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .training-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .training-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .training-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+        
+        .training-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .training-duration {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent), var(--success));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .schedule {
+            margin-bottom: 3rem;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1.5rem;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .day.active {
+            background: var(--success);
+            color: var(--dark);
+            font-weight: bold;
+        }
+        
+        .day.rest {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .day:hover {
+            transform: scale(1.1);
+        }
+        
+        .techniques {
+            margin-bottom: 3rem;
+        }
+        
+        .technique-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .technique-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .technique-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .technique-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--success);
+        }
+        
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .word-display {
+            font-size: 3rem;
+            margin: 2rem 0;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--light);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .input-area {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        input {
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 300px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .result {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            min-height: 2rem;
+        }
+        
+        .correct {
+            color: var(--success);
+        }
+        
+        .incorrect {
+            color: var(--danger);
+        }
+        
+        .motivation {
+            text-align: center;
+            font-style: italic;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .input-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Spelling Master</h1>
+            <p class="subtitle">Devenez un Dieu de l'Épellation - Préparez-vous pour le concours</p>
+        </header>
+        
+        <section class="dashboard">
+            <div class="card">
+                <h2>Vos Statistiques</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="words-mastered">0</div>
+                        <div class="stat-label">Mots Maîtrisés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="success-rate">0%</div>
+                        <div class="stat-label">Taux de Réussite</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">Série Actuelle</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="overall-progress" style="width: 0%"></div>
+                </div>
+                <p>Progression globale</p>
+            </div>
+            
+            <div class="card">
+                <h2>Prochain Entraînement</h2>
+                <div id="next-training">
+                    <h3>Session de 45 minutes</h3>
+                    <p>Méthode de mémorisation avancée</p>
+                    <p>Demain à 18:00</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="session-progress" style="width: 30%"></div>
+                </div>
+                <p>Progression de la session</p>
+            </div>
+        </section>
+        
+        <section class="training-section">
+            <h2>Programmes d'Entraînement</h2>
+            <div class="training-options">
+                <div class="training-card" data-duration="30">
+                    <div class="training-icon">⚡</div>
+                    <h3 class="training-title">Session Rapide</h3>
+                    <p class="training-duration">30 minutes</p>
+                    <p>Révisez 50 mots courants avec techniques de mémorisation accélérée</p>
+                </div>
+                <div class="training-card" data-duration="45">
+                    <div class="training-icon">🔥</div>
+                    <h3 class="training-title">Session Standard</h3>
+                    <p class="training-duration">45 minutes</p>
+                    <p>Approfondissement avec techniques mnémotechniques et répétition espacée</p>
+                </div>
+                <div class="training-card" data-duration="60">
+                    <div class="training-icon">🚀</div>
+                    <h3 class="training-title">Session Intensive</h3>
+                    <p class="training-duration">60 minutes</p>
+                    <p>Perfectionnement avec mots complexes et simulation de concours</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="schedule">
+            <h2>Calendrier d'Entraînement</h2>
+            <p>Planification optimisée avec jours de repos intégrés</p>
+            <div class="calendar" id="training-calendar">
+                <!-- Le calendrier sera généré par JavaScript -->
+            </div>
+        </section>
+        
+        <section class="techniques">
+            <h2>Techniques de Mémorisation</h2>
+            <div class="technique-list">
+                <div class="technique-item">
+                    <h3 class="technique-title">Répétition Espacée</h3>
+                    <p>Révision des mots à intervalles croissants pour une mémorisation à long terme</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Méthode des Loci</h3>
+                    <p>Associer chaque mot à un lieu pour faciliter le rappel</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Segmentation</h3>
+                    <p>Diviser les mots complexes en parties plus petites et mémorisables</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Association d'Images</h3>
+                    <p>Créer des images mentales pour chaque mot difficile</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="game-area">
+            <h2>Zone d'Entraînement</h2>
+            <p>Testez vos compétences en épellation avec des mots du dictionnaire</p>
+            
+            <div class="word-display" id="word-to-spell">Chargement...</div>
+            
+            <div class="input-area">
+                <input type="text" id="spelling-input" placeholder="Épelez le mot que vous entendez">
+                <button id="check-button">Vérifier</button>
+            </div>
+            
+            <div class="result" id="result-message"></div>
+            
+            <button id="hint-button">Indice</button>
+            <button id="next-word">Mot Suivant</button>
+        </section>
+        
+        <div class="motivation">
+            "La maîtrise vient non pas de la chance, mais de la pratique délibérée et de la persévérance."
+        </div>
+        
+        <footer>
+            <p>Spelling Master - Votre compagnon pour dominer l'épellation | Concours Janvier/Février</p>
+        </footer>
+    </div>
 
-// Configuration Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
-  authDomain: "match-en-ligne.firebaseapp.com",
-  projectId: "match-en-ligne",
-  storageBucket: "match-en-ligne.firebasestorage.app",
-  messagingSenderId: "706011207623",
-  appId: "1:706011207623:web:17374990a6202b64f0abe2",
-  measurementId: "G-D9XYRE3W2M",
-  databaseURL: "https://match-en-ligne-default-rtdb.firebaseio.com/" // Ajoutez cette ligne
-};
+    <script>
+        // Données de l'application
+        const appData = {
+            wordsMastered: 0,
+            successRate: 0,
+            currentStreak: 0,
+            trainingSchedule: [],
+            dictionary: [
+                "phénoménal", "conscience", "rhododendron", "psychologie", "xylophone",
+                "mnémotechnique", "hippopotame", "onomatopée", "parallelogramme", "exacerbation",
+                "équivoque", "inébranlable", "péremptoire", "quintessence", "sycophante",
+                "tintinnabuler", "ubiquité", "véhémence", "zélé", "abnégation"
+            ],
+            currentWord: "",
+            userProgress: []
+        };
 
-// Initialisation Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getDatabase(app);
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            generateCalendar();
+            loadNextWord();
+        });
 
-class FirebaseRealtime {
-  constructor() {
-    this.matchesRef = ref(database, 'matches');
-    this.usersRef = ref(database, 'users');
-  }
+        function initializeApp() {
+            // Charger les données depuis le localStorage si disponibles
+            const savedData = localStorage.getItem('spellingMasterData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                Object.assign(appData, parsedData);
+            }
+            
+            updateStats();
+            generateTrainingSchedule();
+        }
 
-  // Écouter les changements en temps réel
-  listenToMatches(callback) {
-    return onValue(this.matchesRef, (snapshot) => {
-      const data = snapshot.val();
-      callback(data);
-    });
-  }
+        function setupEventListeners() {
+            // Bouton de vérification
+            document.getElementById('check-button').addEventListener('click', checkSpelling);
+            
+            // Bouton d'indice
+            document.getElementById('hint-button').addEventListener('click', showHint);
+            
+            // Bouton mot suivant
+            document.getElementById('next-word').addEventListener('click', loadNextWord);
+            
+            // Entrée dans le champ de texte
+            document.getElementById('spelling-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkSpelling();
+                }
+            });
+            
+            // Cartes d'entraînement
+            document.querySelectorAll('.training-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const duration = this.getAttribute('data-duration');
+                    startTrainingSession(duration);
+                });
+            });
+        }
 
-  // Écouter un match spécifique
-  listenToMatch(matchId, callback) {
-    const matchRef = ref(database, `matches/${matchId}`);
-    return onValue(matchRef, (snapshot) => {
-      const data = snapshot.val();
-      callback(data);
-    });
-  }
+        function generateCalendar() {
+            const calendar = document.getElementById('training-calendar');
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            
+            // Ajouter les en-têtes de jours
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day';
+                dayHeader.textContent = day;
+                dayHeader.style.fontWeight = 'bold';
+                calendar.appendChild(dayHeader);
+            });
+            
+            // Générer les jours du mois (exemple sur 28 jours)
+            for (let i = 1; i <= 28; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = i;
+                
+                // Marquer les jours d'entraînement et de repos
+                if (i % 7 === 0) {
+                    dayElement.classList.add('rest'); // Jour de repos
+                } else if (i % 2 === 0) {
+                    dayElement.classList.add('active'); // Jour d'entraînement
+                }
+                
+                calendar.appendChild(dayElement);
+            }
+        }
 
-  // Créer un nouveau match
-  async createMatch(matchData) {
-    try {
-      const newMatchRef = push(this.matchesRef);
-      await set(newMatchRef, {
-        ...matchData,
-        createdAt: Date.now(),
-        status: 'en_attente'
-      });
-      return newMatchRef.key;
-    } catch (error) {
-      console.error('Erreur création match:', error);
-      throw error;
-    }
-  }
+        function generateTrainingSchedule() {
+            // Générer un programme d'entraînement sur 8 semaines
+            const schedule = [];
+            const startDate = new Date();
+            
+            for (let week = 0; week < 8; week8; week++)++) {
+                const weekSchedule {
+                const weekSchedule = [];
+ = [];
+                
+                for                
+                for (let day = 0; day (let day = 0; day < 7; day++) {
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.getDate() < 7; day++) {
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.get + (week * 7) +Date() + (week * 7) + day);
+                    
+ day);
+                    
+                    let session = null;
+                    
+                    let session = null                   ;
+                    
+                    // Plan // Planifier des sessions différentes selon leifier des sessions différentes selon le jour
+                    if jour
+                    if (day (day === 0 === 0 || day === || day === 3 || 3 || day === day === 6) {
+                        6) {
+                        // J // Jours de reposours de repos ou ré ou révision légèrevision légère
+                        if
+                        if (day ===  (day === 6)6) {
+                            session = { type: 'repos', duration: 0 };
+                        } {
+                            session = { type: 'repos', duration: 0 };
+ else {
+                            session = {                        } else {
+                            session = { type: type: 'révision', 'révision', duration: duration: 30 };
+                        30 };
+                        }
+                    }
+                    } else {
+                        // J } else {
+                        // Jours d'entraînementours d'entraînement
+                        const sessionTypes =
+                        const sessionTypes = [
+                            [
+                            { type: 'mémoire', duration: 45 },
+ { type: 'mémoire', duration: 45 },
+                            { type: 'vit                            { type: 'vitesse', duration: 60esse', duration: 60 },
+ },
+                            { type: 'pr                            { type: 'précécision', duration: ision', duration: 45 }
+                        ];
+                        session45 }
+                        ];
+                        = session session = sessionTypes[day % 3];
+Types[day % 3];
+                    }
+                    
+                    weekSchedule.push({
+                                           }
+                    
+                    weekSchedule.push({
+                        date: new Date(currentDate),
+                        session: session date: new Date(currentDate),
+                        session: session
+                    });
+                }
+                
+                schedule.push(week
+                    });
+                }
+                
+                schedule.push(weekScheduleSchedule);
+            }
+            
+            appData.trainingSchedule);
+            }
+            
+            appData.trainingSchedule = schedule;
+            updateNextTraining();
+        }
 
-  // Mettre à jour un match
-  async updateMatch(matchId, updates) {
-    try {
-      const matchRef = ref(database, `matches/${matchId}`);
-      await update(matchRef, {
-        ...updates,
-        updatedAt: Date.now()
-      });
-    } catch (error) {
-      console.error('Erreur mise à jour match:', error);
-      throw error;
-    }
-  }
+ = schedule;
+            updateNextTraining();
+        }
 
-  // Ajouter un utilisateur
-  async addUser(userData) {
-    try {
-      const newUserRef = push(this.usersRef);
-      await set(newUserRef, {
-        ...userData,
-        createdAt: Date.now(),
-        isOnline: true
-      });
-      return newUserRef.key;
-    } catch (error) {
-      console.error('Erreur ajout utilisateur:', error);
-      throw error;
-    }
-  }
-}
+               function updateNextTraining() {
+ function updateNextTraining() {
+                       const today = new Date const today = new Date();
+            let nextTraining =();
+            let nextTraining = null;
+            
+            // Trou null;
+            
+            // Trouver la prochaine sessionver la prochaine session d d'entraînement
+           'entraînement
+            for (const week of appData for (const week of appData.trainingSchedule) {
+               .trainingSchedule) {
+                for (const day of week) for (const day of {
+                    if (day.session week) {
+                    if (day.duration > 0.session.duration > 0 && day.date > && day.date > today) {
+                        next today) {
+                        nextTraining = day;
+                        break;
+                    }
+                }
+Training = day;
+                        break;
+                    }
+                if (nextTraining)                }
+                if (nextTraining break;
+            }
+            
+           ) break;
+            }
+            
+            if (nextTraining) {
+ if (nextTraining) {
+                const nextTrainingElement =                const nextTrainingElement = document.getElementById('next-training');
+                next document.getElementById('next-training');
+                nextTrainingElement.innerHTML = `
+                   TrainingElement.innerHTML = `
+                    <h3>Session de <h3>Session de ${nextTraining.session.duration ${nextTraining.session.duration}} minutes</h3>
+                    minutes</h3>
+                    <p>Entraînement <p>Entraînement ${nextTraining.session.type}</p>
+                    <p>${format ${nextTraining.session.type}</p>
+                    <p>${formatDate(nextTraining.date)}</Date(nextTraining.date)}</p>
+p>
+                `;
+            }
+        }
 
-// Exemple d'utilisation
-const firebaseRT = new FirebaseRealtime();
+        function format                `;
+            }
+        }
 
-// Écouter tous les matches en temps réel
-firebaseRT.listenToMatches((matches) => {
-  console.log('Matches mis à jour:', matches);
-  // Mettre à jour votre interface utilisateur ici
-});
+        function formatDate(date) {
+            returnDate(date) {
+            return date.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                date.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+ year: 'numeric', 
+                month: 'long', 
+                month: 'long', 
+                day: 'numeric',
+                day: 'numeric',
+                               hour: '2-digit',
+                minute: ' hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
 
-// Exporter pour utilisation dans d'autres fichiers
-export default firebaseRT;
+       2-digit'
+            });
+        }
+
+        function function loadNextWord() {
+            loadNextWord() {
+            // Sélectionner un mot // Sélectionner un mot aléatoire du dictionnaire aléatoire du dictionnaire
+            const randomIndex
+            const randomIndex = Math.floor(Math.random() * app = Math.floor(Math.random() * appData.dictionary.length);
+            appData.currentWord = appData.dictionary[Data.dictionary.length);
+            appData.currentWord = appData.dictionary[randomIndex];
+            
+            //randomIndex];
+            
+            // Afficher le mot avec Afficher le mot avec certaines lettres masquées pour l certaines lettres masquées pour l'entraînement
+           'entraînement
+            const displayElement = document.getElementById('word-to-spell const displayElement = document.getElementById('word-to-spell');
+            display');
+            displayElement.textContentElement.textContent = appData.current = appData.currentWord;
+           Word;
+            displayElement displayElement.classList.remove.classList.remove('correct('correct', 'incorrect', 'incorrect');
+            
+           ');
+            
+            // Réinitial // Réinitialiser le champ deiser le champ de saisie et saisie et le message de le message de résultat
+            document.getElementById('spelling-input'). résultat
+            document.getElementById('value = '';
+            document.getElementByIdspelling-input').value = '';
+            document.getElementById('result-message('result-message').textContent').textContent = '';
+            
+ = '';
+            
+            // Pron            // Prononceroncer le mot (sim le mot (simulation)
+           ulation)
+            speakWord(app speakWord(appData.currentWordData.currentWord);
+        }
+
+       );
+        }
+
+        function speakWord function speakWord(word) {
+            // Util(word) {
+            // Utiliser l'API de synthèse vocale du navigateur
+            if ('speechSynthesis' in window) {
+                const utteranceiser l'API de synthèse vocale du navigateur
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechS = new SpeechSynthesisUtteranceynthesisUtterance(word);
+                utterance.lang = 'fr-F(word);
+                utterance.lang =R';
+                utterance.rate 'fr-FR';
+                utterance.rate = 0 = 0.8; // Vitesse de parole rédu.8; // Vitesse deite
+                speechSynthesis parole réduite
+                speechSynthesis.speak.speak(utterance);
+           (utterance);
+            }
+        }
+
+        function checkSp }
+        }
+
+        function checkSpellingelling() {
+            const userInput = document.getElementById('sp() {
+            const userInput = document.getElementById('spelling-inputelling-input').value.trim().toLowerCase').value.trim().toLowerCase();
+            const correctWord =();
+            const correctWord = appData.currentWord.toLowerCase();
+ appData.currentWord.toLowerCase();
+            const resultElement = document.getElementById('result-message');
+            const            const resultElement = document.getElementById('result-message');
+            const wordElement wordElement = document.getElementById(' = document.getElementById('word-to-spword-to-spell');
+            
+           ell');
+            
+            if (userInput if (userInput === correctWord) {
+                resultElement.text === correctWord) {
+                resultContent = "Correct! ExcellenteElement.textContent = "Correct! Excellente orthographe orthographe!!";
+                result";
+                resultElement.className = 'result correct';
+                wordElement.classList.add('Element.className = 'result correct';
+                wordElementcorrect');
+                
+                // Mettre à jour les statist.classList.add('correct');
+                
+                // Mettre à jour les statistiques
+                appiques
+                appData.Data.wordsMastered++;
+wordsMastered++;
+                app                appData.currentStreak++;
+               Data.currentStreak++;
+                appData.successRate = Math.min( appData.successRate = Math.min(100, appData.successRate + 5);
+                
+                // Animation de réussite
+                wordElement.style.animation = 'bounce 1s';
+                setTimeout(() => {
+                    wordElement.style.animation = '';
+                }, 1000);
+            } else {
+                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
+                resultElement.className = 'result incorrect';
+                wordElement.classList.add('incorrect');
+                
+                // Mettre à jour les statistiques
+                appData.currentStreak = 0;
+                appData.successRate = Math.max(0, appData.successRate - 2);
+            }
+            
+            updateStats();
+            saveProgress();
+            
+            // Passer au mot suivant après un délai
+            setTimeout(loadNextWord, 3000);
+100, appData.successRate + 5);
+                
+                // Animation de réussite
+                wordElement.style.animation = 'bounce 1s';
+                setTimeout(() => {
+                    wordElement.style.animation = '';
+                }, 1000);
+            } else {
+                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
+                resultElement.className = 'result incorrect';
+                wordElement.classList.add('incorrect');
+                
+                // Mettre à jour les statistiques
+                appData.currentStreak = 0;
+                appData.successRate = Math.max(0, appData.successRate - 2);
+            }
+            
+            updateStats();
+            saveProgress();
+            
+            // Passer au mot suivant après un délai
+            setTimeout(loadNextWord, 3000);
+               }
+
+        function showHint() }
+
+        function showHint() {
+            const word = appData.currentWord {
+            const word = appData.currentWord;
+;
+            const hintLength = Math            const hintLength = Math.ceil(word.length / .ceil(word.length /3);
+            const hint = word 3);
+            const hint = word.substring(0, hintLength.substring(0, hintLength)) + '...';
+            
+            + '...';
+            
+            document document.getElementById('result-m.getElementById('result-message').textContent = `essage').textContent = `IndIndice: ${hint}`;
+            document.getElementById('result-message').className = 'result';
+        }
+
+        function startTrainingSession(duration) {
+            // Simuler le début d'une session d'entraînementice: ${hint}`;
+            document.getElementById('result-message').className = 'result';
+        }
+
+        function startTrainingSession(duration) {
+            // Simuler le début d
+            alert(`Début de la session d'une session d'entraînement
+            alert(`Début de la session d'ent'entraînement de ${duration} minutes!`);
+raînement de ${duration} minutes!`);
+            
+            // Mettre à jour la barre de progression            
+            // Mettre à jour la barre de de session
+            const session progression de session
+            const sessionProgress = document.getElementByIdProgress = document.getElementById('session('session-progress');
+-progress');
+            session            sessionProgress.style.width = 'Progress.style.width = '0%0%';
+            
+            // Animation';
+            
+            // Animation de progression
+            let progress =  de progression
+            let progress = 0;
+            const0;
+            const interval = interval = setInterval(() => {
+                progress += setInterval(() => {
+                progress += 100 100 / (duration * 60 /  / (duration * 60 / 100100); // Simuler la progression en temps réel); // Simuler la progression en temps réel
+                sessionProgress.style.width =
+                sessionProgress.style.width = `${Math.min(progress, `${Math.min(progress, 100)} 100)}%`;
+%`;
+                
+                if (progress >=                 
+                if (progress >= 100) {
+                    clearInterval(interval100) {
+                    clearInterval(interval);
+                    alert('Session terminée! Excellent travail!);
+                    alert('Session terminée! Excellent travail!');
+');
+                    
+                    // Mettre                    
+                    // Mettre à jour à jour les statistiques
+ les statistiques
+                    appData.wordsMastered +=                    appData.wordsMastered += 10;
+                    updateStats();
+ 10;
+                    updateStats();
+                }
+            },                 }
+            }, 100);
+100);
+        }
+
+        function update        }
+
+        function updateStats() {
+            document.getElementById('Stats() {
+            document.getElementByIdwords-mastered').text('words-mastered').textContent = appDataContent = appData.wordsMaster.wordsMastered;
+            document.getElementByIded;
+            document.getElementById('success-rate').('success-rate').textContent = `${appData.successRate}%`;
+            document.getElementByIdtextContent = `${appData.successRate}%`;
+            document.getElementById('streak('streak').textContent = app').textContent = appData.currentStreakData.currentStreak;
+            
+;
+            
+            // Mettre            // Mettre à jour la barre de progression globale
+ à jour la barre de progression globale
+            const overallProgress            const overallProgress = document.getElementById = document.getElementById('overall('overall-progress');
+-progress');
+            const progressPercentage            const progressPercentage = Math.min(100, (appData. = Math.min(100, (appData.wordsMasterwordsMastered / 200ed / 200) * 100) * 100);
+           );
+            overallProgress.style.width overallProgress.style.width = `${progressPercentage}%`;
+        = `${progressPercentage}%`;
+        }
+
+ }
+
+               function saveProgress() function saveProgress() {
+            // {
+            // Sauvegarder les Sauvegarder les données dans le localStorage données dans le localStorage
+            localStorage.setItem('spellingMasterData', JSON
+            localStorage.setItem('spellingMasterData', JSON.stringify(appData));
+        }
+    </script>
+</body>
+</html>
