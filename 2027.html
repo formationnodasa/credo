@@ -3,37 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Master - Devenez un Dieu de l'Épellation</title>
+    <title>Spéciale Ya Lwanga Credo Musao - Devenez un Dieu de l'Épellation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --success: #4cc9f0;
-            --warning: #f8961e;
-            --danger: #e63946;
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --light: #ffffff;
+            --dark: #0f0c29;
+            --success: #00ff88;
+            --warning: #ffcc00;
+            --danger: #ff3333;
+            --neon: #00ffff;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             color: var(--light);
             overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animation Galaxie */
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .nebula {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 30s infinite linear;
+        }
+        
+        .nebula-1 {
+            background: radial-gradient(circle, #6a11cb, transparent);
+            top: 10%;
+            left: 10%;
+        }
+        
+        .nebula-2 {
+            background: radial-gradient(circle, #2575fc, transparent);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -15s;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 50px) rotate(360deg); }
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
         
         header {
@@ -43,19 +99,40 @@
         }
         
         h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(to right, #f72585, #4cc9f0);
+            text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon);
+            background: linear-gradient(to right, #ff2d75, #00ffff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #ff2d75, #00ffff);
+            border-radius: 10px;
+        }
+        
+        .legend {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+            font-style: italic;
         }
         
         .subtitle {
             font-size: 1.5rem;
             opacity: 0.9;
             margin-bottom: 2rem;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
         
         .dashboard {
@@ -67,23 +144,36 @@
         
         .card {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent), var(--neon));
         }
         
         .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
         
         .card h2 {
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
             color: var(--success);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
         
         .stats {
@@ -100,6 +190,7 @@
             font-size: 2.5rem;
             font-weight: bold;
             color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 45, 117, 0.5);
         }
         
         .stat-label {
@@ -127,6 +218,23 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .training-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .training-card:hover::before {
+            left: 100%;
         }
         
         .training-card:hover {
@@ -138,6 +246,7 @@
             font-size: 3rem;
             margin-bottom: 1rem;
             color: var(--success);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
         
         .training-title {
@@ -165,6 +274,7 @@
             background: linear-gradient(to right, var(--accent), var(--success));
             border-radius: 5px;
             transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 45, 117, 0.5);
         }
         
         .schedule {
@@ -193,11 +303,13 @@
             background: var(--success);
             color: var(--dark);
             font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
         
         .day.rest {
             background: var(--warning);
             color: var(--dark);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
         }
         
         .day:hover {
@@ -219,84 +331,232 @@
             border-radius: 15px;
             padding: 1.5rem;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .technique-item:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .technique-item::before {
+            content: position: absolute;
+            top '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            left: 0;
+            width: 0;
+            width: 5px;
+: 5px;
+                       height: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, var background: linear-gradient(to bottom, var(--accent), var(--(--accent), var(--neon));
+        }
+        
+neon));
+        }
+        
+        .technique-item:hover        .technique-item:hover {
+ {
+            background: rgba(            background: rgba(255255, 255, , 255, 255,255, 0 0..2);
+            transform: translateY(-52);
             transform: translateY(-5px);
         }
         
-        .technique-title {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--success);
+       px);
         }
         
-        .game-area {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        .technique-title {
+            font-size: 1.2 .technique-title {
+            font-size: 1.2rem;
+            margin-bottom: rem;
+            margin-bottom: 0.5rem;
+           0.5rem;
+            color: var(--success);
+ color: var(--success);
+        }
+        
+        .        }
+        
+        .gamegame-area {
+            background: rgba(-area {
+            background: rgba(255255, 255, , 255, 255255, 0., 0.1);
+            backdrop-filter: blur(1);
+            backdrop-filter: blur(15px15px);
+            border-radius: 20px;
+            padding:);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 3rem;
             text-align: center;
+ 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            position: relative;
+                       overflow: hidden;
+        }
+ overflow: hidden;
+        }
+        
+        .game-area::        
+        .game-area::beforebefore {
+            content: '';
+ {
+            content: '';
+                       position: absolute;
+            top position: absolute;
+            top:: 0;
+            left 0;
+            left:: 0;
+            width: 0;
+            width: 100%;
+            height: 100%;
+            height: 100%;
+            100%;
+            background: radial background: radial-gradient(circle at -gradient(circle at 30%30% 30%, rgba 30%, rgba((106106, 17, , 17, 203, 0.2), transparent 203, 0.2), transparent 50%);
+       50%);
         }
         
         .word-display {
-            font-size: 3rem;
-            margin: 2rem 0;
+            font }
+        
+        .word-display {
+            font-size:-size: 3. 3.5rem;
+5rem;
+            margin: 2            margin: 2remrem 0;
+            font-weight 0;
             font-weight: bold;
             letter-spacing: 5px;
-            color: var(--light);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: pulse 2s infinite;
+: bold;
+            letter-spacing: 5px;
+            color            color: var(--light: var(--light);
+           );
+            text-shadow:  text-shadow: 0 0 0 10px rgba(0 10px rgba(255, 255, 255, 255, 255, 0.7);
+            animation: pulse 255, 0.7);
+            animation: pulse 2s2s infinite;
+            font infinite;
+            font-family:-family: 'Courier New', 'Courier New', mon monospace;
         }
         
-        .input-area {
+       ospace;
+        }
+        
+        . .input-area {
+            displayinput-area {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            justify-content: flex;
+            justify-content: center: center;
+            gap:;
+            gap: 1 1rem;
+            marginrem;
+            margin-bottom:-bottom: 2rem;
+        }
+ 2rem;
         }
         
+               
         input {
-            padding: 1rem 1.5rem;
-            font-size: 1.2rem;
+            padding input {
+            padding: 1rem 1: 1rem 1.5.5rem;
+            fontrem;
+            font-size: -size: 1.21.2rem;
+rem;
             border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            width: 300px;
-            text-align: center;
+            border: none;
+            border            border-radius: 10px-radius: 10px;
+           ;
+            background: rgba( background: rgba(255,255, 255,  255, 255, 0.9255, 0.9);
+            width);
+            width: 300: 300px;
+            textpx;
+            text-align: center-align: center;
+            box;
+            box-shadow: 0 5-shadow: 0 5px 15pxpx 15px rgba(0, 0, rgba(0, 0, 0, 0.2);
+ 0, 0.2);
+            transition:            transition: all 0.3s all 0.3s ease;
+ ease;
+        }
+        
+               }
+        
+        input:focus {
+            outline: none input:focus {
+            outline: none;
+            box-shadow:;
+            box-shadow:  0 0 150 0 15pxpx var(--neon);
+            transform: scale(1.05);
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            font-size:  var(--neon);
+            transform: scale(1.05);
         }
         
         button {
             padding: 1rem 2rem;
             font-size: 1.2rem;
-            border: none;
+1.2rem;
+                       border: border: none;
+            border none;
             border-radius: 10px;
-            background: var(--accent);
-            color: white;
-            cursor: pointer;
+            background-radius: 10px;
+            background: linear: linear-gradient(to right, var(--accent-gradient(to right, var(--accent), var), var(--primary));
+           (--primary));
+            color color: white;
+            cursor: white;
+            cursor: pointer: pointer;
+            transition: all ;
             transition: all 0.3s ease;
-            font-weight: bold;
+0.3s ease;
+                       font-weight: bold;
+ font-weight: bold;
+            box            box-shadow: 0-shadow: 0  5px 15px rgba5px 15px rgba((0, 0, 0, 0, 0, 0.30, 0.3);
+);
         }
+        
+        button        }
         
         button:hover {
-            background: var(--primary);
-            transform: scale(1.05);
+:hover {
+            transform: scale            transform: scale(1(1.05);
+           .05);
+            box-shadow box-shadow: 0 : 0 0 0 15px var(--ac15px var(--accent);
+       cent);
         }
+        
+        . }
         
         .result {
-            font-size: 1.5rem;
-            margin-top: 1rem;
-            min-height: 2rem;
+result {
+            font-size:            font-size: 1 1.5rem;
+.5rem;
+            margin            margin-top: 1-top: 1rem;
+           rem;
+            min-height: min-height: 2rem;
+ 2rem;
+            font-weight:            font-weight: bold;
+ bold;
         }
         
-        .correct {
+               }
+        
+        .correct .correct {
+            color: {
             color: var(--success);
+            text-shadow: 0 0 10px rgba(0, 255 var(--success);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
         
         .incorrect {
             color: var(--danger);
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+        
+       , 136, 0.5);
+        }
+        
+        .incorrect {
+            color: var(--danger);
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
         }
         
         .motivation {
@@ -305,38 +565,81 @@
             margin: 2rem 0;
             font-size: 1.2rem;
             opacity: 0.9;
+            padding: 1rem;
+            border-radius .motivation {
+            text-align: center;
+            font-style: italic;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            padding: 1rem;
+            border-radius: 10: 10px;
+           px;
+            background: rgba background: rgba(255,(255, 255, 255, 255, 0 255, 0.1.1);
         }
         
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+);
+        }
+        
+        footer        footer {
+            text-align {
+            text-align: center: center;
+           ;
+            margin-top margin-top:: 3rem;
+            padding-top: 3rem;
+            padding-top: 2rem 2rem;
+            border-top: 1;
+            border-top: 1px solid rgba(px solid rgba(255, 255, 255, 255, 255, 0255, 0.2);
+        }
+        
+        /* Anim.2);
         }
         
         /* Animations */
+ations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+                   @keyframes fadeIn {
+            from { from { opacity: 0 opacity: 0; transform; transform: translateY(: translateY(20px20px); }
+            to {); }
+            to { opacity: opacity: 1; transform 1; transform: translateY: translateY(0); }
+(0); }
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @key        }
+        
+        @keyframes pulseframes pulse {
+            0% {
+            0% { transform: scale(1 { transform: scale(1); text-shadow: 0 0 ); text-shadow: 0 0 10px rgba(25510px rgba(255, , 255, 255,255, 255,  0.7); }
+            0.7); }
+            5050% { transform: scale% { transform: scale(1(1.05); text.05); text-shadow: 0 0-shadow: 0 0 20px rgba(255,  20px rgba(255, 255, 255, 255, 255, 0.9); }
+            0.9); }
+            100% { transform: scale100% { transform: scale((1); text-shadow: 1); text-shadow: 0 0 10px rgba0 0 10px rgba(255, 255,(255, 255, 255, 0. 255, 0.7); }
+7); }
         }
         
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        }
+        
+        @key        @keyframes bounce {
+            frames bounce {
+            0%,0%, 20%, 50%, 80%, 100% { transform: translateY 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10(0); }
             40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+px); }
+            60%            60% { transform: translateY { transform: translateY(-5(-5px); }
+        }
+px); }
         }
         
+               
         .bounce {
-            animation: bounce 2s infinite;
+ .bounce {
+            animation            animation: bounce 2: bounce 2s infinites infinite;
         }
         
-        /* Responsive */
+;
+        }
+        
+        /*        /* Responsive */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -358,111 +661,245 @@
     </style>
 </head>
 <body>
+    <!-- Animation Galaxie -->
+    <div class="galaxy" id="galaxy"></div>
+    
     <div class="container">
         <header>
-            <h1>Spelling Master</h1>
-            <p class="subtitle">Devenez un Dieu de l'Épellation - Préparez-vous pour le concours</p>
-        </header>
+            <h1>Spéciale Ya Lwanga Credo Musao</h1>
+            <p class="legend">Épellation des mots du dictionnaire</p>
+            Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .input-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animation Galaxie -->
+    <div class="galaxy" id="galaxy"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Spéciale Ya Lwanga Credo Musao</h1>
+            <p class="legend">Épellation des mots du dictionnaire</p>
+ <p class="subtitle">De            <p class="subtitle">Devenez unvenez un Dieu de l' Dieu de l'ÉpÉpellation -ellation - Préparez-vous pour Préparez-vous pour le le concours</p>
+        concours</p>
+        </header </header>
         
-        <section class="dashboard">
-            <div class="card">
-                <h2>Vos Statistiques</h2>
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="words-mastered">0</div>
-                        <div class="stat-label">Mots Maîtrisés</div>
+       >
+        
+        <section class <section class="dashboard">
+           ="dashboard">
+            <div <div class=" class="card">
+                <h2>card">
+                <h2>Vos Statistiques</Vos Statistiques</h2h2>
+                <div>
+                <div class="stats class="stats">
+                   ">
+                    <div class="stat <div class="stat-item">
+-item">
+                        <div class                        <div class="stat-value="stat-value" id="words" id="words-mastered">0</div>
+                       -mastered">0</div <div class="stat-label>
+                        <div class="stat-label">">Mots MaîtrisMots Maîtrisésés</div>
+                    </div</div>
                     </div>
+                    <div class="stat>
                     <div class="stat-item">
-                        <div class="stat-value" id="success-rate">0%</div>
-                        <div class="stat-label">Taux de Réussite</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="streak">0</div>
-                        <div class="stat-label">Série Actuelle</div>
-                    </div>
+                        <div class-item">
+                        <div class="stat="stat-value" id="-value" id="success-ratesuccess-rate">0%</">0%</div>
+div>
+                        <div class="                        <div class="statstat-label">Taux de Ré-label">Taux de Réussite</div>
+                   ussite</div>
+                    </ </div>
+                    <divdiv>
+                    <div class=" class="stat-item">
+                        <stat-item">
+                        <divdiv class="stat-value" id class="stat-value" id="streak">0</div>
+                        <div class="="streak">0</div>
+                        <div class="stat-label">stat-label">Série ActuelleSérie Actuelle</div</div>
+>
+                                       </ </div>
+               div>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress" id="overall-progress" style="width: 0%"></div>
                 </div>
-                <p>Progression globale</p>
+                <div class="progress <div class="progress-bar">
+                    <div-bar">
+                    <div class="progress" id class="progress" id="overall-pro="overall-progress" style="widthgress" style="width: 0%: 0%"></div>
+                </div>
+"></div>
+                </div>
+                <p>Pro                <p>Progression globale</pgression globale</p>
+            </div>
             </div>
             
-            <div class="card">
-                <h2>Prochain Entraînement</h2>
-                <div id="next-training">
-                    <h3>Session de 45 minutes</h3>
-                    <p>Méthode de mémorisation avancée</p>
-                    <p>Demain à 18:00</p>
+>
+            
+            <div            <div class="card">
+ class="card">
+                <h                <h2>Prochain2>Prochain Entra Entraînement</hînement</h2>
+               2>
+                <div id <div id="next-training="next-training">
+">
+                    <h                    <h3>Session de 3>Session de 45 minutes</h45 minutes</h3>
+                    <3>
+                    <p>Méthode de mémorisation avancée</p>Méthode de mémorisation avancée</pp>
+                    <p>Demain à>
+                    <p>Demain à 18:00</p 18:00</p>
+>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress" id="session-progress" style="width: 30%"></div>
-                </div>
-                <p>Progression de la session</p>
+                <                </div>
+                <divdiv class="progress-bar">
+                    class="progress-bar">
+                    <div class="progress" <div class="progress" id="session-progress" id="session-progress" style="width: 30 style="width: 30%"></div>
+               %"></div>
+                </ </div>
+                <p>div>
+                <p>ProgressionProgression de la session</p>
+ de la session</p>
             </div>
-        </section>
+                   </div>
+        </ </section>
+        
+        <sectionsection>
         
         <section class="training-section">
-            <h2>Programmes d'Entraînement</h2>
-            <div class="training-options">
-                <div class="training-card" data-duration="30">
+            class="training-section">
+            <h2>Programmes <h2>Programmes d' d'Entraînement</Entraînement</hh2>
+            <div2>
+            <div class="training class="training-options">
+               -options">
+                <div class="training-card <div class="training-card" data-duration="30">
+                    <div class="training-icon">⚡</div" data-duration="30">
                     <div class="training-icon">⚡</div>
-                    <h3 class="training-title">Session Rapide</h3>
-                    <p class="training-duration">30 minutes</p>
-                    <p>Révisez 50 mots courants avec techniques de mémorisation accélérée</p>
+>
+                    <h3 class="                    <h3 class="training-titletraining-title">Session Rapide">Session Rapide</h</h3>
+                   3>
+                    <p class="training-duration"> <p class="training-duration">3030 minutes</p>
+                    minutes</p>
+                    <p>Révisez  <p>Révisez 50 mots courants avec techniques de50 mots courants avec techniques de mémorisation accél mémorisation accélérée</p>
+érée</p>
                 </div>
-                <div class="training-card" data-duration="45">
-                    <div class="training-icon">🔥</div>
+                <div class                </div>
+                <div class="training-card" data-duration="training-card" data-duration="="45">
+                   45">
+                    <div class=" <div class="training-icon">🔥</div>
+                    <h3 classtraining-icon">🔥</div>
                     <h3 class="training-title">Session Standard</h3>
-                    <p class="training-duration">45 minutes</p>
-                    <p>Approfondissement avec techniques mnémotechniques et répétition espacée</p>
+                   ="training-title">Session Standard</h3>
+                    <p class=" <p class="training-duration">45 minutes</p>
+training-duration">45 minutes</p>
+                    <p>Approfond                    <p>Approfondissementissement avec techniques mnémotechniques avec techniques mnémotechniques et répétition espac et répétition espacée</p>
+                </ée</p>
                 </div>
-                <div class="training-card" data-duration="60">
-                    <div class="training-icon">🚀</div>
-                    <h3 class="training-title">Session Intensive</h3>
-                    <p class="training-duration">60 minutes</p>
-                    <p>Perfectionnement avec mots complexes et simulation de concours</p>
-                </div>
+                <div classdiv>
+                <div class="training-card" data="training-card" data-duration="60">
+                   -duration="60">
+                    <div class="training-icon"> <div class="training-icon">🚀</div>
+                    <h🚀</div>
+                    <h3 class="training-title">3 class="training-title">SessionSession Intensive</h3>
+ Intensive</h3>
+                                       <p class="training <p class="training-duration-duration">60 minutes</p">60 minutes</p>
+>
+                    <p>Perfection                    <p>Perfectionnement avecnement avec mots complexes et mots complexes et simulation de concours</p>
+ simulation de concours</p>
+                               </div>
+            </ </div>
             </div>
+div>
+        </section>
         </section>
         
-        <section class="schedule">
-            <h2>Calendrier d'Entraînement</h2>
-            <p>Planification optimisée avec jours de repos intégrés</p>
+               
+        <section class="sche <section class="scheduledule">
+            <h2>">
+            <h2>Calendrier d'EntCalendrier d'Entraraînement</h2înement</h2>
+>
+            <p>Plan            <p>Planification optimification optimisée avec jours deisée avec jours de repos intég repos intégrés</p>
+            <div class="calendar" id="training-calendar">
+                <!-- Le calendrier sera génrés</p>
             <div class="calendar" id="training-calendar">
                 <!-- Le calendrier sera généré par JavaScript -->
-            </div>
+éré par JavaScript -->
+            </            </div>
+        </section>
+div>
         </section>
         
+        <section class="techn        
         <section class="techniques">
-            <h2>Techniques de Mémorisation</h2>
+            <hiques">
+            <h22>Techniques de Mém>orTechniques de Mémorisation</isation</h2h2>
+            <div class="technique-list>
             <div class="technique-list">
-                <div class="technique-item">
-                    <h3 class="technique-title">Répétition Espacée</h3>
-                    <p>Révision des mots à intervalles croissants pour une mémorisation à long terme</p>
+                <div class">
+                <div class="technique-item="technique-item">
+                   ">
+                    <h3 class <h3 class="technique="technique-title">Rép-title">Répétitionétition Espacée</h Espacée</h3>
+3>
+                    <p                    <p>Ré>Révision des mots àvision des mots à intervalles croissants intervalles croissants pour une mém pour une mémorisationorisation à à long long terme terme</p>
+               </p>
                 </div>
+                <div </div>
                 <div class="technique-item">
-                    <h3 class="technique-title">Méthode des Loci</h3>
-                    <p>Associer chaque mot à un lieu pour faciliter le rappel</p>
+ class="technique-item">
+                    <h3 class="                    <h3 class="technique-title">Méthtechnique-title">Méthode des Lociode des Loci</h3>
+                    <p</h3>
+                    <p>Associer chaque mot>Associer chaque mot à un lieu pour faciliter le à un lieu pour faciliter le rappel</p>
+                </ rappel</p>
                 </div>
-                <div class="technique-item">
-                    <h3 class="technique-title">Segmentation</h3>
-                    <p>Diviser les mots complexes en parties plus petites et mémorisables</p>
+                <div>
+                <div class="techndiv class="technique-item">
+                   ique-item">
+                    <h <h3 class3 class="technique-title="technique-title">Segmentation</">Segmentation</h3>
+h3>
+                    <p>Div                    <p>Diviseriser les mots complexes en parties les mots complexes en parties plus petites plus petites et mémoris et mémorisables</p>
                 </div>
+ables</p>
+                </                <div class="techndiv>
                 <div class="technique-item">
-                    <h3 class="technique-title">Association d'Images</h3>
-                    <p>Créer des images mentales pour chaque mot difficile</p>
+                    <hique-item">
+                    <h3 class="technique-title">3 class="technique-title">Association d'Images</hAssociation d'Images</h33>
+                    <p>Cr>
+                    <p>Créer des images mentaleséer des images mentales pour chaque mot difficile</p pour chaque mot difficile</p>
+                </div>
+           >
                 </div>
             </div>
+        </section </div>
         </section>
         
-        <section class="game-area">
-            <h2>Zone d'Entraînement</h2>
-            <p>Testez vos compétences en épellation avec des mots du dictionnaire</p>
+        <section class=">
+        
+        <section class="gamegame-area">
+            <-area">
+            <hh2>Zone d'Entra2>Zone d'Entraînement</h2>
+înement</h2>
+            <p>Testez            <p>Testez vos comp vos compétences en épellation avec lesétences en épellation avec les  10 mots du concours</p>
             
-            <div class="word-display" id="word-to-spell">Chargement...</div>
+            <div class="word-display" id="word-to-sp10 mots du concours</p>
             
-            <div class="input-area">
-                <input type="text" id="spelling-input" placeholder="Épelez le mot que vous entendez">
+            <div class="word-display" id="word-to-spell">Chargement...</ell">Chargement...</div>
+div>
+            
+            <div            
+            <div class=" class="input-area">
+                <input type="text" id="spelling-input" placeholder="input-area">
+                <input type="text" id="spelling-input" placeholder="ÉpelezÉpelez le mot que vous entendez">
                 <button id="check-button">Vérifier</button>
             </div>
             
@@ -470,6 +907,7 @@
             
             <button id="hint-button">Indice</button>
             <button id="next-word">Mot Suivant</button>
+            <button id="hear-again">Réécouter</button>
         </section>
         
         <div class="motivation">
@@ -477,7 +915,7 @@
         </div>
         
         <footer>
-            <p>Spelling Master - Votre compagnon pour dominer l'épellation | Concours Janvier/Février</p>
+            <p>Spéciale Ya Lwanga Credo Musao - Votre compagnon pour dominer l'épellation | Concours Janvier/Février</p>
         </footer>
     </div>
 
@@ -489,13 +927,12 @@
             currentStreak: 0,
             trainingSchedule: [],
             dictionary: [
-                "phénoménal", "conscience", "rhododendron", "psychologie", "xylophone",
-                "mnémotechnique", "hippopotame", "onomatopée", "parallelogramme", "exacerbation",
-                "équivoque", "inébranlable", "péremptoire", "quintessence", "sycophante",
-                "tintinnabuler", "ubiquité", "véhémence", "zélé", "abnégation"
+                "Abyssal", "Clarté", "Diligent", "Éphémère", "Frémir",
+                "Générosité", "Habile", "Lucide", "Sérénité", "Véhément"
             ],
             currentWord: "",
-            userProgress: []
+            userProgress: [],
+            currentWordIndex: 0
         };
 
         // Initialisation
@@ -503,462 +940,667 @@
             initializeApp();
             setupEventListeners();
             generateCalendar();
+            createGalaxy le mot que vous entendez">
+                <button id="check-button">Vérifier</button>
+            </div>
+            
+            <div class="result" id="result-message"></div>
+            
+            <button id="hint-button">Indice</button>
+            <button id="next-word">Mot Suivant</button>
+            <button id="hear-again">Réécouter</button>
+        </section>
+        
+        <div class="motivation">
+            "La maîtrise vient non pas de la chance, mais de la pratique délibérée et de la persévérance."
+        </div>
+        
+        <footer>
+            <p>Spéciale Ya Lwanga Credo Musao - Votre compagnon pour dominer l'épellation | Concours Janvier/Février</p>
+        </footer>
+    </div>
+
+    <script>
+        // Données de l'application
+        const appData = {
+            wordsMastered: 0,
+            successRate: 0,
+            currentStreak: 0,
+            trainingSchedule: [],
+            dictionary: [
+                "Abyssal", "Clarté", "Diligent", "Éphémère", "Frémir",
+                "Générosité", "Habile", "Lucide", "Sérénité", "Véhément"
+            ],
+            currentWord: "",
+            userProgress: [],
+            currentWordIndex: 0
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            generateCalendar();
+            create();
             loadNextWord();
+Galaxy();
+            loadNextWord        });
+
+        function createGalaxy() {
+            const galaxy = document.getElementById('galaxy();
         });
 
-        function initializeApp() {
-            // Charger les données depuis le localStorage si disponibles
-            const savedData = localStorage.getItem('spellingMasterData');
-            if (savedData) {
+        function createGalaxy() {
+            const galaxy = document.getElementById('galaxy');
+            
+            // Cré');
+            
+            // Créer leser les étoiles
+ étoiles
+            for            for (let i =  (let i = 00; i < 200; i++) {
+                const star; i < 200; i++) {
+                const star = = document.createElement('div');
+ document.createElement('div');
+                               star.class star.classNameName = 'star = 'star';
+                
+                //';
+                
+                // Position aléatoire
+                const x = Math Position aléatoire
+                const x = Math.random.random() * 100;
+                const y() * 100;
+                const y = Math = Math.random() * .random() * 100;
+100;
+                
+                // T                
+                // Taille alaille aléatoire
+               éatoire
+                const size const size = Math.random() = Math.random() *  * 3;
+                
+               3;
+                
+                star.style star.style.left = `${x}.left = `${x}%`;
+               %`;
+                star.style.top = star.style.top = `${y `${y}%`;
+               }%`;
+                star.style.width = `${size}px star.style.width = `${size}px`;
+                star.style`;
+                star.style.height = `${.height = `${sizesize}px`;
+                
+}px`;
+                
+                //                // Animation delay aléatoire
+                star.style.animationDelay = `${Math.random() Animation delay aléatoire
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                galaxy.appendChild * 5}s`;
+                
+                galaxy.appendChild(star);
+            }
+(star);
+            }
+            
+            // Créer les né            
+            // Créer les nébuleuses
+            constbuleuses
+            const nebula nebula1 = document.createElement('1 = document.createElement('divdiv');
+            neb');
+            nebula1.className = 'nebula nebula1.className = 'nebula nebula-1';
+            galaxyula-1';
+            galaxy.appendChild(nebula1);
+            
+.appendChild(nebula1);
+            const nebula2 =            
+            const nebula2 = document.createElement('div');
+            neb document.createElement('div');
+            nebula2.className = 'nebula nebula-2ula2.className = 'nebula nebula-2';
+            galaxy.appendChild(nebula';
+            galaxy.appendChild(nebula2);
+        }
+
+        function initialize2);
+        }
+
+        functionApp() {
+            // Charg initializeApp() {
+            //er les données depuis le localStorage Charger les données depuis le localStorage si disponibles
+            const savedData si disponibles
+            const savedData = = localStorage.getItem('spellingMaster localStorage.getItem('spellingMasterData');
+Data');
+            if (s            if (savedDataavedData) {
+                const) {
                 const parsedData = JSON.parse(savedData);
-                Object.assign(appData, parsedData);
+ parsedData = JSON.parse(savedData);
+                Object.assign(appData,                Object.assign(appData, parsed parsedData);
+            }
+            
+           Data);
             }
             
             updateStats();
+            generateTrainingSchedule updateStats();
             generateTrainingSchedule();
         }
 
+        function setup();
+        }
+
         function setupEventListeners() {
+           EventListeners() {
             // Bouton de vérification
-            document.getElementById('check-button').addEventListener('click', checkSpelling);
+ // Bouton de vérification            document.getElementById('check-button').
+            document.getElementById('check-buttonaddEventListener('click', check').addEventListener('click', checkSpelling);
             
-            // Bouton d'indice
-            document.getElementById('hint-button').addEventListener('click', showHint);
+            //Spelling);
             
-            // Bouton mot suivant
-            document.getElementById('next-word').addEventListener('click', loadNextWord);
+            // Bouton Bouton d d'indice
+           'indice
+            document.getElementById('hint-button'). document.getElementById('hint-button').addEventListener('click',addEventListener('click', showHint);
             
-            // Entrée dans le champ de texte
-            document.getElementById('spelling-input').addEventListener('keypress', function(e) {
+            // Bout showHint);
+            
+            // Bouton mot suivanton mot suivant
+            document.getElementById('next
+            document.getElementById('next-word').add-word').addEventListener('click',EventListener('click', loadNext loadNextWord);
+            
+           Word);
+            
+            // Bout // Bouton réécouteron réécouter
+            document
+            document.getElementById('hear.getElementById('hear-again').add-again').addEventListener('click',EventListener('click', function() function() {
+                speakWord {
+                speakWord(appData(appData.currentWord);
+           .currentWord);
+            });
+            
+ });
+            
+            // Entrée            // Entrée dans le champ dans le champ de texte
+            de texte
+            document document.getElementById.getElementById('spelling-input('spelling-input').addEventListener('').addEventListener('keypress', function(e)keypress', function(e) {
+                if (e {
                 if (e.key === 'Enter') {
+                    checkSp.key === 'Enter') {
                     checkSpelling();
+                }
+           elling();
                 }
             });
             
-            // Cartes d'entraînement
-            document.querySelectorAll('.training-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const duration = this.getAttribute('data-duration');
-                    startTrainingSession(duration);
+ });
+            
+            //            // Cartes d'entraî Cartes d'entraînement
+nement
+            document.querySelectorAll            document.querySelectorAll('.training('.training-card').forEach(c-card').forEach(card =>ard => {
+                card.addEventListener(' {
+                card.addEventListener('click',click', function() {
+                    const function() {
+                    const duration = duration = this.getAttribute(' this.getAttribute('data-ddata-duration');
+                    starturation');
+                    startTrainingSessionTrainingSession(duration);
+               (duration);
                 });
             });
+            });
+        }
+
+        });
         }
 
         function generateCalendar() {
+            const calendar function generateCalendar() {
             const calendar = document.getElementById('training-calendar');
-            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+ = document.getElementById('training-calendar');
+            const days = ['L            const days = ['Lunun', 'Mar', 'Mar', '', 'Mer', 'Jeu',Mer', 'Jeu', 'Ven 'Ven', 'Sam',', 'Sam', 'Dim 'Dim'];
+            
+            // Ajouter'];
             
             // Ajouter les en-têtes de jours
+            days.forEach(day les en-têtes de jours
             days.forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'day';
-                dayHeader.textContent = day;
-                dayHeader.style.fontWeight = 'bold';
+ => {
+                const dayHeader = document                const dayHeader = document.createElement('div');
+                day.createElement('div');
+                dayHeaderHeader.className = 'day.className = 'day';
+               ';
+                dayHeader.textContent dayHeader.textContent = day = day;
+                dayHeader;
+                dayHeader.style.fontWeight.style.fontWeight = 'bold = 'bold';
+                calendar.appendChild';
                 calendar.appendChild(dayHeader);
+(dayHeader);
+            });
             });
             
-            // Générer les jours du mois (exemple sur 28 jours)
-            for (let i = 1; i <= 28; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'day';
+            // Gén            
+            // Générer lesérer les jours du mois ( jours du mois (exempleexemple sur 28 jours sur 28 jours)
+           )
+            for (let i for (let i =  = 1; i <=1; i <=  2828;; i++) {
+                i++) {
+                const dayElement = const dayElement = document.createElement('div');
+ document.createElement('div');
+                dayElement.className                dayElement.className = 'day';
+                day = 'day';
                 dayElement.textContent = i;
                 
-                // Marquer les jours d'entraînement et de repos
-                if (i % 7 === 0) {
-                    dayElement.classList.add('rest'); // Jour de repos
-                } else if (i % 2 === 0) {
-                    dayElement.classList.add('active'); // Jour d'entraînement
+Element.textContent = i;
+                
+                // Marquer                // Marquer les jours d'entra les jours d'entraînement et de reposînement et de repos
+                if (i
+                if (i % 7 ===  % 7 === 0) {
+                    dayElement0) {
+                    dayElement.classList.add('rest.classList.add('rest'); // Jour'); // Jour de repos
+ de repos
+                } else if                } else if (i (i % 2 === % 2 === 0) 0) {
+                    day {
+                    dayElement.classListElement.classList.add('active'); //.add('active'); // Jour d'entraî Jour d'entraînement
+                }
+nement
                 }
                 
-                calendar.appendChild(dayElement);
-            }
+                calendar.appendChild                
+                calendar.appendChild(day(dayElement);
+Element);
+                       }
+        }
+
+        function generateTraining }
         }
 
         function generateTrainingSchedule() {
-            // Générer un programme d'entraînement sur 8 semaines
+           Schedule() {
+            // Gén // Générer un programme dérer un programme d'entraînement'entraînement sur 8 semaines
+            const schedule = sur 8 semaines
             const schedule = [];
+            const startDate = [];
             const startDate = new Date();
             
-            for (let week = 0; week < 8; week8; week++)++) {
-                const weekSchedule {
+            for new Date();
+            
+            for (let (let week = 0 week = 0; week; week < 8; week < 8; week++)++) {
+                const weekSchedule = {
                 const weekSchedule = [];
- = [];
                 
-                for                
-                for (let day = 0; day (let day = 0; day < 7; day++) {
-                    const currentDate = new Date(startDate);
-                    currentDate.setDate(startDate.getDate() < 7; day++) {
-                    const currentDate = new Date(startDate);
-                    currentDate.setDate(startDate.get + (week * 7) +Date() + (week * 7) + day);
+                for ( [];
+                
+                forlet day = 0; day < 7; day++) {
+                    (let day = 0; day < 7; day++) {
+                    const currentDate = new Date const currentDate = new Date(startDate);
+                    currentDate(startDate);
+                    currentDate.setDate(startDate.setDate(startDate.getDate() + (week * 7.getDate() + (week * ) + day);
                     
- day);
+                    let7) + day);
                     
                     let session = null;
                     
-                    let session = null                   ;
+                    // Planifier des sessions différentes session = null;
                     
-                    // Plan // Planifier des sessions différentes selon leifier des sessions différentes selon le jour
-                    if jour
-                    if (day (day === 0 === 0 || day === || day === 3 || 3 || day === day === 6) {
-                        6) {
-                        // J // Jours de reposours de repos ou ré ou révision légèrevision légère
-                        if
-                        if (day ===  (day === 6)6) {
-                            session = { type: 'repos', duration: 0 };
-                        } {
-                            session = { type: 'repos', duration: 0 };
- else {
-                            session = {                        } else {
-                            session = { type: type: 'révision', 'révision', duration: duration: 30 };
-                        30 };
+                    // Planifier des sessions différentes selon le jour
+                    if (day selon le jour
+                    if (day === 0 || === 0 || day === 3 day === 3 || day || day === 6) === 6) {
+                        // {
+                        // Jours de Jours de repos ou révision repos ou révision légère légère
+                        if (
+                        if (day ===day === 6) {
+ 6) {
+                            session =                            session = { type: { type: 'repos', 'repos', duration:  duration: 00 };
+                        } else {
+                            };
+                        } else {
+                            session = { type session = { type: 'révision: 'révision', duration: ', duration: 30 };
+                       30 };
                         }
-                    }
+                    } else }
                     } else {
-                        // J } else {
-                        // Jours d'entraînementours d'entraînement
-                        const sessionTypes =
+                        {
+                        // J // Joursours d d'ent'entraraîînement
                         const sessionTypes = [
-                            [
-                            { type: 'mémoire', duration: 45 },
- { type: 'mémoire', duration: 45 },
-                            { type: 'vit                            { type: 'vitesse', duration: 60esse', duration: 60 },
- },
-                            { type: 'pr                            { type: 'précécision', duration: ision', duration: 45 }
+                           nement
+                        const sessionTypes = [
+                            { type: { type: 'mémoire', duration: 45 },
+ 'mémoire', duration: 45 },
+                            { type:                            { type: 'vitesse 'vitesse', duration:', duration: 60 },
+                            { 60 },
+                            { type: type: 'précision 'précision', duration', duration: 45 }
+: 45 }
                         ];
-                        session45 }
                         ];
-                        = session session = sessionTypes[day % 3];
-Types[day % 3];
-                    }
+                        session = session                        session = sessionTypesTypes[day % 3];
+[day % 3];
+                                       }
+                    
+                    weekSchedule }
                     
                     weekSchedule.push({
-                                           }
-                    
-                    weekSchedule.push({
-                        date: new Date(currentDate),
-                        session: session date: new Date(currentDate),
+                       .push({
+                        date: new Date date: new Date(current(currentDate),
+                        session:Date),
                         session: session
+ session
+                    });
+                }
                     });
                 }
                 
-                schedule.push(week
-                    });
-                }
-                
-                schedule.push(weekScheduleSchedule);
+                               
+                schedule.push(weekSchedule);
+ schedule.push(weekSchedule);
             }
             
-            appData.trainingSchedule);
-            }
+            appData            }
             
-            appData.trainingSchedule = schedule;
-            updateNextTraining();
+            appData.t.trainingSchedule = schedule;
+rainingSchedule = schedule;
+                       updateNextTraining updateNextTraining();
         }
 
- = schedule;
-            updateNextTraining();
+       ();
         }
 
-               function updateNextTraining() {
- function updateNextTraining() {
-                       const today = new Date const today = new Date();
-            let nextTraining =();
+        function update function updateNextTraining() {
+            const today =NextTraining() {
+            const today = new Date();
+ new Date();
             let nextTraining = null;
             
-            // Trou null;
+                       let nextTraining = null;
             
-            // Trouver la prochaine sessionver la prochaine session d d'entraînement
-           'entraînement
-            for (const week of appData for (const week of appData.trainingSchedule) {
-               .trainingSchedule) {
-                for (const day of week) for (const day of {
-                    if (day.session week) {
-                    if (day.duration > 0.session.duration > 0 && day.date > && day.date > today) {
-                        next today) {
-                        nextTraining = day;
+            // Trou // Trouver la prochaine sessionver la prochaine session d'ent d'entraînement
+raînement
+            for            for (const week of (const week of appData appData.training.trainingSchedule)Schedule) {
+                for (const day of week) {
+                    if {
+                for (const day of week) {
+                    if (day.session.duration > 0 && day (day.session.duration > 0 &&.date > today) {
+                        day.date > today) {
+                        nextTraining nextTraining = day;
+                        = day;
                         break;
+                    }
+ break;
                     }
                 }
-Training = day;
-                        break;
-                    }
                 if (nextTraining)                }
-                if (nextTraining break;
+                if (nextTraining) break;
+ break;
             }
             
-           ) break;
-            }
+            if            }
             
-            if (nextTraining) {
- if (nextTraining) {
-                const nextTrainingElement =                const nextTrainingElement = document.getElementById('next-training');
-                next document.getElementById('next-training');
-                nextTrainingElement.innerHTML = `
-                   TrainingElement.innerHTML = `
-                    <h3>Session de <h3>Session de ${nextTraining.session.duration ${nextTraining.session.duration}} minutes</h3>
-                    minutes</h3>
-                    <p>Entraînement <p>Entraînement ${nextTraining.session.type}</p>
-                    <p>${format ${nextTraining.session.type}</p>
-                    <p>${formatDate(nextTraining.date)}</Date(nextTraining.date)}</p>
+            if ( (nextTraining) {
+               nextTraining) {
+                const next const nextTrainingElement = document.getElementByIdTrainingElement = document.getElementById('next('next-training');
+                next-training');
+                nextTrainingElementTrainingElement.innerHTML = `
+                    <h.innerHTML = `
+                    <h3>Session de ${next3>Session de ${nextTraining.session.dTraining.session.duration} minutesuration} minutes</h3>
+                   </h3>
+                    <p> <p>EntraînementEntraînement ${next ${nextTraining.session.type}</pTraining.session.type}</p>
+>
+                    <p>                    <p>${format${formatDate(nextTraining.date)}</Date(nextTraining.date)}</p>
 p>
                 `;
+                           `;
             }
         }
-
-        function format                `;
-            }
         }
 
-        function formatDate(date) {
-            returnDate(date) {
-            return date.toLocaleDateString('fr-FR', { 
-                weekday: 'long', 
-                date.toLocaleDateString('fr-FR', { 
-                weekday: 'long', 
-                year: 'numeric', 
- year: 'numeric', 
+        }
+
+        function format function formatDate(date) {
+Date(date) {
+            return date.toLocaleDateString('fr            return date.toLocaleDateString('fr-FR-FR', { 
+                weekday', { 
+                weekday:: 'long', 'long', 
+                
+                year: year: 'numeric 'numeric', 
                 month: 'long', 
+', 
                 month: 'long', 
-                day: 'numeric',
-                day: 'numeric',
-                               hour: '2-digit',
-                minute: ' hour: '2-digit',
-                minute: '2-digit'
+                day: '                day: 'numeric',
+                hour: '2-digitnumeric',
+                hour: '2-digit',
+               ',
+                minute minute: '2-digit'
+: '2-digit'
             });
         }
 
-       2-digit'
-            });
+                   });
         }
 
-        function function loadNextWord() {
-            loadNextWord() {
-            // Sélectionner un mot // Sélectionner un mot aléatoire du dictionnaire aléatoire du dictionnaire
-            const randomIndex
-            const randomIndex = Math.floor(Math.random() * app = Math.floor(Math.random() * appData.dictionary.length);
-            appData.currentWord = appData.dictionary[Data.dictionary.length);
-            appData.currentWord = appData.dictionary[randomIndex];
+        function load function loadNextWord() {
+NextWord() {
+            //            // Sélectionner le Sélectionner le mot suivant mot suivant dans la liste
+            dans la liste
+            appData.current appData.currentWord = appData.dictionary[appData.currentWord = appData.dictionary[appData.currentWordIndexWordIndex];
+            appData];
+            appData.currentWord.currentWordIndex = (appIndex = (appData.currentData.currentWordIndex + WordIndex + 1) % app1) % appData.dictionary.lengthData.dictionary.length;
             
-            //randomIndex];
+;
             
-            // Afficher le mot avec Afficher le mot avec certaines lettres masquées pour l certaines lettres masquées pour l'entraînement
-           'entraînement
-            const displayElement = document.getElementById('word-to-spell const displayElement = document.getElementById('word-to-spell');
-            display');
-            displayElement.textContentElement.textContent = appData.current = appData.currentWord;
-           Word;
-            displayElement displayElement.classList.remove.classList.remove('correct('correct', 'incorrect', 'incorrect');
-            
-           ');
-            
-            // Réinitial // Réinitialiser le champ deiser le champ de saisie et saisie et le message de le message de résultat
-            document.getElementById('spelling-input'). résultat
-            document.getElementById('value = '';
-            document.getElementByIdspelling-input').value = '';
-            document.getElementById('result-message('result-message').textContent').textContent = '';
-            
- = '';
-            
-            // Pron            // Prononceroncer le mot (sim le mot (simulation)
-           ulation)
-            speakWord(app speakWord(appData.currentWordData.currentWord);
-        }
-
-       );
-        }
-
-        function speakWord function speakWord(word) {
-            // Util(word) {
-            // Utiliser l'API de synthèse vocale du navigateur
-            if ('speechSynthesis' in window) {
-                const utteranceiser l'API de synthèse vocale du navigateur
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechS = new SpeechSynthesisUtteranceynthesisUtterance(word);
-                utterance.lang = 'fr-F(word);
-                utterance.lang =R';
-                utterance.rate 'fr-FR';
-                utterance.rate = 0 = 0.8; // Vitesse de parole rédu.8; // Vitesse deite
-                speechSynthesis parole réduite
-                speechSynthesis.speak.speak(utterance);
-           (utterance);
-            }
-        }
-
-        function checkSp }
-        }
-
-        function checkSpellingelling() {
-            const userInput = document.getElementById('sp() {
-            const userInput = document.getElementById('spelling-inputelling-input').value.trim().toLowerCase').value.trim().toLowerCase();
-            const correctWord =();
-            const correctWord = appData.currentWord.toLowerCase();
- appData.currentWord.toLowerCase();
-            const resultElement = document.getElementById('result-message');
-            const            const resultElement = document.getElementById('result-message');
-            const wordElement wordElement = document.getElementById(' = document.getElementById('word-to-spword-to-spell');
-            
+            // Affic            // Afficher leher le mot
+            const mot
+            const displayElement displayElement = document.getElementById(' = document.getElementById('word-to-spword-to-spell');
            ell');
+            displayElement.textContent displayElement.textContent = app = appData.currentWord;
+Data.currentWord;
+            displayElement.classList            displayElement.classList.remove('correct', 'incorrect');
+.remove('correct', 'incorrect');
             
-            if (userInput if (userInput === correctWord) {
-                resultElement.text === correctWord) {
-                resultContent = "Correct! ExcellenteElement.textContent = "Correct! Excellente orthographe orthographe!!";
-                result";
-                resultElement.className = 'result correct';
-                wordElement.classList.add('Element.className = 'result correct';
-                wordElementcorrect');
-                
-                // Mettre à jour les statist.classList.add('correct');
-                
-                // Mettre à jour les statistiques
-                appiques
-                appData.Data.wordsMastered++;
-wordsMastered++;
-                app                appData.currentStreak++;
-               Data.currentStreak++;
-                appData.successRate = Math.min( appData.successRate = Math.min(100, appData.successRate + 5);
-                
-                // Animation de réussite
-                wordElement.style.animation = 'bounce 1s';
-                setTimeout(() => {
-                    wordElement.style.animation = '';
-                }, 1000);
-            } else {
-                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
-                resultElement.className = 'result incorrect';
-                wordElement.classList.add('incorrect');
-                
-                // Mettre à jour les statistiques
-                appData.currentStreak = 0;
-                appData.successRate = Math.max(0, appData.successRate - 2);
-            }
+            // Réinitial            
+            // Réinitialiser le champ de saisie et le message de résultat
+            document.getElementByIdiser le champ de saisie et le message de résultat
+            document.getElementById('sp('spelling-input').valueelling-input').value = '';
+            document = '';
+            document.getElementById('result.getElementById('result-message').textContent = '';
             
-            updateStats();
-            saveProgress();
-            
-            // Passer au mot suivant après un délai
-            setTimeout(loadNextWord, 3000);
-100, appData.successRate + 5);
-                
-                // Animation de réussite
-                wordElement.style.animation = 'bounce 1s';
-                setTimeout(() => {
-                    wordElement.style.animation = '';
-                }, 1000);
-            } else {
-                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
-                resultElement.className = 'result incorrect';
-                wordElement.classList.add('incorrect');
-                
-                // Mettre à jour les statistiques
-                appData.currentStreak = 0;
-                appData.successRate = Math.max(0, appData.successRate - 2);
-            }
-            
-            updateStats();
-            saveProgress();
-            
-            // Passer au mot suivant après un délai
-            setTimeout(loadNextWord, 3000);
-               }
+            // Prononcer le mot
+            speakWord(appData.currentWord);
+        }
 
-        function showHint() }
+        function speak-message').textContent = '';
+            
+            // Prononcer le mot
+            speakWord(appData.currentWord);
+        }
+
+        function speakWord(word) {
+            //Word(word) {
+            // Utiliser l'API de Utiliser l'API de synth synthèse vocale du navigateurèse vocale du navigateur
+            if ('speechSynthesis'
+            if ('speechSynthesis' in window) {
+                const utterance = new Speech in window) {
+                const utterance = new SpeechSynthesisUtterSynthesisUtterance(word);
+                utterance.lang =ance(word);
+                utterance.lang = ' 'fr-FR';
+                utterance.rate = 0.8; // Vitesse de parole réduite
+                speechSynthesisfr-FR';
+                utterance.rate = 0.8; // Vitesse de parole réduite
+                speechSynthesis.speak(utter.speak(utterance);
+           ance);
+            }
+        }
+
+        }
+        }
+
+        function checkSp function checkSpelling() {
+           elling() {
+            const user const userInputInput = document.getElementById('sp = document.getElementById('spelling-input').valueelling-input').value.trim();
+           .trim();
+            const correctWord const correctWord = appData.current = appData.currentWord;
+           Word;
+            const const resultElement resultElement = = document document.getElementById('result-m.getElementById('result-message');
+            const wordessage');
+            const wordElement = document.getElementById('word-to-spellElement = document.getElementById('word-to-spell');
+            
+');
+            
+            if (user            if (userInput.toLowerCaseInput.toLowerCase() === correctWord.toLowerCase())() === correctWord.toLowerCase()) {
+ {
+                resultElement.textContent                resultElement.textContent = " = "Correct! ExcellenteCorrect! Excellente orth orthographe!";
+               ographe!";
+                resultElement resultElement.className = '.className = 'result correctresult correct';
+                wordElement.classList';
+                wordElement.classList.add('.add('correct');
+                
+                //correct');
+                
+                // Mettre à jour les statist Mettre à jour les statistiques
+iques
+                appData.                appData.wordsMasterwordsMastered++;
+                apped++;
+                appData.currentStreak++;
+                appData.successData.currentStreak++;
+                appDataRate = Math.min.successRate(100, appData.successRate +  = Math.min(100, appData.successRate10);
+                
+                // Animation + 10);
+                
+                de réussite
+                word // Animation de réussite
+               Element.style.animation = ' wordElement.style.animation = 'bounce 1s';
+               bounce 1s';
+                setTimeout(() => {
+                    setTimeout(() => {
+                    wordElement wordElement.style.animation.style.animation = 'pulse 2s = 'pulse 2s infinite';
+ infinite';
+                }, 100                }, 1000);
+0);
+            } else {
+                           } else {
+                resultElement resultElement.textContent = `In.textContent = `Incorrect.correct. La bonne orthographe est: ${appData La bonne orthographe est: ${appData.currentWord}`;
+                resultElement.currentWord}`;
+                resultElement.class.className = 'result incorrect';
+Name = 'result incorrect';
+                word                wordElement.classList.add('Element.classList.add('incorrectincorrect');
+                
+                //');
+                
+                // Mettre à Mettre à jour les statist jour les statistiques
+                appiques
+                appData.currentStreakData.currentStreak =  = 0;
+                app0;
+                appData.successData.successRate = Math.max(0Rate = Math.max(0, appData.successRate - , appData.successRate - 55);
+            }
+            
+);
+            }
+            
+                       updateStats();
+            save updateStats();
+            saveProgress();
+            
+            // PassProgress();
+            
+            // Passerer au mot suivant après un délai au mot suivant après un délai
+            setTimeout(loadNext
+            setTimeout(loadNextWord, 3000);
+Word, 3000);
+        }
 
         function showHint() {
-            const word = appData.currentWord {
-            const word = appData.currentWord;
-;
-            const hintLength = Math            const hintLength = Math.ceil(word.length / .ceil(word.length /3);
-            const hint = word 3);
-            const hint = word.substring(0, hintLength.substring(0, hintLength)) + '...';
-            
-            + '...';
-            
-            document document.getElementById('result-m.getElementById('result-message').textContent = `essage').textContent = `IndIndice: ${hint}`;
-            document.getElementById('result-message').className = 'result';
         }
 
-        function startTrainingSession(duration) {
-            // Simuler le début d'une session d'entraînementice: ${hint}`;
-            document.getElementById('result-message').className = 'result';
+        function showHint() {
+            const word = appData            const word = appData.currentWord;
+            const hint.currentWord;
+            const hintLength = Math.ceil(wordLength = Math.ceil(word.length / 3);
+           .length / 3);
+            const const hint = word.substring(0 hint = word.substring(0,, hint hintLengthLength) + '...';
+            
+            document.getElementById('result-m) + '...';
+            
+            document.getElementById('result-message').textContent = `Indice:essage').textContent = `Indice: ${ ${hint}`;
+            document.getElementById('result-message').classNamehint}`;
+            document.getElementById('result-message').className = = 'result';
         }
 
-        function startTrainingSession(duration) {
-            // Simuler le début d
-            alert(`Début de la session d'une session d'entraînement
-            alert(`Début de la session d'ent'entraînement de ${duration} minutes!`);
-raînement de ${duration} minutes!`);
+        'result';
+        }
+
+        function startTrainingSession(duration function startTrainingSession(duration) {
+            // Simuler) {
+            // Simuler le le début d'une session d début d'une session d'entra'entraînement
+           înement
+            alert(`Début de la session alert(`Début de la session d'entraînement de d'entraînement de ${duration} minutes!`);
             
-            // Mettre à jour la barre de progression            
-            // Mettre à jour la barre de de session
-            const session progression de session
-            const sessionProgress = document.getElementByIdProgress = document.getElementById('session('session-progress');
+ ${duration} minutes!`);
+            // Mettre à jour la            
+            // Mettre à jour la barre de progression barre de progression de session de session
+            const sessionProgress
+            const sessionProgress = = document.getElementById('session document.getElementById('session-progress');
 -progress');
-            session            sessionProgress.style.width = 'Progress.style.width = '0%0%';
+            sessionProgress.style.width = '0%';
             
-            // Animation';
+            // Animation de progression            sessionProgress.style.width = '0%';
             
             // Animation de progression
-            let progress =  de progression
+            let progress = 0
             let progress = 0;
-            const0;
-            const interval = interval = setInterval(() => {
-                progress += setInterval(() => {
-                progress += 100 100 / (duration * 60 /  / (duration * 60 / 100100); // Simuler la progression en temps réel); // Simuler la progression en temps réel
-                sessionProgress.style.width =
-                sessionProgress.style.width = `${Math.min(progress, `${Math.min(progress, 100)} 100)}%`;
-%`;
+            const interval = set;
+            const interval = setInterval(() => {
+                progressInterval(() => {
+                progress += 100 / (duration * += 100 / (duration 60 / 100); // * 60 / 100); Simuler la progression // Simuler la progression en temps réel
+ en temps réel
+                sessionProgress.style.width =                sessionProgress.style.width = `${Math.min( `${Math.min(progress, 100)}%progress, 100)}%`;
                 
-                if (progress >=                 
-                if (progress >= 100) {
-                    clearInterval(interval100) {
-                    clearInterval(interval);
-                    alert('Session terminée! Excellent travail!);
-                    alert('Session terminée! Excellent travail!');
-');
+                if (progress >=`;
+                
+                if (progress 100) {
+                    clearInterval >= 100) {
+                    clear(interval);
+                    alert('Interval(interval);
+                    alert('Session terminée! Excellent travailSession terminée! Excellent travail!');
                     
-                    // Mettre                    
-                    // Mettre à jour à jour les statistiques
- les statistiques
-                    appData.wordsMastered +=                    appData.wordsMastered += 10;
-                    updateStats();
- 10;
+                    // M!');
+                    
+                    // Mettre à jour les statistiques
+ettre à jour les statistiques
+                    appData.words                    appData.wordsMastered += 10;
+                    updateMastered += 10;
                     updateStats();
                 }
-            },                 }
+            },Stats();
+                }
             }, 100);
-100);
         }
 
-        function update        }
+        100);
+        }
 
         function updateStats() {
-            document.getElementById('Stats() {
-            document.getElementByIdwords-mastered').text('words-mastered').textContent = appDataContent = appData.wordsMaster.wordsMastered;
-            document.getElementByIded;
-            document.getElementById('success-rate').('success-rate').textContent = `${appData.successRate}%`;
-            document.getElementByIdtextContent = `${appData.successRate}%`;
-            document.getElementById('streak('streak').textContent = app').textContent = appData.currentStreakData.currentStreak;
+            document function updateStats() {
+            document.getElementById.getElementById('words-mastered').('words-mastered').textContent = appData.textContent = appData.wordsMastered;
+            documentwordsMastered;
+            document.getElementById('success-rate').text.getElementById('success-rate').textContent = `${appData.successRateContent = `${appData.success}%`;
+            document.getElementById('Rate}%`;
+            document.getElementByIdstreak').textContent =('streak').textContent = appData.currentStreak;
+ appData.currentStreak;
             
-;
-            
-            // Mettre            // Mettre à jour la barre de progression globale
- à jour la barre de progression globale
-            const overallProgress            const overallProgress = document.getElementById = document.getElementById('overall('overall-progress');
--progress');
-            const progressPercentage            const progressPercentage = Math.min(100, (appData. = Math.min(100, (appData.wordsMasterwordsMastered / 200ed / 200) * 100) * 100);
-           );
-            overallProgress.style.width overallProgress.style.width = `${progressPercentage}%`;
-        = `${progressPercentage}%`;
+            //            
+            // Mettre à Mettre à jour la barre jour la barre de progression globale
+            const overallProgress = document.getElementById('overall-progress de progression globale
+            const overallProgress = document.getElementById('overall-pro');
+            const progressPercentage =gress');
+            const progressPercentage Math.min(100, ( = Math.min(100, (appData.wordsMasteredappData.wordsMastered / / 100) *  100) * 100);
+100);
+            overall            overallProgress.styleProgress.style.width = `${progressPercentage}%`;
+.width = `${progressPercentage}%`;
         }
 
- }
+        function saveProgress        }
 
-               function saveProgress() function saveProgress() {
-            // {
-            // Sauvegarder les Sauvegarder les données dans le localStorage données dans le localStorage
-            localStorage.setItem('spellingMasterData', JSON
-            localStorage.setItem('spellingMasterData', JSON.stringify(appData));
+        function saveProgress() {
+            // Sauve() {
+            // Sauvegarder les données dans le localStorage
+garder les données dans le localStorage
+            localStorage.set            localStorage.setItem('spellingMasterData', JSONItem('spellingMasterData', JSON.stringify.stringify(appData));
+        }
+   (appData));
         }
     </script>
+</body>
+ </script>
 </body>
 </html>
