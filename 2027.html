@@ -507,6 +507,33 @@
             color: var(--accent);
         }
         
+        /* Statistiques temporelles */
+        .time-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .time-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .time-stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+        
+        .time-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -643,6 +670,29 @@
             </div>
         </section>
         
+        <!-- Statistiques temporelles -->
+        <section class="history-section">
+            <h2>Votre Engagement Temporel</h2>
+            <div class="time-stats">
+                <div class="time-stat-card">
+                    <div class="time-stat-value" id="totalDays">0</div>
+                    <div class="time-stat-label">Jours d'entraînement</div>
+                </div>
+                <div class="time-stat-card">
+                    <div class="time-stat-value" id="totalMinutes">0</div>
+                    <div class="time-stat-label">Minutes totales</div>
+                </div>
+                <div class="time-stat-card">
+                    <div class="time-stat-value" id="avgDailyTime">0</div>
+                    <div class="time-stat-label">Moyenne quotidienne (min)</div>
+                </div>
+                <div class="time-stat-card">
+                    <div class="time-stat-value" id="currentWeekTime">0</div>
+                    <div class="time-stat-label">Cette semaine (min)</div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Historique des sessions -->
         <section class="history-section">
             <h2>Votre Historique d'Apprentissage</h2>
@@ -733,7 +783,7 @@
     </div>
 
     <script>
-        // Système de gestion des profils
+        // Système de gestion des profils avec suivi temporel
         const ProfileManager = {
             currentUser: null,
             allUsers: {},
@@ -784,7 +834,11 @@
                         totalSessions: 0,
                         totalWords: 0,
                         currentStreakDays: 0,
-                        lastSessionDate: null
+                        lastSessionDate: null,
+                        totalTrainingDays: 0,
+                        totalTrainingMinutes: 0,
+                        trainingDays: [],
+                        weeklyStats: {}
                     },
                     sessionHistory: [],
                     level: 'Débutant',
@@ -808,6 +862,7 @@
                 this.updateProfileDisplay();
                 this.hideLoginModal();
                 this.loadSessionHistory();
+                this.updateTimeStats();
             },
             
             logout() {
@@ -851,12 +906,49 @@
                 this.currentUser.sessionHistory.unshift(session);
                 this.currentUser.stats.totalSessions++;
                 this.currentUser.stats.totalWords += sessionData.wordsPracticed;
+                this.currentUser.stats.totalTrainingMinutes += sessionData.duration;
+                
+                // Mettre à jour les jours d'entraînement
+                this.updateTrainingDays();
                 
                 // Mettre à jour le niveau
                 this.updateLevel();
                 
                 this.saveUsers();
                 this.loadSessionHistory();
+                this.updateTimeStats();
+            },
+            
+            updateTrainingDays() {
+                const today = new Date().toDateString();
+                const trainingDays = this.currentUser.stats.trainingDays;
+                
+                if (!trainingDays.includes(today)) {
+                    trainingDays.push(today);
+                    this.currentUser.stats.totalTrainingDays = trainingDays.length;
+                }
+                
+                // Mettre à jour les statistiques hebdomadaires
+                this.updateWeeklyStats();
+            },
+            
+            updateWeeklyStats() {
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                
+                const weekKey = startOfWeek.toISOString().split('T')[0];
+                
+                if (!this.currentUser.stats.weeklyStats[weekKey]) {
+                    this.currentUser.stats.weeklyStats[weekKey] = {
+                        minutes: 0,
+                        sessions: 0
+                    };
+                }
+                
+                this.currentUser.stats.weeklyStats[weekKey].minutes += appData.currentSessionDuration || 0;
+                this.currentUser.stats.weeklyStats[weekKey].sessions++;
             },
             
             updateLevel() {
@@ -891,6 +983,30 @@
                 document.getElementById('overall-progress').style.width = `${progressPercentage}%`;
             },
             
+            updateTimeStats() {
+                if (!this.currentUser) return;
+                
+                const stats = this.currentUser.stats;
+                
+                document.getElementById('totalDays').textContent = stats.totalTrainingDays;
+                document.getElementById('totalMinutes').textContent = stats.totalTrainingMinutes;
+                
+                // Calculer la moyenne quotidienne
+                const avgDaily = stats.totalTrainingDays > 0 ? 
+                    Math.round(stats.totalTrainingMinutes / stats.totalTrainingDays) : 0;
+                document.getElementById('avgDailyTime').textContent = avgDaily;
+                
+                // Calculer le temps de la semaine en cours
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                
+                const weekKey = startOfWeek.toISOString().split('T')[0];
+                const weekMinutes = stats.weeklyStats[weekKey] ? stats.weeklyStats[weekKey].minutes : 0;
+                document.getElementById('currentWeekTime').textContent = weekMinutes;
+            },
+            
             loadSessionHistory() {
                 if (!this.currentUser) return;
                 
@@ -906,9 +1022,10 @@
                     
                     const date = new Date(session.date);
                     const formattedDate = date.toLocaleDateString('fr-FR');
+                    const formattedTime = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
                     
                     sessionCard.innerHTML = `
-                        <div class="session-date">${formattedDate}</div>
+                        <div class="session-date">${formattedDate} ${formattedTime}</div>
                         <div class="session-score">${session.score}%</div>
                         <div>${session.wordsPracticed} mots</div>
                         <div>${session.duration} min</div>
@@ -930,7 +1047,8 @@
                 correctAnswers: 0,
                 totalWords: 0,
                 startTime: null
-            }
+            },
+            currentSessionDuration: 0
         };
 
         // Initialisation
@@ -939,6 +1057,13 @@
             setupEventListeners();
             generateCalendar();
             createGalaxy();
+            
+            // Charger les voix disponibles
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = function() {
+                    console.log("Voix chargées:", speechSynthesis.getVoices());
+                };
+            }
         });
 
         function createGalaxy() {
@@ -1010,7 +1135,8 @@
             
             document.querySelectorAll('.training-card').forEach(card => {
                 card.addEventListener('click', function() {
-                    const duration = this.getAttribute('data-duration');
+                    const duration = parseInt(this.getAttribute('data-duration'));
+                    appData.currentSessionDuration = duration;
                     startTrainingSession(duration);
                 });
             });
@@ -1071,12 +1197,53 @@
                 speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'fr-FR';
-                utterance.rate = 0.8;
                 
+                // Voix plus aiguë et motivante
+                utterance.rate = 0.9;  // Légèrement plus rapide
+                utterance.pitch = 1.4; // Plus aigu (1.0 = normal, 2.0 = très aigu)
+                utterance.volume = 1.0;
+                
+                // Sélectionner une voix féminine si disponible (généralement plus aiguë)
                 const voices = speechSynthesis.getVoices();
-                const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
-                if (frenchVoice) {
-                    utterance.voice = frenchVoice;
+                let selectedVoice = voices.find(voice => 
+                    voice.lang.startsWith('fr') && 
+                    voice.name.toLowerCase().includes('female')
+                );
+                
+                // Si pas de voix féminine, prendre la première voix française
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(voice => voice.lang.startsWith('fr'));
+                }
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                // Phrases motivantes occasionnelles
+                const motivationalPhrases = [
+                    "Excellent !", 
+                    "Superbe !", 
+                    "Formidable !",
+                    "Incroyable !",
+                    "Magnifique !"
+                ];
+                
+                // 20% de chance d'ajouter une phrase motivante
+                if (Math.random() < 0.2) {
+                    const phrase = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+                    setTimeout(() => {
+                        const motivationalUtterance = new SpeechSynthesisUtterance(phrase);
+                        motivationalUtterance.lang = 'fr-FR';
+                        motivationalUtterance.rate = 1.1;
+                        motivationalUtterance.pitch = 1.6;
+                        motivationalUtterance.volume = 0.8;
+                        
+                        if (selectedVoice) {
+                            motivationalUtterance.voice = selectedVoice;
+                        }
+                        
+                        speechSynthesis.speak(motivationalUtterance);
+                    }, 500);
                 }
                 
                 speechSynthesis.speak(utterance);
@@ -1107,6 +1274,9 @@
                 
                 appData.currentSession.correctAnswers++;
                 
+                // Feedback vocal positif
+                speakMotivationalFeedback(true);
+                
                 wordElement.style.animation = 'bounce 1s';
                 setTimeout(() => {
                     wordElement.style.animation = '';
@@ -1120,12 +1290,48 @@
                 ProfileManager.currentUser.stats.successRate = Math.max(0, 
                     ((appData.currentSession.correctAnswers / appData.currentSession.totalWords) * 100).toFixed(1)
                 );
+                
+                // Feedback vocal encourageant
+                speakMotivationalFeedback(false);
             }
             
             ProfileManager.updateProfileDisplay();
             ProfileManager.saveUsers();
             
             setTimeout(loadNextWord, 3000);
+        }
+
+        function speakMotivationalFeedback(isCorrect) {
+            if ('speechSynthesis' in window) {
+                const phrases = isCorrect ? [
+                    "Bravo ! Tu es formidable !",
+                    "Excellent ! Continue comme ça !", 
+                    "Superbe orthographe !",
+                    "Tu es incroyable !",
+                    "Magnifique ! Tu progresses vite !"
+                ] : [
+                    "Presque ! Tu y es presque !",
+                    "Continue, tu vas y arriver !",
+                    "Ne lâche rien, tu progresses !",
+                    "Presque parfait, essaye encore !",
+                    "Tu apprends de tes erreurs, c'est excellent !"
+                ];
+                
+                const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+                const utterance = new SpeechSynthesisUtterance(phrase);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.5; // Voix aiguë et motivante
+                utterance.volume = 0.9;
+                
+                const voices = speechSynthesis.getVoices();
+                const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
+                if (frenchVoice) {
+                    utterance.voice = frenchVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
         }
 
         function showHint() {
@@ -1140,7 +1346,8 @@
         function startTrainingSession(duration) {
             if (!ProfileManager.currentUser) return;
             
-            alert(`Début de la session d'entraînement de ${duration} minutes!`);
+            // Message vocal de début de session
+            speakSessionStart(duration);
             
             const sessionProgress = document.getElementById('session-progress');
             sessionProgress.style.width = '0%';
@@ -1163,7 +1370,8 @@
                         duration: duration
                     });
                     
-                    alert(`Session terminée! Score: ${sessionScore}% - ${appData.currentSession.correctAnswers}/${appData.currentSession.totalWords} mots corrects`);
+                    // Message vocal de fin de session
+                    speakSessionEnd(sessionScore, appData.currentSession.correctAnswers, appData.currentSession.totalWords);
                     
                     // Réinitialiser la session
                     appData.currentSession = {
@@ -1171,18 +1379,70 @@
                         totalWords: 0,
                         startTime: null
                     };
+                    appData.currentSessionDuration = 0;
                 }
             }, 100);
         }
 
+        function speakSessionStart(duration) {
+            if ('speechSynthesis' in window) {
+                const phrases = [
+                    `C'est parti pour ${duration} minutes d'entraînement intensif !`,
+                    `Prêt pour ${duration} minutes de progrès ? Allez !`,
+                    `${duration} minutes pour devenir un champion ! Commençons !`,
+                    `Session de ${duration} minutes démarrée ! Donne le meilleur de toi-même !`
+                ];
+                
+                const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+                const utterance = new SpeechSynthesisUtterance(phrase);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 1.1;
+                utterance.pitch = 1.6;
+                utterance.volume = 1.0;
+                
+                const voices = speechSynthesis.getVoices();
+                const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
+                if (frenchVoice) {
+                    utterance.voice = frenchVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakSessionEnd(score, correct, total) {
+            if ('speechSynthesis' in window) {
+                let phrase;
+                if (score >= 90) {
+                    phrase = `Session terminée ! Score exceptionnel de ${score}% ! ${correct} bonnes réponses sur ${total} ! Tu es un génie !`;
+                } else if (score >= 70) {
+                    phrase = `Belle session ! ${score}% de réussite, ${correct} sur ${total} ! Continue comme ça !`;
+                } else {
+                    phrase = `Session terminée ! ${score}% aujourd'hui. Chaque erreur te rend plus fort, persévère !`;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(phrase);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.5;
+                utterance.volume = 1.0;
+                
+                const voices = speechSynthesis.getVoices();
+                const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
+                if (frenchVoice) {
+                    utterance.voice = frenchVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
         function generateTrainingSchedule() {
             // Cette fonction reste similaire à l'originale
-            // ... (code inchangé)
         }
 
         function updateNextTraining() {
             // Cette fonction reste similaire à l'originale
-            // ... (code inchangé)
         }
 
         function formatDate(date) {
