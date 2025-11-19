@@ -14,6 +14,7 @@
             --success: #4cc9f0;
             --warning: #f8961e;
             --danger: #e63946;
+            --repetition-day: #4a86e8; /* Nouvelle couleur pour les jours de répétition */
         }
         
         * {
@@ -362,6 +363,12 @@
             color: var(--dark);
         }
         
+        .day.repetition {
+            background: var(--repetition-day);
+            color: var(--light);
+            font-weight: bold;
+        }
+        
         .day:hover {
             transform: scale(1.1);
         }
@@ -507,6 +514,125 @@
             color: var(--accent);
         }
         
+        /* Section Calendrier Mensuel */
+        .monthly-calendar-section {
+            margin-bottom: 3rem;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .month-navigation {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .month-year-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .monthly-calendar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .monthly-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1rem;
+        }
+        
+        .monthly-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem;
+            color: var(--success);
+        }
+        
+        .monthly-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .monthly-day.repetition {
+            background: var(--repetition-day);
+            color: var(--light);
+            font-weight: bold;
+        }
+        
+        .monthly-day.today {
+            border: 2px solid var(--accent);
+        }
+        
+        .monthly-day:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Programme d'entraînement */
+        .training-program {
+            margin-bottom: 3rem;
+        }
+        
+        .program-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .program-day {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .program-day.repetition-day {
+            background: rgba(74, 134, 232, 0.3);
+            border-left: 4px solid var(--repetition-day);
+        }
+        
+        .program-day h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        
+        .program-day ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .program-day li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .program-day li:before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+        
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -556,6 +682,11 @@
             
             .profile-stats {
                 justify-content: center;
+            }
+            
+            .calendar-controls {
+                flex-direction: column;
+                gap: 1rem;
             }
         }
     </style>
@@ -643,6 +774,90 @@
             </div>
         </section>
         
+        <!-- Section Programme d'Entraînement -->
+        <section class="training-program">
+            <h2>Programme Hebdomadaire d'Entraînement</h2>
+            <div class="program-schedule">
+                <div class="program-day repetition-day">
+                    <h3>Lundi - Répétition</h3>
+                    <ul>
+                        <li>Révision des mots de la semaine précédente</li>
+                        <li>Session de 45 minutes</li>
+                        <li>Technique: Répétition espacée</li>
+                        <li>Objectif: 50 mots révisés</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Mardi - Répétition</h3>
+                    <ul>
+                        <li>Nouveaux mots difficiles</li>
+                        <li>Session de 60 minutes</li>
+                        <li>Technique: Association d'images</li>
+                        <li>Objectif: 30 nouveaux mots</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Mercredi - Répétition</h3>
+                    <ul>
+                        <li>Mots complexes et exceptions</li>
+                        <li>Session de 45 minutes</li>
+                        <li>Technique: Segmentation</li>
+                        <li>Objectif: 40 mots maîtrisés</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Jeudi - Repos</h3>
+                    <ul>
+                        <li>Jour de repos actif</li>
+                        <li>Révision légère optionnelle</li>
+                        <li>Lecture de textes littéraires</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Vendredi - Répétition</h3>
+                    <ul>
+                        <li>Simulation de concours</li>
+                        <li>Session de 60 minutes</li>
+                        <li>Technique: Méthode des Loci</li>
+                        <li>Objectif: Test complet</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Samedi - Repos</h3>
+                    <ul>
+                        <li>Jour de détente</li>
+                        <li>Pas d'entraînement formel</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Dimanche - Révision</h3>
+                    <ul>
+                        <li>Révision libre</li>
+                        <li>Session de 30 minutes max</li>
+                        <li>Focus sur les points faibles</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section Calendrier Mensuel -->
+        <section class="monthly-calendar-section">
+            <h2>Calendrier d'Entraînement</h2>
+            <div class="calendar-controls">
+                <button id="toggleCalendarBtn">Afficher le Calendrier (Janvier à Septembre)</button>
+                <div class="month-navigation">
+                    <button id="prevMonthBtn">←</button>
+                    <div class="month-year-display" id="monthYearDisplay">Janvier 2024</div>
+                    <button id="nextMonthBtn">→</button>
+                </div>
+            </div>
+            <div class="monthly-calendar" id="monthlyCalendar" style="display: none;">
+                <div class="monthly-calendar-grid" id="monthlyCalendarGrid">
+                    <!-- Le calendrier mensuel sera généré par JavaScript -->
+                </div>
+            </div>
+        </section>
+        
         <!-- Historique des sessions -->
         <section class="history-section">
             <h2>Votre Historique d'Apprentissage</h2>
@@ -676,8 +891,8 @@
         </section>
         
         <section class="schedule">
-            <h2>Calendrier d'Entraînement</h2>
-            <p>Planification optimisée avec jours de repos intégrés</p>
+            <h2>Calendrier d'Entraînement Hebdomadaire</h2>
+            <p>Planification optimisée avec jours de répétition en bleu</p>
             <div class="calendar" id="training-calendar">
                 <!-- Le calendrier sera généré par JavaScript -->
             </div>
@@ -721,6 +936,12 @@
             <button id="hint-button">Indice</button>
             <button id="next-word">Mot Suivant</button>
             <button id="hear-word">🔊 Entendre le mot</button>
+            <div style="margin-top: 1rem;">
+                <label for="voiceSelect">Choisir la voix: </label>
+                <select id="voiceSelect">
+                    <option value="">Voix par défaut</option>
+                </select>
+            </div>
         </section>
         
         <div class="motivation">
@@ -741,6 +962,7 @@
             init() {
                 this.loadUsers();
                 this.checkExistingUser();
+                this.loadVoices();
             },
             
             loadUsers() {
@@ -916,6 +1138,33 @@
                     
                     historyContainer.appendChild(sessionCard);
                 });
+            },
+            
+            loadVoices() {
+                // Charger les voix disponibles
+                if ('speechSynthesis' in window) {
+                    // Attendre que les voix soient chargées
+                    speechSynthesis.onvoiceschanged = () => {
+                        const voices = speechSynthesis.getVoices();
+                        const voiceSelect = document.getElementById('voiceSelect');
+                        
+                        // Vider les options existantes
+                        voiceSelect.innerHTML = '<option value="">Voix par défaut</option>';
+                        
+                        // Ajouter les voix françaises
+                        voices.forEach(voice => {
+                            if (voice.lang.startsWith('fr')) {
+                                const option = document.createElement('option');
+                                option.value = voice.name;
+                                option.textContent = `${voice.name} (${voice.lang})`;
+                                voiceSelect.appendChild(option);
+                            }
+                        });
+                    };
+                    
+                    // Déclencher le chargement des voix
+                    speechSynthesis.getVoices();
+                }
             }
         };
 
@@ -930,7 +1179,10 @@
                 correctAnswers: 0,
                 totalWords: 0,
                 startTime: null
-            }
+            },
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+            selectedVoice: null
         };
 
         // Initialisation
@@ -939,6 +1191,7 @@
             setupEventListeners();
             generateCalendar();
             createGalaxy();
+            generateMonthlyCalendar();
         });
 
         function createGalaxy() {
@@ -1002,10 +1255,47 @@
                 speakWord(appData.currentWord);
             });
             
+            // Sélecteur de voix
+            document.getElementById('voiceSelect').addEventListener('change', function() {
+                appData.selectedVoice = this.value;
+            });
+            
             document.getElementById('spelling-input').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     checkSpelling();
                 }
+            });
+            
+            // Boutons du calendrier mensuel
+            document.getElementById('toggleCalendarBtn').addEventListener('click', function() {
+                const calendar = document.getElementById('monthlyCalendar');
+                if (calendar.style.display === 'none') {
+                    calendar.style.display = 'block';
+                    this.textContent = 'Masquer le Calendrier';
+                } else {
+                    calendar.style.display = 'none';
+                    this.textContent = 'Afficher le Calendrier (Janvier à Septembre)';
+                }
+            });
+            
+            document.getElementById('prevMonthBtn').addEventListener('click', function() {
+                if (appData.currentMonth === 0) {
+                    appData.currentMonth = 11;
+                    appData.currentYear--;
+                } else {
+                    appData.currentMonth--;
+                }
+                generateMonthlyCalendar();
+            });
+            
+            document.getElementById('nextMonthBtn').addEventListener('click', function() {
+                if (appData.currentMonth === 11) {
+                    appData.currentMonth = 0;
+                    appData.currentYear++;
+                } else {
+                    appData.currentMonth++;
+                }
+                generateMonthlyCalendar();
             });
             
             document.querySelectorAll('.training-card').forEach(card => {
@@ -1028,18 +1318,100 @@
                 calendar.appendChild(dayHeader);
             });
             
+            // Jours de répétition: lundi (1), mardi (2), mercredi (3), vendredi (5)
+            const repetitionDays = [1, 2, 3, 5];
+            
             for (let i = 1; i <= 28; i++) {
                 const dayElement = document.createElement('div');
                 dayElement.className = 'day';
                 dayElement.textContent = i;
                 
-                if (i % 7 === 0) {
+                // Déterminer le jour de la semaine (0 = dimanche, 1 = lundi, etc.)
+                const dayOfWeek = (i % 7) || 7; // Ajustement pour avoir 1=lundi, 7=dimanche
+                
+                if (repetitionDays.includes(dayOfWeek)) {
+                    dayElement.classList.add('repetition');
+                } else if (i % 7 === 0) {
                     dayElement.classList.add('rest');
                 } else if (i % 2 === 0) {
                     dayElement.classList.add('active');
                 }
                 
                 calendar.appendChild(dayElement);
+            }
+        }
+
+        function generateMonthlyCalendar() {
+            const monthNames = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
+            
+            const grid = document.getElementById('monthlyCalendarGrid');
+            const display = document.getElementById('monthYearDisplay');
+            
+            // Mettre à jour l'affichage du mois et de l'année
+            display.textContent = `${monthNames[appData.currentMonth]} ${appData.currentYear}`;
+            
+            // Vider la grille
+            grid.innerHTML = '';
+            
+            // Ajouter les en-têtes des jours
+            const dayHeaders = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'monthly-day-header';
+                dayHeader.textContent = day;
+                grid.appendChild(dayHeader);
+            });
+            
+            // Obtenir le premier jour du mois
+            const firstDay = new Date(appData.currentYear, appData.currentMonth, 1);
+            const startingDay = firstDay.getDay(); // 0 = dimanche, 1 = lundi, etc.
+            
+            // Ajuster pour commencer le lundi
+            const startOffset = startingDay === 0 ? 6 : startingDay - 1;
+            
+            // Obtenir le nombre de jours dans le mois
+            const daysInMonth = new Date(appData.currentYear, appData.currentMonth + 1, 0).getDate();
+            
+            // Jours de répétition: lundi (1), mardi (2), mercredi (3), vendredi (5)
+            const repetitionDays = [1, 2, 3, 5];
+            
+            // Remplir les cases vides avant le premier jour
+            for (let i = 0; i < startOffset; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'monthly-day';
+                grid.appendChild(emptyDay);
+            }
+            
+            // Remplir les jours du mois
+            const today = new Date();
+            const isCurrentMonth = today.getMonth() === appData.currentMonth && today.getFullYear() === appData.currentYear;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'monthly-day';
+                dayElement.textContent = day;
+                
+                // Calculer le jour de la semaine (0 = dimanche, 1 = lundi, etc.)
+                const date = new Date(appData.currentYear, appData.currentMonth, day);
+                const dayOfWeek = date.getDay();
+                
+                // Ajuster pour avoir 1=lundi, 7=dimanche
+                const adjustedDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+                
+                // Marquer les jours de répétition
+                if (repetitionDays.includes(adjustedDayOfWeek)) {
+                    dayElement.classList.add('repetition');
+                }
+                
+                // Marquer le jour actuel
+                if (isCurrentMonth && day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                grid.appendChild(dayElement);
             }
         }
 
@@ -1073,10 +1445,13 @@
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.8;
                 
-                const voices = speechSynthesis.getVoices();
-                const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
-                if (frenchVoice) {
-                    utterance.voice = frenchVoice;
+                // Utiliser la voix sélectionnée si disponible
+                if (appData.selectedVoice) {
+                    const voices = speechSynthesis.getVoices();
+                    const selectedVoice = voices.find(voice => voice.name === appData.selectedVoice);
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                    }
                 }
                 
                 speechSynthesis.speak(utterance);
