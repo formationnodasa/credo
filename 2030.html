@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Livre de Vocabulaire Interactif</title>
+    <title>Livre de Vocabulaire - Ya Lwanga Credo Musao</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Georgia', serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -21,501 +22,462 @@
             align-items: center;
             padding: 20px;
             color: #333;
+            overflow-x: hidden;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            max-width: 600px;
-        }
-
-        .book-container {
-            width: 90%;
-            max-width: 1000px;
-            height: 600px;
-            position: relative;
-            perspective: 2000px;
-            margin-bottom: 30px;
-        }
-
-        .book {
+        .container {
             width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 1s ease-in-out;
-        }
-
-        .page {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            background-color: #fefefe;
-            border-radius: 5px 15px 15px 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            padding: 30px;
+            max-width: 1200px;
             display: flex;
             flex-direction: column;
-            backface-visibility: hidden;
-            overflow: hidden;
-            transform-origin: left center;
-            transition: transform 1s ease-in-out;
-            border: 1px solid #ccc;
+            align-items: center;
         }
 
-        .page-front {
-            z-index: 2;
-        }
-
-        .page-back {
-            transform: rotateY(180deg);
-            z-index: 1;
-        }
-
-        .page.flipped {
-            transform: rotateY(-180deg);
-        }
-
-        .page-number {
-            position: absolute;
-            bottom: 20px;
-            right: 30px;
-            font-size: 14px;
-            color: #888;
-        }
-
-        .page-header {
+        .logo-container {
             text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1.5s ease-out;
         }
 
-        .page-header h2 {
-            color: #2c3e50;
-            font-size: 24px;
-        }
-
-        .vocabulary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .vocabulary-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffd700, #ffed4e, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             position: relative;
-            overflow: hidden;
-            border-left: 4px solid #8B4513;
         }
 
-        .vocabulary-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            background: #e8f4fd;
+        .logo::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #ffd700, transparent);
         }
 
-        .word {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .meaning {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .pronunciation {
-            font-size: 13px;
-            color: #7f8c8d;
-            font-style: italic;
-            margin-bottom: 10px;
-        }
-
-        .speak-btn {
-            background: #8B4513;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .speak-btn:hover {
-            background: #A0522D;
-        }
-
-        .book-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .nav-btn {
-            background: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover {
-            background: #34495e;
-            transform: scale(1.1);
-        }
-
-        .nav-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: scale(1);
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-top: 10px;
+            opacity: 0.9;
         }
 
         .book-cover {
-            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-            color: white;
+            width: 350px;
+            height: 500px;
+            background: linear-gradient(45deg, #8B0000, #B22222, #8B0000);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            color: #FFD700;
             text-align: center;
-            z-index: 10;
-            border-radius: 10px 15px 15px 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.5s, box-shadow 0.5s;
+            animation: pulse 4s infinite alternate;
         }
 
-        .book-cover h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .book-cover:hover {
+            transform: scale(1.03);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .book-cover p {
-            font-size: 18px;
-            max-width: 80%;
-            line-height: 1.6;
-        }
-
-        .book-spine {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 30px;
-            height: 100%;
-            background: linear-gradient(to right, #5D4037, #8B4513);
-            border-radius: 5px 0 0 5px;
-            box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .book-shadow {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            filter: blur(10px);
-            z-index: -1;
-        }
-
-        .page-indicator {
-            color: white;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .vocabulary-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .book-container {
-                height: 700px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-        }
-
-        /* Effet de papier pour les pages */
-        .page::before {
+        .book-cover::before {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="%23FFD700" stroke-width="1"/><circle cx="50" cy="50" r="30" fill="none" stroke="%23FFD700" stroke-width="1"/></svg>');
+        }
+
+        .book-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .book-author {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-style: italic;
+            z-index: 1;
+        }
+
+        .open-book-btn {
+            background: linear-gradient(to bottom, #FFD700, #B8860B);
+            color: #8B0000;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .open-book-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to bottom, #FFED4E, #FFD700);
+        }
+
+        .open-book-btn:active {
+            transform: translateY(1px);
+        }
+
+        .book-content {
+            display: none;
+            width: 100%;
+            margin-top: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .difficulty-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .difficulty-tab {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .difficulty-tab.active {
+            background: rgba(255, 215, 0, 0.9);
+            color: #8B0000;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .difficulty-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .word-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .word-card.easy {
+            border-left: 5px solid #4CAF50;
+        }
+
+        .word-card.medium {
+            border-left: 5px solid #FF9800;
+        }
+
+        .word-card.hard {
+            border-left: 5px solid #F44336;
+        }
+
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .word {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .difficulty-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .easy-badge {
+            background: #4CAF50;
+        }
+
+        .medium-badge {
+            background: #FF9800;
+        }
+
+        .hard-badge {
+            background: #F44336;
+        }
+
+        .meaning {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .pronunciation {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speak-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .speak-btn:hover {
+            background: #2980b9;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .book-cover {
+                width: 300px;
+                height: 450px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+                letter-spacing: 5px;
+            }
+            
+            .words-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Livre de Vocabulaire Interactif</h1>
-        <p>Feuilletez les pages pour découvrir 100 mots avec leurs définitions et prononciations</p>
-    </div>
-
-    <div class="book-container">
-        <div class="book" id="book">
-            <!-- Page de couverture -->
-            <div class="page page-front book-cover">
-                <div class="book-spine"></div>
-                <h1>Mon Livre de Vocabulaire</h1>
-                <p>100 mots essentiels avec prononciation</p>
-                <p>Feuilletez les pages pour découvrir</p>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo">KXA</div>
+            <div class="subtitle">SALAMU - AMANI</div>
+            <div class="logo" style="font-size: 2rem; margin-top: 20px;">Ya Lwanga Credo Musao</div>
+        </div>
+        
+        <div class="book-cover" id="bookCover">
+            <div class="book-title">Dictionnaire Animé</div>
+            <div class="book-author">Épellation des Mots</div>
+            <button class="open-book-btn" id="openBookBtn">
+                <i class="fas fa-book-open"></i> Ouvrir le Livre
+            </button>
+        </div>
+        
+        <div class="book-content" id="bookContent">
+            <div class="difficulty-tabs">
+                <button class="difficulty-tab active" data-difficulty="easy">Facile</button>
+                <button class="difficulty-tab" data-difficulty="medium">Moyen</button>
+                <button class="difficulty-tab" data-difficulty="hard">Difficile</button>
             </div>
-
-            <!-- Pages de contenu -->
-            <div class="page page-front">
-                <div class="page-header">
-                    <h2>Page 1 - Vocabulaire Essentiel</h2>
-                </div>
-                <div class="vocabulary-grid" id="page1-content">
-                    <!-- Le contenu sera généré par JavaScript -->
-                </div>
-                <div class="page-number">1</div>
-            </div>
-
-            <div class="page page-back">
-                <div class="page-header">
-                    <h2>Page 2 - Vocabulaire Essentiel</h2>
-                </div>
-                <div class="vocabulary-grid" id="page2-content">
-                    <!-- Le contenu sera généré par JavaScript -->
-                </div>
-                <div class="page-number">2</div>
-            </div>
-
-            <div class="page page-front">
-                <div class="page-header">
-                    <h2>Page 3 - Vocabulaire Essentiel</h2>
-                </div>
-                <div class="vocabulary-grid" id="page3-content">
-                    <!-- Le contenu sera généré par JavaScript -->
-                </div>
-                <div class="page-number">3</div>
-            </div>
-
-            <div class="page page-back">
-                <div class="page-header">
-                    <h2>Page 4 - Vocabulaire Essentiel</h2>
-                </div>
-                <div class="vocabulary-grid" id="page4-content">
-                    <!-- Le contenu sera généré par JavaScript -->
-                </div>
-                <div class="page-number">4</div>
-            </div>
-
-            <div class="page page-front">
-                <div class="page-header">
-                    <h2>Page 5 - Vocabulaire Essentiel</h2>
-                </div>
-                <div class="vocabulary-grid" id="page5-content">
-                    <!-- Le contenu sera généré par JavaScript -->
-                </div>
-                <div class="page-number">5</div>
+            
+            <div class="words-container" id="wordsContainer">
+                <!-- Les mots seront insérés ici par JavaScript -->
             </div>
         </div>
-        <div class="book-shadow"></div>
-    </div>
-
-    <div class="page-indicator">
-        Page <span id="current-page">1</span> sur <span id="total-pages">5</span>
-    </div>
-
-    <div class="book-controls">
-        <button class="nav-btn" id="prev-btn">←</button>
-        <button class="nav-btn" id="next-btn">→</button>
+        
+        <div class="footer">
+            <p>Livre de Vocabulaire Interactif - Épellation des Mots</p>
+            <p>© 2023 Ya Lwanga Credo Musao</p>
+        </div>
     </div>
 
     <script>
-        // Dictionnaire de 100 mots avec leurs définitions et prononciations
-        const vocabulary = [
-            { word: "Abondant", meaning: "Qui existe en grande quantité", pronunciation: "a-bon-dan" },
-            { word: "Acquérir", meaning: "Devenir propriétaire de quelque chose", pronunciation: "a-ke-rir" },
-            { word: "Admirable", meaning: "Digne d'admiration", pronunciation: "ad-mi-rabl" },
-            { word: "Affable", meaning: "D'une grande amabilité", pronunciation: "a-fa-bl" },
-            { word: "Agréable", meaning: "Qui plaît, qui est plaisant", pronunciation: "a-gre-a-bl" },
-            { word: "Aisance", meaning: "Facilité, absence de gêne", pronunciation: "è-zanç" },
-            { word: "Altruiste", meaning: "Qui se soucie du bien-être des autres", pronunciation: "al-tru-ist" },
-            { word: "Ambitieux", meaning: "Qui a de l'ambition", pronunciation: "an-bi-syeu" },
-            { word: "Amical", meaning: "Qui manifeste de l'amitié", pronunciation: "a-mi-kal" },
-            { word: "Anodin", meaning: "Sans importance, insignifiant", pronunciation: "a-no-din" },
-            { word: "Apaisant", meaning: "Qui calme, qui apaise", pronunciation: "a-pè-zan" },
-            { word: "Apprécier", meaning: "Reconnaître la valeur de", pronunciation: "a-pre-sye" },
-            { word: "Ardent", meaning: "Passionné, plein de feu", pronunciation: "ar-dan" },
-            { word: "Assidu", meaning: "Appliqué, régulier dans son travail", pronunciation: "a-si-du" },
-            { word: "Attentif", meaning: "Qui fait attention", pronunciation: "a-tan-tif" },
-            { word: "Audacieux", meaning: "Qui a de l'audace", pronunciation: "o-da-syeu" },
-            { word: "Authentique", meaning: "Véritable, qui n'est pas falsifié", pronunciation: "o-tan-tik" },
-            { word: "Avide", meaning: "Qui désire avec passion", pronunciation: "a-vid" },
-            { word: "Bénéfique", meaning: "Qui apporte du bien", pronunciation: "be-ne-fik" },
-            { word: "Bienveillant", meaning: "Qui veut du bien aux autres", pronunciation: "byan-ve-yan" },
-            { word: "Brillant", meaning: "Qui émet de la lumière", pronunciation: "bri-yan" },
-            { word: "Calme", meaning: "Tranquille, paisible", pronunciation: "kalm" },
-            { word: "Candide", meaning: "Naïf, innocent", pronunciation: "kan-did" },
-            { word: "Capable", meaning: "Qui a la capacité de faire", pronunciation: "ka-pabl" },
-            { word: "Célèbre", meaning: "Très connu, renommé", pronunciation: "se-lebr" },
-            { word: "Chaleureux", meaning: "Plein de chaleur humaine", pronunciation: "sha-leu-reu" },
-            { word: "Charismatique", meaning: "Qui a du charisme", pronunciation: "ka-ris-ma-tik" },
-            { word: "Charmant", meaning: "Qui a du charme", pronunciation: "char-man" },
-            { word: "Clairvoyant", meaning: "Qui voit clairement", pronunciation: "kler-vwa-yan" },
-            { word: "Compétent", meaning: "Qui a de la compétence", pronunciation: "kom-pe-tan" },
-            { word: "Concis", meaning: "Qui exprime beaucoup en peu de mots", pronunciation: "kon-si" },
-            { word: "Confiant", meaning: "Qui a confiance", pronunciation: "kon-fyan" },
-            { word: "Consciencieux", meaning: "Qui agit avec conscience", pronunciation: "kon-syan-syeu" },
-            { word: "Constant", meaning: "Qui ne change pas", pronunciation: "kon-stan" },
-            { word: "Courageux", meaning: "Qui a du courage", pronunciation: "kou-ra-jeu" },
-            { word: "Courtois", meaning: "Poli, qui a des manières raffinées", pronunciation: "kour-twa" },
-            { word: "Créatif", meaning: "Qui a de la créativité", pronunciation: "kre-a-tif" },
-            { word: "Curieux", meaning: "Qui a de la curiosité", pronunciation: "ku-ryeu" },
-            { word: "Décisif", meaning: "Qui permet de décider", pronunciation: "de-si-zif" },
-            { word: "Délicat", meaning: "Fin, subtil, qui demande des précautions", pronunciation: "de-li-ka" },
-            { word: "Dévoué", meaning: "Qui se consacre entièrement", pronunciation: "de-vou-é" },
-            { word: "Diligent", meaning: "Appliqué, soigneux", pronunciation: "di-li-jan" },
-            { word: "Diplomate", meaning: "Qui fait preuve de diplomatie", pronunciation: "di-plo-mat" },
-            { word: "Discret", meaning: "Qui sait se faire oublier", pronunciation: "dis-krè" },
-            { word: "Dynamique", meaning: "Plein d'énergie", pronunciation: "di-na-mik" },
-            { word: "Efficace", meaning: "Qui produit l'effet voulu", pronunciation: "e-fi-kas" },
-            { word: "Éloquent", meaning: "Qui parle avec éloquence", pronunciation: "e-lo-kan" },
-            { word: "Émerveillé", meaning: "Rempli d'émerveillement", pronunciation: "e-mer-ve-yé" },
-            { word: "Empathique", meaning: "Capable de ressentir l'émotion d'autrui", pronunciation: "an-pa-tik" },
-            { word: "Energique", meaning: "Plein d'énergie", pronunciation: "e-ner-jik" },
-            { word: "Enthousiaste", meaning: "Plein d'enthousiasme", pronunciation: "an-tou-zyast" },
-            { word: "Équilibré", meaning: "Stable, bien équilibré", pronunciation: "e-ki-li-bre" },
-            { word: "Érudit", meaning: "Qui a de l'érudition", pronunciation: "e-ru-di" },
-            { word: "Exemplaire", meaning: "Qui peut servir d'exemple", pronunciation: "eg-zan-pler" },
-            { word: "Expert", meaning: "Qui a une grande compétence", pronunciation: "eks-per" },
-            { word: "Expressif", meaning: "Qui exprime bien les sentiments", pronunciation: "eks-pre-sif" },
-            { word: "Extraverti", meaning: "Qui aime les contacts sociaux", pronunciation: "eks-tra-ver-ti" },
-            { word: "Fiable", meaning: "Digne de confiance", pronunciation: "fyabl" },
-            { word: "Fier", meaning: "Qui a de la fierté", pronunciation: "fyer" },
-            { word: "Généreux", meaning: "Qui donne facilement", pronunciation: "je-ne-reu" },
-            { word: "Gracieux", meaning: "Plein de grâce", pronunciation: "gra-syeu" },
-            { word: "Habile", meaning: "Qui a de l'habileté", pronunciation: "a-bil" },
-            { word: "Honorable", meaning: "Digne d'honneur", pronunciation: "o-no-rabl" },
-            { word: "Humble", meaning: "Qui a de l'humilité", pronunciation: "um-bl" },
-            { word: "Imaginatif", meaning: "Qui a de l'imagination", pronunciation: "i-ma-ji-na-tif" },
-            { word: "Impartial", meaning: "Qui ne prend pas parti", pronunciation: "im-par-syal" },
-            { word: "Industrieux", meaning: "Travailleur, actif", pronunciation: "in-dus-tryeu" },
-            { word: "Ingénieux", meaning: "Qui a de l'ingéniosité", pronunciation: "in-je-nyeu" },
-            { word: "Innovant", meaning: "Qui innove", pronunciation: "i-no-van" },
-            { word: "Intègre", meaning: "D'une honnêteté scrupuleuse", pronunciation: "in-tegr" },
-            { word: "Intelligent", meaning: "Qui a de l'intelligence", pronunciation: "in-tel-li-jan" },
-            { word: "Intuitif", meaning: "Qui a de l'intuition", pronunciation: "in-tui-tif" },
-            { word: "Jovial", meaning: "Enjoué, de bonne humeur", pronunciation: "jo-vyal" },
-            { word: "Judicieux", meaning: "Qui a du jugement", pronunciation: "jyu-di-syeu" },
-            { word: "Juste", meaning: "Conforme à la justice", pronunciation: "just" },
-            { word: "Logique", meaning: "Conforme à la logique", pronunciation: "lo-jik" },
-            { word: "Loyal", meaning: "Fidèle, qui a de la loyauté", pronunciation: "lwa-yal" },
-            { word: "Lucide", meaning: "Qui voit les choses clairement", pronunciation: "lu-sid" },
-            { word: "Magnanime", meaning: "Qui a de la grandeur d'âme", pronunciation: "ma-nya-nim" },
-            { word: "Mature", meaning: "Qui a atteint la maturité", pronunciation: "ma-tur" },
-            { word: "Méthodique", meaning: "Qui suit une méthode", pronunciation: "me-to-dik" },
-            { word: "Minutieux", meaning: "Très attentif aux détails", pronunciation: "mi-nu-syeu" },
-            { word: "Modeste", meaning: "Qui a de la modestie", pronunciation: "mo-dest" },
-            { word: "Noble", meaning: "Qui a de la noblesse", pronunciation: "nobl" },
-            { word: "Objectif", meaning: "Qui se base sur les faits", pronunciation: "ob-jek-tif" },
-            { word: "Observateur", meaning: "Qui observe attentivement", pronunciation: "ob-ser-va-teur" },
-            { word: "Optimiste", meaning: "Qui voit le bon côté des choses", pronunciation: "op-ti-mist" },
-            { word: "Ordonné", meaning: "Qui a de l'ordre", pronunciation: "or-do-ne" },
-            { word: "Organisé", meaning: "Qui sait s'organiser", pronunciation: "or-ga-ni-ze" },
-            { word: "Pacifique", meaning: "Qui aime la paix", pronunciation: "pa-si-fik" },
-            { word: "Patient", meaning: "Qui a de la patience", pronunciation: "pa-syan" },
-            { word: "Persévérant", meaning: "Qui persévère", pronunciation: "per-se-ve-ran" },
-            { word: "Perspicace", meaning: "Qui a de la perspicacité", pronunciation: "per-spi-kas" },
-            { word: "Poli", meaning: "Qui a des manières courtoises", pronunciation: "po-li" },
-            { word: "Pragmatique", meaning: "Qui s'adapte à la réalité", pronunciation: "prag-ma-tik" },
-            { word: "Précis", meaning: "Exact, rigoureux", pronunciation: "pre-si" },
-            { word: "Prudent", meaning: "Qui agit avec prudence", pronunciation: "pru-dan" }
-        ];
+        // Données des mots classés par difficulté
+        const wordsData = {
+            easy: [
+                { word: "Maison", meaning: "Bâtiment destiné à l'habitation", pronunciation: "mè-zon" },
+                { word: "Arbre", meaning: "Végétal ligneux de grande taille", pronunciation: "ar-br" },
+                { word: "Fleur", meaning: "Partie colorée souvent odorante des plantes", pronunciation: "fleur" },
+                { word: "Soleil", meaning: "Étoile autour de laquelle gravite la Terre", pronunciation: "so-lèy" },
+                { word: "Eau", meaning: "Liquide transparent, incolore, inodore et insipide", pronunciation: "o" },
+                { word: "Chien", meaning: "Mammifère domestique de la famille des canidés", pronunciation: "chyen" },
+                { word: "Chat", meaning: "Petit mammifère carnivore domestique", pronunciation: "cha" },
+                { word: "Livre", meaning: "Ouvrage écrit ou imprimé", pronunciation: "li-vr" },
+                { word: "École", meaning: "Établissement où l'on donne un enseignement collectif", pronunciation: "é-col" },
+                { word: "Ami", meaning: "Personne avec laquelle on est lié d'amitié", pronunciation: "a-mi" }
+            ],
+            medium: [
+                { word: "Épanouissement", meaning: "Action de s'épanouir, de se développer pleinement", pronunciation: "é-pa-nou-is-se-man" },
+                { word: "Bienveillance", meaning: "Disposition favorable envers quelqu'un", pronunciation: "byen-vè-yanç" },
+                { word: "Persévérance", meaning: "Qualité de celui qui persévère", pronunciation: "per-sé-vé-ranç" },
+                { word: "Émerveillement", meaning: "État de quelqu'un qui est émerveillé", pronunciation: "é-mèr-vè-yeu-man" },
+                { word: "Authenticité", meaning: "Caractère de ce qui est authentique", pronunciation: "o-tan-ti-si-té" },
+                { word: "Responsabilité", meaning: "Obligation de répondre de ses actes", pronunciation: "rè-pon-sa-bi-li-té" },
+                { word: "Curiosité", meaning: "Désir de savoir, de connaître", pronunciation: "ku-ryo-zi-té" },
+                { word: Imagination", meaning: "Faculté d'imaginer, de se représenter des images", pronunciation: "i-ma-ji-na-syon" },
+                { word: "Créativité", meaning: "Capacité à créer, à inventer", pronunciation: "kré-a-ti-vi-té" },
+                { word: "Équilibre", meaning: "État de ce qui est en équilibre", pronunciation: "é-ki-libr" }
+            ],
+            hard: [
+                { word: "Incommensurable", meaning: "Qui ne peut être mesuré", pronunciation: "in-ko-man-su-rabl" },
+                { word: "Inéluctable", meaning: "Qu'on ne peut éviter", pronunciation: "i-né-luk-ta-bl" },
+                { word: "Métamorphose", meaning: "Transformation complète", pronunciation: "mé-ta-mor-foz" },
+                { word: "Paradoxalement", meaning: "D'une manière paradoxale", pronunciation: "pa-ra-dok-sa-leu-man" },
+                { word: "Quintessence", meaning: "Ce qu'il y a de plus fin, de plus pur", pronunciation: "kin-tè-sanç" },
+                { word: "Syllogisme", meaning: "Raisonnement logique à deux prémisses", pronunciation: "sil-lo-jism" },
+                { word: "Tautologie", meaning: "Répétition de la même idée en termes différents", pronunciation: "to-to-lo-ji" },
+                { word: "Véhémence", meaning: "Caractère de ce qui est véhément", pronunciation: "vé-é-manç" },
+                { word: "Xénophilie", meaning: "Goût pour les étrangers", pronunciation: "gzè-no-fi-li" },
+                { word: "Zététique", meaning: "Qui recherche, qui examine", pronunciation: "zé-té-tik" }
+            ]
+        };
 
-        // Variables pour gérer l'état du livre
-        let currentPage = 0;
-        const totalPages = 5;
-        let startX = 0;
-        let endX = 0;
+        // Éléments DOM
+        const bookCover = document.getElementById('bookCover');
+        const openBookBtn = document.getElementById('openBookBtn');
+        const bookContent = document.getElementById('bookContent');
+        const wordsContainer = document.getElementById('wordsContainer');
+        const difficultyTabs = document.querySelectorAll('.difficulty-tab');
 
-        // Initialisation du livre
-        document.addEventListener('DOMContentLoaded', function() {
-            // Remplir les pages avec le vocabulaire
-            populatePages();
-            
-            // Configurer les écouteurs d'événements
-            document.getElementById('prev-btn').addEventListener('click', prevPage);
-            document.getElementById('next-btn').addEventListener('click', nextPage);
-            
-            // Ajouter les écouteurs pour le swipe
-            const bookContainer = document.getElementById('book');
-            bookContainer.addEventListener('touchstart', handleTouchStart, false);
-            bookContainer.addEventListener('touchmove', handleTouchMove, false);
-            bookContainer.addEventListener('touchend', handleTouchEnd, false);
-            
-            // Mettre à jour l'état des boutons
-            updateButtons();
-            updatePageIndicator();
+        // Ouvrir le livre
+        openBookBtn.addEventListener('click', function() {
+            bookCover.style.display = 'none';
+            bookContent.style.display = 'block';
+            showWords('easy');
         });
 
-        // Fonction pour remplir les pages avec le vocabulaire
-        function populatePages() {
-            for (let page = 1; page <= totalPages; page++) {
-                const pageContent = document.getElementById(`page${page}-content`);
-                pageContent.innerHTML = '';
+        // Changer l'onglet de difficulté
+        difficultyTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Retirer la classe active de tous les onglets
+                difficultyTabs.forEach(t => t.classList.remove('active'));
+                // Ajouter la classe active à l'onglet cliqué
+                this.classList.add('active');
+                // Afficher les mots de la difficulté sélectionnée
+                const difficulty = this.getAttribute('data-difficulty');
+                showWords(difficulty);
+            });
+        });
+
+        // Afficher les mots selon la difficulté
+        function showWords(difficulty) {
+            wordsContainer.innerHTML = '';
+            
+            wordsData[difficulty].forEach(wordObj => {
+                const wordCard = document.createElement('div');
+                wordCard.className = `word-card ${difficulty}`;
                 
-                // Calculer l'index de départ pour cette page
-                const startIndex = (page - 1) * 20;
+                let badgeClass = '';
+                let badgeText = '';
                 
-                // Ajouter 20 mots à la page
-                for (let i = startIndex; i < startIndex + 20 && i < vocabulary.length; i++) {
-                    const word = vocabulary[i];
-                    
-                    const wordElement = document.createElement('div');
-                    wordElement.className = 'vocabulary-item';
-                    wordElement.innerHTML = `
-                        <div class="word">${word.word}</div>
-                        <div class="meaning">${word.meaning}</div>
-                        <div class="pronunciation">${word.pronunciation}</div>
-                        <button class="speak-btn" data-word="${word.word}">Prononcer</button>
-                    `;
-                    
-                    pageContent.appendChild(wordElement);
+                switch(difficulty) {
+                    case 'easy':
+                        badgeClass = 'easy-badge';
+                        badgeText = 'Facile';
+                        break;
+                    case 'medium':
+                        badgeClass = 'medium-badge';
+                        badgeText = 'Moyen';
+                        break;
+                    case 'hard':
+                        badgeClass = 'hard-badge';
+                        badgeText = 'Difficile';
+                        break;
                 }
-            }
+                
+                wordCard.innerHTML = `
+                    <div class="word-header">
+                        <div class="word">${wordObj.word}</div>
+                        <div class="difficulty-badge ${badgeClass}">${badgeText}</div>
+                    </div>
+                    <div class="meaning">${wordObj.meaning}</div>
+                    <div class="pronunciation">
+                        <span>${wordObj.pronunciation}</span>
+                        <button class="speak-btn" data-word="${wordObj.word}">
+                            <i class="fas fa-volume-up"></i> Prononcer
+                        </button>
+                    </div>
+                `;
+                
+                wordsContainer.appendChild(wordCard);
+            });
             
             // Ajouter des écouteurs d'événements pour les boutons de prononciation
             document.querySelectorAll('.speak-btn').forEach(button => {
@@ -538,66 +500,13 @@
             }
         }
 
-        // Fonction pour passer à la page suivante
-        function nextPage() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                updateBook();
-            }
-        }
-
-        // Fonction pour revenir à la page précédente
-        function prevPage() {
-            if (currentPage > 0) {
-                currentPage--;
-                updateBook();
-            }
-        }
-
-        // Fonction pour mettre à jour l'apparence du livre
-        function updateBook() {
-            const book = document.getElementById('book');
-            const rotation = -currentPage * 180;
-            book.style.transform = `rotateY(${rotation}deg)`;
-            updateButtons();
-            updatePageIndicator();
-        }
-
-        // Fonction pour mettre à jour l'état des boutons de navigation
-        function updateButtons() {
-            document.getElementById('prev-btn').disabled = currentPage === 0;
-            document.getElementById('next-btn').disabled = currentPage === totalPages;
-        }
-
-        // Fonction pour mettre à jour l'indicateur de page
-        function updatePageIndicator() {
-            document.getElementById('current-page').textContent = currentPage + 1;
-            document.getElementById('total-pages').textContent = totalPages;
-        }
-
-        // Gestion des événements de swipe
-        function handleTouchStart(evt) {
-            startX = evt.touches[0].clientX;
-        }
-
-        function handleTouchMove(evt) {
-            endX = evt.touches[0].clientX;
-        }
-
-        function handleTouchEnd() {
-            const diffX = startX - endX;
-            
-            // Seuil pour déterminer si c'est un swipe
-            if (Math.abs(diffX) > 50) {
-                if (diffX > 0) {
-                    // Swipe vers la gauche - page suivante
-                    nextPage();
-                } else {
-                    // Swipe vers la droite - page précédente
-                    prevPage();
-                }
-            }
-        }
+        // Animation d'apparition des éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.logo, .subtitle, .book-cover');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.3}s`;
+            });
+        });
     </script>
 </body>
 </html>
