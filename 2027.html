@@ -420,7 +420,7 @@
             margin-bottom: 2rem;
         }
         
-        input {
+        .spelling-input {
             padding: 1rem 1.5rem;
             font-size: 1.2rem;
             border: none;
@@ -428,6 +428,11 @@
             background: rgba(255, 255, 255, 0.9);
             width: 300px;
             text-align: center;
+            /* Désactivation du correcteur */
+            spellcheck: false;
+            autocomplete: "off";
+            autocorrect: "off";
+            autocapitalize: "off";
         }
         
         button {
@@ -451,6 +456,7 @@
             font-size: 1.5rem;
             margin-top: 1rem;
             min-height: 2rem;
+            font-weight: bold;
         }
         
         .correct {
@@ -459,6 +465,24 @@
         
         .incorrect {
             color: var(--danger);
+        }
+        
+        .spelling-comparison {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .user-spelling {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+        
+        .correct-spelling {
+            color: var(--success);
+            font-weight: bold;
         }
         
         .motivation {
@@ -571,7 +595,7 @@
                 align-items: center;
             }
             
-            input {
+            .spelling-input {
                 width: 100%;
             }
             
@@ -762,15 +786,17 @@
             <div class="word-display" id="word-to-spell">Chargement...</div>
             
             <div class="input-area">
-                <input type="text" id="spelling-input" placeholder="Épelez le mot que vous entendez">
+                <input type="text" class="spelling-input" id="spelling-input" placeholder="Épelez le mot que vous entendez" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 <button id="check-button">Vérifier</button>
             </div>
             
             <div class="result" id="result-message"></div>
+            <div class="spelling-comparison" id="spelling-comparison" style="display: none;"></div>
             
             <button id="hint-button">Indice</button>
             <button id="next-word">Mot Suivant</button>
             <button id="hear-word">🔊 Entendre le mot</button>
+            <button id="slow-voice">🐌 Voix Lente</button>
         </section>
         
         <div class="motivation">
@@ -1048,7 +1074,8 @@
                 totalWords: 0,
                 startTime: null
             },
-            currentSessionDuration: 0
+            currentSessionDuration: 0,
+            speechRate: 0.8 // Vitesse normale par défaut
         };
 
         // Initialisation
@@ -1058,12 +1085,8 @@
             generateCalendar();
             createGalaxy();
             
-            // Charger les voix disponibles
-            if ('speechSynthesis' in window) {
-                speechSynthesis.onvoiceschanged = function() {
-                    console.log("Voix chargées:", speechSynthesis.getVoices());
-                };
-            }
+            // Initialiser la synthèse vocale
+            initSpeechSynthesis();
         });
 
         function createGalaxy() {
@@ -1097,6 +1120,15 @@
             galaxy.appendChild(nebula2);
         }
 
+        function initSpeechSynthesis() {
+            if ('speechSynthesis' in window) {
+                // Attendre que les voix soient chargées
+                speechSynthesis.onvoiceschanged = function() {
+                    console.log("Voix disponibles:", speechSynthesis.getVoices());
+                };
+            }
+        }
+
         function setupEventListeners() {
             // Bouton de démarrage
             document.getElementById('startBtn').addEventListener('click', function() {
@@ -1124,7 +1156,12 @@
             document.getElementById('hint-button').addEventListener('click', showHint);
             document.getElementById('next-word').addEventListener('click', loadNextWord);
             document.getElementById('hear-word').addEventListener('click', function() {
-                speakWord(appData.currentWord);
+                speakWord(appData.currentWord, appData.speechRate);
+            });
+            document.getElementById('slow-voice').addEventListener('click', function() {
+                appData.speechRate = 0.5;
+                speakWord(appData.currentWord, 0.5);
+                setTimeout(() => { appData.speechRate = 0.8; }, 2000);
             });
             
             document.getElementById('spelling-input').addEventListener('keypress', function(e) {
@@ -1132,6 +1169,12 @@
                     checkSpelling();
                 }
             });
+            
+            // Désactiver le correcteur orthographique
+            document.getElementById('spelling-input').setAttribute('spellcheck', 'false');
+            document.getElementById('spelling-input').setAttribute('autocomplete', 'off');
+            document.getElementById('spelling-input').setAttribute('autocorrect', 'off');
+            document.getElementById('spelling-input').setAttribute('autocapitalize', 'off');
             
             document.querySelectorAll('.training-card').forEach(card => {
                 card.addEventListener('click', function() {
@@ -1176,13 +1219,14 @@
             appData.currentWord = appData.dictionary[randomIndex];
             
             const displayElement = document.getElementById('word-to-spell');
-            displayElement.textContent = appData.currentWord;
+            displayElement.textContent = "? ? ?";
             displayElement.classList.remove('correct', 'incorrect');
             
             document.getElementById('spelling-input').value = '';
             document.getElementById('result-message').textContent = '';
+            document.getElementById('spelling-comparison').style.display = 'none';
             
-            speakWord(appData.currentWord);
+            speakWord(appData.currentWord, appData.speechRate);
             
             // Démarrer la session si ce n'est pas déjà fait
             if (!appData.currentSession.startTime) {
@@ -1192,61 +1236,52 @@
             }
         }
 
-        function speakWord(word) {
+        function speakWord(word, rate = 0.8) {
             if ('speechSynthesis' in window) {
                 speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'fr-FR';
-                
-                // Voix plus aiguë et motivante
-                utterance.rate = 0.9;  // Légèrement plus rapide
-                utterance.pitch = 1.4; // Plus aigu (1.0 = normal, 2.0 = très aigu)
+                utterance.rate = rate;
+                utterance.pitch = 1.2; // Voix plus aiguë
                 utterance.volume = 1.0;
                 
-                // Sélectionner une voix féminine si disponible (généralement plus aiguë)
+                // Sélectionner la meilleure voix disponible
                 const voices = speechSynthesis.getVoices();
-                let selectedVoice = voices.find(voice => 
-                    voice.lang.startsWith('fr') && 
-                    voice.name.toLowerCase().includes('female')
-                );
+                let selectedVoice = null;
                 
-                // Si pas de voix féminine, prendre la première voix française
-                if (!selectedVoice) {
-                    selectedVoice = voices.find(voice => voice.lang.startsWith('fr'));
+                // Priorité aux voix françaises
+                const frenchVoices = voices.filter(voice => voice.lang.startsWith('fr'));
+                if (frenchVoices.length > 0) {
+                    // Préférer les voix féminines
+                    selectedVoice = frenchVoices.find(voice => 
+                        voice.name.toLowerCase().includes('female') || 
+                        voice.name.toLowerCase().includes('victoire') ||
+                        voice.name.toLowerCase().includes('audrey')
+                    ) || frenchVoices[0];
+                } else {
+                    // Fallback sur les voix anglaises si pas de voix française
+                    selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
                 }
                 
                 if (selectedVoice) {
                     utterance.voice = selectedVoice;
                 }
                 
-                // Phrases motivantes occasionnelles
-                const motivationalPhrases = [
-                    "Excellent !", 
-                    "Superbe !", 
-                    "Formidable !",
-                    "Incroyable !",
-                    "Magnifique !"
-                ];
+                utterance.onstart = function() {
+                    console.log("Début de la parole avec la voix:", selectedVoice ? selectedVoice.name : 'voix par défaut');
+                };
                 
-                // 20% de chance d'ajouter une phrase motivante
-                if (Math.random() < 0.2) {
-                    const phrase = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
-                    setTimeout(() => {
-                        const motivationalUtterance = new SpeechSynthesisUtterance(phrase);
-                        motivationalUtterance.lang = 'fr-FR';
-                        motivationalUtterance.rate = 1.1;
-                        motivationalUtterance.pitch = 1.6;
-                        motivationalUtterance.volume = 0.8;
-                        
-                        if (selectedVoice) {
-                            motivationalUtterance.voice = selectedVoice;
-                        }
-                        
-                        speechSynthesis.speak(motivationalUtterance);
-                    }, 500);
-                }
+                utterance.onerror = function(event) {
+                    console.error("Erreur de synthèse vocale:", event.error);
+                    // Fallback : afficher le mot si la voix ne marche pas
+                    document.getElementById('word-to-spell').textContent = word;
+                };
                 
                 speechSynthesis.speak(utterance);
+            } else {
+                // Fallback si pas de support de synthèse vocale
+                document.getElementById('word-to-spell').textContent = word;
             }
         }
 
@@ -1256,14 +1291,19 @@
             const userInput = document.getElementById('spelling-input').value.trim();
             const correctWord = appData.currentWord;
             const resultElement = document.getElementById('result-message');
+            const comparisonElement = document.getElementById('spelling-comparison');
             const wordElement = document.getElementById('word-to-spell');
             
             appData.currentSession.totalWords++;
+            
+            // Afficher le mot correct
+            wordElement.textContent = correctWord;
             
             if (userInput.toLowerCase() === correctWord.toLowerCase()) {
                 resultElement.textContent = "Correct! Excellente orthographe!";
                 resultElement.className = 'result correct';
                 wordElement.classList.add('correct');
+                comparisonElement.style.display = 'none';
                 
                 // Mettre à jour les statistiques
                 ProfileManager.currentUser.stats.wordsMastered++;
@@ -1282,9 +1322,16 @@
                     wordElement.style.animation = '';
                 }, 1000);
             } else {
-                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
+                resultElement.textContent = "Incorrect !";
                 resultElement.className = 'result incorrect';
                 wordElement.classList.add('incorrect');
+                
+                // Afficher la comparaison détaillée
+                comparisonElement.innerHTML = `
+                    <div>Votre réponse: <span class="user-spelling">${userInput || '(vide)'}</span></div>
+                    <div>Orthographe correcte: <span class="correct-spelling">${correctWord}</span></div>
+                `;
+                comparisonElement.style.display = 'block';
                 
                 ProfileManager.currentUser.stats.currentStreak = 0;
                 ProfileManager.currentUser.stats.successRate = Math.max(0, 
@@ -1298,7 +1345,7 @@
             ProfileManager.updateProfileDisplay();
             ProfileManager.saveUsers();
             
-            setTimeout(loadNextWord, 3000);
+            setTimeout(loadNextWord, 4000);
         }
 
         function speakMotivationalFeedback(isCorrect) {
@@ -1321,7 +1368,7 @@
                 const utterance = new SpeechSynthesisUtterance(phrase);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 1.0;
-                utterance.pitch = 1.5; // Voix aiguë et motivante
+                utterance.pitch = 1.4; // Voix aiguë et motivante
                 utterance.volume = 0.9;
                 
                 const voices = speechSynthesis.getVoices();
