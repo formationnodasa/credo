@@ -1,23 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Épellation des Mots de la Bible - Ya Lwanga Credo Musao</title>
+    <title>Livre d'Épellation - Ya Lwanga Credo Musao</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --galaxy-black: #000000;
-            --galaxy-dark: #0a0a0a;
-            --galaxy-purple: #4a1c6b;
-            --galaxy-blue: #1a1a4b;
-            --galaxy-pink: #b0308c;
-            --galaxy-cyan: #00c9ff;
-            --star-color: #ffffff;
-            --text-glow: 0 0 10px rgba(255, 255, 255, 0.7);
-            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -26,1026 +14,735 @@
         }
 
         body {
-            background: var(--galaxy-black);
-            color: white;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             min-height: 100vh;
+            color: white;
             overflow-x: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
 
         .container {
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        header {
+        .logo-container {
             text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-            padding: 20px 0;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1.5s ease-out;
         }
 
-        header::after {
-            content: '';
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff3366, #ff9933, #33ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+            position: relative;
+        }
+
+        .logo::after {
+            content: "";
             position: absolute;
-            bottom: 0;
+            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 300px;
+            width: 200px;
             height: 3px;
-            background: linear-gradient(to right, transparent, var(--galaxy-cyan), transparent);
-            box-shadow: var(--text-glow);
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(0, 201, 255, 0.8);
-            background: linear-gradient(to right, #ffffff, var(--galaxy-cyan), #b0308c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 2px;
-            font-weight: 800;
+            background: linear-gradient(to right, transparent, #ff3366, transparent);
         }
 
         .subtitle {
-            font-size: 1.4rem;
-            color: var(--galaxy-cyan);
-            margin-bottom: 10px;
-            text-shadow: var(--text-glow);
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-top: 10px;
+            opacity: 0.9;
+            color: #33ccff;
         }
 
-        .author {
-            font-size: 1.2rem;
-            color: var(--galaxy-pink);
-            font-style: italic;
+        .book-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 700px;
+            perspective: 2000px;
             margin-bottom: 30px;
-            text-shadow: 0 0 8px rgba(176, 48, 140, 0.7);
         }
 
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .book-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .book-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        .book {
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(0, 201, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .book-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 201, 255, 0.3);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .book-card:hover::before {
-            transform: translateX(100%);
-        }
-
-        .book-card.active {
-            background: rgba(0, 201, 255, 0.15);
-            border: 1px solid var(--galaxy-cyan);
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 201, 255, 0.5);
-        }
-
-        .book-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--galaxy-cyan);
-            text-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
-        }
-
-        .book-chapters {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.8s ease;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        .chapter-title {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: var(--galaxy-cyan);
-            text-align: center;
             position: relative;
-            padding-bottom: 15px;
-            text-shadow: var(--text-glow);
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
         }
 
-        .chapter-title::after {
-            content: '';
+        .page {
             position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 3px;
-            background: var(--galaxy-cyan);
-            box-shadow: var(--text-glow);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            background: linear-gradient(to bottom, #fefefe, #f5f5f5);
+            border-radius: 10px 20px 20px 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            backface-visibility: hidden;
+            overflow: hidden;
+            transform-origin: left center;
+            transition: transform 1s ease-in-out;
+            border: 1px solid #ddd;
         }
 
-        .terms-grid {
+        .page-front {
+            z-index: 2;
+        }
+
+        .page-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .page-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
+        .vocabulary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
-        .term-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+        .vocabulary-item {
+            background: white;
+            border-radius: 10px;
             padding: 20px;
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            transform-style: preserve-3d;
-            perspective: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            border-left: 5px solid #ff3366;
         }
 
-        .term-card:hover {
-            transform: translateY(-5px) rotateY(5deg);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(176, 48, 140, 0.3);
-            background: rgba(255, 255, 255, 0.08);
+        .vocabulary-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: #f8f9fa;
         }
 
-        .term-content {
-            flex: 1;
-        }
-
-        .term-name {
-            font-size: 1.4rem;
+        .word {
+            font-size: 20px;
             font-weight: bold;
+            color: #2c3e50;
             margin-bottom: 10px;
-            color: var(--galaxy-cyan);
-            text-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .term-pronunciation {
-            font-style: italic;
-            margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
-        }
-
-        .term-reference {
-            font-size: 0.9rem;
-            color: var(--galaxy-pink);
-            text-shadow: 0 0 5px rgba(176, 48, 140, 0.5);
-        }
-
-        .voice-button {
-            background: rgba(0, 201, 255, 0.2);
-            border: 1px solid var(--galaxy-cyan);
+        .word-number {
+            background: #ff3366;
+            color: white;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-left: 15px;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
+            font-size: 14px;
         }
 
-        .voice-button:hover {
-            background: rgba(0, 201, 255, 0.3);
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 201, 255, 0.5);
+        .meaning {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
 
-        .voice-button.playing {
-            background: rgba(176, 48, 140, 0.3);
-            border-color: var(--galaxy-pink);
-            box-shadow: 0 0 15px rgba(176, 48, 140, 0.5);
-            animation: pulse 1s infinite;
+        .pronunciation {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .voice-icon {
-            width: 24px;
-            height: 24px;
-            fill: var(--galaxy-cyan);
-            transition: var(--transition);
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .voice-button.playing .voice-icon {
-            fill: var(--galaxy-pink);
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 12px 25px;
-            background: rgba(0, 201, 255, 0.15);
-            border: 1px solid var(--galaxy-cyan);
-            border-radius: 8px;
-            color: var(--galaxy-cyan);
-            cursor: pointer;
-            transition: var(--transition);
-            text-shadow: 0 0 5px rgba(0, 201, 255, 0.5);
-            box-shadow: 0 0 10px rgba(0, 201, 255, 0.2);
-        }
-
-        .back-button:hover {
-            background: rgba(0, 201, 255, 0.25);
-            transform: translateX(-5px);
-            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
-        }
-
-        .search-container {
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
+        .speak-btn {
+            background: linear-gradient(to right, #ff3366, #ff0044);
             color: white;
-            font-size: 1rem;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: var(--galaxy-cyan);
-            box-shadow: 0 0 20px rgba(0, 201, 255, 0.4);
-            background: rgba(255, 255, 255, 0.15);
+        .speak-btn:hover {
+            background: linear-gradient(to right, #ff0044, #cc0033);
+            transform: scale(1.05);
         }
 
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+        .book-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .galaxy-background {
+        .nav-btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #34495e;
+            transform: scale(1.1);
+        }
+
+        .nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .book-shadow {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            filter: blur(10px);
+            z-index: -1;
+        }
+
+        .page-indicator {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            width: 100%;
+        }
+
+        /* Effet de papier pour les pages */
+        .page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+
+        /* Animation de particules */
+        .particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            background: var(--galaxy-black);
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .star {
+        .particle {
             position: absolute;
-            background-color: white;
+            background: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            animation: twinkle 5s infinite ease-in-out;
+            animation: float 20s infinite linear;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-            100% {
-                transform: translateY(0) rotate(360deg);
-            }
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(100px, 100px) rotate(360deg); opacity: 0; }
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .nebula {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.4;
-            animation: float 25s infinite linear;
-        }
-
-        .nebula-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, var(--galaxy-purple), transparent);
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .nebula-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--galaxy-cyan), transparent);
-            top: 60%;
-            left: 80%;
-            animation-delay: -12s;
-        }
-
-        .nebula-3 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, var(--galaxy-pink), transparent);
-            top: 80%;
-            left: 20%;
-            animation-delay: -6s;
-        }
-
-        .shooting-star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 10px white;
-            opacity: 0;
-        }
-
-        @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(-500px) translateY(500px);
-                opacity: 0;
-            }
-        }
-
-        .galaxy-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, rgba(26, 26, 75, 0.3) 40%, transparent 70%);
-            border-radius: 50%;
-            animation: rotate 120s infinite linear;
-        }
-
-        @keyframes rotate {
-            from {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
-            .books-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .terms-grid {
+            .vocabulary-grid {
                 grid-template-columns: 1fr;
             }
             
-            .galaxy-center {
-                width: 400px;
-                height: 400px;
+            .book-container {
+                height: 800px;
             }
             
-            .term-card {
-                flex-direction: column;
+            .logo {
+                font-size: 2.5rem;
             }
             
-            .voice-button {
-                margin-left: 0;
-                margin-top: 15px;
-                align-self: center;
+            .subtitle {
+                font-size: 1.2rem;
+                letter-spacing: 5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="galaxy-background" id="galaxy-background">
-        <div class="galaxy-center"></div>
-        <div class="nebula nebula-1"></div>
-        <div class="nebula nebula-2"></div>
-        <div class="nebula nebula-3"></div>
-    </div>
-
+    <div class="particles" id="particles"></div>
+    
     <div class="container">
-        <header>
-            <h1>Spécial Diocèse</h1>
-            <p class="subtitle">Épellation des mots de la Bible de Jérusalem à la spéciale </p>
-            <p class="author"> Ya Lwanga Credo Musao</p>
-        </header>
+        <div class="logo-container">
+            <div class="logo">KXA</div>
+            <div class="subtitle">SALAMU - AMANI</div>
+            <div class="logo" style="font-size: 2rem; margin-top: 20px;">Ya Lwanga Credo Musao</div>
+        </div>
+        
+        <div class="book-container">
+            <div class="book" id="book">
+                <!-- Pages générées par JavaScript -->
+            </div>
+            <div class="book-shadow"></div>
+        </div>
+        
+        <div class="page-indicator">
+            Page <span id="current-page">1</span> sur <span id="total-pages">10</span>
+        </div>
 
-        <section id="books-section" class="content-section active">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Rechercher un livre de la Bible...">
-            </div>
-            <div class="books-grid" id="books-grid">
-                <!-- Les livres seront générés dynamiquement -->
-            </div>
-        </section>
-
-        <section id="book-content-section" class="content-section">
-            <div class="back-button" id="back-to-books">← Retour aux livres</div>
-            <h2 class="chapter-title" id="book-title">Titre du livre</h2>
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Rechercher un terme...">
-            </div>
-            <div class="terms-grid" id="book-terms">
-                <!-- Les termes du livre sélectionné seront générés dynamiquement -->
-            </div>
-        </section>
+        <div class="book-controls">
+            <button class="nav-btn" id="prev-btn">←</button>
+            <button class="nav-btn" id="next-btn">→</button>
+        </div>
+        
+        <div class="footer">
+            <p>Livre d'Épellation - Prononciation des Mots du Dictionnaire</p>
+            <p>© 2023 Ya Lwanga Credo Musao</p>
+        </div>
     </div>
 
     <script>
-        // Données des livres de la Bible
-        const bibleBooks = [
-            "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome", "Josué", "Juges", "Ruth", 
-            "1 Samuel", "2 Samuel", "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques", "Esdras", 
-            "Néhémie", "Esther", "Job","Tobie", "Psaumes","Judith", "Sagesse","Siracide (Ecclésiastique)","Proverbes", "Ecclésiaste", "Cantique des Cantiques",
-            "Ésaïe", "Jérémie", "Lamentations", "Ézéchiel", "Daniel", "Osée", "Baruch","Joël", "Amos",
-            "Abdias", "Jonas", "Michée", "Nahum", "Habaquq", "Sophonie", "Aggée", "Zacharie", "Malachie",
-            "Matthieu", "Marc", "Luc", "Jean", "Actes", "Romains", "1 Corinthiens", "2 Corinthiens",
-            "Galates", "Éphésiens", "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens",
-            "1 Timothée", "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques","1 Maccabées","2 Maccabées","1 Pierre", "2 Pierre",
-            "1 Jean", "2 Jean", "3 Jean", "Jude", "Apocalypse"
+        // Données des mots (premiers 200 mots de votre liste)
+        const words = [
+            { word: "aà", meaning: "Avec accent grave", pronunciation: "a ah-sahn grahv" },
+            { word: "Aà", meaning: "A majuscule avec accent grave", pronunciation: "ah ah-sahn grahv" },
+            { word: "bouchetonà", meaning: "Terminaison en à", pronunciation: "boosh-toh-nah" },
+            { word: "bras-le-corpsà", meaning: "Expression avec à", pronunciation: "brah luh kor ah" },
+            { word: "brule-pourpointà", meaning: "À brûle-pourpoint", pronunciation: "ah brewl poor-pwan" },
+            { word: "brûle-pourpointà", meaning: "Avec accent circonflexe", pronunciation: "ah brewl poor-pwan" },
+            { word: "califourchona", meaning: "Sans accent", pronunciation: "kah-lee-foor-shoh-nah" },
+            { word: "capellaà", meaning: "Avec à final", pronunciation: "kah-pel-lah" },
+            { word: "capellaa", meaning: "Avec double a", pronunciation: "kah-pel-lah-ah" },
+            { word: "cappellaà", meaning: "Avec double p et à", pronunciation: "kahp-pel-lah" },
+            { word: "cloche-piedà", meaning: "À cloche-pied", pronunciation: "ah klohsh pyay" },
+            { word: "clochepieda", meaning: "En un mot", pronunciation: "klohsh-pyay-dah" },
+            { word: "contrarioà", meaning: "A contrario", pronunciation: "ah kon-trah-ryoh" },
+            { word: "contraireà", meaning: "Au contraire", pronunciation: "oh kon-trair" },
+            { word: "contre-biaisà", meaning: "De contre-biais", pronunciation: "duh kon-truh byay" },
+            { word: "contre-bordà", meaning: "À contre-bord", pronunciation: "ah kon-truh bor" },
+            { word: "contre-lumièreà", meaning: "À contre-jour", pronunciation: "ah kon-truh loo-myair" },
+            { word: "contre-poilà", meaning: "À contre-poil", pronunciation: "ah kon-truh pwal" },
+            { word: "contre-saisonà", meaning: "Hors saison", pronunciation: "or say-zon" },
+            { word: "croupetonsà", meaning: "Accroupi", pronunciation: "ah kroop-ton" },
+            
+            { word: "demià", meaning: "À demi", pronunciation: "ah duh-mee" },
+            { word: "demi-motà", meaning: "À demi-mot", pronunciation: "ah duh-mee moh" },
+            { word: "demi-voixa", meaning: "À demi-voix", pronunciation: "ah duh-mee vwah" },
+            { word: "fortiorià", meaning: "A fortiori", pronunciation: "ah for-syo-ree" },
+            { word: "fortioria", meaning: "Variante", pronunciation: "ah for-syo-ryah" },
+            { word: "giornoà", meaning: "A giorno", pronunciation: "ah jor-no" },
+            { word: "gogoà", meaning: "À gogo", pronunciation: "ah go-go" },
+            { word: "grand-peineà", meaning: "À grand-peine", pronunciation: "ah grahn pen" },
+            { word: "jeunà", meaning: "À jeun", pronunciation: "ah jeun" },
+            { word: "la bonne franquetteà", meaning: "À la bonne franquette", pronunciation: "ah lah bon frahn-ket" },
+            { word: "la couleà", meaning: "À la coule", pronunciation: "ah lah kool" },
+            { word: "la croque-au-selà", meaning: "À la croque-au-sel", pronunciation: "ah lah krok o sel" },
+            { word: "la dérobéeà", meaning: "À la dérobée", pronunciation: "ah lah day-ro-bay" },
+            { word: "la manqueà", meaning: "À la manque", pronunciation: "ah lah mahnk" },
+            { word: "la mords-moi-le-noeudà", meaning: "Expression familière", pronunciation: "ah lah mor mwa luh nuh" },
+            { word: "la redresseà", meaning: "À la redresse", pronunciation: "ah lah ruh-dres" },
+            { word: "la sauvetteà", meaning: "À la sauvette", pronunciation: "ah lah so-vet" },
+            { word: "la six-quatre-deuxà", meaning: "À la six-quatre-deux", pronunciation: "ah lah seez kah-truh duh" },
+            { word: "la va-viteà", meaning: "À la va-vite", pronunciation: "ah lah vah veet" },
+            { word: "la venvoleà", meaning: "À la venvole", pronunciation: "ah lah van-vol" },
+            
+            { word: "lèche-doigtsà", meaning: "À lécher les doigts", pronunciation: "ah lay-shay dwah" },
+            { word: "mi-cheminà", meaning: "À mi-chemin", pronunciation: "ah mee shuh-man" },
+            { word: "mi-côteà", meaning: "À mi-côte", pronunciation: "ah mee koht" },
+            { word: "mi-penteà", meaning: "À mi-pente", pronunciation: "ah mee pahnt" },
+            { word: "mi-voixa", meaning: "À mi-voix", pronunciation: "ah mee vwah" },
+            { word: "minimaà", meaning: "Au minima", pronunciation: "oh mee-nee-mah" },
+            { word: "peineà", meaning: "À peine", pronunciation: "ah pen" },
+            { word: "piblea", meaning: "Mot rare", pronunciation: "pee-blah" },
+            { word: "posteriorià", meaning: "A posteriori", pronunciation: "ah pos-te-ryo-ree" },
+            { word: "postériorià", meaning: "Variante orthographique", pronunciation: "ah pos-tay-ryo-ree" },
+            { word: "présenta", meaning: "À présent", pronunciation: "ah pray-zan" },
+            { word: "priorià", meaning: "A priori", pronunciation: "ah pryo-ree" },
+            { word: "prioria", meaning: "Variante", pronunciation: "ah pryo-ryah" },
+            { word: "quia", meaning: "Mot latin", pronunciation: "kwee-ah" },
+            { word: "reboursà", meaning: "À rebours", pronunciation: "ah ruh-boor" },
+            { word: "reculonsà", meaning: "À reculons", pronunciation: "ah ruh-ku-lon" },
+            { word: "tâtonsà", meaning: "À tâtons", pronunciation: "ah tah-ton" },
+            { word: "tempoà", meaning: "A tempo", pronunciation: "ah tem-po" },
+            { word: "tire-larigotà", meaning: "À tire-larigot", pronunciation: "ah teer lah-ree-go" },
+            
+            { word: "tout berzingueà", meaning: "À tout berzingue", pronunciation: "ah too ber-zang" },
+            { word: "toute berzingueà", meaning: "Au féminin", pronunciation: "ah toot ber-zang" },
+            { word: "tue-têteà", meaning: "À tue-tête", pronunciation: "ah too tet" },
+            { word: "verseà", meaning: "À verse", pronunciation: "ah vairs" },
+            { word: "côtéà", meaning: "À côté", pronunciation: "ah ko-tay" },
+            { word: "coupà", meaning: "À coup", pronunciation: "ah koo" },
+            { word: "peu-prèsà", meaning: "À peu près", pronunciation: "ah peu pray" },
+            { word: "picà", meaning: "À pic", pronunciation: "ah peek" },
+            { word: "picsà", meaning: "Aux pics", pronunciation: "oh peek" },
+            { word: "platà", meaning: "À plat", pronunciation: "ah plah" },
+            { word: "proposà", meaning: "À propos", pronunciation: "ah pro-po" },
+            { word: "valoirà", meaning: "À valoir", pronunciation: "ah vah-lwar" },
+            { word: "venira", meaning: "À venir", pronunciation: "ah vuh-neer" },
+            { word: "aa", meaning: "Double a", pronunciation: "ah-ah" },
+            { word: "AAAAA", meaning: "Série de A", pronunciation: "ah-ah-ah-ah-ah" },
+            { word: "aaaa", meaning: "Série de a minuscules", pronunciation: "ah-ah-ah-ah" },
+            { word: "AAAAAa", meaning: "Mix majuscules/minuscules", pronunciation: "ah-ah-ah-ah-ah" },
+            { word: "abamA", meaning: "Mot avec A final", pronunciation: "ah-bah-mah" },
+            { word: "AHa", meaning: "A et H", pronunciation: "ah ah" },
+            { word: "alénien", meaning: "Relatif à Alène", pronunciation: "ah-lay-nyen" },
+            { word: "alénienne", meaning: "Féminin d'alénien", pronunciation: "ah-lay-nyen" },
+            
+            { word: "aastais", meaning: "Originaire d'Aast", pronunciation: "ahs-tay" },
+            { word: "AAVE", meaning: "Sigle", pronunciation: "ah-ah-vuh-uh" },
+            { word: "ab", meaning: "Préposition latine", pronunciation: "ahb" },
+            { word: "AB", meaning: "Sigle", pronunciation: "ah beh" },
+            { word: "ab absurdo", meaning: "Locution latine", pronunciation: "ahb ahb-sur-do" },
+            { word: "ab hoc et ab hac", meaning: "Locution latine", pronunciation: "ahb ok ay ahb ahk" },
+            { word: "ab initio", meaning: "Dès le début", pronunciation: "ahb ee-nee-syo" },
+            { word: "ab intestat", meaning: "Sans testament", pronunciation: "ahb an-tes-tah" },
+            { word: "ab irato", meaning: "Sous l'effet de la colère", pronunciation: "ahb ee-rah-to" },
+            { word: "ab ovo", meaning: "Dès l'origine", pronunciation: "ahb o-vo" },
+            { word: "aba", meaning: "Manteau de moine", pronunciation: "ah-bah" },
+            { word: "ababouiné", meaning: "Rendu semblable à un babouin", pronunciation: "ah-bah-boo-ee-nay" },
+            { word: "abaca", meaning: "Plante textile", pronunciation: "ah-bah-kah" },
+            { word: "abacos", meaning: "Pluriel d'abaco", pronunciation: "ah-bah-kos" },
+            { word: "abacost", meaning: "Vestement africain", pronunciation: "ah-bah-kost" },
+            { word: "abactérien", meaning: "Sans bactéries", pronunciation: "ah-bak-tay-ryen" },
+            { word: "abactérienne", meaning: "Féminin d'abactérien", pronunciation: "ah-bak-tay-ryen" },
+            { word: "abacule", meaning: "Petit cube de mosaïque", pronunciation: "ah-bah-kul" },
+            { word: "abacus", meaning: "Boulier compteur", pronunciation: "ah-bah-kus" },
+            { word: "abader", meaning: "Verbe rare", pronunciation: "ah-bah-day" },
+            { word: "abadie", meaning: "Nom propre", pronunciation: "ah-bah-dee" },
+            
+            { word: "abadis", meaning: "Pluriel d'abadi", pronunciation: "ah-bah-dees" },
+            { word: "abaga", meaning: "Langue papoue", pronunciation: "ah-bah-gah" },
+            { word: "abainvillois", meaning: "Originaire d'Abainville", pronunciation: "ah-ban-vee-lwa" },
+            { word: "abaissable", meaning: "Qui peut être abaissé", pronunciation: "ah-bay-sah-bl" },
+            { word: "abaissant", meaning: "Qui abaisse", pronunciation: "ah-bay-san" },
+            { word: "abaisse", meaning: "Partie inférieure", pronunciation: "ah-bays" },
+            { word: "abaissé", meaning: "Qui a été abaissé", pronunciation: "ah-bay-say" },
+            { word: "abaisse-langue", meaning: "Instrument médical", pronunciation: "ah-bays lahn-g" },
+            { word: "abaisse-langues", meaning: "Pluriel d'abaisse-langue", pronunciation: "ah-bays lahn-g" },
+            { word: "abaissée", meaning: "Féminin d'abaissé", pronunciation: "ah-bay-say" },
+            { word: "abaissement", meaning: "Action d'abaisser", pronunciation: "ah-bays-mon" },
+            { word: "abaisser", meaning: "Mettre plus bas", pronunciation: "ah-bay-say" },
+            { word: "abaisseur", meaning: "Muscle abaisseur", pronunciation: "ah-bay-seur" },
+            { word: "abaisseuse", meaning: "Féminin d'abaisseur", pronunciation: "ah-bay-seuz" },
+            { word: "abajoue", meaning: "Joue de certains animaux", pronunciation: "ah-bah-zhoo" },
+            { word: "abalone", meaning: "Coquillage comestible", pronunciation: "ah-bah-lon" },
+            { word: "abalourdir", meaning: "Rendre lourd", pronunciation: "ah-bah-loor-deer" },
+            { word: "abancourtois", meaning: "Originaire d'Abancourt", pronunciation: "ah-ban-koor-twa" },
+            { word: "abandon", meaning: "Action d'abandonner", pronunciation: "ah-ban-don" },
+            { word: "abandonnable", meaning: "Qui peut être abandonné", pronunciation: "ah-ban-do-nah-bl" },
+            
+            { word: "abandonnataire", meaning: "Bénéficiaire d'un abandon", pronunciation: "ah-ban-do-nah-tair" },
+            { word: "abandonnateur", meaning: "Celui qui abandonne", pronunciation: "ah-ban-do-nah-teur" },
+            { word: "abandonnatrice", meaning: "Celle qui abandonne", pronunciation: "ah-ban-do-nah-trees" },
+            { word: "abandonné", meaning: "Qui est abandonné", pronunciation: "ah-ban-do-nay" },
+            { word: "abandonnement", meaning: "Action d'abandonner", pronunciation: "ah-ban-don-mon" },
+            { word: "abandonnément", meaning: "De manière abandonnée", pronunciation: "ah-ban-don-nay-mon" },
+            { word: "abandonner", meaning: "Cesser d'entretenir", pronunciation: "ah-ban-do-nay" },
+            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah-ban-do-neur" },
+            { word: "abandonneuse", meaning: "Féminin d'abandonneur", pronunciation: "ah-ban-do-neuz" },
+            { word: "abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek" },
+            { word: "abandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair" },
+            { word: "abaque", meaning: "Tablette à calculer", pronunciation: "ah-bahk" },
+            { word: "abarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-ku-lair" },
+            { word: "abas", meaning: "État d'abattement", pronunciation: "ah-bah" },
+            { word: "abasie", meaning: "Incapacité de marcher", pronunciation: "ah-bah-zee" },
+            { word: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah-bah-soor-dee" },
+            { word: "abasourdir", meaning: "Étourdir, surprendre", pronunciation: "ah-bah-soor-deer" },
+            { word: "abasourdissant", meaning: "Très surprenant", pronunciation: "ah-bah-soor-dee-san" },
+            { word: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-soor-dees-mon" },
+            { word: "abat", meaning: "Action d'abattre", pronunciation: "ah-bah" },
+            
+            { word: "abat-carre", meaning: "Outil de charpentier", pronunciation: "ah-bah kair" },
+            { word: "abat-carrer", meaning: "Action d'abattre carrément", pronunciation: "ah-bah kah-ray" },
+            { word: "abat-chauvée", meaning: "Action d'abattre des arbres", pronunciation: "ah-bah sho-vay" },
+            { word: "abat-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan" },
+            { word: "abat-foin", meaning: "Outil agricole", pronunciation: "ah-bah fwan" },
+            { word: "abat-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-bah fwan" },
+            { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: "ah-bah zhoor" },
+            { word: "abat-jours", meaning: "Pluriel d'abat-jour", pronunciation: "ah-bah zhoor" },
+            { word: "abat-son", meaning: "Dispositif acoustique", pronunciation: "ah-bah son" },
+            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son" },
+            { word: "abat-vent", meaning: "Protection contre le vent", pronunciation: "ah-bah van" },
+            { word: "abat-vents", meaning: "Pluriel d'abat-vent", pronunciation: "ah-bah van" },
+            { word: "abat-voix", meaning: "Réflecteur de voix", pronunciation: "ah-bah vwah" },
+            { word: "abatage", meaning: "Action d'abattre", pronunciation: "ah-bah-tahzh" },
+            { word: "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan" },
+            { word: "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah-bah-tar-deer" },
+            { word: "abâtardissement", meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon" },
+            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "ah-bah-tay" },
+            { word: "batis", meaning: "Amas de branches", pronunciation: "ah-bah-tee" },
+            { word: "abats", meaning: "Parties comestibles d'animaux", pronunciation: "ah-bah" }
         ];
 
-        // Données des termes de Genèse avec textes pour la synthèse vocale
-        const genesisTerms = [
-            { name: "Dieu", pronunciation: "Dyœ", reference: "Genèse 1:1", speakText: "Dieu" },
-            { name: "Yahvé Dieu", pronunciation: "Yah-vé Dyœ", reference: "Genèse 2:4", speakText: "Yahvé Dieu" },
-            { name: "L'homme (Adam)", pronunciation: "Lomme (A-dam)", reference: "Genèse 1:26", speakText: "L'homme Adam" },
-            { name: "La femme (Ève)", pronunciation: "La famme (Ève)", reference: "Genèse 3:20", speakText: "La femme Ève" },
-            { name: "Mé-Zahab", pronunciation: "Mé Za-ab", reference: "Genèse 36:39", speakText: "Mé-Zahab" },
-            { name: "La tunique ornée", pronunciation: "La tu-nique or-né", reference: "Genèse 37:3", speakText: "La tunique ornée" },
-            { name: "La terre de Goshèn", pronunciation: "La tère de Go-shène", reference: "Genèse 45:10", speakText: "La terre de Goshèn" },
-            { name: "La grotte du champ de Makpéla", pronunciation: "La grout du chan de Mak-pé-la", reference: "Genèse 23:9", speakText: "La grotte du champ de Makpéla" },
-            { name: "Gorèn-ha-Atad", pronunciation: "Go-rène a A-tad", reference: "Genèse 50:10", speakText: "Gorèn-ha-Atad" },
-            { name: "Abel-Miçrayim", pronunciation: "A-bèl Mis-ra-yim", reference: "Genèse 50:11", speakText: "Abel-Miçrayim" },
-            { name: "Le cep de vigne et les sarments", pronunciation: "Le sèp de vigne è les sar-man", reference: "Genèse 40:9-10", speakText: "Le cep de vigne et les sarments" },
-            { name: "Les sept vaches grasses et maigres", pronunciation: "Les sète vache grasse è mègre", reference: "Genèse 41:2-4", speakText: "Les sept vaches grasses et maigres" },
-            { name: "Les sept épis pleins et grêles", pronunciation: "Les sète zé-pi plein è grèl", reference: "Genèse 41:5-7", speakText: "Les sept épis pleins et grêles" },
-            { name: "Le vent d'est", pronunciation: "Le van d'èste", reference: "Genèse 41:6", speakText: "Le vent d'est" },
-            { name: "Les années d'abondance et de famine", pronunciation: "Les zan-né d'a-bon-dan-sè de fa-mine", reference: "Genèse 41:30", speakText: "Les années d'abondance et de famine" },
-            { name: "L'anneau de Pharaon, les habits de lin, le collier d'or", pronunciation: "L'a-no de Fa-ra-on, les za-bi de line, le kol-yé dor", reference: "Genèse 41:42", speakText: "L'anneau de Pharaon, les habits de lin, le collier d'or" },
-            { name: "Le char", pronunciation: "Le shar", reference: "Genèse 41:43", speakText: "Le char" },
-            { name: "Abrek", pronunciation: "A-brèk", reference: "Genèse 41:43", speakText: "Abrek" },
-            { name: "Cophnat-Panéah (nom égyptien de Joseph)", pronunciation: "Kof-nat Pa-né-a", reference: "Genèse 41:45", speakText: "Cophnat-Panéah nom égyptien de Joseph" },
-            { name: "On (ville)", pronunciation: "One", reference: "Genèse 41:45", speakText: "On ville" },
-            { name: "Le serment (main sous la cuisse)", pronunciation: "Le ser-man (main sou la cui-sse)", reference: "Genèse 47:29", speakText: "Le serment main sous la cuisse" },
-            { name: "Les chariots de Pharaon", pronunciation: "Les sha-ryo de Fa-ra-on", reference: "Genèse 45:19", speakText: "Les chariots de Pharaon" },
-            { name: "Les habits de fête", pronunciation: "Les za-bi de fète", reference: "Genèse 45:22", speakText: "Les habits de fête" },
-            { name: "Le tribut (le cinquième pour Pharaon)", pronunciation: "Le tri-bu (le sin-kyème pour Fa-ra-on)", reference: "Genèse 47:24", speakText: "Le tribut le cinquième pour Pharaon" },
-            { name: "Le sceptre de Juda", pronunciation: "Le sèptre de Ju-da", reference: "Genèse 49:10", speakText: "Le sceptre de Juda" },
-            { name: "La bénédiction de Jacob à ses fils", pronunciation: "La bé-né-dik-syon de Ja-kob a sé fis", reference: "Genèse 49:1-28", speakText: "La bénédiction de Jacob à ses fils" },
-            { name: "La prophétie du Shiloh (ou \"celui à qui appartient le sceptre\")", pronunciation: "La pro-fé-ti du Shi-lo (ou \"se-lui a ki a-par-tien le sèptre\")", reference: "Genèse 49:10", speakText: "La prophétie du Shiloh ou celui à qui appartient le sceptre" },
-            { name: "L'embaumement", pronunciation: "L'an-bôme-man", reference: "Genèse 50:2", speakText: "L'embaumement" },
-            { name: "Les 70 années de deuil des Egyptiens", pronunciation: "Les swa-san-t(e) zan-né de deu-y dé zégyp-tyin", reference: "Genèse 50:3", speakText: "Les 70 années de deuil des Egyptiens" },
-            { name: "Ruben : Hénok, Pallu, Heçrôn, Karmi", pronunciation: "Rou-bène : É-nok, Pa-llu, È-tsron, Kar-mi", reference: "Genèse 46:9", speakText: "Ruben Hénok, Pallu, Heçrôn, Karmi" },
-            { name: "Siméon : Yemuel, Yamîn, Ohad, Yakîn, Cohar, Shaûl (fils de la Cananéenne)", pronunciation: "Si-mé-on : Yé-mu-èl, Ya-min, O-ad, Ya-kin, Ko-ar, Sha-ul", reference: "Genèse 46:10", speakText: "Siméon Yemuel, Yamîn, Ohad, Yakîn, Cohar, Shaûl fils de la Cananéenne" },
-            { name: "Lévi : Gershôn, Qehat, Merari", pronunciation: "Lé-vi : Guer-shon, Ké-at, Mé-ra-ri", reference: "Genèse 46:11", speakText: "Lévi Gershôn, Qehat, Merari" },
-            { name: "Juda : Er, Onân, Shéla, Pérèç, Zérah (Er et Onân morts en Canaan). Fils de Pérèç : Heçrôn, Hamul", pronunciation: "Ju-da : Ère, O-nan, Shé-la, Pé-rèts, Zé-ra. Fis de Pé-rèts : È-tsron, A-mul", reference: "Genèse 46:12", speakText: "Juda Er, Onân, Shéla, Pérèç, Zérah Er et Onân morts en Canaan Fils de Pérèç Heçrôn, Hamul" },
-            { name: "Issachar : Tola, Puvva, Yashub, Shimrôn", pronunciation: "I-sa-kar : To-la, Puv-va, Ya-shub, Shim-ron", reference: "Genèse 46:13", speakText: "Issachar Tola, Puvva, Yashub, Shimrôn" },
-            { name: "Zabulon : Séred, Elôn, Yahléel", pronunciation: "Za-bu-lon : Sé-rède, É-lon, Ya-lé-èl", reference: "Genèse 46:14", speakText: "Zabulon Séred, Elôn, Yahléel" },
-            { name: "Gad : Cephôn, Haggi, Shuni, Eçbôn, Eri, Arodi, Aréli", pronunciation: "Gade : Sé-fon, Ha-gui, Shu-ni, Ès-bon, É-ri, A-ro-di, A-ré-li", reference: "Genèse 46:16", speakText: "Gad Cephôn, Haggi, Shuni, Eçbôn, Eri, Arodi, Aréli" },
-            { name: "Asher : Yimna, Yishva, Yishvi, Beria, et leur sœur Sérah. Fils de Beria : Héber, Malkiel", pronunciation: "A-shère : Yim-na, Yish-va, Yish-vi, Bé-rya, è leur seur Sé-ra. Fis de Bé-rya : É-bère, Mal-kyèl", reference: "Genèse 46:17", speakText: "Asher Yimna, Yishva, Yishvi, Beria, et leur sœur Sérah Fils de Beria Héber, Malkiel" },
-            { name: "Joseph : Manassé, Ephraïm (nés d'Asnat)", pronunciation: "Jo-zèf : Ma-na-sé, É-fra-im", reference: "Genèse 46:20", speakText: "Joseph Manassé, Ephraïm nés d'Asnat" },
-            { name: "Benjamin : Béla, Béker, Ashbel, Géra, Naamân, Ehi, Rosh, Muppim, Huppim, Ard", pronunciation: "Ben-ja-main : Bé-la, Bé-kère, Ash-bèl, Gé-ra, Na-a-man, É-hi, Rosh, Mup-pim, Hup-pim, Ard", reference: "Genèse 46:21", speakText: "Benjamin Béla, Béker, Ashbel, Géra, Naamân, Ehi, Rosh, Muppim, Huppim, Ard" },
-            { name: "Dan : Hushim", pronunciation: "Dane : Hou-shim", reference: "Genèse 46:23", speakText: "Dan Hushim" },
-            { name: "Nephtali : Yahçéel, Guni, Yéçer, Shillem", pronunciation: "Nef-ta-li : Ya-tsé-èl, Gu-ni, Yé-sère, Shil-lème", reference: "Genèse 46:24", speakText: "Nephtali Yahçéel, Guni, Yéçer, Shillem" }
-        ];
+        // Variables pour gérer l'état du livre
+        let currentPage = 0;
+        const wordsPerPage = 20;
+        const totalPages = Math.ceil(words.length / wordsPerPage);
+        let startX = 0;
+        let endX = 0;
 
-        // Données des termes pour les autres livres (exemples)
-        const bookTerms = {
+        // Éléments DOM
+        const book = document.getElementById('book');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
 
-
-"Exode": [
-    { name: "Aaron", pronunciation: "a-a-ron", reference: "Exode 4:14", speakText: "Aaron" },
-    { name: "Abiasaph", pronunciation: "a-bia-zaf", reference: "Exode 6:24", speakText: "Abiasaph" },
-    { name: "Abihu", pronunciation: "a-bi-u", reference: "Exode 6:23", speakText: "Abihu" },
-    { name: "Abiram", pronunciation: "a-bi-ram", reference: "Exode 6:24", speakText: "Abiram" },
-    { name: "Abraham", pronunciation: "a-bra-am", reference: "Exode 3:6", speakText: "Abraham" },
-    { name: "Ahisamak", pronunciation: "a-i-sa-mak", reference: "Exode 31:6", speakText: "Ahisamak" },
-    { name: "Amalécites", pronunciation: "a-ma-lé-sit", reference: "Exode 17:8", speakText: "Amalécites" },
-    { name: "Amminadab", pronunciation: "a-mi-na-dab", reference: "Exode 6:23", speakText: "Amminadab" },
-    { name: "Amram", pronunciation: "am-ram", reference: "Exode 6:18", speakText: "Amram" },
-    { name: "Assir", pronunciation: "a-sir", reference: "Exode 6:24", speakText: "Assir" },
-    { name: "Baal-Cephôn", pronunciation: "ba-al sé-fon", reference: "Exode 14:2", speakText: "Baal-Cephôn" },
-    { name: "Beçaléel", pronunciation: "bé-za-lé-èl", reference: "Exode 31:2", speakText: "Beçaléel" },
-    { name: "Benjamin", pronunciation: "ban-ja-min", reference: "Exode 1:3", speakText: "Benjamin" },
-    { name: "Coré", pronunciation: "ko-ré", reference: "Exode 6:21", speakText: "Coré" },
-    { name: "Dan", pronunciation: "dan", reference: "Exode 1:4", speakText: "Dan" },
-    { name: "Elçaphân", pronunciation: "èl-za-fan", reference: "Exode 6:22", speakText: "Elçaphân" },
-    { name: "Eliézer", pronunciation: "é-li-é-zèr", reference: "Exode 18:4", speakText: "Eliézer" },
-    { name: "Elishéba", pronunciation: "é-li-ché-ba", reference: "Exode 6:23", speakText: "Elishéba" },
-    { name: "Elqana", pronunciation: "èl-ka-na", reference: "Exode 6:24", speakText: "Elqana" },
-    { name: "Éliab", pronunciation: "é-li-ab", reference: "Exode 6:23", speakText: "Éliab" },
-    { name: "Gad", pronunciation: "gad", reference: "Exode 1:4", speakText: "Gad" },
-    { name: "Gershom", pronunciation: "guer-chom", reference: "Exode 2:22", speakText: "Gershom" },
-    { name: "Gershôn", pronunciation: "guer-chon", reference: "Exode 6:16", speakText: "Gershôn" },
-    { name: "Hébrôn", pronunciation: "é-bron", reference: "Exode 6:18", speakText: "Hébrôn" },
-    { name: "Hénok", pronunciation: "é-nok", reference: "Exode 6:14", speakText: "Hénok" },
-    { name: "Heçrôn", pronunciation: "èss-ron", reference: "Exode 6:14", speakText: "Heçrôn" },
-    { name: "Hur", pronunciation: "ur", reference: "Exode 17:10", speakText: "Hur" },
-    { name: "Isaac", pronunciation: "i-zak", reference: "Exode 3:6", speakText: "Isaac" },
-    { name: "Issachar", pronunciation: "i-ssa-kar", reference: "Exode 1:3", speakText: "Issachar" },
-    { name: "Itamar", pronunciation: "i-ta-mar", reference: "Exode 6:23", speakText: "Itamar" },
-    { name: "Jacob", pronunciation: "ja-kob", reference: "Exode 1:1", speakText: "Jacob" },
-    { name: "Jéthro", pronunciation: "jé-tro", reference: "Exode 3:1", speakText: "Jéthro" },
-    { name: "Joseph", pronunciation: "jo-zèf", reference: "Exode 1:5", speakText: "Joseph" },
-    { name: "Josué", pronunciation: "jo-zu-é", reference: "Exode 17:9", speakText: "Josué" },
-    { name: "Juda", pronunciation: "ju-da", reference: "Exode 1:2", speakText: "Juda" },
-    { name: "Karmi", pronunciation: "kar-mi", reference: "Exode 6:14", speakText: "Karmi" },
-    { name: "Lévi", pronunciation: "lé-vi", reference: "Exode 2:1", speakText: "Lévi" },
-    { name: "Libni", pronunciation: "lib-ni", reference: "Exode 6:17", speakText: "Libni" },
-    { name: "Mahli", pronunciation: "ma-li", reference: "Exode 6:19", speakText: "Mahli" },
-    { name: "Merari", pronunciation: "mé-ra-ri", reference: "Exode 6:16", speakText: "Merari" },
-    { name: "Mishaël", pronunciation: "mi-cha-èl", reference: "Exode 6:22", speakText: "Mishaël" },
-    { name: "Moïse", pronunciation: "mo-iz", reference: "Exode 2:10", speakText: "Moïse" },
-    { name: "Mushi", pronunciation: "mou-chi", reference: "Exode 6:19", speakText: "Mushi" },
-    { name: "Nadab", pronunciation: "na-dab", reference: "Exode 6:23", speakText: "Nadab" },
-    { name: "Nahshôn", pronunciation: "na-chon", reference: "Exode 6:23", speakText: "Nahshôn" },
-    { name: "Nephtali", pronunciation: "nèf-ta-li", reference: "Exode 1:4", speakText: "Nephtali" },
-    { name: "Népheg", pronunciation: "né-fèg", reference: "Exode 6:21", speakText: "Népheg" },
-    { name: "Ohad", pronunciation: "o-ad", reference: "Exode 6:15", speakText: "Ohad" },
-    { name: "Oholiab", pronunciation: "o-o-li-ab", reference: "Exode 31:6", speakText: "Oholiab" },
-    { name: "Pallu", pronunciation: "pa-lu", reference: "Exode 6:14", speakText: "Pallu" },
-    { name: "Pinhas", pronunciation: "pin-ass", reference: "Exode 6:25", speakText: "Pinhas" },
-    { name: "Pua", pronunciation: "pu-a", reference: "Exode 1:15", speakText: "Pua" },
-    { name: "Putiel", pronunciation: "pu-ti-èl", reference: "Exode 6:25", speakText: "Putiel" },
-    { name: "Qehat", pronunciation: "ké-at", reference: "Exode 6:16", speakText: "Qehat" },
-    { name: "Réuel", pronunciation: "ré-u-èl", reference: "Exode 2:18", speakText: "Réuel" },
-    { name: "Ruben", pronunciation: "ru-ben", reference: "Exode 1:2", speakText: "Ruben" },
-    { name: "Shaûl", pronunciation: "cha-oul", reference: "Exode 6:15", speakText: "Shaûl" },
-    { name: "Shiméï", pronunciation: "chi-mé-i", reference: "Exode 6:17", speakText: "Shiméï" },
-    { name: "Shiphra", pronunciation: "chif-ra", reference: "Exode 1:15", speakText: "Shiphra" },
-    { name: "Siméon", pronunciation: "si-mé-on", reference: "Exode 1:2", speakText: "Siméon" },
-    { name: "Sitri", pronunciation: "si-tri", reference: "Exode 6:22", speakText: "Sitri" },
-    { name: "Uzziel", pronunciation: "u-zi-èl", reference: "Exode 6:18", speakText: "Uzziel" },
-    { name: "Yakîn", pronunciation: "ya-kin", reference: "Exode 6:15", speakText: "Yakîn" },
-    { name: "Yemuel", pronunciation: "yé-mu-èl", reference: "Exode 6:15", speakText: "Yemuel" },
-    { name: "Yiçhar", pronunciation: "i-ssar", reference: "Exode 6:21", speakText: "Yiçhar" },
-    { name: "Yokébed", pronunciation: "yo-ké-bèd", reference: "Exode 6:20", speakText: "Yokébed" },
-    { name: "Zabulon", pronunciation: "za-bu-lon", reference: "Exode 1:3", speakText: "Zabulon" },
-    { name: "Zikri", pronunciation: "zik-ri", reference: "Exode 6:21", speakText: "Zikri" },
-    { name: "Cippora", pronunciation: "si-po-ra", reference: "Exode 2:21", speakText: "Cippora" },
-    { name: "Miryam", pronunciation: "mi-ri-am", reference: "Exode 15:20", speakText: "Miryam" },
-    { name: "Amorites", pronunciation: "a-mo-rit", reference: "Exode 3:8", speakText: "Amorites" },
-    { name: "Cananéens", pronunciation: "ka-na-né-in", reference: "Exode 3:8", speakText: "Cananéens" },
-    { name: "Édom", pronunciation: "é-dom", reference: "Exode 15:15", speakText: "Édom" },
-    { name: "Egyptiens", pronunciation: "é-jip-sien", reference: "Exode 1:13", speakText: "Egyptiens" },
-    { name: "Hébreux", pronunciation: "é-breu", reference: "Exode 1:15", speakText: "Hébreux" },
-    { name: "Hittites", pronunciation: "i-tit", reference: "Exode 3:8", speakText: "Hittites" },
-    { name: "Hivvites", pronunciation: "i-vit", reference: "Exode 3:8", speakText: "Hivvites" },
-    { name: "Jébuséens", pronunciation: "jé-bu-zé-in", reference: "Exode 3:8", speakText: "Jébuséens" },
-    { name: "Lévites", pronunciation: "lé-vit", reference: "Exode 4:14", speakText: "Lévites" },
-    { name: "Madianites", pronunciation: "ma-dia-nit", reference: "Exode 2:15", speakText: "Madianites" },
-    { name: "Moab", pronunciation: "mo-ab", reference: "Exode 15:15", speakText: "Moab" },
-    { name: "Perizzites", pronunciation: "pé-ri-zit", reference: "Exode 3:8", speakText: "Perizzites" },
-    { name: "Philistins", pronunciation: "fi-lis-tin", reference: "Exode 13:17", speakText: "Philistins" },
-    { name: "Dieu", pronunciation: "dieu", reference: "Exode 1:17", speakText: "Dieu" },
-    { name: "Yahvé", pronunciation: "ia-vé", reference: "Exode 3:4", speakText: "Yahvé" },
-    { name: "El Shaddaï", pronunciation: "èl cha-da-i", reference: "Exode 6:3", speakText: "El Shaddaï" },
-    { name: "L'Ange de Yahvé", pronunciation: "lanj de ia-vé", reference: "Exode 3:2", speakText: "L'Ange de Yahvé" },
-    { name: "Chérubins", pronunciation: "ké-ru-bin", reference: "Exode 25:18", speakText: "Chérubins" },
-    { name: "Dieux", pronunciation: "dieu", reference: "Exode 12:12", speakText: "Dieux" },
-    { name: "Elim", pronunciation: "é-lim", reference: "Exode 15:27", speakText: "Elim" },
-    { name: "Etam", pronunciation: "é-tam", reference: "Exode 13:20", speakText: "Etam" },
-    { name: "Goshèn", pronunciation: "go-chèn", reference: "Exode 8:18", speakText: "Goshèn" },
-    { name: "Horeb", pronunciation: "o-rèb", reference: "Exode 3:1", speakText: "Horeb" },
-    { name: "Mara", pronunciation: "ma-ra", reference: "Exode 15:23", speakText: "Mara" },
-    { name: "Migdol", pronunciation: "mig-dol", reference: "Exode 14:2", speakText: "Migdol" },
-    { name: "Pi-Hahirot", pronunciation: "pi a-i-rot", reference: "Exode 14:2", speakText: "Pi-Hahirot" },
-    { name: "Pitom", pronunciation: "pi-tom", reference: "Exode 1:11", speakText: "Pitom" },
-    { name: "Ramsès", pronunciation: "ram-sèss", reference: "Exode 1:11", speakText: "Ramsès" },
-    { name: "Rephidim", pronunciation: "ré-fi-dim", reference: "Exode 17:1", speakText: "Rephidim" },
-    { name: "Sinaï", pronunciation: "si-na-i", reference: "Exode 19:1", speakText: "Sinaï" },
-    { name: "Sukkot", pronunciation: "sou-kot", reference: "Exode 12:37", speakText: "Sukkot" },
-    { name: "Massa et Meriba", pronunciation: "ma-sa é mé-ri-ba", reference: "Exode 17:7", speakText: "Massa et Meriba" },
-    { name: "Canaan", pronunciation: "ka-na-an", reference: "Exode 6:4", speakText: "Canaan" },
-    { name: "Désert", pronunciation: "dé-zèr", reference: "Exode 3:1", speakText: "Désert" },
-    { name: "Egypte", pronunciation: "é-jipt", reference: "Exode 1:1", speakText: "Egypte" },
-    { name: "Madiân", pronunciation: "ma-dian", reference: "Exode 2:15", speakText: "Madiân" },
-    { name: "Terre promise", pronunciation: "tèr pro-miz", reference: "Exode 3:8", speakText: "Terre promise" },
-    { name: "Le Fleuve", pronunciation: "le fleuv", reference: "Exode 1:22", speakText: "Le Fleuve" },
-    { name: "Mer des Roseaux", pronunciation: "mèr dé ro-zo", reference: "Exode 13:18", speakText: "Mer des Roseaux" },
-    { name: "Arche", pronunciation: "arch", reference: "Exode 25:10", speakText: "Arche" },
-    { name: "Autel", pronunciation: "o-tèl", reference: "Exode 27:1", speakText: "Autel" },
-    { name: "Azymes", pronunciation: "a-zim", reference: "Exode 12:8", speakText: "Azymes" },
-    { name: "Bassin", pronunciation: "ba-sin", reference: "Exode 30:18", speakText: "Bassin" },
-    { name: "Bouquet d'hysope", pronunciation: "bou-ké di-zop", reference: "Exode 12:22", speakText: "Bouquet d'hysope" },
-    { name: "Caleçons", pronunciation: "kal-son", reference: "Exode 28:42", speakText: "Caleçons" },
-    { name: "Calices", pronunciation: "ka-liss", reference: "Exode 25:31", speakText: "Calices" },
-    { name: "Candélabre", pronunciation: "kan-dé-labr", reference: "Exode 25:31", speakText: "Candélabre" },
-    { name: "Ceinture", pronunciation: "sin-tur", reference: "Exode 28:4", speakText: "Ceinture" },
-    { name: "Cordeaux", pronunciation: "kor-do", reference: "Exode 35:18", speakText: "Cordeaux" },
-    { name: "Corbeille", pronunciation: "kor-bèy", reference: "Exode 2:3", speakText: "Corbeille" },
-    { name: "Coudée", pronunciation: "kou-dé", reference: "Exode 25:10", speakText: "Coudée" },
-    { name: "Coupe", pronunciation: "koup", reference: "Exode 25:31", speakText: "Coupe" },
-    { name: "Cuir fin", pronunciation: "kuir fin", reference: "Exode 25:5", speakText: "Cuir fin" },
-    { name: "Encens", pronunciation: "an-san", reference: "Exode 25:6", speakText: "Encens" },
-    { name: "Encensoir", pronunciation: "an-san-swar", reference: "Exode 25:38", speakText: "Encensoir" },
-    { name: "Éphod", pronunciation: "é-fod", reference: "Exode 28:4", speakText: "Éphod" },
-    { name: "Fleur d'amandier", pronunciation: "fleur da-man-dié", reference: "Exode 25:33", speakText: "Fleur d'amandier" },
-    { name: "Gomor", pronunciation: "go-mor", reference: "Exode 16:16", speakText: "Gomor" },
-    { name: "Huile", pronunciation: "uil", reference: "Exode 25:6", speakText: "Huile" },
-    { name: "Huche", pronunciation: "uch", reference: "Exode 8:9", speakText: "Huche" },
-    { name: "Luminaire", pronunciation: "lu-mi-nèr", reference: "Exode 25:37", speakText: "Luminaire" },
-    { name: "Manne", pronunciation: "man", reference: "Exode 16:15", speakText: "Manne" },
-    { name: "Manteau", pronunciation: "man-to", reference: "Exode 28:4", speakText: "Manteau" },
-    { name: "Mouchettes", pronunciation: "mou-chèt", reference: "Exode 25:38", speakText: "Mouchettes" },
-    { name: "Pain d'oblation", pronunciation: "pin do-bla-syon", reference: "Exode 25:30", speakText: "Pain d'oblation" },
-    { name: "Pectoral", pronunciation: "pèk-to-ral", reference: "Exode 28:4", speakText: "Pectoral" },
-    { name: "Pierres", pronunciation: "pièr", reference: "Exode 28:17-20", speakText: "Pierres" },
-    { name: "Poix", pronunciation: "pwa", reference: "Exode 2:3", speakText: "Poix" },
-    { name: "Propitiatoire", pronunciation: "pro-pi-sya-war", reference: "Exode 25:17", speakText: "Propitiatoire" },
-    { name: "Sicle", pronunciation: "sikl", reference: "Exode 30:13", speakText: "Sicle" },
-    { name: "Setier", pronunciation: "se-tyé", reference: "Exode 29:40", speakText: "Setier" },
-    { name: "Tables", pronunciation: "tabl", reference: "Exode 24:12", speakText: "Tables" },
-    { name: "Talent", pronunciation: "ta-lan", reference: "Exode 25:39", speakText: "Talent" },
-    { name: "Tente du Rendez-vous", pronunciation: "tant du ran-dé-vou", reference: "Exode 27:21", speakText: "Tente du Rendez-vous" },
-    { name: "Témoignage", pronunciation: "té-mwa-gnaj", reference: "Exode 25:16", speakText: "Témoignage" },
-    { name: "Turban", pronunciation: "tur-ban", reference: "Exode 28:4", speakText: "Turban" },
-    { name: "Tunique", pronunciation: "tu-nik", reference: "Exode 28:4", speakText: "Tunique" },
-    { name: "Urim et Tummim", pronunciation: "u-rim é tou-mim", reference: "Exode 28:30", speakText: "Urim et Tummim" },
-    { name: "Voile", pronunciation: "vwal", reference: "Exode 26:31", speakText: "Voile" },
-    { name: "Alliance", pronunciation: "a-li-anse", reference: "Exode 24:7", speakText: "Alliance" },
-    { name: "Expiation", pronunciation: "èk-spia-syon", reference: "Exode 29:36", speakText: "Expiation" },
-    { name: "Fête", pronunciation: "fèt", reference: "Exode 5:1", speakText: "Fête" },
-    { name: "Holocauste", pronunciation: "o-lo-ko-st", reference: "Exode 10:25", speakText: "Holocauste" },
-    { name: "Onction", pronunciation: "onk-syon", reference: "Exode 29:7", speakText: "Onction" },
-    { name: "Pâque", pronunciation: "pak", reference: "Exode 12:11", speakText: "Pâque" },
-    { name: "Sabbat", pronunciation: "sa-ba", reference: "Exode 16:23", speakText: "Sabbat" },
-    { name: "Sacrifice", pronunciation: "sa-kri-fiss", reference: "Exode 3:18", speakText: "Sacrifice" },
-    { name: "Sacerdoce", pronunciation: "sa-sèr-doss", reference: "Exode 28:1", speakText: "Sacerdoce" },
-    { name: "Vœu", pronunciation: "veu", reference: "Exode 35:29", speakText: "Vœu" },
-    { name: "Auges", pronunciation: "oj", reference: "Exode 2:16", speakText: "Auges" },
-    { name: "Bâton", pronunciation: "ba-ton", reference: "Exode 4:2", speakText: "Bâton" },
-    { name: "Bitume", pronunciation: "bi-tum", reference: "Exode 2:3", speakText: "Bitume" },
-    { name: "Buisson", pronunciation: "bui-son", reference: "Exode 3:2", speakText: "Buisson" },
-    { name: "Chaîne", pronunciation: "chèn", reference: "Exode 28:14", speakText: "Chaîne" },
-    { name: "Chef de corvée", pronunciation: "chéf de kor-vé", reference: "Exode 1:11", speakText: "Chef de corvée" },
-    { name: "Colonne", pronunciation: "ko-lon", reference: "Exode 13:21", speakText: "Colonne" },
-    { name: "Corvée", pronunciation: "kor-vé", reference: "Exode 1:11", speakText: "Corvée" },
-    { name: "Doigt de Dieu", pronunciation: "dwa de dieu", reference: "Exode 8:15", speakText: "Doigt de Dieu" },
-    { name: "Epoux de sang", pronunciation: "é-pou de san", reference: "Exode 4:25", speakText: "Epoux de sang" },
-    { name: "Fléau", pronunciation: "flé-o", reference: "Exode 9:14", speakText: "Fléau" },
-    { name: "Glaive", pronunciation: "glèv", reference: "Exode 5:21", speakText: "Glaive" },
-    { name: "Main forte", pronunciation: "min fort", reference: "Exode 3:19", speakText: "Main forte" },
-    { name: "Magiciens", pronunciation: "ma-ji-sien", reference: "Exode 7:11", speakText: "Magiciens" },
-    { name: "Moustiques", pronunciation: "mous-tik", reference: "Exode 8:12", speakText: "Moustiques" },
-    { name: "Pain levé", pronunciation: "pin le-vé", reference: "Exode 12:15", speakText: "Pain levé" },
-    { name: "Peste", pronunciation: "pèst", reference: "Exode 9:3", speakText: "Peste" },
-    { name: "Prémices", pronunciation: "pré-miss", reference: "Exode 23:19", speakText: "Prémices" },
-    { name: "Premier-né", pronunciation: "pre-mier né", reference: "Exode 4:22", speakText: "Premier-né" },
-    { name: "Roseaux", pronunciation: "ro-zo", reference: "Exode 2:3", speakText: "Roseaux" },
-    { name: "Sable", pronunciation: "sabl", reference: "Exode 2:12", speakText: "Sable" },
-    { name: "Silex", pronunciation: "si-lèks", reference: "Exode 4:25", speakText: "Silex" },
-    { name: "Sortilège", pronunciation: "sor-ti-lèj", reference: "Exode 7:11", speakText: "Sortilège" },
-    { name: "Taons", pronunciation: "tan", reference: "Exode 8:17", speakText: "Taons" },
-    { name: "Trésor", pronunciation: "tré-zor", reference: "Exode 1:11", speakText: "Trésor" },
-    { name: "Âne", pronunciation: "an", reference: "Exode 4:20", speakText: "Âne" },
-    { name: "Bélier", pronunciation: "bé-lié", reference: "Exode 29:1", speakText: "Bélier" },
-    { name: "Boeuf", pronunciation: "beuf", reference: "Exode 20:17", speakText: "Boeuf" },
-    { name: "Brebis", pronunciation: "bre-bi", reference: "Exode 12:21", speakText: "Brebis" },
-    { name: "Cailles", pronunciation: "kay", reference: "Exode 16:13", speakText: "Cailles" },
-    { name: "Chameau", pronunciation: "cha-mo", reference: "Exode 9:3", speakText: "Chameau" },
-    { name: "Cheval", pronunciation: "che-val", reference: "Exode 9:3", speakText: "Cheval" },
-    { name: "Chèvre", pronunciation: "chèvr", reference: "Exode 12:5", speakText: "Chèvre" },
-    { name: "Chiens", pronunciation: "chi-en", reference: "Exode 11:7", speakText: "Chiens" },
-    { name: "Grenouilles", pronunciation: "gre-nouy", reference: "Exode 8:1", speakText: "Grenouilles" },
-    { name: "Mouton", pronunciation: "mou-ton", reference: "Exode 12:5", speakText: "Mouton" },
-    { name: "Petit bétail", pronunciation: "pe-ti bé-tay", reference: "Exode 12:38", speakText: "Petit bétail" },
-    { name: "Gros bétail", pronunciation: "gro bé-tay", reference: "Exode 12:38", speakText: "Gros bétail" },
-    { name: "Serpent", pronunciation: "sèr-pan", reference: "Exode 4:3", speakText: "Serpent" },
-    { name: "Troupeau", pronunciation: "trou-po", reference: "Exode 10:9", speakText: "Troupeau" }
-],
-
-
-            "Lévitique": [
-                { name: "Les sacrifices", pronunciation: "Les sa-cri-fi-ces", reference: "Lévitique 1:3", speakText: "Les sacrifices" },
-                { name: "Les lois de pureté", pronunciation: "Les lois de pu-re-té", reference: "Lévitique 11:1", speakText: "Les lois de pureté" },
-                { name: "Le jour des expiations", pronunciation: "Le jour des ex-pi-a-tions", reference: "Lévitique 16:1", speakText: "Le jour des expiations" },
-                { name: "La loi de sainteté", pronunciation: "La loi de sai-ne-té", reference: "Lévitique 19:2", speakText: "La loi de sainteté" },
-                { name: "Les fêtes", pronunciation: "Les fêtes", reference: "Lévitique 23:1", speakText: "Les fêtes" },
-                { name: "L'année sabbatique", pronunciation: "L'an-née sab-ba-ti-que", reference: "Lévitique 25:4", speakText: "L'année sabbatique" },
-                { name: "Le jubilé", pronunciation: "Le ju-bi-lé", reference: "Lévitique 25:10", speakText: "Le jubilé" }
-            ],
-            "Nombres": [
-                { name: "Le recensement", pronunciation: "Le re-cen-se-ment", reference: "Nombres 1:2", speakText: "Le recensement" },
-                { name: "Les douze tribus", pronunciation: "Les douze tri-bus", reference: "Nombres 1:5", speakText: "Les douze tribus" },
-                { name: "La manne", pronunciation: "La man-ne", reference: "Nombres 11:6", speakText: "La manne" },
-                { name: "Les cailles", pronunciation: "Les cailles", reference: "Nombres 11:31", speakText: "Les cailles" },
-                { name: "La révolte de Coré", pronunciation: "La ré-volte de Co-ré", reference: "Nombres 16:1", speakText: "La révolte de Coré" },
-                { name: "Le serpent d'airain", pronunciation: "Le ser-pent d'ai-rain", reference: "Nombres 21:9", speakText: "Le serpent d'airain" },
-                { name: "Balaam et son ânesse", pronunciation: "Ba-la-am et son â-nes-se", reference: "Nombres 22:21", speakText: "Balaam et son ânesse" }
-            ],
-            "Deutéronome": [
-                { name: "Le Shema Israël", pronunciation: "Le She-ma Is-ra-ël", reference: "Deutéronome 6:4", speakText: "Le Shema Israël" },
-                { name: "Les commandements", pronunciation: "Les com-man-de-ments", reference: "Deutéronome 5:6", speakText: "Les commandements" },
-                { name: "La terre promise", pronunciation: "La terre pro-mi-se", reference: "Deutéronome 1:8", speakText: "La terre promise" },
-                { name: "Les bénédictions et malédictions", pronunciation: "Les bé-né-dic-tions et ma-lé-dic-tions", reference: "Deutéronome 28:1", speakText: "Les bénédictions et malédictions" },
-                { name: "L'alliance", pronunciation: "L'al-li-an-ce", reference: "Deutéronome 29:1", speakText: "L'alliance" },
-                { name: "Le cantique de Moïse", pronunciation: "Le can-ti-que de Mo-ï-se", reference: "Deutéronome 32:1", speakText: "Le cantique de Moïse" }
-            ]
-        };
-
-        // Variable pour suivre le bouton vocal actif
-        let currentVoiceButton = null;
-        let currentBook = "";
-
-        // Créer les étoiles et étoiles filantes
-        function createStars() {
-            const galaxy = document.getElementById('galaxy-background');
-            const starCount = 200;
+        // Créer les particules d'animation
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
             
-            // Étoiles fixes
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                // Taille aléatoire
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                
-                // Position aléatoire
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                
-                // Animation delay aléatoire
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                
-                galaxy.appendChild(star);
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = `${Math.random() * 5 + 1}px`;
+                particle.style.height = particle.style.width;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                particlesContainer.appendChild(particle);
             }
-            
-            // Étoiles filantes
-            setInterval(createShootingStar, 1500);
         }
 
-        function createShootingStar() {
-            const galaxy = document.getElementById('galaxy-background');
-            const shootingStar = document.createElement('div');
-            shootingStar.className = 'shooting-star';
+        // Créer les pages du livre
+        function createPages() {
+            book.innerHTML = '';
             
-            // Position de départ aléatoire
-            const startX = Math.random() * 100 + 50;
-            const startY = Math.random() * 30;
-            
-            shootingStar.style.left = `${startX}%`;
-            shootingStar.style.top = `${startY}%`;
-            shootingStar.style.animation = `shoot ${Math.random() * 1 + 0.5}s linear`;
-            
-            galaxy.appendChild(shootingStar);
-            
-            // Supprimer après l'animation
-            setTimeout(() => {
-                shootingStar.remove();
-            }, 2000);
-        }
-
-        // Fonction pour la synthèse vocale
-        function speakText(text, button) {
-            // Arrêter la lecture précédente si elle existe
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                if (currentVoiceButton) {
-                    currentVoiceButton.classList.remove('playing');
-                }
-            }
-
-            // Créer un nouvel objet de synthèse vocale
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Configurer la voix française
-            utterance.lang = 'fr-FR';
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-
-            // Ajouter l'icône de lecture au bouton
-            button.classList.add('playing');
-            currentVoiceButton = button;
-
-            // Quand la lecture commence
-            utterance.onstart = function() {
-                button.classList.add('playing');
-            };
-
-            // Quand la lecture se termine
-            utterance.onend = function() {
-                button.classList.remove('playing');
-                currentVoiceButton = null;
-            };
-
-            // Quand il y a une erreur
-            utterance.onerror = function() {
-                button.classList.remove('playing');
-                currentVoiceButton = null;
-                alert('Erreur lors de la lecture vocale. Vérifiez que votre navigateur supporte la synthèse vocale.');
-            };
-
-            // Lancer la lecture
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // Générer la grille des livres
-        const booksGrid = document.getElementById('books-grid');
-        bibleBooks.forEach(book => {
-            const bookCard = document.createElement('div');
-            bookCard.className = 'book-card';
-            bookCard.innerHTML = `
-                <div class="book-title">${book}</div>
-                <div class="book-chapters">Cliquez pour explorer</div>
-            `;
-            
-            // Ajouter un événement de clic pour chaque livre
-            bookCard.addEventListener('click', () => {
-                currentBook = book;
-                document.getElementById('books-section').classList.remove('active');
-                document.getElementById('book-content-section').classList.add('active');
-                document.getElementById('book-title').textContent = `${book} - Personnages et Termes`;
-                generateBookTerms(book);
-            });
-            
-            booksGrid.appendChild(bookCard);
-        });
-
-        // Générer les termes pour un livre spécifique
-        function generateBookTerms(book) {
-            const bookTermsContainer = document.getElementById('book-terms');
-            bookTermsContainer.innerHTML = '';
-            
-            let terms = [];
-            
-            // Sélectionner les termes appropriés selon le livre
-            if (book === "Genèse") {
-                terms = genesisTerms;
-            } else if (bookTerms[book]) {
-                terms = bookTerms[book];
-            } else {
-                // Pour les livres sans données spécifiques, afficher un message
-                terms = [
-                    { 
-                        name: "Informations en développement", 
-                        pronunciation: "En cours de préparation", 
-                        reference: `${book} 1:1`, 
-                        speakText: "Les termes pour ce livre sont en cours de préparation" 
-                    }
-                ];
-            }
-            
-            terms.forEach(term => {
-                const termCard = document.createElement('div');
-                termCard.className = 'term-card';
-                termCard.innerHTML = `
-                    <div class="term-content">
-                        <div class="term-name">${term.name}</div>
-                        <div class="term-pronunciation">${term.pronunciation}</div>
-                        <div class="term-reference">${term.reference}</div>
+            for (let i = 0; i < totalPages; i++) {
+                const page = document.createElement('div');
+                page.className = i % 2 === 0 ? 'page page-front' : 'page page-back';
+                
+                const startIndex = i * wordsPerPage;
+                const endIndex = Math.min(startIndex + wordsPerPage, words.length);
+                const pageWords = words.slice(startIndex, endIndex);
+                
+                page.innerHTML = `
+                    <div class="page-header">
+                        <h2>Page ${i + 1} - Épellation des Mots</h2>
                     </div>
-                    <div class="voice-button" title="Écouter la prononciation">
-                        <svg class="voice-icon" viewBox="0 0 24 24">
-                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                        </svg>
+                    <div class="vocabulary-grid">
+                        ${pageWords.map((word, index) => createWordHTML(word, startIndex + index + 1)).join('')}
                     </div>
+                    <div class="page-number">${i + 1}</div>
                 `;
                 
-                // Ajouter l'événement pour le bouton vocal
-                const voiceButton = termCard.querySelector('.voice-button');
-                voiceButton.addEventListener('click', () => {
-                    speakText(term.speakText, voiceButton);
+                book.appendChild(page);
+            }
+            
+            // Ajouter les écouteurs d'événements pour les boutons de prononciation
+            document.querySelectorAll('.speak-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const word = this.getAttribute('data-word');
+                    speakWord(word);
                 });
-                
-                bookTermsContainer.appendChild(termCard);
             });
+            
+            totalPagesSpan.textContent = totalPages;
         }
 
-        // Bouton de retour
-        document.getElementById('back-to-books').addEventListener('click', () => {
-            document.getElementById('book-content-section').classList.remove('active');
-            document.getElementById('books-section').classList.add('active');
+        // Créer le HTML pour un mot
+        function createWordHTML(wordObj, number) {
+            return `
+                <div class="vocabulary-item">
+                    <div class="word">
+                        <span class="word-number">${number}</span>
+                        ${wordObj.word}
+                    </div>
+                    <div class="meaning">${wordObj.meaning}</div>
+                    <div class="pronunciation">
+                        <span>${wordObj.pronunciation}</span>
+                        <div class="audio-controls">
+                            <button class="speak-btn" data-word="${wordObj.word}">
+                                <i class="fas fa-volume-up"></i> Écouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fonction pour prononcer un mot
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("La synthèse vocale n'est pas supportée par votre navigateur.");
+            }
+        }
+
+        // Fonction pour passer à la page suivante
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updateBook();
+            }
+        }
+
+        // Fonction pour revenir à la page précédente
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updateBook();
+            }
+        }
+
+        // Fonction pour mettre à jour l'apparence du livre
+        function updateBook() {
+            const rotation = -currentPage * 180;
+            book.style.transform = `rotateY(${rotation}deg)`;
+            updateButtons();
+            updatePageIndicator();
+        }
+
+        // Fonction pour mettre à jour l'état des boutons de navigation
+        function updateButtons() {
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage === totalPages - 1;
+        }
+
+        // Fonction pour mettre à jour l'indicateur de page
+        function updatePageIndicator() {
+            currentPageSpan.textContent = currentPage + 1;
+        }
+
+        // Gestion des événements de swipe
+        function handleTouchStart(evt) {
+            startX = evt.touches[0].clientX;
+        }
+
+        function handleTouchMove(evt) {
+            endX = evt.touches[0].clientX;
+        }
+
+        function handleTouchEnd() {
+            const diffX = startX - endX;
             
-            // Arrêter toute lecture vocale en cours
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                if (currentVoiceButton) {
-                    currentVoiceButton.classList.remove('playing');
-                    currentVoiceButton = null;
+            // Seuil pour déterminer si c'est un swipe
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // Swipe vers la gauche - page suivante
+                    nextPage();
+                } else {
+                    // Swipe vers la droite - page précédente
+                    prevPage();
                 }
             }
-        });
-
-        // Fonctionnalité de recherche pour les livres
-        const bookSearchInput = document.querySelector('#books-section .search-input');
-        bookSearchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const bookCards = document.querySelectorAll('.book-card');
-            
-            bookCards.forEach(card => {
-                const bookTitle = card.querySelector('.book-title').textContent.toLowerCase();
-                if (bookTitle.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        // Fonctionnalité de recherche pour les termes
-        const bookContentSearchInput = document.querySelector('#book-content-section .search-input');
-        bookContentSearchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const termCards = document.querySelectorAll('.term-card');
-            
-            termCards.forEach(card => {
-                const termName = card.querySelector('.term-name').textContent.toLowerCase();
-                if (termName.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        // Animation au chargement de la page
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 1s';
-            
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
-            
-            createStars();
-        });
-
-        // Vérifier la compatibilité avec la synthèse vocale
-        if (!('speechSynthesis' in window)) {
-            console.warn('Votre navigateur ne supporte pas la synthèse vocale');
         }
+
+        // Initialisation
+        function init() {
+            createParticles();
+            createPages();
+            updateBook();
+            
+            // Configurer les écouteurs d'événements
+            prevBtn.addEventListener('click', prevPage);
+            nextBtn.addEventListener('click', nextPage);
+            
+            // Ajouter les écouteurs pour le swipe
+            book.addEventListener('touchstart', handleTouchStart, false);
+            book.addEventListener('touchmove', handleTouchMove, false);
+            book.addEventListener('touchend', handleTouchEnd, false);
+            
+            // Animation d'apparition des éléments
+            const elements = document.querySelectorAll('.logo, .subtitle');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.3}s`;
+            });
+        }
+
+        // Démarrer l'application
+        init();
     </script>
 </body>
 </html>
