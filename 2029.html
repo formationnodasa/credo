@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictionnaire Galactique - Ya Lwanga Credo Musao</title>
+    <title>Dictionnaire Galactique - Programme Légendaire</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -241,6 +241,51 @@
             box-shadow: 0 0 10px rgba(121, 85, 72, 0.5);
         }
 
+        .training-program {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            border-left: 4px solid #4fc3f7;
+        }
+
+        .program-title {
+            font-size: 1.3rem;
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .program-day {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .program-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .program-day.active {
+            background: rgba(79, 195, 247, 0.2);
+            border-left: 3px solid #4fc3f7;
+        }
+
+        .day-name {
+            font-weight: bold;
+            color: #bbdefb;
+            margin-bottom: 5px;
+        }
+
+        .day-task {
+            font-size: 0.85rem;
+            color: #e3f2fd;
+            line-height: 1.4;
+        }
+
         .stats {
             margin-top: 30px;
         }
@@ -349,9 +394,9 @@
             background: rgba(255, 152, 0, 0.6);
         }
 
-        .words-grid {
+        .words-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 25px;
             max-height: 600px;
             overflow-y: auto;
@@ -368,6 +413,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 220px;
         }
 
         .word-card::before {
@@ -405,54 +451,65 @@
         }
 
         .word {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: white;
             word-break: break-word;
+            line-height: 1.3;
+            flex: 1;
+            margin-right: 15px;
         }
 
         .word-info {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            min-width: 80px;
         }
 
         .word-number {
             background: rgba(79, 195, 247, 0.3);
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
+            font-weight: bold;
         }
 
         .difficulty-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
             font-weight: bold;
+            text-align: center;
+            width: 100%;
         }
 
         .badge-easy {
             background: rgba(76, 175, 80, 0.3);
             color: #c8e6c9;
+            border: 1px solid rgba(76, 175, 80, 0.5);
         }
 
         .badge-medium {
             background: rgba(255, 152, 0, 0.3);
             color: #ffe0b2;
+            border: 1px solid rgba(255, 152, 0, 0.5);
         }
 
         .badge-hard {
             background: rgba(244, 67, 54, 0.3);
             color: #ffcdd2;
+            border: 1px solid rgba(244, 67, 54, 0.5);
         }
 
         .meaning {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: #e3f2fd;
             margin-bottom: 15px;
             line-height: 1.5;
@@ -460,13 +517,16 @@
         }
 
         .pronunciation {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #bbdefb;
             font-style: italic;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
         }
 
         .audio-controls {
@@ -480,8 +540,8 @@
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 0.95rem;
+            padding: 12px 20px;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -489,12 +549,36 @@
             gap: 8px;
             flex-grow: 1;
             justify-content: center;
+            font-weight: 600;
         }
 
         .speak-btn:hover {
             background: linear-gradient(to right, #29b6f6, #0288d1);
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+        }
+
+        .legend-message {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend-title {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .legend-text {
+            color: #fff8e1;
+            line-height: 1.6;
+            margin-bottom: 10px;
         }
 
         .footer {
@@ -506,21 +590,21 @@
         }
 
         /* Scrollbar personnalisé */
-        .words-grid::-webkit-scrollbar {
+        .words-container::-webkit-scrollbar {
             width: 8px;
         }
 
-        .words-grid::-webkit-scrollbar-track {
+        .words-container::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
 
-        .words-grid::-webkit-scrollbar-thumb {
+        .words-container::-webkit-scrollbar-thumb {
             background: rgba(79, 195, 247, 0.5);
             border-radius: 10px;
         }
 
-        .words-grid::-webkit-scrollbar-thumb:hover {
+        .words-container::-webkit-scrollbar-thumb:hover {
             background: rgba(79, 195, 247, 0.7);
         }
 
@@ -530,8 +614,8 @@
                 grid-template-columns: 1fr;
             }
             
-            .words-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            .words-container {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             }
         }
 
@@ -561,15 +645,26 @@
             .subtitle {
                 font-size: 1.4rem;
             }
+            
+            .words-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
-            .words-grid {
+            .accent-buttons {
                 grid-template-columns: 1fr;
             }
             
-            .accent-buttons {
-                grid-template-columns: 1fr;
+            .word-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .word-info {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
             }
         }
     </style>
@@ -613,6 +708,38 @@
                         <button class="accent-btn" data-accent="trema">Tréma (ë)</button>
                         <button class="accent-btn" data-accent="cedille">Cédille (ç)</button>
                         <button class="accent-btn" data-accent="trait-union">Trait d'union (-)</button>
+                    </div>
+                </div>
+                
+                <div class="training-program">
+                    <h3 class="program-title">Programme Légendaire</h3>
+                    <div class="program-day active">
+                        <div class="day-name">LUNDI - Mots Faciles</div>
+                        <div class="day-task">10 pages minimum + 15 min de suivi progression</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">MARDI - Révision & Accents</div>
+                        <div class="day-task">Mots non maîtrisés + étude accents + 4 pages exercices</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">MERCREDI - Mots Moyens</div>
+                        <div class="day-task">8 pages minimum + révision mots mardi</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">JEUDI - Repos Actif</div>
+                        <div class="day-task">Repos ou révision légère</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">VENDREDI - Mots Difficiles</div>
+                        <div class="day-task">6 pages minimum + révision mots mercredi</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">SAMEDI - Détente</div>
+                        <div class="day-task">Repos complet</div>
+                    </div>
+                    <div class="program-day">
+                        <div class="day-name">DIMANCHE - Préparation</div>
+                        <div class="day-task">Préparation semaine + test mensuel le 1er</div>
                     </div>
                 </div>
                 
@@ -661,14 +788,35 @@
                     </div>
                 </div>
                 
-                <div class="words-grid" id="words-container">
+                <div class="words-container" id="words-container">
                     <!-- Les mots seront insérés ici par JavaScript -->
+                </div>
+
+                <div class="legend-message">
+                    <div class="legend-title">DEVENIR UNE LÉGENDE COMME YA LWANGA CREDO</div>
+                    <p class="legend-text">
+                        Pour atteindre l'excellence, suivez ce programme d'entraînement avec discipline. 
+                        Je ne vous demande pas de respecter les jours exacts, mais d'adopter ce rythme 
+                        d'entraînement avec vos jours disponibles.
+                    </p>
+                    <p class="legend-text">
+                        <strong>Surpassez-vous !</strong> Faites plus que ce qui est demandé si vous en êtes capable. 
+                        Ces mots du dictionnaire vous serviront toute votre vie, car ce sont les mots 
+                        que nous utilisons quotidiennement.
+                    </p>
+                    <p class="legend-text">
+                        <strong>Exercez-vous régulièrement dans le programme de progression</strong> pour voir votre niveau évoluer. 
+                        Chaque 1er jour du mois, testez-vous pour mesurer vos progrès.
+                    </p>
+                    <p class="legend-text" style="color: #ffd700; font-weight: bold;">
+                        La persévérance transforme l'ordinaire en extraordinaire !
+                    </p>
                 </div>
             </div>
         </div>
         
         <div class="footer">
-            <p>Dictionnaire Galactique - Épellation et Prononciation des Mots</p>
+            <p>Dictionnaire Galactique - Programme d'Entraînement Légendaire</p>
             <p>© 2023 Ya Lwanga Credo Musao - Tous droits réservés</p>
         </div>
     </div>
@@ -806,47 +954,90 @@
             { word: "abandonnataire", meaning: "Bénéficiaire d'un abandon", pronunciation: "ah-ban-do-nah-tair", difficulty: "hard", accents: [] },
             { word: "abandonnateur", meaning: "Celui qui abandonne", pronunciation: "ah-ban-do-nah-teur", difficulty: "hard", accents: [] },
             { word: "abandonnatrice", meaning: "Celle qui abandonne", pronunciation: "ah-ban-do-nah-trees", difficulty: "hard", accents: [] },
-            { word: "abandonné", meaning: "Qui est abandonné", pronunciation: "ah-ban-do-nay", difficulty: "easy", accents: ["aigu"] },
-            { word: "abandonnement", meaning: "Action d'abandonner", pronunciation: "ah-ban-don-mon", difficulty: "medium", accents: [] },
-            { word: "abandonnément", meaning: "De manière abandonnée", pronunciation: "ah-ban-don-nay-mon", difficulty: "hard", accents: ["aigu"] },
-            { word: "abandonner", meaning: "Cesser d'entretenir", pronunciation: "ah-ban-do-nay", difficulty: "easy", accents: [] },
-            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah-ban-do-neur", difficulty: "medium", accents: [] },
+            { word: "abah-trees", difficulty: "hard", accents: [] },
+            { word: "abandonné", meaning: "Qui est abandonné", pronunciation: "ahandonné", meaning: "Qui est abandonné", pronunciation: "ah-ban-do-nay", difficulty: "easy-ban-do-nay", difficulty: "easy", accents: ["", accents: ["aigu"] },
+            { word: "abaigu"] },
+            { word: "abandonnement", meaning: "Action d'abandonner", pronunciation: "ahandonnement", meaning: "Action d'abandonner", pronunciation: "ah-ban-don-mon", difficulty: "medium", accents:-ban-don-mon", difficulty: "medium", accents: [] },
+            { word: " [] },
+            { word: "abandonnément", meaning: "De manière abandonnéeabandonnément", meaning: "De manière abandonnée", pronunciation: "ah-ban-don-nay-mon", difficulty: "", pronunciation: "ah-ban-don-nay-mon", difficulty: "hard", accents: ["aigu"] },
+            {hard", accents: ["aigu"] },
+            { word: "abandonner", meaning: "Cesser d' word: "abandonner", meaning: "Cesser d'entretenir", pronunciation: "ah-ban-do-nayentretenir", pronunciation: "ah-ban-do-nay", difficulty", difficulty: "easy", accents: [] },
+            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah: "easy", accents: [] },
+            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah-ban-do-ban-do-neur", difficulty: "medium", accents: [] },
+            { word: "abandonneuse", meaning: "Fé-neur", difficulty: "medium", accents: [] },
             { word: "abandonneuse", meaning: "Féminin d'abandonneur", pronunciation: "ah-ban-do-neuz", difficulty: "medium", accents: [] },
-            { word: "abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek", difficulty: "hard", accents: [] },
-            { word: "abandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair", difficulty: "medium", accents: [] },
-            { word: "abaque", meaning: "Tablette à calculer", pronunciation: "ah-bahk", difficulty: "medium", accents: [] },
-            { word: "abarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-ku-lair", difficulty: "hard", accents: [] },
-            { word: "abas", meaning: "État d'abattement", pronunciation: "ah-bah", difficulty: "medium", accents: [] },
-            { word: "abasie", meaning: "Incapacité de marcher", pronunciation: "ah-bah-zee", difficulty: "hard", accents: [] },
-            { word: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah-bah-soor-dee", difficulty: "medium", accents: [] },
+            { word:minin d'abandonneur", pronunciation: "ah-ban-do-neuz", difficulty: "medium", accents: [] },
+            { word: " "abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek", difficulty: "hard", accents: [] },
+            { word:abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek", difficulty: "hard", accents: [] },
+            { word: " "abandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair", difficulty: "medium", accents: [] },
+            { word: "abaqueabandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair", difficulty: "medium", accents: [] },
+            { word: "abaque", meaning: "Tablette à calculer", pronunciation:", meaning: "Tablette à calculer", pronunciation: "ah-bahk", difficulty: "medium", accents: [] },
+            { word: " "ah-bahk", difficulty: "medium", accents: [] },
+            { word: "abarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-kuabarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-ku-lair", difficulty: "hard", accents: [] },
+-lair", difficulty: "hard", accents: [] },
+            { word: "abas", meaning: "État d'abattement", pronunciation: "ah            { word: "abas", meaning: "État d'abattement", pronunciation: "ah-bah", difficulty: "medium", accents: [] },
+            { word: "abasie",-bah", difficulty: "medium", accents: [] },
+            { word: "abasie", meaning: "Incapacité de marcher", pronunciation: " meaning: "Incapacité de marcher", pronunciation: "ah-bah-zee", difficulty: "hard", accents: [] },
+            { wordah-bah-zee", difficulty: "hard", accents: [] },
+            { word: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah-bah-soor-bah-soor-dee", difficulty: "medium", accents: [] },
+            { word: "abasourdir",-dee", difficulty: "medium", accents: [] },
             { word: "abasourdir", meaning: "Étourdir, surprendre", pronunciation: "ah-bah-soor-deer", difficulty: "medium", accents: [] },
-            { word: "abasourdissant", meaning: "Très surprenant", pronunciation: "ah-bah-soor-dee-san", difficulty: "medium", accents: [] },
-            { word: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-soor-dees-mon", difficulty: "hard", accents: [] },
+            { word: "abasourdissant", meaning: "Étourdir, surprendre", pronunciation: "ah-bah-soor-deer", difficulty: "medium", accents: [] },
+            { word: "abasourdissant", meaning: "Très surprenant", pronunciation: "ah-bah-soor meaning: "Très surprenant", pronunciation: "ah-bah-soor-dee-san", difficulty: "medium", accents: [] },
+            { word-dee-san", difficulty: "medium", accents: [] },
+            { word: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-so: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-soor-dees-mon", difficulty: "or-dees-mon", difficulty: "hard", accents:hard", accents: [] },
             { word: "abat", meaning: "Action d'abattre", pronunciation: "ah-bah", difficulty: "easy", accents: [] },
             
-            { word: "abat-carre", meaning: "Outil de charpentier", pronunciation: "ah-bah kair", difficulty: "hard", accents: ["trait-union"] },
+            [] },
+            { word: "abat", meaning: "Action d'abattre", pronunciation: "ah-bah", difficulty: "easy", accents: [] },
+            
+            { word: "abat-carre", meaning: "Outil de charpentier", { word: "abat-carre", meaning: "Outil de charpentier", pronunciation: "ah-bah kair", difficulty: "hard", accents: ["trait- pronunciation: "ah-bah kair", difficulty: "hard", accents: ["trait-union"] },
+            { word: "abat-carrer", meaning: "Action d'abattre carrément", pronunciation: "ah-bah kah-rayunion"] },
             { word: "abat-carrer", meaning: "Action d'abattre carrément", pronunciation: "ah-bah kah-ray", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abat-chauvée", meaning: "Action d'abattre des arbres", pronunciation: "ah-bah sho-vay", difficulty: "hard", accents: ["trait-union", "aigu"] },
-            { word: "abat-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan", difficulty: "medium", accents: ["trait-union"] },
+            { word: "", difficulty: "hard", accents: ["trait-union"] },
+            { word: "abat-chauvée", meaning: "Action d'abattabat-chauvée", meaning: "Action d'abattre des arbres", pronunciation: "ah-bah sho-vay", difficulty: "hard",re des arbres", pronunciation: "ah-bah sho-vay", difficulty: "hard", accents: ["trait-union", "aigu"] },
+            { word: "abat accents: ["trait-union", "aigu"] },
+            { word: "-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan", difficulty: "medium", accents: ["tabat-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan", difficulty: "medium", accents: ["trait-union"] },
+            { word: "abat-foin", meaning: "Outil agricole", pronunciation: "ah-brait-union"] },
             { word: "abat-foin", meaning: "Outil agricole", pronunciation: "ah-bah fwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-bah fwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: "ah-bah zhoor", difficulty: "easy", accents: ["trait-union"] },
+            { word: "abatah fwan", difficulty: "medium", accents: ["trait-union"] },
+            { word: "abat-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-bah fwan", difficulty: "medium", accents: ["trait-union"] },
+           -bah fwan", difficulty: "medium", accents: ["trait-union"] },
+            { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: "ah-bah zhoor "ah-bah zhoor", difficulty: "easy", accents: ["trait-union"] },
+            { word: "abat-jours", meaning: "Pluriel d'abat-jour", pronunciation: "ah-bah zhoor",", difficulty: "easy", accents: ["trait-union"] },
             { word: "abat-jours", meaning: "Pluriel d'abat-jour", pronunciation: "ah-bah zhoor", difficulty: "easy", accents: ["trait-union"] },
-            { word: "abat-son", meaning: "Dispositif acoustique", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-union"] },
+ difficulty: "easy", accents: ["trait-union"] },
+            { word: "abat-son", meaning: "Disposit            { word: "abat-son", meaning: "Dispositif acoustique", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-unionif acoustique", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-union"]"] },
+            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son", difficulty: "medium", accents: },
+            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son", difficulty ["trait-union"] },
+            { word: "abat-vent", meaning: "Protection contre le vent", pronunciation: "ah-bah van: "medium", accents: ["trait-union"] },
             { word: "abat-vent", meaning: "Protection contre le vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-vents", meaning: "Pluriel d'abat-vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-voix", meaning: "Réflecteur de voix", pronunciation: "ah-bah vwah", difficulty: "hard", accents: ["trait-union"] },
+           ", difficulty: "medium", accents: ["trait-union"] },
+            { word: "abat-vents", meaning: "Pluriel d { word: "abat-vents", meaning: "Pluriel d'abat-vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait'abat-vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait-union"] },
+            { word: "abat-voix", meaning: "Réf-union"] },
+            { word: "abat-voix", meaning: "Réflecteur de voix", pronunciation: "ah-bah vwah", difficultylecteur de voix", pronunciation: "ah-bah vwah", difficulty: "hard", accents: ["trait-union"] },
+            { word: "abatage", meaning: "Action d'abattre", pronunciation: "ah: "hard", accents: ["trait-union"] },
             { word: "abatage", meaning: "Action d'abattre", pronunciation: "ah-bah-tahzh", difficulty: "medium", accents: [] },
-            { word: "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan", difficulty: "medium", accents: [] },
-            { word: "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah-bah-tar-deer", difficulty: "hard", accents: ["circonflexe"] },
-            { word: "abâtardissement", meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon", difficulty: "hard", accents: ["circonflexe"] },
-            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "ah-bah-tay", difficulty: "hard", accents: ["aigu"] },
-            { word: "batis", meaning: "Amas de branches", pronunciation: "ah-bah-tee", difficulty: "medium", accents: [] },
-            { word: "abats", meaning: "Parties comestibles d'animaux", pronunciation: "ah-bah", difficulty: "easy", accents: [] }
+            { word:-bah-tahzh", difficulty: "medium", accents: [] },
+            { word "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan", difficulty: "medium", accents: [] },
+            { word:: "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan", difficulty: "medium", accents: [] },
+            { word: "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah-bah-tar-deer", difficulty: "hard", accents-bah-tar-deer", difficulty: "hard", accents: ["circonflexe"] },
+            { word: "abâtardissement",: ["circonflexe"] },
+            { word: "abâtardissement", meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon", difficulty: "hard", accents: ["cir", difficulty: "hard", accents: ["circonflexe"] },
+            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "conflexe"] },
+            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "ah-bah-tay", difficulty: "hard", accents: ["aiguah-bah-tay", difficulty: "hard", accents: ["aigu"] },
+            { word: "batis", meaning: "Amas de branches"] },
+            { word: "batis", meaning: "Amas de branches", pronunciation: "ah-bah-tee", difficulty: "medium", accents", pronunciation: "ah-bah-tee", difficulty: "medium", accents: [] },
+            { word: "abats", meaning: "Parties comestibles d: [] },
+            { word: "abats", meaning: "Parties comestibles d'animaux", pronunciation: "ah-bah", difficulty: "easy", accents:'animaux", pronunciation: "ah-bah", difficulty: "easy", accents: [] }
         ];
 
-        // Variables pour gérer l'état
+        // Variables pour [] }
+        ];
+
+        // Variables pour gérer l gérer l'état
+        let currentPage = 1;
+'état
         let currentPage = 1;
         const wordsPerPage = 20;
         let currentFilter = "all";
@@ -855,18 +1046,40 @@
 
         // Éléments DOM
         const wordsContainer = document.getElementById('words-container');
+        const wordsPerPage = 20;
+        let currentFilter = "all";
+        let currentAccent = null;
+        let audioCount = 0;
+
+        // Éléments DOM
+        const wordsContainer = document.getElementById('        const firstBtn = document.getElementById('first-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const lastBtn = document.getElementById('lastwords-container');
         const firstBtn = document.getElementById('first-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const lastBtn = document.getElementById('last-btn');
         const jumpBtn = document.getElementById('jump-btn');
+        const page-btn');
+        const jumpBtn = document.getElementById('jump-btn');
         const pageInput = document.getElementById('page-input');
         const currentPageSpan = document.getElementById('current-page');
-        const totalPagesSpan = document.getElementById('total-pages');
+        constInput = document.getElementById('page-input');
+        const currentPageSpan = document.getElementById('current-page');
+ totalPagesSpan = document.getElementById('total-pages');
+        const wordsCountSpan = document.getElementById('wordsCount');
+        const pagesCountSpan = document.getElementById('        const totalPagesSpan = document.getElementById('total-pages');
         const wordsCountSpan = document.getElementById('wordsCount');
         const pagesCountSpan = document.getElementById('pagesCount');
         const audioCountSpan = document.getElementById('audioCount');
-        const searchInput = document.getElementById('searchInput');
+       pagesCount');
+        const audioCountSpan = document.getElementById('audioCount');
+        const searchInput = document.getElementById('searchInput const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const accentButtons = document.querySelectorAll('.accent-btn');
+
+        // Créer');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const accentButtons = document.querySelectorAll('.accent-btn');
 
@@ -875,31 +1088,67 @@
             const galaxy = document.getElementById('galaxy');
             const starCount = 200;
             
+            for ( la galaxie
+        function createGalaxy() {
+            const galaxy = document.getElementById('galaxy');
+            const starCount = 200;
+            
             for (let i = 0; i < starCount; i++) {
+                const star = document.createElementlet i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
+                const size = Math.random() > 0.8 ? 'large' : (('div');
                 const size = Math.random() > 0.8 ? 'large' : (Math.random() > 0.5 ? 'medium' : 'small');
+Math.random() > 0.5 ? 'medium' : 'small');
                 star.className = `star ${size}`;
-                star.style.left = `${Math.random() * 100}%`;
+                star.style.left =                star.className = `star ${size}`;
+                star.style.left = `${Math.random() * 100}% `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay =`;
                 star.style.top = `${Math.random() * 100}%`;
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 galaxy.appendChild(star);
             }
             
+ `${Math.random() * 5}s`;
+                galaxy.appendChild(star);
+            }
+            
             // Créer les nébuleuses
             const nebulaBlue = document.createElement('div');
+            nebulaBlue            // Créer les nébuleuses
+            const nebulaBlue = document.createElement('div');
             nebulaBlue.className = 'nebula blue';
+            galaxy.appendChild(nebulaBlue);
+            
+            const nebulaWhite = document.createElement.className = 'nebula blue';
             galaxy.appendChild(nebulaBlue);
             
             const nebulaWhite = document.createElement('div');
             nebulaWhite.className = 'nebula white';
             galaxy.appendChild(nebulaWhite);
             
-            const nebulaPurple = document.createElement('div');
+            const nebulaPurple('div');
+            nebulaWhite.className = 'nebula white';
+            galaxy.appendChild(nebulaWhite);
+            
+            const neb = document.createElement('div');
             nebulaPurple.className = 'nebula purple';
             galaxy.appendChild(nebulaPurple);
         }
 
-        // Afficher les mots
+        // AfficulaPurple = document.createElement('div');
+            nebulaPurple.className = 'nebula purple';
+            galaxy.appendChild(nebulaPurple);
+        }
+
+        // Afficherher les mots
+        function displayWords() {
+            wordsContainer.innerHTML = '';
+            
+            // Filtrer les mots
+            let filteredWords = words;
+            
+            les mots
         function displayWords() {
             wordsContainer.innerHTML = '';
             
@@ -907,65 +1156,132 @@
             let filteredWords = words;
             
             // Filtre par difficulté
+            if (currentFilter !== "all // Filtre par difficulté
             if (currentFilter !== "all") {
+                filteredWords = filteredWords.filter(word => word.difficulty === currentFilter);
+            }
+            
+            // Filt") {
                 filteredWords = filteredWords.filter(word => word.difficulty === currentFilter);
             }
             
             // Filtre par accent
             if (currentAccent) {
+                filteredWords = filteredWords.filter(wordre par accent
+            if (currentAccent) {
                 filteredWords = filteredWords.filter(word => word.accents.includes(currentAccent));
+            }
+            
+            // Recherche
+            => word.accents.includes(currentAccent));
             }
             
             // Recherche
             const searchTerm = searchInput.value.toLowerCase();
             if (searchTerm) {
+                filteredWords const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
                 filteredWords = filteredWords.filter(word => 
+                    word.word.toLowerCase().includes(searchTerm) || 
+                    word = filteredWords.filter(word => 
                     word.word.toLowerCase().includes(searchTerm) || 
                     word.meaning.toLowerCase().includes(searchTerm)
                 );
             }
             
+           .meaning.toLowerCase().includes(searchTerm)
+                );
+            }
+            
             // Calculer la pagination
+            const totalPages = Math.ceil(filter // Calculer la pagination
             const totalPages = Math.ceil(filteredWords.length / wordsPerPage);
+            const startIndex = (edWords.length / wordsPerPage);
             const startIndex = (currentPage - 1) * wordsPerPage;
+            const endIndex = Math.min(startIndex + wordsPerPage,currentPage - 1) * wordsPerPage;
             const endIndex = Math.min(startIndex + wordsPerPage, filteredWords.length);
+            const pageWords = filteredWords.slice(startIndex, endIndex);
+            
+            // Afficher les mots de la page
+            filteredWords.length);
             const pageWords = filteredWords.slice(startIndex, endIndex);
             
             // Afficher les mots de la page
             pageWords.forEach((word, index) => {
                 const wordElement = createWordElement(word, startIndex + index + 1);
+                pageWords.forEach((word, index) => {
+                const wordElement = createWordElement(word, startIndex + index + 1);
                 wordsContainer.appendChild(wordElement);
+            });
+            
+            // Mettre à jour wordsContainer.appendChild(wordElement);
             });
             
             // Mettre à jour les indicateurs
             currentPageSpan.textContent = currentPage;
+            totalPagesSpan.text les indicateurs
+            currentPageSpan.textContent = currentPage;
             totalPagesSpan.textContent = totalPages;
+            wordsCountSpan.textContent = filteredContent = totalPages;
             wordsCountSpan.textContent = filteredWords.length;
+            pagesCountSpan.textContent = totalPages;
+            audioCountSpan.textContent =Words.length;
             pagesCountSpan.textContent = totalPages;
             audioCountSpan.textContent = audioCount;
             
             // Gérer les boutons de navigation
             firstBtn.disabled = currentPage === 1;
-            prevBtn.disabled = currentPage === 1;
+            prevBtn.disabled = audioCount;
+            
+            // Gérer les boutons de navigation
+            firstBtn.disabled = currentPage === 1;
+            prev currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+            lastBtn.disabled = currentPage === totalPages;
+            
+            // Mettre à jour lBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage === totalPages;
             lastBtn.disabled = currentPage === totalPages;
             
             // Mettre à jour l'input de page
             pageInput.value = currentPage;
+           'input de page
+            pageInput.value = currentPage;
             pageInput.max = totalPages;
+        }
+
+        // Créer un élément de mot
+        function create pageInput.max = totalPages;
         }
 
         // Créer un élément de mot
         function createWordElement(wordObj, number) {
             const wordCard = document.createElement('div');
-            wordCard.className = `word-card ${wordObj.difficulty}`;
+            wordCard.className =WordElement(wordObj, number) {
+            const wordCard = document.createElement('div');
+            wordCard.className = `word-card ${wordObj.difficulty}` `word-card ${wordObj;
             
             // Déterminer le badge de difficulté
-            let difficultyBadge = '';
+            let difficulty.difficulty}`;
+            
+            // Déterminer le badge de difficulté
+            let difficultyBadge =Badge = '';
+            let badgeClass = '';
+            switch(wordObj.difficulty) {
+                case 'easy':
+                    difficultyBadge = 'Fac '';
             let badgeClass = '';
             switch(wordObj.difficulty) {
                 case 'easy':
                     difficultyBadge = 'Facile';
+                    badgeClass = 'badge-easy';
+                    break;
+                case 'medium':
+                    difficultyBadge = 'Moyen';
+                    badgeClass = 'badge-medium';
+                    break;
+                case 'hard':
+                   ile';
                     badgeClass = 'badge-easy';
                     break;
                 case 'medium':
@@ -979,30 +1295,65 @@
             }
             
             wordCard.innerHTML = `
+                < difficultyBadge = 'Difficile';
+                    badgeClass = 'badge-hard';
+                    break;
+            }
+            
+            wordCard.innerHTML = `
                 <div class="word-header">
+                    <div class="word">${wordObj.word}</div>
+                   div class="word-header">
                     <div class="word">${wordObj.word}</div>
                     <div class="word-info">
                         <div class="word-number">${number}</div>
-                        <div class="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
+                        <div class <div class="word-info">
+                        <div class="word-number">${number}</div>
+                        <div class="dif="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
+                    </div>
+                </div>
+                <div class="meaning">${wordficulty-badge ${badgeClass}">${difficultyBadge}</div>
                     </div>
                 </div>
                 <div class="meaning">${wordObj.meaning}</div>
                 <div class="pronunciation">
+                    <span>${Obj.meaning}</div>
+                <div class="pronunciation">
                     <span>${wordObj.pronunciation}</span>
                 </div>
                 <div class="audio-controls">
+wordObj.pronunciation}</span>
+                </div>
+                <div class="audio-controls">
                     <button class="speak-btn" data-word="${wordObj.word}">
+                        <i class="fas fa                    <button class="speak-btn" data-word="${wordObj.word}">
                         <i class="fas fa-volume-up"></i> Écouter la prononciation
+                   -volume-up"></i> Écouter la prononciation
                     </button>
+                </div </button>
                 </div>
             `;
             
             // Ajouter l'écouteur d'événement pour le bouton de prononciation
-            const speakBtn = wordCard.querySelector('.speak-btn');
+            const speakBtn = wordCard.querySelector('.speak-btn>
+            `;
+            
+            // Ajouter l'écouteur d'événement pour le bouton de prononciation
+            const speakBtn = word');
             speakBtn.addEventListener('click', function() {
                 speakWord(wordObj.word);
                 audioCount++;
-                audioCountSpan.textContent = audioCount;
+                audioCountSpan.textContentCard.querySelector('.speak-btn');
+            speakBtn.addEventListener('click', function() {
+                speakWord(wordObj.word);
+                audioCount++;
+                audioCountSpan.textContent = = audioCount;
+            });
+            
+            return wordCard;
+        }
+
+        // Fonction pour pron audioCount;
             });
             
             return wordCard;
@@ -1010,21 +1361,46 @@
 
         // Fonction pour prononcer un mot
         function speakWord(word) {
+            if ('speechSynthesis' in window)oncer un mot
+        function speakWord(word) {
             if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'fr-FR';
+ {
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.8;
                 utterance.pitch = 1;
                 window.speechSynthesis.speak(utterance);
             } else {
-                alert("La synthèse vocale n'est pas supportée par votre navigateur.");
+                alert                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("La("La synthèse vocale n'est pas supportée par votre navigateur.");
             }
         }
 
         // Aller à une page spécifique
         function goToPage(page) {
-            const totalPages = Math.ceil(words.length / wordsPerPage);
+            const synthèse vocale n'est pas supportée par votre navigateur.");
+            }
+        }
+
+        // Aller à une page spécifique
+        function goToPage(page) {
+            const totalPages = Math.ceil(words.length totalPages = Math.ceil(words.length / wordsPerPage);
+            if (page >= 1 && page <= totalPages / wordsPerPage);
             if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayWords();
+            }
+        }
+
+        // Initialisation
+        function init() {
+            createGalaxy();
+            display) {
                 currentPage = page;
                 displayWords();
             }
@@ -1036,22 +1412,47 @@
             displayWords();
             
             // Écouteurs d'événements pour la navigation
+            firstBtn.addEventListener('click',Words();
+            
+            // Écouteurs d'événements pour la navigation
             firstBtn.addEventListener('click', () => goToPage(1));
-            prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+            prevBtn.addEventListener('click', () => goTo () => goToPage(1));
+            prevBtn.addEventListener('click', () => goToPage(currentPage - 1Page(currentPage - 1));
+            nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+            lastBtn.addEventListener('click',));
             nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
             lastBtn.addEventListener('click', () => {
                 const totalPages = Math.ceil(words.length / wordsPerPage);
                 goToPage(totalPages);
             });
             
-            jumpBtn.addEventListener('click', () => {
+ () => {
+                const totalPages = Math.ceil(words.length / wordsPerPage);
+                goToPage(totalPages);
+            });
+            
+            jumpBtn.addEventListener('click            jumpBtn.addEventListener('click', () => {
+                const page = parseInt(pageInput.value);
+                goToPage(page);
+           ', () => {
                 const page = parseInt(pageInput.value);
                 goToPage(page);
             });
             
             pageInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter });
+            
+            pageInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') {
+                    const page') {
                     const page = parseInt(pageInput.value);
+                    goToPage(page);
+                }
+            });
+            
+            // Filtres par difficulté
+            filterButtons.forEach(button => {
+                = parseInt(pageInput.value);
                     goToPage(page);
                 }
             });
@@ -1060,7 +1461,12 @@
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    currentPage = 1;
+                    display.add('active');
                     currentFilter = this.getAttribute('data-filter');
                     currentPage = 1;
                     displayWords();
@@ -1068,15 +1474,31 @@
             });
             
             // Filtres par accent
+            accentButtons.forEach(buttonWords();
+                });
+            });
+            
+            // Filtres par accent
             accentButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const accent => {
                 button.addEventListener('click', function() {
                     const accent = this.getAttribute('data-accent');
                     
                     // Toggle de l'état actif
                     if (currentAccent === accent) {
+                        currentAccent = = this.getAttribute('data-accent');
+                    
+                    // Toggle de l'état actif
+                    if (currentAccent === accent) {
                         currentAccent = null;
                         this.classList.remove('active');
+                    null;
+                        this.classList.remove('active');
                     } else {
+                        currentAccent = accent;
+                        accentButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add(' } else {
                         currentAccent = accent;
                         accentButtons.forEach(btn => btn.classList.remove('active'));
                         this.classList.add('active');
@@ -1085,7 +1507,17 @@
                     currentPage = 1;
                     displayWords();
                 });
+active');
+                    }
+                    
+                    currentPage = 1;
+                    displayWords();
+                });
             });
+            
+            // Recherche
+            searchInput.addEventListener('input', () => {
+                currentPage = 1            });
             
             // Recherche
             searchInput.addEventListener('input', () => {
