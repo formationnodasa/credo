@@ -448,7 +448,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 200px;
+            min-height: 180px;
         }
 
         .word-card::before {
@@ -503,9 +503,9 @@
             min-width: 80px;
         }
 
-        .word-number {
-            background: rgba(79, 195, 247, 0.3);
-            color: white;
+        .letter-count {
+            background: rgba(156, 39, 176, 0.3);
+            color: #e1bee7;
             width: 35px;
             height: 35px;
             border-radius: 50%;
@@ -514,6 +514,7 @@
             justify-content: center;
             font-size: 0.9rem;
             font-weight: bold;
+            border: 1px solid rgba(156, 39, 176, 0.5);
         }
 
         .difficulty-badge {
@@ -622,29 +623,6 @@
             font-size: 1.05rem;
             color: #e3f2fd;
             line-height: 1.5;
-        }
-
-        .legend-message {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .legend-title {
-            font-size: 1.5rem;
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .legend-text {
-            color: #fff8e1;
-            line-height: 1.6;
-            margin-bottom: 10px;
         }
 
         .footer {
@@ -823,11 +801,11 @@
                     </h3>
                     <div class="stat-item">
                         <span>Mots affichés:</span>
-                        <span class="stat-value" id="wordsCount">200</span>
+                        <span class="stat-value" id="wordsCount">20</span>
                     </div>
                     <div class="stat-item">
                         <span>Pages:</span>
-                        <span class="stat-value" id="pagesCount">10</span>
+                        <span class="stat-value" id="pagesCount">1</span>
                     </div>
                     <div class="stat-item">
                         <span>Prononciations:</span>
@@ -847,7 +825,7 @@
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <span class="page-indicator">
-                            Page <span id="current-page">1</span> sur <span id="total-pages">10</span>
+                            Page <span id="current-page">1</span> sur <span id="total-pages">1</span>
                         </span>
                         <button class="page-btn" id="next-btn">
                             <i class="fas fa-chevron-right"></i>
@@ -864,27 +842,6 @@
                 
                 <div class="words-container" id="words-container">
                     <!-- Les mots seront insérés ici par JavaScript -->
-                </div>
-
-                <div class="legend-message">
-                    <div class="legend-title">DEVENIR UNE LÉGENDE COMME YA LWANGA CREDO</div>
-                    <p class="legend-text">
-                        Pour atteindre l'excellence, suivez ce programme d'entraînement avec discipline. 
-                        Je ne vous demande pas de respecter les jours exacts, mais d'adopter ce rythme 
-                        d'entraînement avec vos jours disponibles.
-                    </p>
-                    <p class="legend-text">
-                        <strong>Surpassez-vous !</strong> Faites plus que ce qui est demandé si vous en êtes capable. 
-                        Ces mots du dictionnaire vous serviront toute votre vie, car ce sont les mots 
-                        que nous utilisons quotidiennement.
-                    </p>
-                    <p class="legend-text">
-                        <strong>Exercez-vous régulièrement dans le programme de progression</strong> pour voir votre niveau évoluer. 
-                        Chaque 1er jour du mois, testez-vous pour mesurer vos progrès.
-                    </p>
-                    <p class="legend-text" style="color: #ffd700; font-weight: bold;">
-                        La persévérance transforme l'ordinaire en extraordinaire !
-                    </p>
                 </div>
             </div>
         </div>
@@ -1131,7 +1088,7 @@
             
             // Afficher les mots de la page
             pageWords.forEach((word, index) => {
-                const wordElement = createWordElement(word, startIndex + index + 1);
+                const wordElement = createWordElement(word);
                 wordsContainer.appendChild(wordElement);
             });
             
@@ -1154,9 +1111,12 @@
         }
 
         // Créer un élément de mot
-        function createWordElement(wordObj, number) {
+        function createWordElement(wordObj) {
             const wordCard = document.createElement('div');
             wordCard.className = `word-card ${wordObj.difficulty}`;
+            
+            // Calculer le nombre de lettres
+            const letterCount = wordObj.word.length;
             
             // Déterminer le badge de difficulté
             let difficultyBadge = '';
@@ -1180,7 +1140,7 @@
                 <div class="word-header">
                     <div class="word">${wordObj.word}</div>
                     <div class="word-info">
-                        <div class="word-number">${number}</div>
+                        <div class="letter-count">${letterCount}</div>
                         <div class="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
                     </div>
                 </div>
@@ -1195,7 +1155,7 @@
                         <i class="fas fa-book"></i> Définition
                     </button>
                 </div>
-                <div class="definition-content" id="definition-${number}">
+                <div class="definition-content">
                     <div class="meaning">${wordObj.meaning}</div>
                 </div>
             `;
