@@ -115,7 +115,6 @@
             margin-bottom: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
         }
 
         .logo {
@@ -140,57 +139,6 @@
             font-size: 1.4rem;
             color: #e3f2fd;
             font-style: italic;
-        }
-
-        .global-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .toggle-btn {
-            width: 50px;
-            height: 25px;
-            background: #4caf50;
-            border-radius: 25px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .toggle-btn.red {
-            background: #f44336;
-        }
-
-        .toggle-btn::after {
-            content: '';
-            position: absolute;
-            width: 21px;
-            height: 21px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-btn.red::after {
-            left: 27px;
-        }
-
-        .toggle-label {
-            font-size: 0.9rem;
-            color: #e3f2fd;
-            font-weight: 500;
         }
 
         .content {
@@ -555,17 +503,6 @@
             min-height: 180px;
         }
 
-        .word-card.hidden {
-            opacity: 0.4;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .word-card.hidden .word,
-        .word-card.hidden .pronunciation,
-        .word-card.hidden .definition-content {
-            display: none;
-        }
-
         .word-card::before {
             content: "";
             position: absolute;
@@ -591,10 +528,6 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             background: rgba(255, 255, 255, 0.2);
-        }
-
-        .word-card.hidden:hover {
-            background: rgba(255, 255, 255, 0.08);
         }
 
         .word-header {
@@ -661,23 +594,6 @@
             background: rgba(244, 67, 54, 0.3);
             color: #ffcdd2;
             border: 1px solid rgba(244, 67, 54, 0.5);
-        }
-
-        .word-toggle {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 20px;
-            height: 20px;
-            background: #f44336;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            transition: all 0.3s ease;
-        }
-
-        .word-toggle.green {
-            background: #4caf50;
         }
 
         .pronunciation {
@@ -844,14 +760,6 @@
                 height: auto;
                 min-height: 400px;
             }
-            
-            .global-toggle {
-                position: relative;
-                top: auto;
-                right: auto;
-                justify-content: center;
-                margin-top: 15px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -888,11 +796,6 @@
             <div class="logo">KXA</div>
             <div class="subtitle">SALAMU - AMANI</div>
             <div class="author">Ya Lwanga Credo Musao</div>
-            <div class="global-toggle">
-                <span class="toggle-label">Afficher mots</span>
-                <button class="toggle-btn" id="global-toggle"></button>
-                <span class="toggle-label">Masquer mots</span>
-            </div>
         </div>
         
         <div class="content">
@@ -1223,8 +1126,6 @@
         let currentFilter = "all";
         let currentAccent = null;
         let audioCount = 0;
-        let globalHideMode = false;
-        let hiddenWords = new Set();
 
         // Éléments DOM
         const wordsContainer = document.getElementById('words-container');
@@ -1250,7 +1151,6 @@
         const programContent = document.getElementById('program-content');
         const coachTitle = document.getElementById('coach-title');
         const coachContent = document.getElementById('coach-content');
-        const globalToggle = document.getElementById('global-toggle');
 
         // Créer la galaxie
         function createGalaxy() {
@@ -1340,10 +1240,7 @@
         // Créer un élément de mot
         function createWordElement(wordObj) {
             const wordCard = document.createElement('div');
-            const isHidden = hiddenWords.has(wordObj.word);
-            const showWord = !globalHideMode || !isHidden;
-            
-            wordCard.className = `word-card ${wordObj.difficulty} ${!showWord ? 'hidden' : ''}`;
+            wordCard.className = `word-card ${wordObj.difficulty}`;
             
             // Calculer le nombre de lettres
             const letterCount = wordObj.word.length;
@@ -1367,7 +1264,6 @@
             }
             
             wordCard.innerHTML = `
-                <div class="word-toggle ${isHidden ? 'green' : ''}" data-word="${wordObj.word}"></div>
                 <div class="word-header">
                     <div class="word">${wordObj.word}</div>
                     <div class="word-info">
@@ -1408,23 +1304,6 @@
                     definitionBtn.innerHTML = '<i class="fas fa-times"></i> Fermer';
                 } else {
                     definitionBtn.innerHTML = '<i class="fas fa-book"></i> Définition';
-                }
-            });
-            
-            // Ajouter l'écouteur d'événement pour le bouton de masquage individuel
-            const wordToggle = wordCard.querySelector('.word-toggle');
-            wordToggle.addEventListener('click', function() {
-                const word = this.getAttribute('data-word');
-                if (hiddenWords.has(word)) {
-                    hiddenWords.delete(word);
-                    this.classList.remove('green');
-                    wordCard.classList.remove('hidden');
-                } else {
-                    hiddenWords.add(word);
-                    this.classList.add('green');
-                    if (globalHideMode) {
-                        wordCard.classList.add('hidden');
-                    }
                 }
             });
             
@@ -1535,13 +1414,6 @@
             coachTitle.addEventListener('click', () => {
                 coachTitle.classList.toggle('active');
                 coachContent.classList.toggle('active');
-            });
-            
-            // Bouton global de masquage
-            globalToggle.addEventListener('click', function() {
-                globalHideMode = !globalHideMode;
-                this.classList.toggle('red');
-                displayWords();
             });
         }
 
