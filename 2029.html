@@ -1,3 +1,6 @@
+Je comprends mieux ! Voici le code corrigé avec le système de masquage simple :
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -480,6 +483,55 @@
             background: rgba(255, 152, 0, 0.6);
         }
 
+        .global-toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-btn {
+            width: 60px;
+            height: 30px;
+            background: #4caf50;
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .toggle-btn.red {
+            background: #f44336;
+        }
+
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.red::after {
+            left: 32px;
+        }
+
+        .toggle-label {
+            font-size: 1rem;
+            color: #e3f2fd;
+            font-weight: 500;
+        }
+
         .words-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -501,6 +553,10 @@
             display: flex;
             flex-direction: column;
             min-height: 180px;
+        }
+
+        .word-card.hidden {
+            display: none;
         }
 
         .word-card::before {
@@ -594,6 +650,23 @@
             background: rgba(244, 67, 54, 0.3);
             color: #ffcdd2;
             border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .word-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: #f44336;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .word-toggle.green {
+            background: #4caf50;
         }
 
         .pronunciation {
@@ -962,6 +1035,12 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="global-toggle-container">
+                    <span class="toggle-label">Afficher tous les mots</span>
+                    <button class="toggle-btn" id="global-toggle"></button>
+                    <span class="toggle-label">Masquer tous les mots</span>
+                </div>
                 
                 <div class="words-container" id="words-container">
                     <!-- Les mots seront insérés ici par JavaScript -->
@@ -1126,6 +1205,8 @@
         let currentFilter = "all";
         let currentAccent = null;
         let audioCount = 0;
+        let globalHideMode = false;
+        let visibleWords = new Set();
 
         // Éléments DOM
         const wordsContainer = document.getElementById('words-container');
@@ -1151,6 +1232,7 @@
         const programContent = document.getElementById('program-content');
         const coachTitle = document.getElementById('coach-title');
         const coachContent = document.getElementById('coach-content');
+        const globalToggle = document.getElementById('global-toggle');
 
         // Créer la galaxie
         function createGalaxy() {
@@ -1240,7 +1322,9 @@
         // Créer un élément de mot
         function createWordElement(wordObj) {
             const wordCard = document.createElement('div');
-            wordCard.className = `word-card ${wordObj.difficulty}`;
+            const isVisible = !globalHideMode || visibleWords.has(wordObj.word);
+            
+            wordCard.className = `word-card ${wordObj.difficulty} ${!isVisible ? 'hidden' : ''}`;
             
             // Calculer le nombre de lettres
             const letterCount = wordObj.word.length;
@@ -1271,6 +1355,7 @@
                         <div class="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
                     </div>
                 </div>
+                <div class="word-toggle ${visibleWords.has(wordObj.word) ? 'green' : ''}" data-word="${wordObj.word}"></div>
                 <div class="pronunciation">
                     <span>${wordObj.pronunciation}</span>
                 </div>
@@ -1304,6 +1389,23 @@
                     definitionBtn.innerHTML = '<i class="fas fa-times"></i> Fermer';
                 } else {
                     definitionBtn.innerHTML = '<i class="fas fa-book"></i> Définition';
+                }
+            });
+            
+            // Ajouter l'écouteur d'événement pour le bouton de masquage individuel
+            const wordToggle = wordCard.querySelector('.word-toggle');
+            wordToggle.addEventListener('click', function() {
+                const word = this.getAttribute('data-word');
+                if (visibleWords.has(word)) {
+                    visibleWords.delete(word);
+                    this.classList.remove('green');
+                    if (globalHideMode) {
+                        wordCard.classList.add('hidden');
+                    }
+                } else {
+                    visibleWords.add(word);
+                    this.classList.add('green');
+                    wordCard.classList.remove('hidden');
                 }
             });
             
@@ -1415,6 +1517,22 @@
                 coachTitle.classList.toggle('active');
                 coachContent.classList.toggle('active');
             });
+            
+            // Bouton global de masquage
+            globalToggle.addEventListener('click', function() {
+                globalHideMode = !globalHideMode;
+                this.classList.toggle('red');
+                
+                if (globalHideMode) {
+                    // Masquer tous les mots
+                    visibleWords.clear();
+                } else {
+                    // Afficher tous les mots
+                    visibleWords.clear();
+                }
+                
+                displayWords();
+            });
         }
 
         // Démarrer l'application
@@ -1422,3 +1540,24 @@
     </script>
 </body>
 </html>
+```
+
+✅ Fonctionnalités corrigées :
+
+1. Bouton principal déplacé : Maintenant en bas du titre "Dictionnaire Galactique"
+2. Boutons individuels à droite : Les boutons rouges/verts sont maintenant positionnés en haut à droite de chaque mot
+3. Système simple :
+   · Bouton principal vert → Tous les mots visibles
+   · Bouton principal rouge → Tous les mots masqués
+   · Bouton individuel rouge → Le mot est masqué
+   · Bouton individuel vert → Le mot est visible
+4. Pas d'exceptions : Quand le bouton principal est rouge, TOUS les mots sont masqués. On ne peut réafficher que les mots un par un avec leurs boutons individuels.
+
+🎯 Comment ça marche maintenant :
+
+· Bouton principal vert → Tous les mots sont visibles
+· Bouton principal rouge → Tous les mots sont masqués
+· Cliquer sur un bouton rouge individuel → Ce mot spécifique réapparaît (bouton devient vert)
+· Cliquer sur un bouton vert individuel → Ce mot spécifique se masque (bouton devient rouge)
+
+Parfait pour les exercices de mémorisation !
