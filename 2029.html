@@ -413,7 +413,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 220px;
+            min-height: 250px;
         }
 
         .word-card::before {
@@ -822,222 +822,1138 @@
     </div>
 
     <script>
-        // Données des mots (200 premiers mots de votre liste)
+        // Données des mots avec définitions détaillées
         const words = [
-            { word: "aà", meaning: "Avec accent grave", pronunciation: "a ah-sahn grahv", difficulty: "easy", accents: ["grave"] },
-            { word: "Aà", meaning: "A majuscule avec accent grave", pronunciation: "ah ah-sahn grahv", difficulty: "easy", accents: ["grave"] },
-            { word: "bouchetonà", meaning: "Terminaison en à", pronunciation: "boosh-toh-nah", difficulty: "medium", accents: ["grave"] },
-            { word: "bras-le-corpsà", meaning: "Expression avec à", pronunciation: "brah luh kor ah", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "brule-pourpointà", meaning: "À brûle-pourpoint", pronunciation: "ah brewl poor-pwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "brûle-pourpointà", meaning: "Avec accent circonflexe", pronunciation: "ah brewl poor-pwan", difficulty: "medium", accents: ["circonflexe", "trait-union"] },
-            { word: "califourchona", meaning: "Sans accent", pronunciation: "kah-lee-foor-shoh-nah", difficulty: "hard", accents: [] },
-            { word: "capellaà", meaning: "Avec à final", pronunciation: "kah-pel-lah", difficulty: "medium", accents: ["grave"] },
-            { word: "capellaa", meaning: "Avec double a", pronunciation: "kah-pel-lah-ah", difficulty: "medium", accents: [] },
-            { word: "cappellaà", meaning: "Avec double p et à", pronunciation: "kahp-pel-lah", difficulty: "medium", accents: ["grave"] },
-            { word: "cloche-piedà", meaning: "À cloche-pied", pronunciation: "ah klohsh pyay", difficulty: "easy", accents: ["grave", "trait-union"] },
-            { word: "clochepieda", meaning: "En un mot", pronunciation: "klohsh-pyay-dah", difficulty: "medium", accents: [] },
-            { word: "contrarioà", meaning: "A contrario", pronunciation: "ah kon-trah-ryoh", difficulty: "hard", accents: ["grave"] },
-            { word: "contraireà", meaning: "Au contraire", pronunciation: "oh kon-trair", difficulty: "easy", accents: ["grave"] },
-            { word: "contre-biaisà", meaning: "De contre-biais", pronunciation: "duh kon-truh byay", difficulty: "hard", accents: ["grave", "trait-union"] },
-            { word: "contre-bordà", meaning: "À contre-bord", pronunciation: "ah kon-truh bor", difficulty: "hard", accents: ["grave", "trait-union"] },
-            { word: "contre-lumièreà", meaning: "À contre-jour", pronunciation: "ah kon-truh loo-myair", difficulty: "hard", accents: ["grave", "trait-union", "aigu"] },
-            { word: "contre-poilà", meaning: "À contre-poil", pronunciation: "ah kon-truh pwal", difficulty: "hard", accents: ["grave", "trait-union"] },
-            { word: "contre-saisonà", meaning: "Hors saison", pronunciation: "or say-zon", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "croupetonsà", meaning: "Accroupi", pronunciation: "ah kroop-ton", difficulty: "medium", accents: ["grave"] },
-            
-            { word: "demià", meaning: "À demi", pronunciation: "ah duh-mee", difficulty: "easy", accents: ["grave"] },
-            { word: "demi-motà", meaning: "À demi-mot", pronunciation: "ah duh-mee moh", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "demi-voixa", meaning: "À demi-voix", pronunciation: "ah duh-mee vwah", difficulty: "medium", accents: ["trait-union"] },
-            { word: "fortiorià", meaning: "A fortiori", pronunciation: "ah for-syo-ree", difficulty: "hard", accents: ["grave"] },
-            { word: "fortioria", meaning: "Variante", pronunciation: "ah for-syo-ryah", difficulty: "hard", accents: [] },
-            { word: "giornoà", meaning: "A giorno", pronunciation: "ah jor-no", difficulty: "hard", accents: ["grave"] },
-            { word: "gogoà", meaning: "À gogo", pronunciation: "ah go-go", difficulty: "easy", accents: ["grave"] },
-            { word: "grand-peineà", meaning: "À grand-peine", pronunciation: "ah grahn pen", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "jeunà", meaning: "À jeun", pronunciation: "ah jeun", difficulty: "easy", accents: ["grave"] },
-            { word: "la bonne franquetteà", meaning: "À la bonne franquette", pronunciation: "ah lah bon frahn-ket", difficulty: "medium", accents: ["grave"] },
-            { word: "la couleà", meaning: "À la coule", pronunciation: "ah lah kool", difficulty: "medium", accents: ["grave"] },
-            { word: "la croque-au-selà", meaning: "À la croque-au-sel", pronunciation: "ah lah krok o sel", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "la dérobéeà", meaning: "À la dérobée", pronunciation: "ah lah day-ro-bay", difficulty: "medium", accents: ["grave", "aigu"] },
-            { word: "la manqueà", meaning: "À la manque", pronunciation: "ah lah mahnk", difficulty: "medium", accents: ["grave"] },
-            { word: "la mords-moi-le-noeudà", meaning: "Expression familière", pronunciation: "ah lah mor mwa luh nuh", difficulty: "hard", accents: ["grave", "trait-union"] },
-            { word: "la redresseà", meaning: "À la redresse", pronunciation: "ah lah ruh-dres", difficulty: "medium", accents: ["grave"] },
-            { word: "la sauvetteà", meaning: "À la sauvette", pronunciation: "ah lah so-vet", difficulty: "medium", accents: ["grave"] },
-            { word: "la six-quatre-deuxà", meaning: "À la six-quatre-deux", pronunciation: "ah lah seez kah-truh duh", difficulty: "hard", accents: ["grave", "trait-union"] },
-            { word: "la va-viteà", meaning: "À la va-vite", pronunciation: "ah lah vah veet", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "la venvoleà", meaning: "À la venvole", pronunciation: "ah lah van-vol", difficulty: "medium", accents: ["grave"] },
-            
-            { word: "lèche-doigtsà", meaning: "À lécher les doigts", pronunciation: "ah lay-shay dwah", difficulty: "medium", accents: ["grave", "trait-union", "aigu"] },
-            { word: "mi-cheminà", meaning: "À mi-chemin", pronunciation: "ah mee shuh-man", difficulty: "easy", accents: ["grave", "trait-union"] },
-            { word: "mi-côteà", meaning: "À mi-côte", pronunciation: "ah mee koht", difficulty: "medium", accents: ["grave", "trait-union", "circonflexe"] },
-            { word: "mi-penteà", meaning: "À mi-pente", pronunciation: "ah mee pahnt", difficulty: "medium", accents: ["grave", "trait-union"] },
-            { word: "mi-voixa", meaning: "À mi-voix", pronunciation: "ah mee vwah", difficulty: "medium", accents: ["trait-union"] },
-            { word: "minimaà", meaning: "Au minima", pronunciation: "oh mee-nee-mah", difficulty: "hard", accents: ["grave"] },
-            { word: "peineà", meaning: "À peine", pronunciation: "ah pen", difficulty: "easy", accents: ["grave"] },
-            { word: "piblea", meaning: "Mot rare", pronunciation: "pee-blah", difficulty: "hard", accents: [] },
-            { word: "posteriorià", meaning: "A posteriori", pronunciation: "ah pos-te-ryo-ree", difficulty: "hard", accents: ["grave"] },
-            { word: "postériorià", meaning: "Variante orthographique", pronunciation: "ah pos-tay-ryo-ree", difficulty: "hard", accents: ["grave", "aigu"] },
-            { word: "présenta", meaning: "À présent", pronunciation: "ah pray-zan", difficulty: "easy", accents: ["aigu"] },
-            { word: "priorià", meaning: "A priori", pronunciation: "ah pryo-ree", difficulty: "hard", accents: ["grave"] },
-            { word: "prioria", meaning: "Variante", pronunciation: "ah pryo-ryah", difficulty: "hard", accents: [] },
-            { word: "quia", meaning: "Mot latin", pronunciation: "kwee-ah", difficulty: "hard", accents: [] },
-            { word: "reboursà", meaning: "À rebours", pronunciation: "ah ruh-boor", difficulty: "medium", accents: ["grave"] },
-            { word: "reculonsà", meaning: "À reculons", pronunciation: "ah ruh-ku-lon", difficulty: "medium", accents: ["grave"] },
-            { word: "tâtonsà", meaning: "À tâtons", pronunciation: "ah tah-ton", difficulty: "medium", accents: ["grave", "circonflexe"] },
-            { word: "tempoà", meaning: "A tempo", pronunciation: "ah tem-po", difficulty: "medium", accents: ["grave"] },
-            { word: "tire-larigotà", meaning: "À tire-larigot", pronunciation: "ah teer lah-ree-go", difficulty: "hard", accents: ["grave", "trait-union"] },
-            
-            { word: "tout berzingueà", meaning: "À tout berzingue", pronunciation: "ah too ber-zang", difficulty: "hard", accents: ["grave"] },
-            { word: "toute berzingueà", meaning: "Au féminin", pronunciation: "ah toot ber-zang", difficulty: "hard", accents: ["grave"] },
-            { word: "tue-têteà", meaning: "À tue-tête", pronunciation: "ah too tet", difficulty: "medium", accents: ["grave", "trait-union", "circonflexe"] },
-            { word: "verseà", meaning: "À verse", pronunciation: "ah vairs", difficulty: "medium", accents: ["grave"] },
-            { word: "côtéà", meaning: "À côté", pronunciation: "ah ko-tay", difficulty: "easy", accents: ["grave", "circonflexe"] },
-            { word: "coupà", meaning: "À coup", pronunciation: "ah koo", difficulty: "easy", accents: ["grave"] },
-            { word: "peu-prèsà", meaning: "À peu près", pronunciation: "ah peu pray", difficulty: "easy", accents: ["grave", "trait-union"] },
-            { word: "picà", meaning: "À pic", pronunciation: "ah peek", difficulty: "medium", accents: ["grave"] },
-            { word: "picsà", meaning: "Aux pics", pronunciation: "oh peek", difficulty: "medium", accents: ["grave"] },
-            { word: "platà", meaning: "À plat", pronunciation: "ah plah", difficulty: "easy", accents: ["grave"] },
-            { word: "proposà", meaning: "À propos", pronunciation: "ah pro-po", difficulty: "easy", accents: ["grave"] },
-            { word: "valoirà", meaning: "À valoir", pronunciation: "ah vah-lwar", difficulty: "medium", accents: ["grave"] },
-            { word: "venira", meaning: "À venir", pronunciation: "ah vuh-neer", difficulty: "easy", accents: [] },
-            { word: "aa", meaning: "Double a", pronunciation: "ah-ah", difficulty: "easy", accents: [] },
-            { word: "AAAAA", meaning: "Série de A", pronunciation: "ah-ah-ah-ah-ah", difficulty: "easy", accents: [] },
-            { word: "aaaa", meaning: "Série de a minuscules", pronunciation: "ah-ah-ah-ah", difficulty: "easy", accents: [] },
-            { word: "AAAAAa", meaning: "Mix majuscules/minuscules", pronunciation: "ah-ah-ah-ah-ah", difficulty: "easy", accents: [] },
-            { word: "abamA", meaning: "Mot avec A final", pronunciation: "ah-bah-mah", difficulty: "medium", accents: [] },
-            { word: "AHa", meaning: "A et H", pronunciation: "ah ah", difficulty: "easy", accents: [] },
-            { word: "alénien", meaning: "Relatif à Alène", pronunciation: "ah-lay-nyen", difficulty: "hard", accents: ["aigu"] },
-            { word: "alénienne", meaning: "Féminin d'alénien", pronunciation: "ah-lay-nyen", difficulty: "hard", accents: ["aigu"] },
-            
-            { word: "aastais", meaning: "Originaire d'Aast", pronunciation: "ahs-tay", difficulty: "hard", accents: [] },
-            { word: "AAVE", meaning: "Sigle", pronunciation: "ah-ah-vuh-uh", difficulty: "medium", accents: [] },
-            { word: "ab", meaning: "Préposition latine", pronunciation: "ahb", difficulty: "easy", accents: [] },
-            { word: "AB", meaning: "Sigle", pronunciation: "ah beh", difficulty: "easy", accents: [] },
-            { word: "ab absurdo", meaning: "Locution latine", pronunciation: "ahb ahb-sur-do", difficulty: "hard", accents: [] },
-            { word: "ab hoc et ab hac", meaning: "Locution latine", pronunciation: "ahb ok ay ahb ahk", difficulty: "hard", accents: [] },
-            { word: "ab initio", meaning: "Dès le début", pronunciation: "ahb ee-nee-syo", difficulty: "hard", accents: [] },
-            { word: "ab intestat", meaning: "Sans testament", pronunciation: "ahb an-tes-tah", difficulty: "hard", accents: [] },
-            { word: "ab irato", meaning: "Sous l'effet de la colère", pronunciation: "ahb ee-rah-to", difficulty: "hard", accents: [] },
-            { word: "ab ovo", meaning: "Dès l'origine", pronunciation: "ahb o-vo", difficulty: "hard", accents: [] },
-            { word: "aba", meaning: "Manteau de moine", pronunciation: "ah-bah", difficulty: "medium", accents: [] },
-            { word: "ababouiné", meaning: "Rendu semblable à un babouin", pronunciation: "ah-bah-boo-ee-nay", difficulty: "hard", accents: ["aigu"] },
-            { word: "abaca", meaning: "Plante textile", pronunciation: "ah-bah-kah", difficulty: "medium", accents: [] },
-            { word: "abacos", meaning: "Pluriel d'abaco", pronunciation: "ah-bah-kos", difficulty: "hard", accents: [] },
-            { word: "abacost", meaning: "Vestement africain", pronunciation: "ah-bah-kost", difficulty: "medium", accents: [] },
-            { word: "abactérien", meaning: "Sans bactéries", pronunciation: "ah-bak-tay-ryen", difficulty: "hard", accents: ["aigu"] },
-            { word: "abactérienne", meaning: "Féminin d'abactérien", pronunciation: "ah-bak-tay-ryen", difficulty: "hard", accents: ["aigu"] },
-            { word: "abacule", meaning: "Petit cube de mosaïque", pronunciation: "ah-bah-kul", difficulty: "hard", accents: [] },
-            { word: "abacus", meaning: "Boulier compteur", pronunciation: "ah-bah-kus", difficulty: "medium", accents: [] },
-            { word: "abader", meaning: "Verbe rare", pronunciation: "ah-bah-day", difficulty: "hard", accents: [] },
-            { word: "abadie", meaning: "Nom propre", pronunciation: "ah-bah-dee", difficulty: "medium", accents: [] },
-            
-            { word: "abadis", meaning: "Pluriel d'abadi", pronunciation: "ah-bah-dees", difficulty: "hard", accents: [] },
-            { word: "abaga", meaning: "Langue papoue", pronunciation: "ah-bah-gah", difficulty: "hard", accents: [] },
-            { word: "abainvillois", meaning: "Originaire d'Abainville", pronunciation: "ah-ban-vee-lwa", difficulty: "hard", accents: [] },
-            { word: "abaissable", meaning: "Qui peut être abaissé", pronunciation: "ah-bay-sah-bl", difficulty: "medium", accents: [] },
-            { word: "abaissant", meaning: "Qui abaisse", pronunciation: "ah-bay-san", difficulty: "medium", accents: [] },
-            { word: "abaisse", meaning: "Partie inférieure", pronunciation: "ah-bays", difficulty: "easy", accents: [] },
-            { word: "abaissé", meaning: "Qui a été abaissé", pronunciation: "ah-bay-say", difficulty: "easy", accents: ["aigu"] },
-            { word: "abaisse-langue", meaning: "Instrument médical", pronunciation: "ah-bays lahn-g", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abaisse-langues", meaning: "Pluriel d'abaisse-langue", pronunciation: "ah-bays lahn-g", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abaissée", meaning: "Féminin d'abaissé", pronunciation: "ah-bay-say", difficulty: "easy", accents: ["aigu"] },
-            { word: "abaissement", meaning: "Action d'abaisser", pronunciation: "ah-bays-mon", difficulty: "medium", accents: [] },
-            { word: "abaisser", meaning: "Mettre plus bas", pronunciation: "ah-bay-say", difficulty: "easy", accents: [] },
-            { word: "abaisseur", meaning: "Muscle abaisseur", pronunciation: "ah-bay-seur", difficulty: "hard", accents: [] },
-            { word: "abaisseuse", meaning: "Féminin d'abaisseur", pronunciation: "ah-bay-seuz", difficulty: "hard", accents: [] },
-            { word: "abajoue", meaning: "Joue de certains animaux", pronunciation: "ah-bah-zhoo", difficulty: "hard", accents: [] },
-            { word: "abalone", meaning: "Coquillage comestible", pronunciation: "ah-bah-lon", difficulty: "medium", accents: [] },
-            { word: "abalourdir", meaning: "Rendre lourd", pronunciation: "ah-bah-loor-deer", difficulty: "hard", accents: [] },
-            { word: "abancourtois", meaning: "Originaire d'Abancourt", pronunciation: "ah-ban-koor-twa", difficulty: "hard", accents: [] },
-            { word: "abandon", meaning: "Action d'abandonner", pronunciation: "ah-ban-don", difficulty: "easy", accents: [] },
-            { word: "abandonnable", meaning: "Qui peut être abandonné", pronunciation: "ah-ban-do-nah-bl", difficulty: "medium", accents: [] },
-            
-            { word: "abandonnataire", meaning: "Bénéficiaire d'un abandon", pronunciation: "ah-ban-do-nah-tair", difficulty: "hard", accents: [] },
-            { word: "abandonnateur", meaning: "Celui qui abandonne", pronunciation: "ah-ban-do-nah-teur", difficulty: "hard", accents: [] },
-            { word: "abandonnatrice", meaning: "Celle qui abandonne", pronunciation: "ah-ban-do-nah-trees", difficulty: "hard", accents: [] },
-            { word: "abah-trees", difficulty: "hard", accents: [] },
-            { word: "abandonné", meaning: "Qui est abandonné", pronunciation: "ahandonné", meaning: "Qui est abandonné", pronunciation: "ah-ban-do-nay", difficulty: "easy-ban-do-nay", difficulty: "easy", accents: ["", accents: ["aigu"] },
-            { word: "abaigu"] },
-            { word: "abandonnement", meaning: "Action d'abandonner", pronunciation: "ahandonnement", meaning: "Action d'abandonner", pronunciation: "ah-ban-don-mon", difficulty: "medium", accents:-ban-don-mon", difficulty: "medium", accents: [] },
-            { word: " [] },
-            { word: "abandonnément", meaning: "De manière abandonnéeabandonnément", meaning: "De manière abandonnée", pronunciation: "ah-ban-don-nay-mon", difficulty: "", pronunciation: "ah-ban-don-nay-mon", difficulty: "hard", accents: ["aigu"] },
-            {hard", accents: ["aigu"] },
-            { word: "abandonner", meaning: "Cesser d' word: "abandonner", meaning: "Cesser d'entretenir", pronunciation: "ah-ban-do-nayentretenir", pronunciation: "ah-ban-do-nay", difficulty", difficulty: "easy", accents: [] },
-            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah: "easy", accents: [] },
-            { word: "abandonneur", meaning: "Personne qui abandonne", pronunciation: "ah-ban-do-ban-do-neur", difficulty: "medium", accents: [] },
-            { word: "abandonneuse", meaning: "Fé-neur", difficulty: "medium", accents: [] },
-            { word: "abandonneuse", meaning: "Féminin d'abandonneur", pronunciation: "ah-ban-do-neuz", difficulty: "medium", accents: [] },
-            { word:minin d'abandonneur", pronunciation: "ah-ban-do-neuz", difficulty: "medium", accents: [] },
-            { word: " "abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek", difficulty: "hard", accents: [] },
-            { word:abandonnique", meaning: "Relatif à l'abandon", pronunciation: "ah-ban-do-neek", difficulty: "hard", accents: [] },
-            { word: " "abandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair", difficulty: "medium", accents: [] },
-            { word: "abaqueabandonware", meaning: "Logiciel abandonné", pronunciation: "ah-ban-don-wair", difficulty: "medium", accents: [] },
-            { word: "abaque", meaning: "Tablette à calculer", pronunciation:", meaning: "Tablette à calculer", pronunciation: "ah-bahk", difficulty: "medium", accents: [] },
-            { word: " "ah-bahk", difficulty: "medium", accents: [] },
-            { word: "abarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-kuabarticulaire", meaning: "Hors articulation", pronunciation: "ah-bar-tee-ku-lair", difficulty: "hard", accents: [] },
--lair", difficulty: "hard", accents: [] },
-            { word: "abas", meaning: "État d'abattement", pronunciation: "ah            { word: "abas", meaning: "État d'abattement", pronunciation: "ah-bah", difficulty: "medium", accents: [] },
-            { word: "abasie",-bah", difficulty: "medium", accents: [] },
-            { word: "abasie", meaning: "Incapacité de marcher", pronunciation: " meaning: "Incapacité de marcher", pronunciation: "ah-bah-zee", difficulty: "hard", accents: [] },
-            { wordah-bah-zee", difficulty: "hard", accents: [] },
-            { word: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah: "abasourdi", meaning: "Étourdi, surpris", pronunciation: "ah-bah-soor-bah-soor-dee", difficulty: "medium", accents: [] },
-            { word: "abasourdir",-dee", difficulty: "medium", accents: [] },
-            { word: "abasourdir", meaning: "Étourdir, surprendre", pronunciation: "ah-bah-soor-deer", difficulty: "medium", accents: [] },
-            { word: "abasourdissant", meaning: "Étourdir, surprendre", pronunciation: "ah-bah-soor-deer", difficulty: "medium", accents: [] },
-            { word: "abasourdissant", meaning: "Très surprenant", pronunciation: "ah-bah-soor meaning: "Très surprenant", pronunciation: "ah-bah-soor-dee-san", difficulty: "medium", accents: [] },
-            { word-dee-san", difficulty: "medium", accents: [] },
-            { word: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-so: "abasourdissement", meaning: "Action d'abasourdir", pronunciation: "ah-bah-soor-dees-mon", difficulty: "or-dees-mon", difficulty: "hard", accents:hard", accents: [] },
-            { word: "abat", meaning: "Action d'abattre", pronunciation: "ah-bah", difficulty: "easy", accents: [] },
-            
-            [] },
-            { word: "abat", meaning: "Action d'abattre", pronunciation: "ah-bah", difficulty: "easy", accents: [] },
-            
-            { word: "abat-carre", meaning: "Outil de charpentier", { word: "abat-carre", meaning: "Outil de charpentier", pronunciation: "ah-bah kair", difficulty: "hard", accents: ["trait- pronunciation: "ah-bah kair", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abat-carrer", meaning: "Action d'abattre carrément", pronunciation: "ah-bah kah-rayunion"] },
-            { word: "abat-carrer", meaning: "Action d'abattre carrément", pronunciation: "ah-bah kah-ray", difficulty: "hard", accents: ["trait-union"] },
-            { word: "", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abat-chauvée", meaning: "Action d'abattabat-chauvée", meaning: "Action d'abattre des arbres", pronunciation: "ah-bah sho-vay", difficulty: "hard",re des arbres", pronunciation: "ah-bah sho-vay", difficulty: "hard", accents: ["trait-union", "aigu"] },
-            { word: "abat accents: ["trait-union", "aigu"] },
-            { word: "-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan", difficulty: "medium", accents: ["tabat-faim", meaning: "Qui calme la faim", pronunciation: "ah-bah fan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-foin", meaning: "Outil agricole", pronunciation: "ah-brait-union"] },
-            { word: "abat-foin", meaning: "Outil agricole", pronunciation: "ah-bah fwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abatah fwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-foins", meaning: "Pluriel d'abat-foin", pronunciation: "ah-bah fwan", difficulty: "medium", accents: ["trait-union"] },
-           -bah fwan", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: { word: "abat-jour", meaning: "Accessoire de lampe", pronunciation: "ah-bah zhoor "ah-bah zhoor", difficulty: "easy", accents: ["trait-union"] },
-            { word: "abat-jours", meaning: "Pluriel d'abat-jour", pronunciation: "ah-bah zhoor",", difficulty: "easy", accents: ["trait-union"] },
-            { word: "abat-jours", meaning: "Pluriel d'abat-jour", pronunciation: "ah-bah zhoor", difficulty: "easy", accents: ["trait-union"] },
- difficulty: "easy", accents: ["trait-union"] },
-            { word: "abat-son", meaning: "Disposit            { word: "abat-son", meaning: "Dispositif acoustique", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-unionif acoustique", pronunciation: "ah-bah son", difficulty: "medium", accents: ["trait-union"]"] },
-            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son", difficulty: "medium", accents: },
-            { word: "abat-sons", meaning: "Pluriel d'abat-son", pronunciation: "ah-bah son", difficulty ["trait-union"] },
-            { word: "abat-vent", meaning: "Protection contre le vent", pronunciation: "ah-bah van: "medium", accents: ["trait-union"] },
-            { word: "abat-vent", meaning: "Protection contre le vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait-union"] },
-           ", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-vents", meaning: "Pluriel d { word: "abat-vents", meaning: "Pluriel d'abat-vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait'abat-vent", pronunciation: "ah-bah van", difficulty: "medium", accents: ["trait-union"] },
-            { word: "abat-voix", meaning: "Réf-union"] },
-            { word: "abat-voix", meaning: "Réflecteur de voix", pronunciation: "ah-bah vwah", difficultylecteur de voix", pronunciation: "ah-bah vwah", difficulty: "hard", accents: ["trait-union"] },
-            { word: "abatage", meaning: "Action d'abattre", pronunciation: "ah: "hard", accents: ["trait-union"] },
-            { word: "abatage", meaning: "Action d'abattre", pronunciation: "ah-bah-tahzh", difficulty: "medium", accents: [] },
-            { word:-bah-tahzh", difficulty: "medium", accents: [] },
-            { word "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan", difficulty: "medium", accents: [] },
-            { word:: "abatant", meaning: "Partie mobile", pronunciation: "ah-bah-tan", difficulty: "medium", accents: [] },
-            { word: "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah "abâtardir", meaning: "Rendre bâtard", pronunciation: "ah-bah-tar-deer", difficulty: "hard", accents-bah-tar-deer", difficulty: "hard", accents: ["circonflexe"] },
-            { word: "abâtardissement",: ["circonflexe"] },
-            { word: "abâtardissement", meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon meaning: "Action d'abâtardir", pronunciation: "ah-bah-tar-dees-mon", difficulty: "hard", accents: ["cir", difficulty: "hard", accents: ["circonflexe"] },
-            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "conflexe"] },
-            { word: "abatée", meaning: "Inclinaison d'un navire", pronunciation: "ah-bah-tay", difficulty: "hard", accents: ["aiguah-bah-tay", difficulty: "hard", accents: ["aigu"] },
-            { word: "batis", meaning: "Amas de branches"] },
-            { word: "batis", meaning: "Amas de branches", pronunciation: "ah-bah-tee", difficulty: "medium", accents", pronunciation: "ah-bah-tee", difficulty: "medium", accents: [] },
-            { word: "abats", meaning: "Parties comestibles d: [] },
-            { word: "abats", meaning: "Parties comestibles d'animaux", pronunciation: "ah-bah", difficulty: "easy", accents:'animaux", pronunciation: "ah-bah", difficulty: "easy", accents: [] }
+            { 
+                word: "aà", 
+                meaning: "Terme linguistique désignant la lettre A avec accent grave, utilisée dans certaines langues pour indiquer une prononciation spécifique ou une distinction grammaticale importante.", 
+                pronunciation: "a ah-sahn grahv", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "Aà", 
+                meaning: "Variante majuscule du A accent grave, souvent utilisée en début de phrase ou pour les noms propres dans certaines langues où l'accentuation est conservée même en majuscules.", 
+                pronunciation: "ah ah-sahn grahv", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "bouchetonà", 
+                meaning: "Terme technique désignant une petite bouche ou orifice, souvent utilisé dans un contexte mécanique ou anatomique pour décrire une ouverture de petite dimension.", 
+                pronunciation: "boosh-toh-nah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "bras-le-corpsà", 
+                meaning: "Expression idiomatique signifiant prendre quelqu'un par le bras et le corps, généralement utilisée pour décrire une étreinte ferme ou une manière de saisir quelqu'un avec détermination.", 
+                pronunciation: "brah luh kor ah", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "brule-pourpointà", 
+                meaning: "Locution adverbiale signifiant de manière brusque et imprévue, sans préparation préalable. Souvent utilisée pour décrire une question posée directement sans détour.", 
+                pronunciation: "ah brewl poor-pwan", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "brûle-pourpointà", 
+                meaning: "Variante orthographique avec accent circonflexe de 'brûle-pourpoint', conservant le même sens mais avec l'orthographe traditionnelle française comprenant l'accent circonflexe.", 
+                pronunciation: "ah brewl poor-pwan", 
+                difficulty: "medium", 
+                accents: ["circonflexe", "trait-union"] 
+            },
+            { 
+                word: "califourchona", 
+                meaning: "Terme rare désignant une position particulière ou une manière de se tenir, probablement dérivé de expressions anciennes décrivant des postures corporelles spécifiques.", 
+                pronunciation: "kah-lee-foor-shoh-nah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "capellaà", 
+                meaning: "Terme musical désignant un style de chant sans accompagnement instrumental, ou se référant à la chapelle dans un contexte historique ou architectural spécifique.", 
+                pronunciation: "kah-pel-lah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "capellaa", 
+                meaning: "Variante orthographique rare pouvant désigner une particularité musicale ou architecturale, avec une terminaison double marquant peut-être une origine linguistique spécifique.", 
+                pronunciation: "kah-pel-lah-ah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "cappellaà", 
+                meaning: "Forme alternative de 'capella' avec double consonne, souvent utilisée dans des contextes musicaux spécialisés ou pour désigner des caractéristiques architecturales précises.", 
+                pronunciation: "kahp-pel-lah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "cloche-piedà", 
+                meaning: "Expression décrivant le fait de se déplacer ou de se tenir en équilibre sur un seul pied, communément utilisée dans les jeux d'enfants ou pour décrire une position instable.", 
+                pronunciation: "ah klohsh pyay", 
+                difficulty: "easy", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "clochepieda", 
+                meaning: "Forme contractée ou régionale de 'cloche-pied', pouvant désigner la même action mais avec une orthographe simplifiée ou adaptée à des usages locaux spécifiques.", 
+                pronunciation: "klohsh-pyay-dah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "contrarioà", 
+                meaning: "Terme juridique ou logique signifiant 'au contraire', utilisé pour introduire un argument opposé ou pour indiquer une position contraire dans un débat ou raisonnement.", 
+                pronunciation: "ah kon-trah-ryoh", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "contraireà", 
+                meaning: "Adverbe courant signifiant 'au contraire', utilisé pour exprimer une opposition ou une contradiction dans une conversation ou un texte argumentatif.", 
+                pronunciation: "oh kon-trair", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "contre-biaisà", 
+                meaning: "Terme technique désignant une orientation ou une direction opposée au biais habituel, utilisé dans divers domaines comme la menuiserie, le textile ou les analyses statistiques.", 
+                pronunciation: "duh kon-truh byay", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-bordà", 
+                meaning: "Expression maritime désignant une manœuvre ou une position opposée au bord habituel, utilisée dans la navigation pour décrire des changements de direction spécifiques.", 
+                pronunciation: "ah kon-truh bor", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-lumièreà", 
+                meaning: "Terme photographique ou artistique désignant une situation où la source lumineuse est face à l'observateur, créant des effets de silhouette ou des contrastes particuliers.", 
+                pronunciation: "ah kon-truh loo-myair", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union", "aigu"] 
+            },
+            { 
+                word: "contre-poilà", 
+                meaning: "Expression signifiant à contre-courant ou à rebours du sens naturel, souvent utilisée pour décrire une action effectuée dans le sens inverse de ce qui est habituel ou attendu.", 
+                pronunciation: "ah kon-truh pwal", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-saisonà", 
+                meaning: "Terme désignant une période ou des produits hors saison, utilisée en agriculture, commerce ou pour décrire des phénomènes météorologiques inhabituels pour la saison.", 
+                pronunciation: "or say-zon", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "croupetonsà", 
+                meaning: "Position accroupie sur les talons, souvent utilisée pour décrire une manière de s'asseoir ou de se reposer typique de certaines cultures ou situations informelles.", 
+                pronunciation: "ah kroop-ton", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "demià", 
+                meaning: "Adverbe indiquant la moitié ou une partie incomplète, utilisé dans divers contextes pour exprimer une quantité réduite ou un état intermédiaire entre le complet et l'absent.", 
+                pronunciation: "ah duh-mee", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "demi-motà", 
+                meaning: "Expression signifiant qu'une compréhension est possible avec peu d'explications, souvent utilisée pour décrire une relation où les interlocuteurs se comprennent facilement.", 
+                pronunciation: "ah duh-mee moh", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "demi-voixa", 
+                meaning: "Manier de parler à voix basse ou modérée, utilisée pour des conversations discrètes ou pour ne pas déranger l'entourage dans des situations nécessitant du silence.", 
+                pronunciation: "ah duh-mee vwah", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "fortiorià", 
+                meaning: "Terme logique signifiant 'à plus forte raison', utilisé pour indiquer qu'un argument est d'autant plus valable que le précédent l'était déjà.", 
+                pronunciation: "ah for-syo-ree", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "fortioria", 
+                meaning: "Variante rare ou régionale de 'fortiori', conservant le même sens logique mais avec une orthographe adaptée ou influencée par des particularités linguistiques locales.", 
+                pronunciation: "ah for-syo-ryah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "giornoà", 
+                meaning: "Terme italien signifiant 'jour', utilisé dans des expressions françaises ou pour décrire des concepts liés au temps, à la lumière ou aux cycles diurnes.", 
+                pronunciation: "ah jor-no", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "gogoà", 
+                meaning: "Expression signifiant 'à volonté' ou 'en abondance', souvent utilisée pour décrire une situation où quelque chose est disponible sans limitation ou restriction.", 
+                pronunciation: "ah go-go", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "grand-peineà", 
+                meaning: "Locution adverbiale signifiant 'avec beaucoup de difficulté', utilisée pour décrire une action réalisée malgré des obstacles importants ou un effort considérable.", 
+                pronunciation: "ah grahn pen", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "jeunà", 
+                meaning: "Adverbe signifiant 'à jeun', c'est-à-dire sans avoir mangé, utilisé principalement dans un contexte médical ou pour décrire un état physiologique particulier.", 
+                pronunciation: "ah jeun", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la bonne franquetteà", 
+                meaning: "Expression signifiant 'de manière simple et sans cérémonie', utilisée pour décrire une réception ou un repas pris dans une ambiance décontractée et amicale.", 
+                pronunciation: "ah lah bon frahn-ket", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la couleà", 
+                meaning: "Expression familière signifiant 'facilement' ou 'sans effort', souvent utilisée pour décrire une tâche accomplie avec aisance et maîtrise.", 
+                pronunciation: "ah lah kool", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la croque-au-selà", 
+                meaning: "Expression culinaire signifiant 'nature' ou 'simplement avec du sel', utilisée pour décrire un aliment consommé sans préparation élaborée.", 
+                pronunciation: "ah lah krok o sel", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "la dérobéeà", 
+                meaning: "Locution adverbiale signifiant 'en cachette' ou 'discrètement', utilisée pour décrire une action effectuée sans être vue ou de manière furtive.", 
+                pronunciation: "ah lah day-ro-bay", 
+                difficulty: "medium", 
+                accents: ["grave", "aigu"] 
+            },
+            { 
+                word: "la manqueà", 
+                meaning: "Expression signifiant 'de manière insuffisante' ou 'avec des lacunes', utilisée pour décrire une performance ou un résultat qui n'atteint pas le niveau attendu.", 
+                pronunciation: "ah lah mahnk", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la mords-moi-le-noeudà", 
+                meaning: "Expression populaire et imagée exprimant l'incrédulité ou le scepticisme, souvent utilisée de manière humoristique pour marquer son désaccord ou son étonnement.", 
+                pronunciation: "ah lah mor mwa luh nuh", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "la redresseà", 
+                meaning: "Terme désignant une correction ou un redressement, utilisé dans divers contextes pour décrire une action visant à remettre quelque chose dans le droit chemin.", 
+                pronunciation: "ah lah ruh-dres", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la sauvetteà", 
+                meaning: "Expression signifiant 'rapidement et furtivement', souvent utilisée pour décrire une action effectuée à la hâte et sans se faire remarquer.", 
+                pronunciation: "ah lah so-vet", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "la six-quatre-deuxà", 
+                meaning: "Expression familière signifiant 'rapidement et sans soin', utilisée pour décrire une tâche effectuée à la va-vite sans attention aux détails.", 
+                pronunciation: "ah lah seez kah-truh duh", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "la va-viteà", 
+                meaning: "Locution adverbiale signifiant 'rapidement et superficiellement', utilisée pour décrire une action réalisée sans prendre le temps nécessaire à son bon accomplissement.", 
+                pronunciation: "ah lah vah veet", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "la venvoleà", 
+                meaning: "Expression rare signifiant 'légèrement' ou 'sans y attacher d'importance', utilisée pour décrire une action effectuée avec désinvolture ou sans sérieux.", 
+                pronunciation: "ah lah van-vol", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "lèche-doigtsà", 
+                meaning: "Expression culinaire désignant un plat si délicieux qu'on en lècherait ses doigts, ou se référant à de petits biscuits ou amuse-gueules particulièrement savoureux.", 
+                pronunciation: "ah lay-shay dwah", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union", "aigu"] 
+            },
+            { 
+                word: "mi-cheminà", 
+                meaning: "Adverbe signifiant 'à mi-parcours' ou 'à la moitié du chemin', utilisé pour indiquer une position intermédiaire dans un trajet ou un processus.", 
+                pronunciation: "ah mee shuh-man", 
+                difficulty: "easy", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "mi-côteà", 
+                meaning: "Terme géographique désignant le milieu d'une pente ou d'une colline, utilisé pour décrire une position spécifique sur un terrain incliné.", 
+                pronunciation: "ah mee koht", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union", "circonflexe"] 
+            },
+            { 
+                word: "mi-penteà", 
+                meaning: "Expression similaire à mi-côte, désignant le milieu d'une pente, utilisée dans des contextes topographiques ou pour décrire des positions sur des surfaces inclinées.", 
+                pronunciation: "ah mee pahnt", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "mi-voixa", 
+                meaning: "Adverbe signifiant 'à mi-voix', c'est-à-dire en parlant modérément fort, utilisé pour des conversations discrètes ou dans des situations nécessitant une certaine retenue.", 
+                pronunciation: "ah mee vwah", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "minimaà", 
+                meaning: "Terme juridique ou administratif signifiant 'au minimum', utilisé pour indiquer le niveau le plus bas acceptable ou les conditions minimales requises.", 
+                pronunciation: "oh mee-nee-mah", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "peineà", 
+                meaning: "Adverbe signifiant 'à peine' ou 'difficilement', utilisé pour exprimer la difficulté d'une action ou le caractère limité d'un résultat.", 
+                pronunciation: "ah pen", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "piblea", 
+                meaning: "Terme rare ou technique pouvant désigner une caractéristique spécifique dans un domaine spécialisé, dont l'usage est restreint à des contextes particuliers.", 
+                pronunciation: "pee-blah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "posteriorià", 
+                meaning: "Terme philosophique signifiant 'a posteriori', c'est-à-dire basé sur l'expérience ou l'observation, par opposition à la connaissance a priori.", 
+                pronunciation: "ah pos-te-ryo-ree", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "postériorià", 
+                meaning: "Variante orthographique de 'posteriori' avec accent aigu, conservant le même sens philosophique mais avec une graphie légèrement différente.", 
+                pronunciation: "ah pos-tay-ryo-ree", 
+                difficulty: "hard", 
+                accents: ["grave", "aigu"] 
+            },
+            { 
+                word: "présenta", 
+                meaning: "Adverbe signifiant 'maintenant' ou 'actuellement', utilisé pour indiquer le moment présent ou la situation courante dans laquelle on se trouve.", 
+                pronunciation: "ah pray-zan", 
+                difficulty: "easy", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "priorià", 
+                meaning: "Terme philosophique signifiant 'a priori', c'est-à-dire indépendant de l'expérience, basé sur la raison pure ou des principes premiers.", 
+                pronunciation: "ah pryo-ree", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "prioria", 
+                meaning: "Variante rare de 'priori', pouvant désigner le même concept philosophique mais avec une terminaison adaptée ou influencée par d'autres langues.", 
+                pronunciation: "ah pryo-ryah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "quia", 
+                meaning: "Terme latin signifiant 'parce que', utilisé dans des contextes philosophiques, juridiques ou littéraires pour introduire une explication ou une justification.", 
+                pronunciation: "kwee-ah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "reboursà", 
+                meaning: "Adverbe signifiant 'à rebours' ou 'à contresens', utilisé pour décrire une action effectuée dans le sens inverse de la normale ou de l'habitude.", 
+                pronunciation: "ah ruh-boor", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "reculonsà", 
+                meaning: "Adverbe signifiant 'en reculant' ou 'à reculons', utilisé pour décrire un déplacement effectué en marchant vers l'arrière plutôt que vers l'avant.", 
+                pronunciation: "ah ruh-ku-lon", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "tâtonsà", 
+                meaning: "Adverbe signifiant 'en tâtonnant' ou 'avec hésitation', utilisé pour décrire une action effectuée de manière incertaine, sans assurance ou sans vision claire.", 
+                pronunciation: "ah tah-ton", 
+                difficulty: "medium", 
+                accents: ["grave", "circonflexe"] 
+            },
+            { 
+                word: "tempoà", 
+                meaning: "Terme musical signifiant 'a tempo', c'est-à-dire en revenant au tempo initial, utilisé pour indiquer la reprise de la vitesse d'exécution originale après un changement.", 
+                pronunciation: "ah tem-po", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "tire-larigotà", 
+                meaning: "Expression signifiant 'abondamment' ou 'sans modération', souvent utilisée pour décrire une consommation excessive ou une action effectuée avec excès.", 
+                pronunciation: "ah teer lah-ree-go", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "tout berzingueà", 
+                meaning: "Expression familière signifiant 'à toute vitesse' ou 'très rapidement', utilisée pour décrire une action effectuée avec une grande célérité et énergie.", 
+                pronunciation: "ah too ber-zang", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "toute berzingueà", 
+                meaning: "Variante féminine de 'tout berzingue', conservant le même sens de rapidité extrême mais adaptée au genre féminin du sujet ou de la situation décrite.", 
+                pronunciation: "ah toot ber-zang", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "tue-têteà", 
+                meaning: "Expression signifiant 'à tue-tête', c'est-à-dire très fort ou à pleine voix, utilisée pour décrire un cri, un chant ou un son émis avec une grande intensité.", 
+                pronunciation: "ah too tet", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union", "circonflexe"] 
+            },
+            { 
+                word: "verseà", 
+                meaning: "Adverbe signifiant 'à verse', utilisé pour décrire une pluie très abondante qui tombe avec force et continuité, créant des flaques importantes.", 
+                pronunciation: "ah vairs", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "côtéà", 
+                meaning: "Adverbe signifiant 'à côté', utilisé pour indiquer une position latérale ou une proximité immédiate par rapport à un point de référence donné.", 
+                pronunciation: "ah ko-tay", 
+                difficulty: "easy", 
+                accents: ["grave", "circonflexe"] 
+            },
+            { 
+                word: "coupà", 
+                meaning: "Adverbe signifiant 'soudainement' ou 'brusquement', utilisé pour décrire une action effectuée de manière inattendue ou sans préparation préalable.", 
+                pronunciation: "ah koo", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "peu-prèsà", 
+                meaning: "Expression signifiant 'approximativement' ou 'à peu près', utilisée pour indiquer une estimation ou une valeur proche mais pas exacte.", 
+                pronunciation: "ah peu pray", 
+                difficulty: "easy", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "picà", 
+                meaning: "Adverbe signifiant 'à pic', utilisé pour décrire une paroi verticale ou une situation critique nécessitant une intervention immédiate et décisive.", 
+                pronunciation: "ah peek", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "picsà", 
+                meaning: "Forme plurielle de 'pic', pouvant désigner plusieurs pointes ou plusieurs situations critiques nécessitant une attention particulière et simultanée.", 
+                pronunciation: "oh peek", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "platà", 
+                meaning: "Adverbe signifiant 'à plat', utilisé pour décrire une surface horizontale ou une situation où quelque chose est étalé uniformément sans relief.", 
+                pronunciation: "ah plah", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "proposà", 
+                meaning: "Adverbe signifiant 'à propos' ou 'opportunément', utilisé pour indiquer que quelque chose est dit ou fait au bon moment ou en relation avec le sujet.", 
+                pronunciation: "ah pro-po", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "valoirà", 
+                meaning: "Terme comptable ou commercial signifiant 'à valoir', utilisé pour indiquer un acompte ou une somme versée en attendant le paiement complet.", 
+                pronunciation: "ah vah-lwar", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "venira", 
+                meaning: "Adverbe signifiant 'à venir', utilisé pour décrire des événements futurs ou des choses qui se produiront prochainement dans le temps.", 
+                pronunciation: "ah vuh-neer", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "aa", 
+                meaning: "Terme phonétique ou linguistique désignant une séquence de deux lettres A, pouvant représenter un son particulier ou une particularité orthographique dans certaines langues.", 
+                pronunciation: "ah-ah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "AAAAA", 
+                meaning: "Séquence de cinq lettres A majuscules, pouvant représenter une exclamation, un cri ou une notation particulière dans des contextes spécifiques comme la musique ou le codage.", 
+                pronunciation: "ah-ah-ah-ah-ah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "aaaa", 
+                meaning: "Séquence de quatre lettres A minuscules, similaire à 'AAAAA' mais en minuscules, pouvant avoir des usages similaires dans différents contextes techniques ou expressifs.", 
+                pronunciation: "ah-ah-ah-ah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "AAAAAa", 
+                meaning: "Séquence mixte de lettres A majuscules et minuscules, pouvant représenter une variation stylistique ou une particularité dans un système de notation ou d'écriture.", 
+                pronunciation: "ah-ah-ah-ah-ah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abamA", 
+                meaning: "Terme technique ou spécialisé pouvant désigner une abréviation, un acronyme ou une notation particulière dans un domaine spécifique comme les sciences ou la technologie.", 
+                pronunciation: "ah-bah-mah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "AHa", 
+                meaning: "Interjection ou expression pouvant représenter une exclamation de surprise, de découverte ou de réalisation soudaine dans une conversation ou un texte.", 
+                pronunciation: "ah ah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "alénien", 
+                meaning: "Terme pouvant désigner une caractéristique liée à Alène, soit comme nom propre, soit comme adjectif décrivant une qualité spécifique dans un contexte particulier.", 
+                pronunciation: "ah-lay-nyen", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "alénienne", 
+                meaning: "Forme féminine d'alénien, utilisée pour accorder l'adjectif avec un sujet féminin ou pour décrire une caractéristique spécifiquement féminine liée à Alène.", 
+                pronunciation: "ah-lay-nyen", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "aastais", 
+                meaning: "Terme désignant une personne ou une chose originaire d'Aast, utilisée comme gentilé ou pour décrire des caractéristiques spécifiques à cette localité ou région.", 
+                pronunciation: "ahs-tay", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "AAVE", 
+                meaning: "Sigle pouvant représenter différentes entités selon le contexte, comme une organisation, un concept technique ou une abréviation dans un domaine spécialisé.", 
+                pronunciation: "ah-ah-vuh-uh", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "ab", 
+                meaning: "Préposition latine signifiant 'depuis' ou 'à partir de', utilisée dans des expressions savantes, des citations ou des contextes où le latin est employé pour sa précision.", 
+                pronunciation: "ahb", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "AB", 
+                meaning: "Sigle pouvant représenter diverses entités selon le contexte, comme des organisations, des concepts ou des abréviations techniques dans différents domaines professionnels.", 
+                pronunciation: "ah beh", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "ab absurdo", 
+                meaning: "Expression latine signifiant 'par l'absurde', utilisée en logique et en philosophie pour décrire un raisonnement qui démontre la fausseté d'une proposition en montrant ses conséquences absurdes.", 
+                pronunciation: "ahb ahb-sur-do", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "ab hoc et ab hac", 
+                meaning: "Expression latine signifiant 'de ceci et de cela', utilisée pour décrire un argumentation qui s'appuie sur des éléments divers sans cohérence logique apparente.", 
+                pronunciation: "ahb ok ay ahb ahk", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "ab initio", 
+                meaning: "Expression latine signifiant 'dès le début', utilisée dans divers contextes pour indiquer que quelque chose existe ou est valable depuis le commencement.", 
+                pronunciation: "ahb ee-nee-syo", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "ab intestat", 
+                meaning: "Expression latine signifiant 'sans testament', utilisée en droit pour décrire une succession qui se fait selon les règles légales en l'absence de testament valide.", 
+                pronunciation: "ahb an-tes-tah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "ab irato", 
+                meaning: "Expression latine signifiant 'sous l'effet de la colère', utilisée pour décrire une action ou une décision prise dans un moment de fureur ou d'emportement.", 
+                pronunciation: "ahb ee-rah-to", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "ab ovo", 
+                meaning: "Expression latine signifiant 'depuis l'œuf', c'est-à-dire depuis le tout début, utilisée pour décrire un récit ou une explication qui commence aux origines.", 
+                pronunciation: "ahb o-vo", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "aba", 
+                meaning: "Terme pouvant désigner un vêtement religieux, un manteau ou une cape, selon le contexte historique, culturel ou linguistique dans lequel il est employé.", 
+                pronunciation: "ah-bah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "ababouiné", 
+                meaning: "Adjectif rare signifiant 'rendu semblable à un babouin', utilisé de manière métaphorique pour décrire un comportement ou une apparence considérée comme primitive ou simiesque.", 
+                pronunciation: "ah-bah-boo-ee-nay", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abaca", 
+                meaning: "Nom d'une plante textile dont les fibres sont utilisées pour fabriquer des cordages, des tissus et divers produits artisanaux dans différentes cultures traditionnelles.", 
+                pronunciation: "ah-bah-kah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abacos", 
+                meaning: "Forme plurielle d'abaco, pouvant désigner plusieurs instruments de calcul anciens ou plusieurs éléments dans un système de notation ou de mesure spécifique.", 
+                pronunciation: "ah-bah-kos", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abacost", 
+                meaning: "Terme désignant un vêtement traditionnel africain, spécifiquement une veste portée par les hommes dans certains pays d'Afrique centrale comme symbole culturel.", 
+                pronunciation: "ah-bah-kost", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abactérien", 
+                meaning: "Adjectif scientifique signifiant 'sans bactéries', utilisé en microbiologie ou en médecine pour décrire un environnement, un produit ou un état exempt de micro-organismes bactériens.", 
+                pronunciation: "ah-bak-tay-ryen", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abactérienne", 
+                meaning: "Forme féminine d'abactérien, utilisée pour accorder l'adjectif avec un sujet féminin tout en conservant le même sens d'absence de bactéries ou de micro-organismes.", 
+                pronunciation: "ah-bak-tay-ryen", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abacule", 
+                meaning: "Terme technique désignant un petit cube ou tesselle utilisé dans la fabrication de mosaïques, contribuant à créer des motifs artistiques complexes par assemblage.", 
+                pronunciation: "ah-bah-kul", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abacus", 
+                meaning: "Instrument de calcul ancien constitué de boules coulissantes sur des tiges, utilisé pour effectuer des opérations arithmétiques avant l'invention des calculatrices modernes.", 
+                pronunciation: "ah-bah-kus", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abader", 
+                meaning: "Verbe rare ou technique dont l'usage est restreint à des contextes spécifiques, pouvant désigner une action particulière dans un domaine spécialisé ou ancien.", 
+                pronunciation: "ah-bah-day", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abadie", 
+                meaning: "Nom propre pouvant désigner une personne, une famille ou un lieu, avec des connotations historiques, géographiques ou culturelles selon le contexte d'utilisation.", 
+                pronunciation: "ah-bah-dee", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abadis", 
+                meaning: "Forme plurielle d'abadi, pouvant désigner plusieurs éléments d'un même type ou plusieurs représentants d'une catégorie spécifique dans un contexte donné.", 
+                pronunciation: "ah-bah-dees", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abaga", 
+                meaning: "Terme linguistique désignant une langue papoue parlée dans une région spécifique, avec ses propres caractéristiques phonétiques, grammaticales et culturelles.", 
+                pronunciation: "ah-bah-gah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abainvillois", 
+                meaning: "Gentilé désignant une personne originaire d'Abainville, utilisée pour identifier l'origine géographique ou les caractéristiques culturelles associées à cette localité.", 
+                pronunciation: "ah-ban-vee-lwa", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abaissable", 
+                meaning: "Adjectif technique signifiant 'qui peut être abaissé', utilisé pour décrire un mécanisme, un dispositif ou un élément pouvant être descendu ou réduit en hauteur.", 
+                pronunciation: "ah-bay-sah-bl", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abaissant", 
+                meaning: "Adjectif signifiant 'qui abaisse', utilisé pour décrire une action, une force ou un facteur qui réduit le niveau, la position ou la valeur de quelque chose.", 
+                pronunciation: "ah-bay-san", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abaisse", 
+                meaning: "Nom désignant la partie inférieure de quelque chose, ou en pâtisserie, une fine couche de pâte étalée utilisée comme base pour diverses préparations culinaires.", 
+                pronunciation: "ah-bays", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abaissé", 
+                meaning: "Adjectif signifiant 'qui a été abaissé', utilisé pour décrire un élément dont la position, la hauteur ou la valeur a été réduite par une action spécifique.", 
+                pronunciation: "ah-bay-say", 
+                difficulty: "easy", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abaisse-langue", 
+                meaning: "Instrument médical utilisé par les professionnels de santé pour examiner la gorge et la bouche en maintenant la langue abaissée pendant l'inspection.", 
+                pronunciation: "ah-bays lahn-g", 
+                difficulty: "hard", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abaisse-langues", 
+                meaning: "Forme plurielle d'abaisse-langue, désignant plusieurs de ces instruments médicaux utilisés dans les examens ORL ou les consultations médicales.", 
+                pronunciation: "ah-bays lahn-g", 
+                difficulty: "hard", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abaissée", 
+                meaning: "Forme féminine d'abaissé, utilisée pour accorder l'adjectif avec un sujet féminin tout en conservant le sens de réduction de position ou de valeur.", 
+                pronunciation: "ah-bay-say", 
+                difficulty: "easy", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abaissement", 
+                meaning: "Nom désignant l'action d'abaisser ou le résultat de cette action, pouvant concerner des positions physiques, des valeurs numériques ou des statuts sociaux.", 
+                pronunciation: "ah-bays-mon", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abaisser", 
+                meaning: "Verbe signifiant 'mettre plus bas', utilisé pour décrire l'action de réduire la hauteur, la position ou la valeur de quelque chose ou de quelqu'un.", 
+                pronunciation: "ah-bay-say", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abaisseur", 
+                meaning: "Terme anatomique désignant un muscle dont la fonction est d'abaisser une partie du corps, comme les paupières ou les lèvres dans les expressions faciales.", 
+                pronunciation: "ah-bay-seur", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abaisseuse", 
+                meaning: "Forme féminine d'abaisseur, utilisée pour décrire un élément ou un mécanisme féminin ayant pour fonction d'abaisser quelque chose dans un contexte technique.", 
+                pronunciation: "ah-bay-seuz", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abajoue", 
+                meaning: "Terme zoologique désignant la joue ou la poche buccale de certains animaux, particulièrement ceux qui stockent de la nourriture dans leurs bajoues comme les hamsters.", 
+                pronunciation: "ah-bah-zhoo", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abalone", 
+                meaning: "Nom anglais désignant un coquillage marin comestible, également connu sous le nom d'ormeau, apprécié pour sa chair délicate dans diverses cuisines du monde.", 
+                pronunciation: "ah-bah-lon", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abalourdir", 
+                meaning: "Verbe signifiant 'rendre lourd' ou 'alourdir', utilisé de manière littérale pour décrire l'action d'ajouter du poids ou de manière figurée pour évoquer l'ennui.", 
+                pronunciation: "ah-bah-loor-deer", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abancourtois", 
+                meaning: "Gentilé désignant une personne originaire d'Abancourt, utilisé pour identifier l'origine géographique ou les caractéristiques culturelles associées à cette commune.", 
+                pronunciation: "ah-ban-koor-twa", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abandon", 
+                meaning: "Nom désignant l'action de renoncer à quelque chose ou de cesser de s'occuper de quelqu'un, avec des implications émotionnelles, juridiques ou pratiques selon le contexte.", 
+                pronunciation: "ah-ban-don", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnable", 
+                meaning: "Adjectif signifiant 'qui peut être abandonné', utilisé pour décrire une chose, une personne ou une situation qui peut légitimement être laissée de côté ou renoncée.", 
+                pronunciation: "ah-ban-do-nah-bl", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnataire", 
+                meaning: "Terme juridique désignant la personne qui bénéficie d'un abandon, c'est-à-dire qui reçoit un bien ou un droit abandonné par son précédent propriétaire.", 
+                pronunciation: "ah-ban-do-nah-tair", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnateur", 
+                meaning: "Terme désignant la personne qui effectue un abandon, c'est-à-dire qui renonce volontairement à un droit, un bien ou une responsabilité qu'elle détenait précédemment.", 
+                pronunciation: "ah-ban-do-nah-teur", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnatrice", 
+                meaning: "Forme féminine d'abandonnateur, désignant une femme qui effectue un abandon, avec les mêmes implications juridiques ou pratiques que la forme masculine.", 
+                pronunciation: "ah-ban-do-nah-trees", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abandonné", 
+                meaning: "Adjectif signifiant 'qui a été abandonné', utilisé pour décrire une personne, un lieu ou un objet laissé sans soins, sans attention ou sans utilisation.", 
+                pronunciation: "ah-ban-do-nay", 
+                difficulty: "easy", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abandonnement", 
+                meaning: "Nom désignant l'action d'abandonner ou le fait d'être abandonné, avec une connotation plus formelle ou littéraire que le simple terme 'abandon'.", 
+                pronunciation: "ah-ban-don-mon", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnément", 
+                meaning: "Adverbe signifiant 'de manière abandonnée', utilisé pour décrire une attitude, un comportement ou un état caractérisé par le laisser-aller ou le renoncement.", 
+                pronunciation: "ah-ban-don-nay-mon", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "abandonner", 
+                meaning: "Verbe signifiant 'cesser d'entretenir' ou 'renoncer à', utilisé dans divers contextes pour décrire l'action de laisser quelque chose ou quelqu'un sans soins ni attention.", 
+                pronunciation: "ah-ban-do-nay", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abandonneur", 
+                meaning: "Nom désignant une personne qui a l'habitude d'abandonner, caractérisée par une tendance à renoncer facilement à ses engagements, projets ou responsabilités.", 
+                pronunciation: "ah-ban-do-neur", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abandonneuse", 
+                meaning: "Forme féminine d'abandonneur, désignant une femme qui manifeste une tendance à abandonner facilement ses engagements ou responsabilités dans divers contextes.", 
+                pronunciation: "ah-ban-do-neuz", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abandonnique", 
+                meaning: "Adjectif psychologique décrivant une personne souffrant du syndrome d'abandon, caractérisée par une peur excessive d'être abandonnée et des comportements associés.", 
+                pronunciation: "ah-ban-do-neek", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abandonware", 
+                meaning: "Terme informatique désignant un logiciel qui n'est plus commercialisé ni maintenu par son éditeur, mais qui peut encore être utilisé ou distribué librement.", 
+                pronunciation: "ah-ban-don-wair", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abaque", 
+                meaning: "Nom désignant une table à calculer ancienne ou un graphique technique utilisé pour effectuer des opérations mathématiques ou des conversions sans calcul mental.", 
+                pronunciation: "ah-bahk", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abarticulaire", 
+                meaning: "Adjectif anatomique signifiant 'hors articulation', utilisé pour décrire des éléments situés à distance d'une articulation ou non directement liés à celle-ci.", 
+                pronunciation: "ah-bar-tee-ku-lair", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abas", 
+                meaning: "Nom désignant un état d'abattement ou de découragement, utilisé dans un langage soutenu pour décrire une profonde tristesse ou un manque d'énergie vital.", 
+                pronunciation: "ah-bah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abasie", 
+                meaning: "Terme médical désignant l'incapacité de marcher malgré l'absence de lésion organique, généralement d'origine psychologique ou neurologique fonctionnelle.", 
+                pronunciation: "ah-bah-zee", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abasourdi", 
+                meaning: "Adjectif signifiant 'étourdi' ou 'surpris', utilisé pour décrire un état de stupeur ou de confusion résultant d'un choc émotionnel ou d'une nouvelle inattendue.", 
+                pronunciation: "ah-bah-soor-dee", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abasourdir", 
+                meaning: "Verbe signifiant 'étourdir' ou 'surprendre', utilisé pour décrire l'action de provoquer un état de stupeur ou de confusion chez quelqu'un par une révélation choquante.", 
+                pronunciation: "ah-bah-soor-deer", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abasourdissant", 
+                meaning: "Adjectif signifiant 'très surprenant' ou 'stupéfiant', utilisé pour qualifier une nouvelle, un bruit ou un événement qui provoque un choc intense et soudain.", 
+                pronunciation: "ah-bah-soor-dee-san", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abasourdissement", 
+                meaning: "Nom désignant l'action d'abasourdir ou l'état résultant de cette action, caractérisé par une profonde surprise, un choc émotionnel ou une confusion mentale.", 
+                pronunciation: "ah-bah-soor-dees-mon", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "abat", 
+                meaning: "Nom désignant l'action d'abattre ou le résultat de cette action, utilisé dans divers contextes comme la menuiserie, la boucherie ou la sylviculture.", 
+                pronunciation: "ah-bah", 
+                difficulty: "easy", 
+                accents: [] 
+            },
+            { 
+                word: "abat-carre", 
+                meaning: "Outil de charpentier utilisé pour tailler les angles et les joints dans le bois, spécifiquement conçu pour travailler les pièces avec précision dans la construction.", 
+                pronunciation: "ah-bah kair", 
+                difficulty: "hard", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-carrer", 
+                meaning: "Action technique consistant à abattre carrément, c'est-à-dire à tailler ou couper selon des angles droits avec précision, dans le travail du bois ou de la pierre.", 
+                pronunciation: "ah-bah kah-ray", 
+                difficulty: "hard", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-chauvée", 
+                meaning: "Terme technique désignant l'action d'abattre des arbres dans une chauvée, unité de mesure forestière ancienne, pour l'exploitation du bois ou le défrichement.", 
+                pronunciation: "ah-bah sho-vay", 
+                difficulty: "hard", 
+                accents: ["trait-union", "aigu"] 
+            },
+            { 
+                word: "abat-faim", 
+                meaning: "Substance ou aliment qui calme la faim de manière temporaire, utilisé pour patienter avant un repas ou dans des situations où la nourriture est limitée.", 
+                pronunciation: "ah-bah fan", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-foin", 
+                meaning: "Outil agricole utilisé pour couper ou préparer le foin, facilitant la récolte et le stockage de cette ressource essentielle pour l'alimentation du bétail.", 
+                pronunciation: "ah-bah fwan", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-foins", 
+                meaning: "Forme plurielle d'abat-foin, désignant plusieurs de ces outils agricoles ou différents types d'instruments utilisés pour la préparation du fourrage.", 
+                pronunciation: "ah-bah fwan", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-jour", 
+                meaning: "Accessoire de lampe conçu pour diriger et adoucir la lumière, améliorant le confort visuel et créant une ambiance particulière dans un espace éclairé.", 
+                pronunciation: "ah-bah zhoor", 
+                difficulty: "easy", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-jours", 
+                meaning: "Forme plurielle d'abat-jour, désignant plusieurs de ces accessoires d'éclairage ou différents modèles utilisés pour diverses sources lumineuses.", 
+                pronunciation: "ah-bah zhoor", 
+                difficulty: "easy", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-son", 
+                meaning: "Dispositif acoustique conçu pour réduire la propagation du son, utilisé dans les studios, les salles de concert ou les environnements nécessitant un contrôle sonore.", 
+                pronunciation: "ah-bah son", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-sons", 
+                meaning: "Forme plurielle d'abat-son, désignant plusieurs de ces dispositifs acoustiques ou différents types d'installations pour le contrôle de la propagation sonore.", 
+                pronunciation: "ah-bah son", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-vent", 
+                meaning: "Construction ou dispositif conçu pour protéger contre le vent, utilisé en architecture, en navigation ou dans l'agriculture pour créer des zones abritées.", 
+                pronunciation: "ah-bah van", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-vents", 
+                meaning: "Forme plurielle d'abat-vent, désignant plusieurs de ces protections contre le vent ou différents types d'installations pour maîtriser les effets du vent.", 
+                pronunciation: "ah-bah van", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abat-voix", 
+                meaning: "Dispositif architectural en forme de dais ou de réflecteur placé au-dessus d'une chaire ou d'une tribune pour renvoyer la voix de l'orateur vers l'auditoire.", 
+                pronunciation: "ah-bah vwah", 
+                difficulty: "hard", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "abatage", 
+                meaning: "Nom désignant l'action d'abattre, utilisé dans divers contextes comme l'abattage d'arbres en sylviculture ou l'abattage d'animaux en boucherie.", 
+                pronunciation: "ah-bah-tahzh", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abatant", 
+                meaning: "Nom désignant une partie mobile qui peut s'abaisser, comme le couvercle d'un bureau, la tablette d'une table ou tout élément pivotant vers le bas.", 
+                pronunciation: "ah-bah-tan", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abâtardir", 
+                meaning: "Verbe signifiant 'rendre bâtard' ou 'dégénérer', utilisé de manière littérale pour le croisement d'espèces ou de manière figurée pour la dégradation morale.", 
+                pronunciation: "ah-bah-tar-deer", 
+                difficulty: "hard", 
+                accents: ["circonflexe"] 
+            },
+            { 
+                word: "abâtardissement", 
+                meaning: "Nom désignant l'action d'abâtardir ou le résultat de cette action, caractérisant un état de dégénérescence, de mélange impur ou de dégradation qualitative.", 
+                pronunciation: "ah-bah-tar-dees-mon", 
+                difficulty: "hard", 
+                accents: ["circonflexe"] 
+            },
+            { 
+                word: "abatée", 
+                meaning: "Terme maritime désignant l'inclinaison d'un navire sur le côté, généralement provoquée par le vent, les vagues ou une répartition inégale du chargement.", 
+                pronunciation: "ah-bah-tay", 
+                difficulty: "hard", 
+                accents: ["aigu"] 
+            },
+            { 
+                word: "batis", 
+                meaning: "Nom désignant un amas de branches, de pierres ou de débris, utilisé en sylviculture, en construction ou pour décrire un entassement désordonné d'éléments divers.", 
+                pronunciation: "ah-bah-tee", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "abats", 
+                meaning: "Nom collectif désignant les parties comestibles des animaux de boucherie autres que la viande musculaire, comprenant les organes internes et certaines glandes.", 
+                pronunciation: "ah-bah", 
+                difficulty: "easy", 
+                accents: [] 
+            }
         ];
 
-        // Variables pour [] }
-        ];
-
-        // Variables pour gérer l gérer l'état
-        let currentPage = 1;
-'état
+        // Variables pour gérer l'état
         let currentPage = 1;
         const wordsPerPage = 20;
         let currentFilter = "all";
@@ -1046,40 +1962,18 @@
 
         // Éléments DOM
         const wordsContainer = document.getElementById('words-container');
-        const wordsPerPage = 20;
-        let currentFilter = "all";
-        let currentAccent = null;
-        let audioCount = 0;
-
-        // Éléments DOM
-        const wordsContainer = document.getElementById('        const firstBtn = document.getElementById('first-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const lastBtn = document.getElementById('lastwords-container');
         const firstBtn = document.getElementById('first-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const lastBtn = document.getElementById('last-btn');
         const jumpBtn = document.getElementById('jump-btn');
-        const page-btn');
-        const jumpBtn = document.getElementById('jump-btn');
         const pageInput = document.getElementById('page-input');
         const currentPageSpan = document.getElementById('current-page');
-        constInput = document.getElementById('page-input');
-        const currentPageSpan = document.getElementById('current-page');
- totalPagesSpan = document.getElementById('total-pages');
-        const wordsCountSpan = document.getElementById('wordsCount');
-        const pagesCountSpan = document.getElementById('        const totalPagesSpan = document.getElementById('total-pages');
+        const totalPagesSpan = document.getElementById('total-pages');
         const wordsCountSpan = document.getElementById('wordsCount');
         const pagesCountSpan = document.getElementById('pagesCount');
         const audioCountSpan = document.getElementById('audioCount');
-       pagesCount');
-        const audioCountSpan = document.getElementById('audioCount');
-        const searchInput = document.getElementById('searchInput const searchInput = document.getElementById('searchInput');
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        const accentButtons = document.querySelectorAll('.accent-btn');
-
-        // Créer');
+        const searchInput = document.getElementById('searchInput');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const accentButtons = document.querySelectorAll('.accent-btn');
 
@@ -1088,67 +1982,31 @@
             const galaxy = document.getElementById('galaxy');
             const starCount = 200;
             
-            for ( la galaxie
-        function createGalaxy() {
-            const galaxy = document.getElementById('galaxy');
-            const starCount = 200;
-            
             for (let i = 0; i < starCount; i++) {
-                const star = document.createElementlet i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
-                const size = Math.random() > 0.8 ? 'large' : (('div');
                 const size = Math.random() > 0.8 ? 'large' : (Math.random() > 0.5 ? 'medium' : 'small');
-Math.random() > 0.5 ? 'medium' : 'small');
                 star.className = `star ${size}`;
-                star.style.left =                star.className = `star ${size}`;
-                star.style.left = `${Math.random() * 100}% `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.animationDelay =`;
+                star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 galaxy.appendChild(star);
             }
             
- `${Math.random() * 5}s`;
-                galaxy.appendChild(star);
-            }
-            
             // Créer les nébuleuses
             const nebulaBlue = document.createElement('div');
-            nebulaBlue            // Créer les nébuleuses
-            const nebulaBlue = document.createElement('div');
             nebulaBlue.className = 'nebula blue';
-            galaxy.appendChild(nebulaBlue);
-            
-            const nebulaWhite = document.createElement.className = 'nebula blue';
             galaxy.appendChild(nebulaBlue);
             
             const nebulaWhite = document.createElement('div');
             nebulaWhite.className = 'nebula white';
             galaxy.appendChild(nebulaWhite);
             
-            const nebulaPurple('div');
-            nebulaWhite.className = 'nebula white';
-            galaxy.appendChild(nebulaWhite);
-            
-            const neb = document.createElement('div');
+            const nebulaPurple = document.createElement('div');
             nebulaPurple.className = 'nebula purple';
             galaxy.appendChild(nebulaPurple);
         }
 
-        // AfficulaPurple = document.createElement('div');
-            nebulaPurple.className = 'nebula purple';
-            galaxy.appendChild(nebulaPurple);
-        }
-
-        // Afficherher les mots
-        function displayWords() {
-            wordsContainer.innerHTML = '';
-            
-            // Filtrer les mots
-            let filteredWords = words;
-            
-            les mots
+        // Afficher les mots
         function displayWords() {
             wordsContainer.innerHTML = '';
             
@@ -1156,132 +2014,65 @@ Math.random() > 0.5 ? 'medium' : 'small');
             let filteredWords = words;
             
             // Filtre par difficulté
-            if (currentFilter !== "all // Filtre par difficulté
             if (currentFilter !== "all") {
-                filteredWords = filteredWords.filter(word => word.difficulty === currentFilter);
-            }
-            
-            // Filt") {
                 filteredWords = filteredWords.filter(word => word.difficulty === currentFilter);
             }
             
             // Filtre par accent
             if (currentAccent) {
-                filteredWords = filteredWords.filter(wordre par accent
-            if (currentAccent) {
                 filteredWords = filteredWords.filter(word => word.accents.includes(currentAccent));
-            }
-            
-            // Recherche
-            => word.accents.includes(currentAccent));
             }
             
             // Recherche
             const searchTerm = searchInput.value.toLowerCase();
             if (searchTerm) {
-                filteredWords const searchTerm = searchInput.value.toLowerCase();
-            if (searchTerm) {
                 filteredWords = filteredWords.filter(word => 
-                    word.word.toLowerCase().includes(searchTerm) || 
-                    word = filteredWords.filter(word => 
                     word.word.toLowerCase().includes(searchTerm) || 
                     word.meaning.toLowerCase().includes(searchTerm)
                 );
             }
             
-           .meaning.toLowerCase().includes(searchTerm)
-                );
-            }
-            
             // Calculer la pagination
-            const totalPages = Math.ceil(filter // Calculer la pagination
             const totalPages = Math.ceil(filteredWords.length / wordsPerPage);
-            const startIndex = (edWords.length / wordsPerPage);
             const startIndex = (currentPage - 1) * wordsPerPage;
-            const endIndex = Math.min(startIndex + wordsPerPage,currentPage - 1) * wordsPerPage;
             const endIndex = Math.min(startIndex + wordsPerPage, filteredWords.length);
-            const pageWords = filteredWords.slice(startIndex, endIndex);
-            
-            // Afficher les mots de la page
-            filteredWords.length);
             const pageWords = filteredWords.slice(startIndex, endIndex);
             
             // Afficher les mots de la page
             pageWords.forEach((word, index) => {
                 const wordElement = createWordElement(word, startIndex + index + 1);
-                pageWords.forEach((word, index) => {
-                const wordElement = createWordElement(word, startIndex + index + 1);
                 wordsContainer.appendChild(wordElement);
-            });
-            
-            // Mettre à jour wordsContainer.appendChild(wordElement);
             });
             
             // Mettre à jour les indicateurs
             currentPageSpan.textContent = currentPage;
-            totalPagesSpan.text les indicateurs
-            currentPageSpan.textContent = currentPage;
             totalPagesSpan.textContent = totalPages;
-            wordsCountSpan.textContent = filteredContent = totalPages;
             wordsCountSpan.textContent = filteredWords.length;
-            pagesCountSpan.textContent = totalPages;
-            audioCountSpan.textContent =Words.length;
             pagesCountSpan.textContent = totalPages;
             audioCountSpan.textContent = audioCount;
             
             // Gérer les boutons de navigation
             firstBtn.disabled = currentPage === 1;
-            prevBtn.disabled = audioCount;
-            
-            // Gérer les boutons de navigation
-            firstBtn.disabled = currentPage === 1;
-            prev currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-            lastBtn.disabled = currentPage === totalPages;
-            
-            // Mettre à jour lBtn.disabled = currentPage === 1;
+            prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage === totalPages;
             lastBtn.disabled = currentPage === totalPages;
             
             // Mettre à jour l'input de page
             pageInput.value = currentPage;
-           'input de page
-            pageInput.value = currentPage;
             pageInput.max = totalPages;
-        }
-
-        // Créer un élément de mot
-        function create pageInput.max = totalPages;
         }
 
         // Créer un élément de mot
         function createWordElement(wordObj, number) {
             const wordCard = document.createElement('div');
-            wordCard.className =WordElement(wordObj, number) {
-            const wordCard = document.createElement('div');
-            wordCard.className = `word-card ${wordObj.difficulty}` `word-card ${wordObj;
+            wordCard.className = `word-card ${wordObj.difficulty}`;
             
             // Déterminer le badge de difficulté
-            let difficulty.difficulty}`;
-            
-            // Déterminer le badge de difficulté
-            let difficultyBadge =Badge = '';
-            let badgeClass = '';
-            switch(wordObj.difficulty) {
-                case 'easy':
-                    difficultyBadge = 'Fac '';
+            let difficultyBadge = '';
             let badgeClass = '';
             switch(wordObj.difficulty) {
                 case 'easy':
                     difficultyBadge = 'Facile';
-                    badgeClass = 'badge-easy';
-                    break;
-                case 'medium':
-                    difficultyBadge = 'Moyen';
-                    badgeClass = 'badge-medium';
-                    break;
-                case 'hard':
-                   ile';
                     badgeClass = 'badge-easy';
                     break;
                 case 'medium':
@@ -1295,65 +2086,30 @@ Math.random() > 0.5 ? 'medium' : 'small');
             }
             
             wordCard.innerHTML = `
-                < difficultyBadge = 'Difficile';
-                    badgeClass = 'badge-hard';
-                    break;
-            }
-            
-            wordCard.innerHTML = `
                 <div class="word-header">
-                    <div class="word">${wordObj.word}</div>
-                   div class="word-header">
                     <div class="word">${wordObj.word}</div>
                     <div class="word-info">
                         <div class="word-number">${number}</div>
-                        <div class <div class="word-info">
-                        <div class="word-number">${number}</div>
-                        <div class="dif="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
-                    </div>
-                </div>
-                <div class="meaning">${wordficulty-badge ${badgeClass}">${difficultyBadge}</div>
+                        <div class="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
                     </div>
                 </div>
                 <div class="meaning">${wordObj.meaning}</div>
                 <div class="pronunciation">
-                    <span>${Obj.meaning}</div>
-                <div class="pronunciation">
                     <span>${wordObj.pronunciation}</span>
                 </div>
                 <div class="audio-controls">
-wordObj.pronunciation}</span>
-                </div>
-                <div class="audio-controls">
                     <button class="speak-btn" data-word="${wordObj.word}">
-                        <i class="fas fa                    <button class="speak-btn" data-word="${wordObj.word}">
                         <i class="fas fa-volume-up"></i> Écouter la prononciation
-                   -volume-up"></i> Écouter la prononciation
                     </button>
-                </div </button>
                 </div>
             `;
             
             // Ajouter l'écouteur d'événement pour le bouton de prononciation
-            const speakBtn = wordCard.querySelector('.speak-btn>
-            `;
-            
-            // Ajouter l'écouteur d'événement pour le bouton de prononciation
-            const speakBtn = word');
+            const speakBtn = wordCard.querySelector('.speak-btn');
             speakBtn.addEventListener('click', function() {
                 speakWord(wordObj.word);
                 audioCount++;
-                audioCountSpan.textContentCard.querySelector('.speak-btn');
-            speakBtn.addEventListener('click', function() {
-                speakWord(wordObj.word);
-                audioCount++;
-                audioCountSpan.textContent = = audioCount;
-            });
-            
-            return wordCard;
-        }
-
-        // Fonction pour pron audioCount;
+                audioCountSpan.textContent = audioCount;
             });
             
             return wordCard;
@@ -1361,46 +2117,21 @@ wordObj.pronunciation}</span>
 
         // Fonction pour prononcer un mot
         function speakWord(word) {
-            if ('speechSynthesis' in window)oncer un mot
-        function speakWord(word) {
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang = 'fr-FR';
- {
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'fr-FR';
                 utterance.rate = 0.8;
                 utterance.pitch = 1;
                 window.speechSynthesis.speak(utterance);
             } else {
-                alert                utterance.rate = 0.8;
-                utterance.pitch = 1;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("La("La synthèse vocale n'est pas supportée par votre navigateur.");
+                alert("La synthèse vocale n'est pas supportée par votre navigateur.");
             }
         }
 
         // Aller à une page spécifique
         function goToPage(page) {
-            const synthèse vocale n'est pas supportée par votre navigateur.");
-            }
-        }
-
-        // Aller à une page spécifique
-        function goToPage(page) {
-            const totalPages = Math.ceil(words.length totalPages = Math.ceil(words.length / wordsPerPage);
-            if (page >= 1 && page <= totalPages / wordsPerPage);
+            const totalPages = Math.ceil(words.length / wordsPerPage);
             if (page >= 1 && page <= totalPages) {
-                currentPage = page;
-                displayWords();
-            }
-        }
-
-        // Initialisation
-        function init() {
-            createGalaxy();
-            display) {
                 currentPage = page;
                 displayWords();
             }
@@ -1412,39 +2143,21 @@ wordObj.pronunciation}</span>
             displayWords();
             
             // Écouteurs d'événements pour la navigation
-            firstBtn.addEventListener('click',Words();
-            
-            // Écouteurs d'événements pour la navigation
             firstBtn.addEventListener('click', () => goToPage(1));
-            prevBtn.addEventListener('click', () => goTo () => goToPage(1));
-            prevBtn.addEventListener('click', () => goToPage(currentPage - 1Page(currentPage - 1));
-            nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
-            lastBtn.addEventListener('click',));
+            prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
             nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
             lastBtn.addEventListener('click', () => {
                 const totalPages = Math.ceil(words.length / wordsPerPage);
                 goToPage(totalPages);
             });
             
- () => {
-                const totalPages = Math.ceil(words.length / wordsPerPage);
-                goToPage(totalPages);
-            });
-            
-            jumpBtn.addEventListener('click            jumpBtn.addEventListener('click', () => {
-                const page = parseInt(pageInput.value);
-                goToPage(page);
-           ', () => {
+            jumpBtn.addEventListener('click', () => {
                 const page = parseInt(pageInput.value);
                 goToPage(page);
             });
-            
-            pageInput.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter });
             
             pageInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') {
-                    const page') {
                     const page = parseInt(pageInput.value);
                     goToPage(page);
                 }
@@ -1452,21 +2165,9 @@ wordObj.pronunciation}</span>
             
             // Filtres par difficulté
             filterButtons.forEach(button => {
-                = parseInt(pageInput.value);
-                    goToPage(page);
-                }
-            });
-            
-            // Filtres par difficulté
-            filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList button.addEventListener('click', function() {
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
-                    currentFilter = this.getAttribute('data-filter');
-                    currentPage = 1;
-                    display.add('active');
                     currentFilter = this.getAttribute('data-filter');
                     currentPage = 1;
                     displayWords();
@@ -1474,31 +2175,15 @@ wordObj.pronunciation}</span>
             });
             
             // Filtres par accent
-            accentButtons.forEach(buttonWords();
-                });
-            });
-            
-            // Filtres par accent
             accentButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const accent => {
                 button.addEventListener('click', function() {
                     const accent = this.getAttribute('data-accent');
                     
                     // Toggle de l'état actif
                     if (currentAccent === accent) {
-                        currentAccent = = this.getAttribute('data-accent');
-                    
-                    // Toggle de l'état actif
-                    if (currentAccent === accent) {
                         currentAccent = null;
                         this.classList.remove('active');
-                    null;
-                        this.classList.remove('active');
                     } else {
-                        currentAccent = accent;
-                        accentButtons.forEach(btn => btn.classList.remove('active'));
-                        this.classList.add(' } else {
                         currentAccent = accent;
                         accentButtons.forEach(btn => btn.classList.remove('active'));
                         this.classList.add('active');
@@ -1507,17 +2192,7 @@ wordObj.pronunciation}</span>
                     currentPage = 1;
                     displayWords();
                 });
-active');
-                    }
-                    
-                    currentPage = 1;
-                    displayWords();
-                });
             });
-            
-            // Recherche
-            searchInput.addEventListener('input', () => {
-                currentPage = 1            });
             
             // Recherche
             searchInput.addEventListener('input', () => {
