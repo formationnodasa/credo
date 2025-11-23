@@ -732,10 +732,23 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     
                     chunks.push(processedSentence.trim());
                     
-                    // Pause après chaque phrase
-                    chunks.push("PAUSE_LONGUE");
+                    // Pause de 5 secondes après chaque phrase
+                    chunks.push("PAUSE_5_SECONDS");
+                    
+                    // Vérifier si la phrase a 8 mots ou plus
+                    const words = sentence.trim().split(/\s+/);
+                    if (words.length >= 8) {
+                        chunks.push("Je répète");
+                        chunks.push("PAUSE_COURTE");
+                        chunks.push(processedSentence.trim());
+                        chunks.push("PAUSE_5_SECONDS");
+                    }
                 }
             }
+            
+            // Instruction de fin avec "point final"
+            chunks.push("Point final");
+            chunks.push("PAUSE_LONGUE");
             
             return chunks.filter(chunk => chunk !== '');
         }
@@ -772,6 +785,10 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     }
                 }
             }
+            
+            // Instruction de fin avec "point final"
+            chunks.push("Point final");
+            chunks.push("PAUSE_LONGUE");
             
             return chunks.filter(chunk => chunk !== '');
         }
@@ -848,7 +865,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 document.getElementById('stop-dictation').disabled = true;
                 document.getElementById('current-sentence').textContent = '';
                 
-                // Gérer la transition entre les phases
+                // Gérer la transition automatique entre les phases
                 if (appData.currentReadingPhase === 0) {
                     // Fin de la première lecture, passer à la deuxième après 5 secondes
                     appData.currentReadingPhase = 1;
@@ -860,14 +877,23 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         // Activer le textarea et donner le focus
                         document.getElementById('user-input').disabled = false;
                         document.getElementById('user-input').focus();
+                        // Démarrer automatiquement la deuxième lecture
+                        playDictation();
                     }, 5000);
                     
                 } else if (appData.currentReadingPhase === 1) {
-                    // Fin de la deuxième lecture, activer la soumission
+                    // Fin de la deuxième lecture, passer à la troisième après 5 secondes
                     appData.currentReadingPhase = 2;
-                    document.getElementById('reading-status').textContent = 'Deuxième lecture terminée - Vous pouvez continuer à écrire';
+                    document.getElementById('reading-status').textContent = 'Deuxième lecture terminée - Dernière lecture dans 5 secondes';
                     document.getElementById('play-dictation').textContent = 'Dernière lecture';
                     document.getElementById('submit-dictation').disabled = false;
+                    
+                    setTimeout(() => {
+                        document.getElementById('reading-status').textContent = 'Prêt pour la dernière lecture';
+                        // Démarrer automatiquement la troisième lecture
+                        playDictation();
+                    }, 5000);
+                    
                 } else if (appData.currentReadingPhase === 2) {
                     // Fin de la troisième lecture, démarrer le chronomètre
                     document.getElementById('reading-status').textContent = 'Dernière lecture terminée - Soumettez votre dictée';
@@ -888,9 +914,17 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
             document.getElementById('reading-status').textContent = `${phaseText}... (${appData.currentChunkIndex + 1}/${appData.dictationChunks.length})`;
             
-            if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE') {
+            if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE' || chunk === 'PAUSE_5_SECONDS') {
                 // Pause
-                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 2000 : 1000; // 2 secondes pour PAUSE_LONGUE, 1 seconde pour PAUSE_COURTE
+                let pauseDuration;
+                if (chunk === 'PAUSE_5_SECONDS') {
+                    pauseDuration = 5000; // 5 secondes
+                } else if (chunk === 'PAUSE_LONGUE') {
+                    pauseDuration = 2000; // 2 secondes
+                } else {
+                    pauseDuration = 1000; // 1 seconde
+                }
+                
                 document.getElementById('current-sentence').textContent = '...';
                 
                 setTimeout(() => {
