@@ -79,6 +79,42 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
+        .mode-selection {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .mode-btn {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            min-width: 150px;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .mode-btn.disabled {
+            background: linear-gradient(45deg, #666, #999);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .mode-btn.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
         .btn {
             background: linear-gradient(45deg, #6a11cb, #2575fc);
             color: white;
@@ -98,6 +134,13 @@
 
         .btn.secondary {
             background: linear-gradient(45deg, #ff6b6b, #ffa726);
+        }
+
+        .btn:disabled {
+            background: linear-gradient(45deg, #666, #999);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
         .menu-buttons {
@@ -213,6 +256,13 @@
             text-decoration-color: red;
         }
 
+        .reading-status {
+            text-align: center;
+            margin: 10px 0;
+            font-style: italic;
+            color: #ffa726;
+        }
+
         /* Animation des étoiles */
         .star {
             position: absolute;
@@ -296,6 +346,15 @@
             .action-buttons {
                 flex-direction: column;
             }
+            
+            .mode-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-btn {
+                width: 200px;
+            }
         }
     </style>
 </head>
@@ -308,7 +367,10 @@
             <h1>Application de Dictée</h1>
             <div class="player-info">
                 <input type="text" id="player-name" placeholder="Entrez votre nom">
-                <button id="start-btn" class="btn">Commencer</button>
+            </div>
+            <div class="mode-selection">
+                <button id="initiation-btn" class="mode-btn">Mode Initiation</button>
+                <button id="bible-btn" class="mode-btn disabled">Mode Bible (Bientôt)</button>
             </div>
             <div class="menu-buttons">
                 <button id="history-btn" class="btn">Historique</button>
@@ -319,7 +381,7 @@
         <!-- Écran de dictée -->
         <div id="dictation-screen" class="screen">
             <div class="header">
-                <h2>Dictée en cours</h2>
+                <h2>Dictée en cours - <span id="current-mode">Initiation</span></h2>
                 <div class="player-display">Joueur: <span id="current-player"></span></div>
             </div>
             
@@ -327,7 +389,9 @@
                 <div class="section">
                     <h3>Écoutez attentivement :</h3>
                     <div id="text-to-dictate" class="text-display"></div>
+                    <div id="reading-status" class="reading-status"></div>
                     <button id="play-dictation" class="btn">Lire la dictée</button>
+                    <button id="pause-dictation" class="btn secondary" disabled>Pause</button>
                 </div>
                 
                 <div class="section">
@@ -374,7 +438,7 @@
         <!-- Écran historique -->
         <div id="history-screen" class="screen">
             <div class="header">
-                <h2>Historique des scores</h2>
+                <h2>Historique des scores - <span id="history-player-name"></span></h2>
                 <button id="back-from-history" class="btn secondary">Retour</button>
             </div>
             <div id="history-list" class="history-container"></div>
@@ -400,10 +464,15 @@
         // Données de l'application
         const appData = {
             playerName: '',
+            currentMode: 'initiation',
             dictationText: '',
             currentParagraphs: [],
             userInput: '',
-            history: JSON.parse(localStorage.getItem('dictationHistory')) || [],
+            history: JSON.parse(localStorage.getItem('dictationHistory')) || {},
+            isReading: false,
+            currentUtterance: null,
+            currentChunkIndex: 0,
+            dictationChunks: [],
             dictationBook: `La rapidité avec laquelle les groupes KA (Kizito-Anuarite) se sont multipliés à Kinshasa, à travers tout le Congo jusqu'aux villages éloignés, et même en dehors du pays, prouve qu'il était urgent de présenter aux enfants et pré-adolescents africains un programme d'éducation chrétienne.
 L'originalité de cette éducation KA est de présenter, non une série de leçons, mais des MODELES capables d'entraîner l'esprit, le cœur, l'enthousiasme de nos jeunes dans un cadre initiatique qui leur est familier. Nous avons une chance fantastique, une grâce même, d'avoir des modèles si proches tels que les MARTYRS DE L'OUGANDA et ANUARITE du Congo.
 Beaucoup de communautés chrétiennes dans le monde pourraient nous envier cette grâce. Mais en profitons-nous assez?
@@ -423,7 +492,6 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
         document.addEventListener('DOMContentLoaded', function() {
             createGalaxy();
             initializeEventListeners();
-            updateHistoryDisplay();
             generateCalendar();
         });
 
@@ -444,298 +512,793 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 // Position aléatoire
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
+Math.random() * 100}%`;
                 
+                // Animation avec délai al                
                 // Animation avec délai aléatoire
-                star.style.animationDelay = `${Math.random() * 5}s`;
+                staréatoire
+                star.style.animation.style.animationDelay = `${Delay = `${Math.random()Math.random() * 5 * 5}s`;
                 
-                galaxy.appendChild(star);
+               }s`;
+                
+                galaxy.appendChild( galaxy.appendChild(star);
+           star);
             }
         }
 
-        // Initialisation des écouteurs d'événements
-        function initializeEventListeners() {
-            // Boutons de navigation
-            document.getElementById('start-btn').addEventListener('click', startDictation);
-            document.getElementById('history-btn').addEventListener('click', showHistory);
-            document.getElementById('calendar-btn').addEventListener('click', showCalendar);
-            document.getElementById('back-to-menu').addEventListener('click', showWelcomeScreen);
-            document.getElementById('back-to-menu-2').addEventListener('click', showWelcomeScreen);
-            document.getElementById('back-from-history').addEventListener('click', showWelcomeScreen);
-            document.getElementById('back-from-calendar').addEventListener('click', showWelcomeScreen);
-            
-            // Boutons de dictée
-            document.getElementById('play-dictation').addEventListener('click', playDictation);
-            document.getElementById('submit-dictation').addEventListener('click', submitDictation);
-            document.getElementById('new-dictation').addEventListener('click', startDictation);
+ }
         }
 
-        // Navigation entre les écrans
+        // Initialisation        // Initialisation des des éc écouteouteurs d'évurs d'événements
+        function initializeénements
+        function initializeEventListeners() {
+           EventListeners() {
+            // Bout // Boutons de navigation
+ons de navigation
+            document.getElementById('initiation-btn').            document.getElementById('initiation-btn').addEventListener('click', () => startaddEventListener('click', () => startDictation('initDictation('initiation'));
+            document.getElementById('iation'));
+            document.getElementById('biblebible-btn').addEventListener('click', () => {
+                alert('Le mode Bible sera disponible-btn').addEventListener('click', () => {
+                alert('Le mode Bible sera disponible prochainement prochainement !');
+ !');
+            });
+            document.getElementById            });
+            document.getElementById('('history-btn').addEventListener('history-btn').addEventListener('click', showHistory);
+           click', showHistory);
+            document.getElementById('calendar-btn'). document.getElementById('calendar-btn').addEventListeneraddEventListener('click', show('click', showCalendar);
+Calendar);
+            document.getElementById('back            document.getElementById('back-to-to-menu').addEventListener('-menu').addEventListener('clickclick', showWelcomeScreen);
+           ', showWelcomeScreen);
+            document.getElementById('back document.getElementById('back-to-menu-to-menu-2').addEventListener('-2').addEventListener('click',click', showWelcomeScreen);
+ showWelcomeScreen);
+            document            document.getElementById('back-from-history.getElementById('back-from-history').').addEventListener('click', showaddEventListener('click', showWelcomeWelcomeScreen);
+            document.getElementByIdScreen);
+            document.getElementById('('back-from-calendar').back-from-calendar').addEventListeneraddEventListener('click('click', showWelcomeScreen', showWelcomeScreen);
+            
+            //);
+            
+            // Boutons Boutons de dictée
+ de dictée
+            document.getElementById('play-dictation            document.getElementById('play-dictation').').addEventListener('click',addEventListener('click', playDict playDictation);
+            documentation);
+            document.getElementById('pause-dictation.getElementById('pause-dictation').add').addEventListener('click', pauseEventListener('click', pauseDictDictation);
+            document.getElementById('ation);
+            document.getElementById('submitsubmit-dictation').add-dictation').addEventListener('EventListener('click', submitDictclick', submitDictation);
+ation);
+            document.getElementById('new-dictation').addEventListener('click', () => startDict            document.getElementById('new-dictation').addEventListener('click', () => startDictationation(appData.currentMode));
+(appData.currentMode));
+        }
+
+        }
+
+        // Navigation entre        // Navigation entre les éc les écrans
+        function showScreen(screenrans
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
+           Id) {
+            document.querySelector document.querySelectorAll('.screen').All('.screen').forEach(sforEach(screen => {
                 screen.classList.remove('active');
             });
-            document.getElementById(screenId).classList.add('active');
-        }
+creen => {
+                screen.classList.remove('active            document.getElementById(screenId).class');
+            });
+            document.getElementById(screenId).classList.add('activeList.add('active');
+');
+               }
 
         function showWelcomeScreen() {
-            showScreen('welcome-screen');
+ }
+
+        function showWelcomeScreen() {
+                       // Arrêter toute lecture en cours // Arrêter toute lecture en cours
+            pauseDictation();
+            showScreen('w
+            pauseDictation();
+            showScreenelcome-screen');
         }
 
         function showHistory() {
+            const player('welcome-screen');
+        }
+
+        function showHistory() {
+           Name = const playerName = document.getElementById('player-name').value.trim() document.getElementById('player-name').value.trim() || 'Invité';
+            document.getElementById('history-player-name').textContent || 'Invité';
+            document.getElementById('history-player-name').textContent = playerName;
+            updateHistoryDisplay = playerName;
             updateHistoryDisplay();
+            showScreen('history();
             showScreen('history-screen');
         }
 
-        function showCalendar() {
-            showScreen('calendar-screen');
+        function-screen');
         }
 
-        // Sélection aléatoire des paragraphes
-        function selectRandomParagraphs() {
-            const paragraphs = appData.dictationBook.split('\n').filter(p => p.trim().length > 0);
+        function showCalendar() {
+            show showCalendar() {
+            showScreenScreen('calendar-screen');
+       ('calendar-screen');
+        }
+
+ }
+
+        // Sélection alé        // Sélection aléatoire des paragraphes
+atoire des paragraphes
+        function selectRandomParagraphs        function selectRandomParagraphs() {
+            const paragraphs =() {
+            const paragraphs = appData.dictationBook.split appData.dictationBook.split('\('\n').filter(p => p.trim().length > 0n').filter(p => p.trim().length > 0);
+            const totalParagraphs);
             const totalParagraphs = paragraphs.length;
             
-            // Choisir entre 3 et 5 paragraphes selon la longueur
-            let numParagraphs;
-            const avgLength = paragraphs.reduce((sum, p) => sum + p.length, 0) / totalParagraphs;
+            // Choisir entre  = paragraphs.length;
+            
+            // Choisir entre 3 et 3 et 5 parag5 paragraphes selon la longueur
+raphes selon la longueur
+            let num            let numParagraphs;
+           Paragraphs;
+            const avg const avgLength = paragraphs.reduceLength = paragraphs.reduce((sum, p) => sum + p.length, 0) / totalParagraphs;
+            
+            if (avgLength > 200((sum, p) => sum + p.length, 0) / totalParagraphs;
             
             if (avgLength > 200) {
-                numParagraphs = 3; // Textes longs : 3 paragraphes
+               ) {
+                numParagraphs numParagraphs = 3; = 3; // Text // Textes longs : es longs : 3 paragraphes
             } else {
-                numParagraphs = 5; // Textes courts : 5 paragraphes
+                numParagraphs = 5; // Text3 paragraphes
+            } else {
+                numParagraphs = 5; //es courts : 5 paragrap Textes courts : 5 paragraphes
+            }
+hes
             }
             
-            // Sélectionner des paragraphes aléatoires
-            const selected = [];
-            const usedIndices = new Set();
+                       
+            // Sélectionner // Sélectionner des parag des paragraphes alraphes aléatoires
+éatoires
+            const selected =            const selected = [];
+            const [];
+            const usedIndices = usedIndices = new new Set();
             
-            while (selected.length < numParagraphs && selected.length < totalParagraphs) {
-                const randomIndex = Math.floor(Math.random() * totalParagraphs);
+            Set();
+            
+            while (selected while (selected.length < numParagraph.length < numParagraphs &&s && selected.length < total selected.length < totalParagraphs)Paragraphs) {
+                const random {
+                const randomIndex = Math.floor(Math.random() * totalIndex = Math.floor(Math.random()Paragraphs);
+ * totalParagraphs                if (!usedInd);
                 if (!usedIndices.has(randomIndex)) {
-                    selected.push(paragraphs[randomIndex]);
-                    usedIndices.add(randomIndex);
+                    selectedices.has(randomIndex)) {
+                    selected.push(.push(paragraphs[randomIndex]);
+                   paragraphs[randomIndex]);
+ usedIndices.add(randomIndex);
+                }
+            }
+            
+                               usedIndices.add(randomIndex);
                 }
             }
             
             return selected;
         }
 
+        return selected;
+        }
+
+        // Préparer le // Préparer le texte pour la lecture avec pauses
+        texte pour la lecture avec pauses function prepareTextFor
+        function prepareTextForReading(text) {
+            // Séparer le texteReading(text) {
+            // Séparer le texte en chunks en chunks aux ponctuations
+            const chunks = aux ponctuations
+            const chunks = [];
+            [];
+            let currentChunk = '';
+            
+            for (let i let currentChunk = '';
+            
+            for (let i = 0; i < text.length = 0; i < text.length; i++) {
+                currentChunk += text[i];
+                
+                // Vérifier si on arrive à une ponctuation; i++) {
+                currentChunk += text[i];
+                
+                // Vérifier si on arrive à une ponctuation
+                if (['.', '!', '?', ',', ';', ':'].includes(text[i]))
+                if (['.', '!', '?', ',', ';', ':'].includes(text[i])) {
+                    // Pour les points, points d'exclamation et points d'interrogation, pause {
+                    // Pour les points, points d'exclamation et points d'interrogation, pause plus longue
+                    if (['.', '!', '?'].includes(text[i])) {
+                        chunks.push(currentCh plus longue
+                    if (['.', '!', '?'].includes(text[i])) {
+                        chunks.push(currentChunk.trim());
+                        chunks.push('PAUSE_LONGUE');unk.trim());
+                        chunks.push('PAUSE_LONGUE'); // 5 secondes
+                        currentChunk = '';
+                    } else {
+                        chunks.push(currentChunk.trim());
+                        chunks.push('PAUSE_COURTE'); // 2 // 5 secondes
+                        currentChunk = '';
+                    } else {
+                        chunks.push(currentChunk.trim());
+                        chunks.push('PAUSE_COURTE'); // 2 secondes
+                        currentChunk = '';
+                    }
+                }
+            }
+            
+            // Ajouter le dernier chunk s'il reste secondes
+                        currentChunk = '';
+                    }
+                }
+            }
+            
+            // Ajouter le dernier chunk s'il reste du texte
+ du texte
+            if (currentChunk.trim()) {
+                chunks.push(currentChunk.trim());
+            }
+            
+            return chunks.filter(chunk => chunk !== '');
+                   if (currentChunk.trim()) {
+                chunks.push(currentChunk.trim());
+            }
+            
+            return chunks.filter(chunk => chunk !== '');
+        }
+
         // Démarrer une nouvelle dictée
-        function startDictation() {
+        function startDictation(mode) {
+            const playerName = }
+
+        // Démarrer une nouvelle dictée
+        function startDictation(mode) {
             const playerName = document.getElementById('player-name').value.trim();
+            if (!playerName) document.getElementById('player-name').value.trim();
             if (!playerName) {
+                alert('Veu {
                 alert('Veuillez entrer votre nom');
+                return;
+           illez entrer votre nom');
                 return;
             }
             
             appData.playerName = playerName;
+            appData.currentMode = mode;
+            app }
+            
+            appData.playerName = playerName;
+            appData.currentMode = mode;
             appData.currentParagraphs = selectRandomParagraphs();
             appData.dictationText = appData.currentParagraphs.join('\n\n');
+Data.currentParagraphs = selectRandomParagraphs();
+            appData.dictationText = appData.currentParagraphs.join('\n\n');
+            
+            // Préparer les chunks pour la lecture
+            appData.dictationChunks = prepareTextForReading(appData.dict            
+            // Préparer les chunks pour la lecture
+            appData.dictationChunks = prepareTextForReading(appData.dictationText);
+            appData.currentChunkIndex = 0;
+            
+ationText);
+            appData.currentChunkIndex = 0;
             
             document.getElementById('current-player').textContent = playerName;
+            document.getElementById('current-mode').textContent =            document.getElementById('current-player').textContent = playerName;
+            document.getElementById('current-mode').textContent = mode === 'initiation' ? 'Initiation' : 'Bible';
+ mode === 'initiation' ? 'Initiation' : 'Bible';
             document.getElementById('text-to-dictate').textContent = appData.dictationText;
+            document            document.getElementById('text-to-dictate').textContent = appData.dictationText;
             document.getElementById('user-input').value = '';
+            document.getElementById('reading-status').textContent = '';
+            document.getElementById('.getElementById('user-input').value = '';
+            document.getElementById('reading-status').textContent = '';
+            document.getElementById('play-dictation').disabled = false;
+            document.getElementById('pause-dictplay-dictation').disabled = false;
+            document.getElementById('pause-dictation').disabled = true;
             
             showScreen('dictation-screen');
         }
 
-        // Lecture de la dictée avec synthèse vocale
+        // Lecture de la dictée avec pauses auxation').disabled = true;
+            
+            showScreen('dictation-screen');
+        }
+
+        // Lecture de la dictée avec pauses aux ponctuations
         function playDictation() {
-            if (!appData.dictationText) return;
+            if (!appData.dictationText || appData.isReading) return;
+            
+            // Utiliser la synth ponctuations
+        function playDictation() {
+            if (!appData.dictationText || appData.isReading) return;
             
             // Utiliser la synthèse vocale du navigateur
             if ('speechSynthesis' in window) {
-                // Arrêter toute lecture en cours
-                speechSynthesis.cancel();
+                appData.isReading = trueèse vocale du navigateur
+            if ('speechSynthesis' in window) {
+                appData.isReading = true;
+                document.getElementById('play-dictation').disabled =;
+                document.getElementById('play-dictation').disabled = true;
+                document.getElementById('pause-dictation').disabled = false;
                 
-                const utterance = new SpeechSynthesisUtterance(appData.dictationText);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.8; // Vitesse de lecture réduite
+                readNextCh true;
+                document.getElementById('pause-dictation').disabled = false;
+                
+                readNextChunk();
+            } else {
+                alertunk();
+            } else {
+                alert('La synthèse('La synthèse vocale n vocale n\'est pas supportée par votre navigateur. Veuillez lire le texte\'est pas supportée par votre navigateur. Veuillez lire le texte affiché.');
+            }
+        }
+
+        // Lecture du chunk suivant
+        affiché.');
+            }
+        }
+
+        // Lecture du chunk suivant
+        function readNextChunk function readNextChunk() {
+            if (appData.currentChunkIndex >= appData.d() {
+            if (appData.currentChunkIndex >=ictationChunks.length) {
+                // Fin de la lecture appData.dictationChunks.length) {
+                // Fin de la lecture
+                appData.isReading = false;
+                document.getElementById('play-dict
+                appData.isReading = false;
+                document.getElementById('play-dictation').disabled =ation').disabled = false;
+                document.getElementById('pause-d false;
+                document.getElementById('pause-dictationictation').disabled = true;
+                document.getElementById('reading-status').textContent = 'Lecture termin').disabled = true;
+                document.getElementById('reading-status').textContent = 'Lecture terminée';
+ée';
+                return;
+            }
+            
+            const chunk = appData.dictationChunks[appData.currentChunkIndex                return;
+            }
+            
+            const chunk = appData.dictationChunks[appData.currentChunkIndex];
+            document.getElementById('reading-status').];
+            document.getElementById('reading-status').textContent = `LecturetextContent = `Lecture en cours... (${appData.current en cours... (${appData.currentChunkIndex +ChunkIndex + 1}/${appData.dictation 1}/${appData.dictationChunksChunks.length})`;
+            
+            if (chunk === '.length})`;
+            
+            if (chunk === 'PAUSE_LONGPAUSE_LONGUE'UE' || chunk === 'PAUSE_COURTE') {
+                // Pause
+                || chunk === 'PAUSE_COURTE') {
+                // Pause
+                const pause const pauseDuration = chunk === 'PAUSE_LONGDuration = chunk === 'PAUSE_LONGUE' ? 5000 : UE' ? 5000 : 2000;
+                document.getElementById2000;
+                document.getElementById('reading-status').textContent = `('reading-status').textContent = `Pause... (Pause... (${appData${appData.current.currentChunkIndex + ChunkIndex + 1}/${appData.dictationChunks.length})`;
+                
+                setTimeout(() => {
+                    appData.currentCh1}/${appData.dictationChunks.length})`;
+                
+                setTimeout(() => {
+                    appData.currentChunkIndex++;
+                    readNextChunkunkIndex++;
+                    readNextChunk();
+                }, pause();
+                }, pauseDuration);
+           Duration);
+            } else {
+                // Lecture du texte
+                const utterance = new Speech } else {
+                // Lecture du texte
+                const utterance = new SpeechSynthesisUtterance(chunk);
+SynthesisUtterance(chunk);
+                utterance.lang = 'fr                utterance.lang = 'fr-FR';
+                utterance.rate = 0.7; // Vitesse de lecture l-FR';
+                utterance.rate = 0.7; // Vitesse de lecture lente
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
-                // Désactiver le bouton pendant la lecture
-                const playButton = document.getElementById('play-dictation');
-                playButton.disabled = true;
-                playButton.textContent = 'Lecture en cours...';
+                utterance.onend =ente
+                utterance.pitch = 1;
+                utterance.volume = 1;
                 
-                // Gérer la fin de la lecture
-                utterance.onend = function() {
-                    playButton.disabled = false;
-                    playButton.textContent = 'Relire la dictée';
+                utterance.onend = function() function() {
+                    {
+                    appData.currentChunkIndex++;
+                    readNext appData.currentChunkIndex++;
+                    readNextChunk();
                 };
                 
-                // Gérer les erreurs
+                utterance.onerror = functionChunk();
+                };
+                
                 utterance.onerror = function(event) {
-                    console.error('Erreur de synthèse vocale:', event);
-                    playButton.disabled = false;
-                    playButton.textContent = 'Relire la dictée';
-                    alert('Erreur lors de la lecture. Veuillez lire le texte affiché.');
+                    console.error(event) {
+                    console.error('Er('Erreur de synthèse vocale:', event);
+                    appData.isReading = false;
+                    document.getElementById('playreur de synthèse vocale:', event);
+                    appData.isReading = false;
+                    document.getElementById('play-d-dictation').disabled = false;
+                    document.getElementById('pauseictation').disabled = false;
+                    document.getElementById('pause-dict-dictation').disabled = true;
+                    document.getElementById('ation').disabled = true;
+                    document.getElementById('reading-statusreading-status').textContent = 'Erreur de lecture';
+                };
+                
+                speechSynthesis').textContent = 'Erreur de lecture';
                 };
                 
                 speechSynthesis.speak(utterance);
-            } else {
-                alert('La synthèse vocale n\'est pas supportée par votre navigateur. Veuillez lire le texte affiché.');
+.speak(utterance);
+                appData.current                appData.currentUtterance = utterance;
+            }
+        }
+
+        // Mettre en pause la lecture
+        function pauseDictation() {
+            if (Utterance = utterance;
+            }
+        }
+
+        // Mettre en pause la lecture
+        function pauseDictation() {
+            ifappData.isReading && speechSynthesis.speaking) {
+ (appData.isReading && speechSynthesis.speaking) {
+                speechSynthesis                speechSynthesis.cancel();
+                appData.isReading.cancel();
+                appData.isReading = false;
+                = false;
+                document.getElementById('play-dictation').disabled = false;
+                document.getElementById document.getElementById('play-dictation').disabled = false;
+                document.getElementById('pause-dictation').disabled('pause-dictation').disabled = true;
+                document.getElementById('reading-status'). = true;
+                document.getElementById('reading-status').textContenttextContent = 'Lecture en pause';
+            }
+        }
+
+        // Soumission de la dictée
+        = 'Lecture en pause';
             }
         }
 
         // Soumission de la dictée
         function submitDictation() {
-            const userInput = document.getElementById('user-input').value.trim();
+            const userInput = document function submitDictation() {
+            const userInput = document.getElementById('user-input')..getElementById('user-input').value.trim();
             if (!userInput) {
-                alert('Veuillez écrire votre dictée avant de soumettre');
+                alert('Veuvalue.trim();
+            if (!userInput) {
+                alert('Veuilleillez écrire votre dictée avant de soumettre');
+                return;
+            }
+z écrire votre dictée avant de soumettre');
                 return;
             }
             
+            // Arrêter            
+            // Arrêter la lecture si elle est en cours
+            pauseDictation();
+ la lecture si elle est en cours
+            pauseDictation();
+            
+            appData.userInput =            
             appData.userInput = userInput;
+            userInput;
             correctDictation();
         }
 
         // Correction de la dictée
         function correctDictation() {
-            const originalText = appData.dictationText;
-            const userText = appData.userInput;
+            correctDictation();
+        }
+
+        // Correction de la dictée
+        function correctDictation() {
+            const originalText = const originalText = appData.dictationText;
+            appData.dictationText;
+            const userText = appData.userInput const userText = appData.userInput;
             
-            // Préparation des textes pour comparaison
+            // Préparation des textes pour comparaison;
+            
+            // Préparation des textes pour
+            const originalWords = originalText.toLowerCase().replace(/[.,!?;: comparaison
             const originalWords = originalText.toLowerCase().replace(/[.,!?;:]/g, '').split(/\s+/);
-            const userWords = userText.toLowerCase().replace(/[.,!?;:]/g, '').split(/\s+/);
+]/g, '').split(/\s+/);
+            const userWords =            const userWords = userText.toLowerCase().replace(/[.,!?;:]/g, '').split(/\s+/);
+            
+            // userText.toLowerCase().replace(/[.,!?;:]/g, '').split(/\s+/ Calcul du score
+            const totalWords = originalWords.length;
+            let errorCount =);
             
             // Calcul du score
             const totalWords = originalWords.length;
             let errorCount = 0;
             
             // Comparaison mot par mot
-            const maxLength = Math.max(originalWords.length, userWords.length);
+            const 0;
+            
+            // Comparaison mot par mot
+            const maxLength maxLength = Math.max( = Math.max(originalWords.length, userWords.length);
+            let userTextWithErrors = '';
+            let correctTextDisplay =originalWords.length, userWords.length);
             let userTextWithErrors = '';
             let correctTextDisplay = '';
             
-            for (let i = 0; i < maxLength; i++) {
+            for (let i = 0 '';
+            
+            for (let i = 0; i < maxLength; i++); i < maxLength; i++) {
+                const original {
                 const originalWord = originalWords[i] || '';
+                const userWord = userWords[iWord = originalWords[i] || '';
                 const userWord = userWords[i] || '';
+                
+] || '';
                 
                 if (originalWord !== userWord) {
                     errorCount++;
-                    userTextWithErrors += `<span class="error">${userWord || '[manquant]'}</span> `;
+                if (originalWord !==                    userTextWithErrors += `<span class="error">${userWord || '[manquant] userWord) {
+                    errorCount++;
+                    userTextWithErrors += `<span class="error">${userWord || '[manquant]'}</span>'}</span> `;
                 } else {
                     userTextWithErrors += `${userWord} `;
+                } else {
+                    userTextWithErrors += `${userWord} `;
+ `;
                 }
                 
                 correctTextDisplay += `${originalWord} `;
             }
             
+            // Calcul du score en                }
+                
+                correctTextDisplay += `${originalWord} `;
+            }
+            
             // Calcul du score en pourcentage
-            const score = Math.max(0, ((totalWords - errorCount) / totalWords) * 100);
+            const score = Math.max pourcentage
+            const score = Math.max(0, ((totalWords - errorCount)(0, ((totalWords - errorCount) / totalWords) *  / totalWords) * 100);
             
             // Affichage des résultats
-            document.getElementById('user-text-with-errors').innerHTML = userTextWithErrors;
-            document.getElementById('correct-text').textContent = correctTextDisplay;
+            document100);
+            
+            // Affichage des résultats
+            document.getElementById('user-text-with-errors')..getElementById('user-text-with-errors').innerHTML = userTextWithErrors;
+            document.getElementByIdinnerHTML = userTextWithErrors;
+            document.getElementById('correct-text').textContent = correct('correct-text').textContentTextDisplay;
+            document = correctTextDisplay;
             document.getElementById('total-words').textContent = totalWords;
             document.getElementById('error-count').textContent = errorCount;
-            document.getElementById('final-score').textContent = score.toFixed(1);
+            document.getElementById('final-score.getElementById('total-words').textContent = totalWords;
+            document.getElementById('error-count').textContent = errorCount;
+            document.getElementById('final-score').textContent = score.toFixed(').textContent = score.toFixed(1);
+            document.getElementById('score-value').textContent =1);
             document.getElementById('score-value').textContent = score.toFixed(1);
             
+            // Sauvegarde dans l'histor score.toFixed(1);
+            
             // Sauvegarde dans l'historique
+            saveToHistory(score, errorCount, totalWords);
+            
+            showScreen('correctionique
             saveToHistory(score, errorCount, totalWords);
             
             showScreen('correction-screen');
         }
 
+        // Sauveg-screen');
+        }
+
         // Sauvegarde dans l'historique
-        function saveToHistory(score, errors, totalWords) {
-            const historyEntry = {
-                date: new Date().toLocaleDateString('fr-FR'),
-                player: appData.playerName,
-                score: score,
-                errors: errors,
-                totalWords: totalWords
-            };
+        function saveToarde dans l'historique
+        function saveToHistory(score, errors, totalHistory(score, errors, totalWords) {
+            constWords) {
+            const playerName = appData.playerName;
             
-            appData.history.unshift(historyEntry);
+            // Initialiser l' playerName = appData.playerName;
             
-            // Garder seulement les 50 dernières entrées
-            if (appData.history.length > 50) {
-                appData.history = appData.history.slice(0, 50);
+            // Initialiser l'historique du joueur s'il n'existehistorique du joueur s'il n'existe pas
+            if (!appData.h pas
+            if (!appData.history[playerName]) {
+                appData.history[playerName]) {
+                appData.history[playerName]istory[playerName] = [];
             }
             
+            const historyEntry = {
+                date: new Date().toLocaleDateString('fr = [];
+            }
+            
+            const historyEntry = {
+                date: new Date().toLocaleDateString('fr-FR'),
+                player: playerName-FR'),
+                player: playerName,
+                score: score,
+                errors: errors,
+                score: score,
+                errors: errors,
+                totalWords,
+                totalWords: totalWords,
+                mode: appData.currentMode
+            };
+            
+           : totalWords,
+                mode: appData.currentMode
+            };
+            
+            appData.history[playerName]. appData.history[playerName].unshift(historyEntry);
+            
+            // Garderunshift(historyEntry);
+            
+            // Garder seulement les 20 dernières entrées par joueur
+            seulement les 20 dernières entrées par joueur
+            if (appData.history[playerName].length >  if (appData.history[playerName].length > 20) {
+               20) {
+                appData.history[playerName] = appData.history[playerName appData.history[playerName] = appData.history[playerName].slice(0, 20);
+            }
+].slice(0, 20);
+            }
+            
+            // Sauveg            
             // Sauvegarde dans le localStorage
+            localStorage.setItem('dictationHistory', JSONarde dans le localStorage
             localStorage.setItem('dictationHistory', JSON.stringify(appData.history));
+            
+            updateHistory.stringify(appData.history));
             
             updateHistoryDisplay();
         }
 
-        // Mise à jour de l'affichage de l'historique
+        // MiseDisplay();
+        }
+
+        // Mise à jour de l'affichage de l'histor à jour de l'affichage de l'historique
+        function updateHistoryDisplay() {
+            const historyList = documentique
         function updateHistoryDisplay() {
             const historyList = document.getElementById('history-list');
+           .getElementById('history-list');
+            const playerName = document.getElementById('player-name const playerName = document.getElementById('player-name').value.trim() || 'Invité';
+            
+            historyList').value.trim() || 'Invité';
+            
             historyList.innerHTML = '';
             
-            if (appData.history.length === 0) {
-                historyList.innerHTML = '<p>Aucun historique pour le moment.</p>';
+            if (!appData.innerHTML = '';
+            
+            if (!appData.history[playerName] || appData.history[player.history[playerName] || appData.history[playerName].length === 0) {
+Name].length === 0) {
+                historyList.innerHTML = '<p>Aucun                historyList.innerHTML = '<p>Aucun historique pour le moment.</p>';
                 return;
             }
             
-            appData.history.forEach(entry => {
+            historique pour le moment.</p>';
+                return;
+            }
+            
+            appData.history[playerName].forEach(entry => appData.history[playerName].forEach(entry => {
+                const historyItem = {
                 const historyItem = document.createElement('div');
+                historyItem.className = ' document.createElement('div');
                 historyItem.className = 'history-item';
                 historyItem.innerHTML = `
+                    <divhistory-item';
+                historyItem.innerHTML = `
                     <div>
-                        <strong>${entry.date}</strong> - ${entry.player}
+                        <strong>${entry.date}</strong> - ${>
+                        <strong>${entry.date}</strong> - ${entry.mode}
+                    </diventry.mode}
                     </div>
                     <div>
-                        Score: ${entry.score.toFixed(1)}% (${entry.errors} erreurs / ${entry.totalWords} mots)
+                        Score: ${entry.score.to>
+                    <div>
+                        Score: ${entry.score.toFixed(1)}% (${entry.errors} erreursFixed(1)}% (${entry.errors} erreurs / ${entry.totalWords} mots)
+                    </div>
+                ` / ${entry.totalWords} mots)
                     </div>
                 `;
                 historyList.appendChild(historyItem);
             });
         }
 
-        // Génération du calendrier
+        // Génération du calend;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+       rier
+        function generateCalendar() {
+            const calendarDisplay = document.getElementById('calendar-display // Génération du calendrier
         function generateCalendar() {
             const calendarDisplay = document.getElementById('calendar-display');
             const today = new Date();
+            const currentMonth = today.getMonth');
+            const today = new Date();
             const currentMonth = today.getMonth();
+            const current();
             const currentYear = today.getFullYear();
             
+           Year = today.getFullYear();
+            
             // Premier jour du mois
+            const firstDay = new Date(currentYear, current // Premier jour du mois
             const firstDay = new Date(currentYear, currentMonth, 1);
             // Dernier jour du mois
+Month, 1);
+            // Dernier jour du            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            
+ mois
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             
             let calendarHTML = '<div class="calendar">';
-            calendarHTML += `<h3>${firstDay.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>`;
-            calendarHTML += '<div class="calendar-grid">';
+            calendarHTML +=            let calendarHTML = '<div class="calendar">';
+            calendarHTML += `<h3>${firstDay.to `<h3>${firstDay.toLocaleDateString('fr-FR', { month:LocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>`;
+            'long', year: 'numeric' })}</h3>`;
+            calendarHTML += '<div class="calendar-grid calendarHTML += '<div class="calendar-grid">';
+            
+            // Jours de la semaine">';
             
             // Jours de la semaine
-            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            const days = ['Lun', 'Mar', 'Mer
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', '', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            days.forEach(day =>Dim'];
             days.forEach(day => {
+                calendarHTML += `<div class="calendar-header">${day}</div {
                 calendarHTML += `<div class="calendar-header">${day}</div>`;
             });
             
-            // Cases vides avant le premier jour
-            const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Ajustement pour lundi=0
-            for (let i = 0; i < firstDayOfWeek; i++) {
+            // Cases vides>`;
+            });
+            
+            avant le premier jour
+            const firstDayOfWeek = firstDay.getDay() === 0 ? // Cases vides avant le premier jour
+            const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // 6 : firstDay.getDay() - 1; // Ajustement pour lundi=0
+            for (let i =  Ajustement pour lundi=0
+            for (let i = 0; i < firstDayOfWeek; i0; i < firstDayOfWeek; i++) {
                 calendarHTML += '<div class="calendar-day empty"></div>';
+++) {
+                calendarHTML += '<div class="calendar-day empty"></div>';
+            }
             }
             
             // Jours du mois
+            for (let day = 1; day <= lastDay.get            
+            // Jours du mois
             for (let day = 1; day <= lastDay.getDate(); day++) {
-                const date = new Date(currentYear, currentMonth, day);
+                const date = new Date(currentYear,Date(); day++) {
+                const date = new currentMonth, day);
                 const dayOfWeek = date.getDay();
-                const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5; // Lundi à vendredi
+                const isWeekday = dayOfWeek >= Date(currentYear, currentMonth, day);
+                const dayOfWeek = date.getDay();
+                const isWeekday = day 1 && dayOfWeek <= 5; // Lundi à vendredi
+                const isToday = date.toOfWeek >= 1 && dayOfWeek <= 5; // Lundi à vendredi
                 const isToday = date.toDateString() === today.toDateString();
-                const hasPractice = appData.history.some(entry => 
-                    entry.date === date.toLocaleDateString('fr-FR')
-                );
+                const playerDateString() === today.toDateString();
+                const playerName = documentName = document.getElementById('player-name').value.trim() || 'Invité';
+                const hasPractice = appData.history.getElementById('player-name').value.trim() || 'Invité[playerName] && 
+                    appData.history[playerName].some(entry => 
+';
+                const hasPractice = appData.history[playerName] && 
+                    appData.history[playerName].some(entry => 
+                        entry.date === date.toLocaleDateString('fr-FR')
+                    );
+                
+                                       entry.date === date.toLocaleDateString('fr-FR')
+                    );
                 
                 let dayClass = 'calendar-day';
+                if let dayClass = 'calendar-day';
                 if (isToday) dayClass += ' today';
+                if (hasPractice) (isToday) dayClass += ' today';
                 if (hasPractice) dayClass += ' practiced';
                 
+                dayClass += ' practiced';
+                
                 calendarHTML += `<div class="${dayClass}">`;
+                calendarHTML += calendarHTML += `<div class="${dayClass}">`;
                 calendarHTML += `<span>${day}</span>`;
+                `<span>${day}</span>`;
                 if (isWeekday) {
-                    calendarHTML += '<div class="practice-indicator">★</div>';
+                    calendarHTML if (isWeekday) {
+                    calendarHTML += '< += '<div class="practice-indicator">★</div>';
+                }
+                calendarHTML +=div class="practice-indicator">★</div>';
                 }
                 calendarHTML += '</div>';
+            }
+            
+            calendarHTML += '</div>';
             }
             
             calendarHTML += '</div></div>';
