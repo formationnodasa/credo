@@ -127,6 +127,12 @@
       transform: translateY(0);
     }
     
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
     .theme-toggle {
       position: fixed;
       top: 20px;
@@ -182,6 +188,21 @@
       margin-bottom: 15px;
     }
     
+    .loading {
+      text-align: center;
+      padding: 30px;
+    }
+    
+    .spinner {
+      border: 4px solid var(--accent-color);
+      border-left: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
     .confetti {
       position: fixed;
       width: 10px;
@@ -224,6 +245,11 @@
       100% { transform: scale(1); }
     }
     
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
     footer {
       margin-top: auto;
       text-align: center;
@@ -250,11 +276,18 @@
     <div id="message-form" class="message-form">
       <form id="anonymous-form">
         <div class="form-group">
-          <label for="message">Votre message :</label>
+          <label for="message">Votre message anonyme :</label>
           <textarea id="message" name="message" placeholder="Tapez votre message ici..." required></textarea>
         </div>
-        <button type="submit" class="submit-btn">Envoyer anonymement</button>
+        <button type="submit" class="submit-btn" id="submit-btn">
+          Envoyer anonymement
+        </button>
       </form>
+    </div>
+    
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Envoi de votre message en cours...</p>
     </div>
     
     <div id="confirmation" class="confirmation hidden">
@@ -263,31 +296,90 @@
       <p>Votre message a été envoyé avec succès de manière anonyme.</p>
       <button class="submit-btn" onclick="resetForm()">Envoyer un autre message</button>
     </div>
+    
+    <div id="error" class="confirmation hidden" style="color: #ff6b6b;">
+      <div class="logo">❌</div>
+      <h2>Erreur d'envoi</h2>
+      <p id="error-message">Une erreur s'est produite lors de l'envoi.</p>
+      <button class="submit-btn" onclick="resetForm()">Réessayer</button>
+    </div>
   </div>
   
   <footer>©️ Messages Anonymes 2025</footer>
   
   <script>
+    // REMPLACEZ CETTE URL PAR L'URL DE VOTRE GOOGLE FORM
+    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/VOTRE_ID_GOOGLE_FORM/formResponse';
+    // REMPLACEZ CETTE VALEUR PAR LE NOM DU CHAMP DE VOTRE GOOGLE FORM
+    const MESSAGE_FIELD = 'entry.123456789'; // Remplacez par l'ID de votre champ message
+
     function toggleMode() {
       document.body.classList.toggle("dark-mode");
       document.body.classList.toggle("light-mode");
     }
     
-    document.getElementById('anonymous-form').addEventListener('submit', function(e) {
+    document.getElementById('anonymous-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      // Animation de confettis
-      createConfetti();
+      const message = document.getElementById('message').value;
+      const submitBtn = document.getElementById('submit-btn');
       
-      // Afficher la confirmation
+      // Désactiver le bouton pendant l'envoi
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Envoi en cours...';
+      
+      // Afficher le loader
       document.getElementById('message-form').classList.add('hidden');
-      document.getElementById('confirmation').classList.remove('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+      
+      try {
+        // Envoyer le message au Google Form
+        await sendToGoogleForm(message);
+        
+        // Animation de confettis
+        createConfetti();
+        
+        // Afficher la confirmation
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('confirmation').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('error-message').textContent = 
+          'Impossible d\'envoyer le message. Vérifiez votre connexion internet.';
+      }
     });
+    
+    async function sendToGoogleForm(message) {
+      const formData = new FormData();
+      formData.append(MESSAGE_FIELD, message);
+      
+      // Ajouter un timestamp pour éviter la mise en cache
+      formData.append('submit', 'Submit');
+      
+      const response = await fetch(GOOGLE_FORM_URL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // Important pour Google Forms
+      });
+      
+      // En mode no-cors, nous ne pouvons pas vérifier la réponse
+      // Mais l'envoi devrait fonctionner
+      return response;
+    }
     
     function resetForm() {
       document.getElementById('anonymous-form').reset();
       document.getElementById('confirmation').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
       document.getElementById('message-form').classList.remove('hidden');
+      
+      // Réactiver le bouton
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Envoyer anonymement';
     }
     
     function createConfetti() {
