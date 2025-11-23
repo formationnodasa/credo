@@ -5,259 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Messages Anonymes</title>
   <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #000000;
-      --primary-color: #6d28d9;
-      --secondary-color: #8b5cf6;
-      --accent-color: #c4b5fd;
-    }
-    
-    body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #f1f1f1;
-      --primary-color: #8b5cf6;
-      --secondary-color: #a78bfa;
-      --accent-color: #c4b5fd;
-    }
-    
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.5s, color 0.5s;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--bg-color) 0%, var(--accent-color) 100%);
-    }
-    
-    .container {
-      max-width: 600px;
-      width: 100%;
-      margin-top: 40px;
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      animation: fadeInDown 1s ease;
-    }
-    
-    .logo {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      animation: pulse 2s infinite;
-    }
-    
-    h1 {
-      color: var(--primary-color);
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .subtitle {
-      font-size: 1.2rem;
-      opacity: 0.8;
-    }
-    
-    .message-form {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      animation: slideUp 1s ease;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    
-    textarea {
-      width: 100%;
-      padding: 15px;
-      border-radius: 10px;
-      border: 2px solid var(--accent-color);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-color);
-      font-size: 1rem;
-      resize: vertical;
-      min-height: 120px;
-      transition: all 0.3s;
-    }
-    
-    textarea:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2);
-    }
-    
-    .submit-btn {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .submit-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    }
-    
-    .submit-btn:active {
-      transform: translateY(0);
-    }
-    
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-    }
-    
-    .toggle-switch {
-      width: 60px;
-      height: 30px;
-      background-color: #ccc;
-      border-radius: 30px;
-      position: relative;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    
-    .toggle-switch::before {
-      content: "";
-      position: absolute;
-      width: 26px;
-      height: 26px;
-      left: 2px;
-      top: 2px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
-    }
-    
-    input:checked + .toggle-switch {
-      background-color: var(--primary-color);
-    }
-    
-    input:checked + .toggle-switch::before {
-      transform: translateX(30px);
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .confirmation {
-      text-align: center;
-      padding: 30px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 1s ease;
-    }
-    
-    .confirmation h2 {
-      color: var(--primary-color);
-      margin-bottom: 15px;
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 30px;
-    }
-    
-    .spinner {
-      border: 4px solid var(--accent-color);
-      border-left: 4px solid var(--primary-color);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-    
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      background-color: var(--primary-color);
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    footer {
-      margin-top: auto;
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-      color: var(--text-color);
-      opacity: 0.7;
-    }
+    /* Gardez tous les styles précédents */
+    /* ... */
   </style>
 </head>
 <body class="light-mode">
@@ -273,144 +22,49 @@
       <p class="subtitle">Exprimez-vous librement, en toute confidentialité</p>
     </div>
     
-    <div id="message-form" class="message-form">
+    <div class="message-form">
       <form id="anonymous-form">
         <div class="form-group">
           <label for="message">Votre message anonyme :</label>
           <textarea id="message" name="message" placeholder="Tapez votre message ici..." required></textarea>
         </div>
-        <button type="submit" class="submit-btn" id="submit-btn">
+        <button type="submit" class="submit-btn">
           Envoyer anonymement
         </button>
       </form>
-    </div>
-    
-    <div id="loading" class="loading hidden">
-      <div class="spinner"></div>
-      <p>Envoi de votre message en cours...</p>
-    </div>
-    
-    <div id="confirmation" class="confirmation hidden">
-      <div class="logo">✅</div>
-      <h2>Message envoyé !</h2>
-      <p>Votre message a été envoyé avec succès de manière anonyme.</p>
-      <button class="submit-btn" onclick="resetForm()">Envoyer un autre message</button>
-    </div>
-    
-    <div id="error" class="confirmation hidden" style="color: #ff6b6b;">
-      <div class="logo">❌</div>
-      <h2>Erreur d'envoi</h2>
-      <p id="error-message">Une erreur s'est produite lors de l'envoi.</p>
-      <button class="submit-btn" onclick="resetForm()">Réessayer</button>
     </div>
   </div>
   
   <footer>©️ Messages Anonymes 2025</footer>
   
   <script>
-    // REMPLACEZ CETTE URL PAR L'URL DE VOTRE GOOGLE FORM
-    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/VOTRE_ID_GOOGLE_FORM/formResponse';
-    // REMPLACEZ CETTE VALEUR PAR LE NOM DU CHAMP DE VOTRE GOOGLE FORM
-    const MESSAGE_FIELD = 'entry.123456789'; // Remplacez par l'ID de votre champ message
-
-    function toggleMode() {
-      document.body.classList.toggle("dark-mode");
-      document.body.classList.toggle("light-mode");
-    }
-    
-    document.getElementById('anonymous-form').addEventListener('submit', async function(e) {
+    document.getElementById('anonymous-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
       const message = document.getElementById('message').value;
-      const submitBtn = document.getElementById('submit-btn');
       
-      // Désactiver le bouton pendant l'envoi
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Envoi en cours...';
-      
-      // Afficher le loader
-      document.getElementById('message-form').classList.add('hidden');
-      document.getElementById('loading').classList.remove('hidden');
-      
-      try {
-        // Envoyer le message au Google Form
-        await sendToGoogleForm(message);
-        
-        // Animation de confettis
-        createConfetti();
-        
-        // Afficher la confirmation
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('confirmation').classList.remove('hidden');
-        
-      } catch (error) {
-        console.error('Erreur:', error);
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('error').classList.remove('hidden');
-        document.getElementById('error-message').textContent = 
-          'Impossible d\'envoyer le message. Vérifiez votre connexion internet.';
+      if (!message.trim()) {
+        alert('Veuillez écrire un message');
+        return;
       }
+      
+      // Ouvrir Gmail avec le message pré-rempli
+      const email = 'dicteeetepellation@gmail.com';
+      const subject = 'Message Anonyme';
+      const body = `Message reçu le ${new Date().toLocaleString('fr-FR')}:\n\n${message}\n\n---\nEnvoyé depuis l'application Messages Anonymes`;
+      
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+      
+      // Réinitialiser le formulaire
+      document.getElementById('anonymous-form').reset();
+      
+      // Afficher un message de confirmation
+      alert('Votre message a été préparé ! Il s\'ouvre dans Gmail. Il vous suffit de cliquer sur "Envoyer".');
     });
     
-    async function sendToGoogleForm(message) {
-      const formData = new FormData();
-      formData.append(MESSAGE_FIELD, message);
-      
-      // Ajouter un timestamp pour éviter la mise en cache
-      formData.append('submit', 'Submit');
-      
-      const response = await fetch(GOOGLE_FORM_URL, {
-        method: 'POST',
-        body: formData,
-        mode: 'no-cors' // Important pour Google Forms
-      });
-      
-      // En mode no-cors, nous ne pouvons pas vérifier la réponse
-      // Mais l'envoi devrait fonctionner
-      return response;
-    }
-    
-    function resetForm() {
-      document.getElementById('anonymous-form').reset();
-      document.getElementById('confirmation').classList.add('hidden');
-      document.getElementById('error').classList.add('hidden');
-      document.getElementById('message-form').classList.remove('hidden');
-      
-      // Réactiver le bouton
-      const submitBtn = document.getElementById('submit-btn');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Envoyer anonymement';
-    }
-    
-    function createConfetti() {
-      const colors = ['#6d28d9', '#8b5cf6', '#c4b5fd', '#a78bfa'];
-      
-      for (let i = 0; i < 50; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        document.body.appendChild(confetti);
-        
-        // Animation
-        const animation = confetti.animate([
-          { 
-            opacity: 1,
-            transform: 'translateY(0) rotate(0deg)'
-          },
-          { 
-            opacity: 0,
-            transform: `translateY(${Math.random() * 300 + 100}px) rotate(${Math.random() * 360}deg)`
-          }
-        ], {
-          duration: Math.random() * 2000 + 1000,
-          easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
-        });
-        
-        animation.onfinish = () => {
-          confetti.remove();
-        };
-      }
+    function toggleMode() {
+      document.body.classList.toggle("dark-mode");
+      document.body.classList.toggle("light-mode");
     }
   </script>
 </body>
