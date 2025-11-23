@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+m<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -706,7 +706,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             return chunks.filter(chunk => chunk !== '');
         }
 
-        // Préparer le texte pour la DEUXIÈME LECTURE (lente avec toutes les ponctuations)
+        // Préparer le texte pour la DEUXIÈME LECTURE (très lente avec toutes les ponctuations)
         function prepareTextForSecondReading(text) {
             const chunks = [];
             
@@ -895,9 +895,9 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     }, 5000);
                     
                 } else if (appData.currentReadingPhase === 2) {
-                    // Fin de la troisième lecture, démarrer le chronomètre
+                    // Fin de la troisième lecture, démarrer le chronomètre avec annonces vocales
                     document.getElementById('reading-status').textContent = 'Dernière lecture terminée - Soumettez votre dictée';
-                    startCountdown();
+                    startCountdownWithVoice();
                 }
                 
                 return;
@@ -940,8 +940,13 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 const utterance = new SpeechSynthesisUtterance(chunk);
                 utterance.lang = 'fr-FR';
                 
-                // Ajuster la vitesse selon la phase - TOUTES les lectures sont lentes maintenant
-                utterance.rate = 0.7; // Vitesse lente pour toutes les lectures
+                // Ajuster la vitesse selon la phase
+                if (appData.currentReadingPhase === 1) {
+                    utterance.rate = 0.5; // Très lent pour la deuxième lecture
+                } else {
+                    utterance.rate = 0.7; // Lent pour les autres lectures
+                }
+                
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
@@ -979,21 +984,50 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             document.getElementById('current-sentence').textContent = '';
         }
 
-        // Démarrer le compte à rebours
-        function startCountdown() {
+        // Démarrer le compte à rebours avec annonces vocales
+        function startCountdownWithVoice() {
             appData.countdownSeconds = 20;
             document.getElementById('timer-container').style.display = 'block';
             document.getElementById('countdown-timer').textContent = appData.countdownSeconds;
+            
+            // Annoncer le début du chronomètre
+            speakCountdown("Il reste 20 secondes");
             
             appData.countdownTimer = setInterval(function() {
                 appData.countdownSeconds--;
                 document.getElementById('countdown-timer').textContent = appData.countdownSeconds;
                 
+                // Annoncer le temps restant à des intervalles spécifiques
+                if (appData.countdownSeconds === 15) {
+                    speakCountdown("15 secondes");
+                } else if (appData.countdownSeconds === 10) {
+                    speakCountdown("10 secondes");
+                } else if (appData.countdownSeconds === 5) {
+                    speakCountdown("5 secondes");
+                } else if (appData.countdownSeconds <= 3 && appData.countdownSeconds > 0) {
+                    speakCountdown(appData.countdownSeconds.toString());
+                }
+                
                 if (appData.countdownSeconds <= 0) {
-                    stopCountdown();
-                    submitDictation();
+                    speakCountdown("Temps écoulé");
+                    setTimeout(() => {
+                        stopCountdown();
+                        submitDictation();
+                    }, 1000);
                 }
             }, 1000);
+        }
+
+        // Fonction pour annoncer le compte à rebours vocalement
+        function speakCountdown(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            }
         }
 
         // Arrêter le compte à rebours
