@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -307,6 +306,18 @@
             border-left: 3px solid gold;
         }
 
+        .timer-container {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.2rem;
+        }
+
+        #countdown-timer {
+            font-weight: bold;
+            color: #ffa726;
+            font-size: 1.4rem;
+        }
+
         /* Animation des étoiles */
         .star {
             position: absolute;
@@ -440,15 +451,17 @@
                     <div id="reading-status" class="reading-status"></div>
                     <div class="action-buttons">
                         <button id="play-dictation" class="btn">Lire la dictée</button>
-                        <button id="pause-dictation" class="btn secondary" disabled>Pause</button>
                         <button id="stop-dictation" class="btn secondary" disabled>Arrêter</button>
                     </div>
                 </div>
                 
                 <div class="section">
                     <h3>Écrivez votre dictée :</h3>
-                    <textarea id="user-input" placeholder="Écrivez votre texte ici..."></textarea>
-                    <button id="submit-dictation" class="btn">Soumettre</button>
+                    <textarea id="user-input" placeholder="Écrivez votre texte ici..." disabled></textarea>
+                    <div id="timer-container" class="timer-container" style="display: none;">
+                        <p>Temps restant pour soumettre : <span id="countdown-timer">20</span> secondes</p>
+                    </div>
+                    <button id="submit-dictation" class="btn" disabled>Soumettre</button>
                 </div>
             </div>
             
@@ -524,6 +537,8 @@
             currentUtterance: null,
             currentChunkIndex: 0,
             dictationChunks: [],
+            countdownTimer: null,
+            countdownSeconds: 20,
             dictationBook: `La rapidité avec laquelle les groupes KA (Kizito-Anuarite) se sont multipliés à Kinshasa, à travers tout le Congo jusqu'aux villages éloignés, et même en dehors du pays, prouve qu'il était urgent de présenter aux enfants et pré-adolescents africains un programme d'éducation chrétienne.
 L'originalité de cette éducation KA est de présenter, non une série de leçons, mais des MODELES capables d'entraîner l'esprit, le cœur, l'enthousiasme de nos jeunes dans un cadre initiatique qui leur est familier. Nous avons une chance fantastique, une grâce même, d'avoir des modèles si proches tels que les MARTYRS DE L'OUGANDA et ANUARITE du Congo.
 Beaucoup de communautés chrétiennes dans le monde pourraient nous envier cette grâce. Mais en profitons-nous assez?
@@ -601,7 +616,6 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             
             // Boutons de dictée
             document.getElementById('play-dictation').addEventListener('click', playDictation);
-            document.getElementById('pause-dictation').addEventListener('click', pauseDictation);
             document.getElementById('stop-dictation').addEventListener('click', stopDictation);
             document.getElementById('submit-dictation').addEventListener('click', submitDictation);
             document.getElementById('new-dictation').addEventListener('click', () => startDictation(appData.currentMode));
@@ -618,6 +632,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
         function showWelcomeScreen() {
             // Arrêter toute lecture en cours
             stopDictation();
+            // Arrêter le chronomètre
+            stopCountdown();
             // Réinitialiser l'interface d'accueil
             document.querySelector('.mode-selection').classList.remove('active');
             document.getElementById('start-btn').style.display = 'block';
@@ -665,33 +681,59 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             return selected;
         }
 
-        // Préparer le texte pour la lecture avec pauses
+        // Préparer le texte pour la lecture avec pauses et répétitions
         function prepareTextForReading(text) {
-            // Séparer le texte en chunks aux ponctuations
             const chunks = [];
-            let currentChunk = '';
             
-            for (let i = 0; i < text.length; i++) {
-                currentChunk += text[i];
-                
-                // Vérifier si on arrive à une ponctuation
-                if (['.', '!', '?', ',', ';', ':'].includes(text[i])) {
-                    // Pour les points, points d'exclamation et points d'interrogation, pause plus longue
-                    if (['.', '!', '?'].includes(text[i])) {
-                        chunks.push(currentChunk.trim());
-                        chunks.push('PAUSE_LONGUE'); // 5 secondes
-                        currentChunk = '';
+            // Ajouter l'instruction initiale
+            chunks.push("Écoutez d'abord la lecture de la dictée");
+            chunks.push("PAUSE_LONGUE");
+            
+            // Séparer le texte en phrases
+            const sentences = text.split(/(?<=[.!?])\s+/);
+            
+            for (let sentence of sentences) {
+                if (sentence.trim()) {
+                    // Vérifier si la phrase a plus de 8 mots
+                    const words = sentence.trim().split(/\s+/);
+                    if (words.length > 8) {
+                        // Répéter la phrase
+                        chunks.push(sentence.trim());
+                        chunks.push("PAUSE_COURTE");
+                        chunks.push("Je répète");
+                        chunks.push("PAUSE_COURTE");
+                        chunks.push(sentence.trim());
+                        chunks.push("PAUSE_LONGUE");
                     } else {
-                        chunks.push(currentChunk.trim());
-                        chunks.push('PAUSE_COURTE'); // 2 secondes
-                        currentChunk = '';
+                        chunks.push(sentence.trim());
+                        chunks.push("PAUSE_LONGUE");
                     }
                 }
             }
             
-            // Ajouter le dernier chunk s'il reste du texte
-            if (currentChunk.trim()) {
-                chunks.push(currentChunk.trim());
+            // Ajouter l'instruction de préparation
+            chunks.push("Préparez-vous à écrire");
+            chunks.push("PAUSE_LONGUE");
+            
+            return chunks.filter(chunk => chunk !== '');
+        }
+
+        // Préparer le texte pour la relecture finale
+        function prepareTextForFinalReading(text) {
+            const chunks = [];
+            
+            // Ajouter l'instruction
+            chunks.push("Je prends une dernière fois la lecture pour que vous puissiez corriger vos fautes");
+            chunks.push("PAUSE_LONGUE");
+            
+            // Séparer le texte en phrases
+            const sentences = text.split(/(?<=[.!?])\s+/);
+            
+            for (let sentence of sentences) {
+                if (sentence.trim()) {
+                    chunks.push(sentence.trim());
+                    chunks.push("PAUSE_LONGUE");
+                }
             }
             
             return chunks.filter(chunk => chunk !== '');
@@ -710,7 +752,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             appData.currentParagraphs = selectRandomParagraphs();
             appData.dictationText = appData.currentParagraphs.join('\n\n');
             
-            // Préparer les chunks pour la lecture
+            // Préparer les chunks pour la lecture initiale
             appData.dictationChunks = prepareTextForReading(appData.dictationText);
             appData.currentChunkIndex = 0;
             
@@ -718,11 +760,13 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             document.getElementById('current-mode').textContent = mode === 'initiation' ? 'Initiation' : 'Bible';
             document.getElementById('text-to-dictate').textContent = appData.dictationText;
             document.getElementById('user-input').value = '';
+            document.getElementById('user-input').disabled = true;
             document.getElementById('reading-status').textContent = '';
             document.getElementById('current-sentence').textContent = '';
             document.getElementById('play-dictation').disabled = false;
-            document.getElementById('pause-dictation').disabled = true;
             document.getElementById('stop-dictation').disabled = true;
+            document.getElementById('submit-dictation').disabled = true;
+            document.getElementById('timer-container').style.display = 'none';
             
             showScreen('dictation-screen');
         }
@@ -735,7 +779,6 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             if ('speechSynthesis' in window) {
                 appData.isReading = true;
                 document.getElementById('play-dictation').disabled = true;
-                document.getElementById('pause-dictation').disabled = false;
                 document.getElementById('stop-dictation').disabled = false;
                 
                 readNextChunk();
@@ -747,13 +790,19 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
         // Lecture du chunk suivant
         function readNextChunk() {
             if (appData.currentChunkIndex >= appData.dictationChunks.length || !appData.isReading) {
-                // Fin de la lecture
+                // Fin de la lecture initiale
                 appData.isReading = false;
                 document.getElementById('play-dictation').disabled = false;
-                document.getElementById('pause-dictation').disabled = true;
                 document.getElementById('stop-dictation').disabled = true;
-                document.getElementById('reading-status').textContent = 'Lecture terminée';
+                document.getElementById('reading-status').textContent = 'Lecture terminée - Préparez-vous à écrire';
                 document.getElementById('current-sentence').textContent = '';
+                
+                // Activer la zone de texte
+                document.getElementById('user-input').disabled = false;
+                document.getElementById('submit-dictation').disabled = false;
+                
+                // Démarrer la relecture finale après un délai
+                setTimeout(startFinalReading, 3000);
                 return;
             }
             
@@ -793,7 +842,6 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     console.error('Erreur de synthèse vocale:', event);
                     appData.isReading = false;
                     document.getElementById('play-dictation').disabled = false;
-                    document.getElementById('pause-dictation').disabled = true;
                     document.getElementById('stop-dictation').disabled = true;
                     document.getElementById('reading-status').textContent = 'Erreur de lecture';
                     document.getElementById('current-sentence').textContent = '';
@@ -804,14 +852,71 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
         }
 
-        // Mettre en pause la lecture
-        function pauseDictation() {
-            if (appData.isReading) {
-                speechSynthesis.pause();
+        // Démarrer la relecture finale
+        function startFinalReading() {
+            if (!appData.isReading) {
+                appData.dictationChunks = prepareTextForFinalReading(appData.dictationText);
+                appData.currentChunkIndex = 0;
+                appData.isReading = true;
+                
+                readNextChunkFinal();
+            }
+        }
+
+        // Lecture du chunk suivant pour la relecture finale
+        function readNextChunkFinal() {
+            if (appData.currentChunkIndex >= appData.dictationChunks.length || !appData.isReading) {
+                // Fin de la relecture finale
                 appData.isReading = false;
-                document.getElementById('play-dictation').disabled = false;
-                document.getElementById('pause-dictation').disabled = true;
-                document.getElementById('reading-status').textContent = 'Lecture en pause';
+                document.getElementById('reading-status').textContent = 'Relecture terminée - Soumettez votre dictée';
+                document.getElementById('current-sentence').textContent = '';
+                
+                // Démarrer le chronomètre de 20 secondes
+                startCountdown();
+                return;
+            }
+            
+            const chunk = appData.dictationChunks[appData.currentChunkIndex];
+            document.getElementById('reading-status').textContent = `Relecture finale... (${appData.currentChunkIndex + 1}/${appData.dictationChunks.length})`;
+            
+            if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE') {
+                // Pause
+                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 5000 : 2000;
+                document.getElementById('reading-status').textContent = `Pause... (${appData.currentChunkIndex + 1}/${appData.dictationChunks.length})`;
+                document.getElementById('current-sentence').textContent = '';
+                
+                setTimeout(() => {
+                    if (appData.isReading) {
+                        appData.currentChunkIndex++;
+                        readNextChunkFinal();
+                    }
+                }, pauseDuration);
+            } else {
+                // Lecture du texte
+                document.getElementById('current-sentence').textContent = chunk;
+                
+                const utterance = new SpeechSynthesisUtterance(chunk);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.7;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                utterance.onend = function() {
+                    if (appData.isReading) {
+                        appData.currentChunkIndex++;
+                        readNextChunkFinal();
+                    }
+                };
+                
+                utterance.onerror = function(event) {
+                    console.error('Erreur de synthèse vocale:', event);
+                    appData.isReading = false;
+                    document.getElementById('reading-status').textContent = 'Erreur de lecture';
+                    document.getElementById('current-sentence').textContent = '';
+                };
+                
+                speechSynthesis.speak(utterance);
+                appData.currentUtterance = utterance;
             }
         }
 
@@ -821,10 +926,35 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             appData.isReading = false;
             appData.currentChunkIndex = 0;
             document.getElementById('play-dictation').disabled = false;
-            document.getElementById('pause-dictation').disabled = true;
             document.getElementById('stop-dictation').disabled = true;
             document.getElementById('reading-status').textContent = 'Lecture arrêtée';
             document.getElementById('current-sentence').textContent = '';
+        }
+
+        // Démarrer le compte à rebours
+        function startCountdown() {
+            appData.countdownSeconds = 20;
+            document.getElementById('timer-container').style.display = 'block';
+            document.getElementById('countdown-timer').textContent = appData.countdownSeconds;
+            
+            appData.countdownTimer = setInterval(function() {
+                appData.countdownSeconds--;
+                document.getElementById('countdown-timer').textContent = appData.countdownSeconds;
+                
+                if (appData.countdownSeconds <= 0) {
+                    stopCountdown();
+                    submitDictation();
+                }
+            }, 1000);
+        }
+
+        // Arrêter le compte à rebours
+        function stopCountdown() {
+            if (appData.countdownTimer) {
+                clearInterval(appData.countdownTimer);
+                appData.countdownTimer = null;
+            }
+            document.getElementById('timer-container').style.display = 'none';
         }
 
         // Soumission de la dictée
@@ -837,6 +967,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             
             // Arrêter la lecture si elle est en cours
             stopDictation();
+            // Arrêter le chronomètre
+            stopCountdown();
             
             appData.userInput = userInput;
             correctDictation();
