@@ -331,6 +331,51 @@
             50% { opacity: 1; }
         }
 
+        /* Animation vocale */
+        .voice-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 60px;
+        }
+
+        .voice-bar {
+            width: 8px;
+            height: 20px;
+            background: linear-gradient(to top, #6a11cb, #2575fc);
+            border-radius: 4px;
+            animation: voicePulse 1.5s infinite ease-in-out;
+        }
+
+        .voice-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.4s; }
+        .voice-bar:nth-child(6) { animation-delay: 0.5s; }
+        .voice-bar:nth-child(7) { animation-delay: 0.6s; }
+        .voice-bar:nth-child(8) { animation-delay: 0.7s; }
+
+        @keyframes voicePulse {
+            0%, 100% { 
+                transform: scaleY(0.5);
+                opacity: 0.5;
+            }
+            50% { 
+                transform: scaleY(2);
+                opacity: 1;
+            }
+        }
+
         /* Styles pour le calendrier */
         .calendar {
             background: rgba(255, 255, 255, 0.05);
@@ -446,7 +491,19 @@
             <div class="dictation-container">
                 <div class="section">
                     <h3>Écoutez attentivement :</h3>
-                    <div id="text-to-dictate" class="text-display"></div>
+                    <div id="text-to-dictate" class="text-display" style="display: none;"></div>
+                    <div id="voice-animation" class="voice-animation" style="display: none;">
+                        <div class="voice-wave">
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                            <div class="voice-bar"></div>
+                        </div>
+                    </div>
                     <div id="current-sentence" class="current-sentence"></div>
                     <div id="reading-status" class="reading-status"></div>
                     <div class="action-buttons">
@@ -820,6 +877,10 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('play-dictation').textContent = 'Première lecture';
             
+            // Cacher le texte et montrer l'animation vocale
+            document.getElementById('text-to-dictate').style.display = 'none';
+            document.getElementById('voice-animation').style.display = 'none';
+            
             showScreen('dictation-screen');
         }
 
@@ -832,6 +893,10 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 appData.isReading = true;
                 document.getElementById('play-dictation').disabled = true;
                 document.getElementById('stop-dictation').disabled = false;
+                
+                // Afficher l'animation vocale et cacher le texte
+                document.getElementById('voice-animation').style.display = 'flex';
+                document.getElementById('text-to-dictate').style.display = 'none';
                 
                 // Préparer le texte selon la phase de lecture
                 switch(appData.currentReadingPhase) {
@@ -864,6 +929,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 document.getElementById('play-dictation').disabled = false;
                 document.getElementById('stop-dictation').disabled = true;
                 document.getElementById('current-sentence').textContent = '';
+                document.getElementById('voice-animation').style.display = 'none';
                 
                 // Gérer la transition automatique entre les phases
                 if (appData.currentReadingPhase === 0) {
@@ -942,7 +1008,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 
                 // Ajuster la vitesse selon la phase
                 if (appData.currentReadingPhase === 1) {
-                    utterance.rate = 0.35; // Extrêmement lent pour la deuxième lecture (35% de la vitesse normale)
+                    utterance.rate = 0.25; // Extrêmement lent pour la deuxième lecture (25% de la vitesse normale)
                 } else {
                     utterance.rate = 0.7; // Lent pour les autres lectures
                 }
@@ -964,6 +1030,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     document.getElementById('stop-dictation').disabled = true;
                     document.getElementById('reading-status').textContent = 'Erreur de lecture';
                     document.getElementById('current-sentence').textContent = '';
+                    document.getElementById('voice-animation').style.display = 'none';
                 };
                 
                 // Annuler toute lecture en cours avant de démarrer une nouvelle
@@ -982,6 +1049,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             document.getElementById('stop-dictation').disabled = true;
             document.getElementById('reading-status').textContent = 'Lecture arrêtée';
             document.getElementById('current-sentence').textContent = '';
+            document.getElementById('voice-animation').style.display = 'none';
         }
 
         // Démarrer le compte à rebours avec annonces vocales
