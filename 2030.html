@@ -682,7 +682,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             return selected;
         }
 
-        // Préparer le texte pour la PREMIÈRE LECTURE (lente, pause après points)
+        // Préparer le texte pour la PREMIÈRE LECTURE (lente)
         function prepareTextForFirstReading(text) {
             const chunks = [];
             
@@ -711,7 +711,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             const chunks = [];
             
             // Instruction de début
-            chunks.push("Deuxième lecture, écoutez attentivement");
+            chunks.push("Deuxième lecture, écrivez maintenant");
             chunks.push("PAUSE_LONGUE");
             
             // Traiter chaque phrase avec prononciation des ponctuations
@@ -732,22 +732,10 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     
                     chunks.push(processedSentence.trim());
                     
-                    // Vérifier si la phrase a plus de 8 mots
-                    const words = sentence.trim().split(/\s+/);
-                    if (words.length > 8) {
-                        chunks.push("PAUSE_COURTE");
-                        chunks.push("Je répète");
-                        chunks.push("PAUSE_COURTE");
-                        chunks.push(processedSentence.trim());
-                    }
-                    
+                    // Pause après chaque phrase
                     chunks.push("PAUSE_LONGUE");
                 }
             }
-            
-            // Instruction de fin
-            chunks.push("Préparez-vous à écrire");
-            chunks.push("PAUSE_LONGUE");
             
             return chunks.filter(chunk => chunk !== '');
         }
@@ -813,6 +801,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             document.getElementById('stop-dictation').disabled = true;
             document.getElementById('submit-dictation').disabled = true;
             document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('play-dictation').textContent = 'Première lecture';
             
             showScreen('dictation-screen');
         }
@@ -835,7 +824,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         break;
                     case 1: // Deuxième lecture
                         appData.dictationChunks = prepareTextForSecondReading(appData.dictationText);
-                        document.getElementById('reading-status').textContent = 'Deuxième lecture - Dictée détaillée';
+                        document.getElementById('reading-status').textContent = 'Deuxième lecture - Écrivez maintenant';
                         break;
                     case 2: // Troisième lecture
                         appData.dictationChunks = prepareTextForThirdReading(appData.dictationText);
@@ -867,8 +856,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     
                     setTimeout(() => {
                         document.getElementById('play-dictation').textContent = 'Deuxième lecture';
-                        document.getElementById('reading-status').textContent = 'Prêt pour la deuxième lecture';
-                        // Ouvrir le clavier virtuellement en activant le textarea
+                        document.getElementById('reading-status').textContent = 'Prêt pour la deuxième lecture - Le clavier est activé';
+                        // Activer le textarea et donner le focus
                         document.getElementById('user-input').disabled = false;
                         document.getElementById('user-input').focus();
                     }, 5000);
@@ -901,8 +890,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             
             if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE') {
                 // Pause
-                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 5000 : 1000; // 5 secondes pour PAUSE_LONGUE, 1 seconde pour PAUSE_COURTE
-                document.getElementById('current-sentence').textContent = '';
+                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 2000 : 1000; // 2 secondes pour PAUSE_LONGUE, 1 seconde pour PAUSE_COURTE
+                document.getElementById('current-sentence').textContent = '...';
                 
                 setTimeout(() => {
                     if (appData.isReading) {
@@ -917,13 +906,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 const utterance = new SpeechSynthesisUtterance(chunk);
                 utterance.lang = 'fr-FR';
                 
-                // Ajuster la vitesse selon la phase
-                if (appData.currentReadingPhase === 0) {
-                    utterance.rate = 0.7; // Lente pour la première lecture
-                } else {
-                    utterance.rate = 0.7; // Lente pour les autres lectures aussi
-                }
-                
+                // Ajuster la vitesse selon la phase - TOUTES les lectures sont lentes maintenant
+                utterance.rate = 0.7; // Vitesse lente pour toutes les lectures
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
@@ -943,6 +927,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     document.getElementById('current-sentence').textContent = '';
                 };
                 
+                // Annuler toute lecture en cours avant de démarrer une nouvelle
+                speechSynthesis.cancel();
                 speechSynthesis.speak(utterance);
                 appData.currentUtterance = utterance;
             }
@@ -1162,7 +1148,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
             
             calendarHTML += '</div></div>';
-            calendarDisplay.innerHTML = calendarHTML calendarDisplay.innerHTML = calendarHTML;
+            calendarDisplay.innerHTML = calendarHTML;
         }
     </script>
 </body>
