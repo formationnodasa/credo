@@ -682,9 +682,13 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             return selected;
         }
 
-        // Préparer le texte pour la PREMIÈRE LECTURE (rapide, pause après points)
+        // Préparer le texte pour la PREMIÈRE LECTURE (lente, pause après points)
         function prepareTextForFirstReading(text) {
             const chunks = [];
+            
+            // Instruction de début
+            chunks.push("Première lecture, écoutez attentivement");
+            chunks.push("PAUSE_LONGUE");
             
             // Séparer le texte en phrases
             const sentences = text.split(/(?<=[.!?])\s+/);
@@ -723,7 +727,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         .replace(/;/g, ' point-virgule ')
                         .replace(/:/g, ' deux-points ')
                         .replace(/!/g, ' point d exclamation ')
-                        .replace(/\?/g, ' point d interrogation ');
+                        .replace(/\?/g, ' point d interrogation ')
+                        .replace(/\./g, ' point ');
                     
                     chunks.push(processedSentence.trim());
                     
@@ -755,12 +760,28 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             chunks.push("Dernière lecture pour corriger vos erreurs");
             chunks.push("PAUSE_LONGUE");
             
-            // Lecture normale sans pauses
+            // Lecture avec toutes les ponctuations prononcées
             const sentences = text.split(/(?<=[.!?])\s+/);
             
             for (let sentence of sentences) {
                 if (sentence.trim()) {
-                    chunks.push(sentence.trim());
+                    // Remplacer les ponctuations par leur prononciation
+                    let processedSentence = sentence
+                        .replace(/\(/g, ' parenthèse ouverte ')
+                        .replace(/\)/g, ' parenthèse fermée ')
+                        .replace(/,/g, ' virgule ')
+                        .replace(/;/g, ' point-virgule ')
+                        .replace(/:/g, ' deux-points ')
+                        .replace(/!/g, ' point d exclamation ')
+                        .replace(/\?/g, ' point d interrogation ')
+                        .replace(/\./g, ' point ');
+                    
+                    chunks.push(processedSentence.trim());
+                    
+                    // Pause d'une seconde après chaque point
+                    if (sentence.trim().endsWith('.')) {
+                        chunks.push("PAUSE_COURTE");
+                    }
                 }
             }
             
@@ -840,16 +861,23 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 
                 // Gérer la transition entre les phases
                 if (appData.currentReadingPhase === 0) {
-                    // Fin de la première lecture, passer à la deuxième
+                    // Fin de la première lecture, passer à la deuxième après 5 secondes
                     appData.currentReadingPhase = 1;
-                    document.getElementById('reading-status').textContent = 'Première lecture terminée - Prêt pour la deuxième lecture';
-                    document.getElementById('play-dictation').textContent = 'Deuxième lecture';
+                    document.getElementById('reading-status').textContent = 'Première lecture terminée - Deuxième lecture dans 5 secondes';
+                    
+                    setTimeout(() => {
+                        document.getElementById('play-dictation').textContent = 'Deuxième lecture';
+                        document.getElementById('reading-status').textContent = 'Prêt pour la deuxième lecture';
+                        // Ouvrir le clavier virtuellement en activant le textarea
+                        document.getElementById('user-input').disabled = false;
+                        document.getElementById('user-input').focus();
+                    }, 5000);
+                    
                 } else if (appData.currentReadingPhase === 1) {
-                    // Fin de la deuxième lecture, activer l'écriture
+                    // Fin de la deuxième lecture, activer la soumission
                     appData.currentReadingPhase = 2;
-                    document.getElementById('reading-status').textContent = 'Deuxième lecture terminée - Vous pouvez écrire';
+                    document.getElementById('reading-status').textContent = 'Deuxième lecture terminée - Vous pouvez continuer à écrire';
                     document.getElementById('play-dictation').textContent = 'Dernière lecture';
-                    document.getElementById('user-input').disabled = false;
                     document.getElementById('submit-dictation').disabled = false;
                 } else if (appData.currentReadingPhase === 2) {
                     // Fin de la troisième lecture, démarrer le chronomètre
@@ -873,7 +901,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             
             if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE') {
                 // Pause
-                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 5000 : 1000; // 1 seconde pour PAUSE_COURTE
+                const pauseDuration = chunk === 'PAUSE_LONGUE' ? 5000 : 1000; // 5 secondes pour PAUSE_LONGUE, 1 seconde pour PAUSE_COURTE
                 document.getElementById('current-sentence').textContent = '';
                 
                 setTimeout(() => {
@@ -891,9 +919,9 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 
                 // Ajuster la vitesse selon la phase
                 if (appData.currentReadingPhase === 0) {
-                    utterance.rate = 1.0; // Rapide pour la première lecture
+                    utterance.rate = 0.7; // Lente pour la première lecture
                 } else {
-                    utterance.rate = 0.7; // Lent pour les autres lectures
+                    utterance.rate = 0.7; // Lente pour les autres lectures aussi
                 }
                 
                 utterance.pitch = 1;
@@ -1134,7 +1162,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
             
             calendarHTML += '</div></div>';
-            calendarDisplay.innerHTML = calendarHTML;
+            calendarDisplay.innerHTML = calendarHTML calendarDisplay.innerHTML = calendarHTML;
         }
     </script>
 </body>
