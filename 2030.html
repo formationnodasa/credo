@@ -787,15 +787,15 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         .replace(/\?/g, ' point d interrogation ')
                         .replace(/\./g, ' point ');
                     
-                    // Vérifier si la phrase a 8 mots ou plus
+                    // Vérifier si la phrase a 5 mots ou plus
                     const words = sentence.trim().split(/\s+/);
                     
                     // Ajouter la phrase
                     chunks.push(processedSentence.trim());
                     
-                    // Si la phrase a 8 mots ou plus, ajouter une pause de 5 secondes
-                    if (words.length >= 8) {
-                        chunks.push("PAUSE_5_SECONDS");
+                    // Si la phrase a 5 mots ou plus, ajouter une pause de 3 secondes
+                    if (words.length >= 5) {
+                        chunks.push("PAUSE_3_SECONDS");
                     } else {
                         // Sinon, pause normale
                         chunks.push("PAUSE_LONGUE");
@@ -892,6 +892,16 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             if ('speechSynthesis' in window) {
                 appData.isReading = true;
                 document.getElementById('play-dictation').disabled = true;
+                
+                // Mettre à jour le texte du bouton d'arrêt selon la phase
+                if (appData.currentReadingPhase === 0) {
+                    document.getElementById('stop-dictation').textContent = 'Passer';
+                } else if (appData.currentReadingPhase === 1) {
+                    document.getElementById('stop-dictation').textContent = 'Fin';
+                } else {
+                    document.getElementById('stop-dictation').textContent = 'Arrêter';
+                }
+                
                 document.getElementById('stop-dictation').disabled = false;
                 
                 // Afficher l'animation vocale et cacher le texte
@@ -980,11 +990,11 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
             document.getElementById('reading-status').textContent = `${phaseText}... (${appData.currentChunkIndex + 1}/${appData.dictationChunks.length})`;
             
-            if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE' || chunk === 'PAUSE_5_SECONDS') {
+            if (chunk === 'PAUSE_LONGUE' || chunk === 'PAUSE_COURTE' || chunk === 'PAUSE_3_SECONDS') {
                 // Pause
                 let pauseDuration;
-                if (chunk === 'PAUSE_5_SECONDS') {
-                    pauseDuration = 5000; // 5 secondes
+                if (chunk === 'PAUSE_3_SECONDS') {
+                    pauseDuration = 3000; // 3 secondes
                 } else if (chunk === 'PAUSE_LONGUE') {
                     pauseDuration = 2000; // 2 secondes
                 } else {
@@ -1000,8 +1010,8 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                     }
                 }, pauseDuration);
             } else {
-                // Lecture du texte
-                document.getElementById('current-sentence').textContent = chunk;
+                // Lecture du texte (sans affichage écrit)
+                document.getElementById('current-sentence').textContent = '';
                 
                 const utterance = new SpeechSynthesisUtterance(chunk);
                 utterance.lang = 'fr-FR';
@@ -1040,16 +1050,50 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             }
         }
 
-        // Arrêter la lecture
+        // Arrêter/Passer la lecture
         function stopDictation() {
             speechSynthesis.cancel();
             appData.isReading = false;
+            
+            // Gérer le comportement selon la phase
+            if (appData.currentReadingPhase === 0) {
+                // Passer directement à la deuxième lecture
+                appData.currentReadingPhase = 1;
+                document.getElementById('reading-status').textContent = 'Passage à la deuxième lecture';
+                document.getElementById('play-dictation').textContent = 'Deuxième lecture';
+                
+                setTimeout(() => {
+                    document.getElementById('reading-status').textContent = 'Prêt pour la deuxième lecture - Le clavier est activé';
+                    // Activer le textarea et donner le focus
+                    document.getElementById('user-input').disabled = false;
+                    document.getElementById('user-input').focus();
+                    // Démarrer automatiquement la deuxième lecture
+                    playDictation();
+                }, 1000);
+                
+            } else if (appData.currentReadingPhase === 1) {
+                // Terminer la deuxième lecture et passer à la troisième
+                appData.currentReadingPhase = 2;
+                document.getElementById('reading-status').textContent = 'Fin de la deuxième lecture - Passage à la dernière lecture';
+                document.getElementById('play-dictation').textContent = 'Dernière lecture';
+                document.getElementById('submit-dictation').disabled = false;
+                
+                setTimeout(() => {
+                    document.getElementById('reading-status').textContent = 'Prêt pour la dernière lecture';
+                    // Démarrer automatiquement la troisième lecture
+                    playDictation();
+                }, 1000);
+                
+            } else {
+                // Arrêter simplement la lecture
+                document.getElementById('play-dictation').disabled = false;
+                document.getElementById('stop-dictation').disabled = true;
+                document.getElementById('reading-status').textContent = 'Lecture arrêtée';
+                document.getElementById('current-sentence').textContent = '';
+                document.getElementById('voice-animation').style.display = 'none';
+            }
+            
             appData.currentChunkIndex = 0;
-            document.getElementById('play-dictation').disabled = false;
-            document.getElementById('stop-dictation').disabled = true;
-            document.getElementById('reading-status').textContent = 'Lecture arrêtée';
-            document.getElementById('current-sentence').textContent = '';
-            document.getElementById('voice-animation').style.display = 'none';
         }
 
         // Démarrer le compte à rebours avec annonces vocales
