@@ -16,6 +16,7 @@
             color: white;
             overflow-x: hidden;
             min-height: 100vh;
+            background: linear-gradient(45deg, #0a0a2a, #1a1a4a, #2a2a6a);
         }
 
         #galaxy-background {
@@ -763,7 +764,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
             return chunks.filter(chunk => chunk !== '');
         }
 
-        // Préparer le texte pour la DEUXIÈME LECTURE (extrêmement lente avec toutes les ponctuations)
+        // Préparer le texte pour la DEUXIÈME LECTURE (extrêmement lente avec répétition après 5 mots)
         function prepareTextForSecondReading(text) {
             const chunks = [];
             
@@ -787,19 +788,31 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         .replace(/\?/g, ' point d interrogation ')
                         .replace(/\./g, ' point ');
                     
-                    // Vérifier si la phrase a 5 mots ou plus
+                    // Séparer la phrase en mots
                     const words = sentence.trim().split(/\s+/);
                     
-                    // Ajouter la phrase
-                    chunks.push(processedSentence.trim());
-                    
-                    // Si la phrase a 5 mots ou plus, ajouter une pause de 3 secondes
-                    if (words.length >= 5) {
-                        chunks.push("PAUSE_3_SECONDS");
-                    } else {
-                        // Sinon, pause normale
-                        chunks.push("PAUSE_LONGUE");
+                    // Lecture mot par mot avec répétition après 5 mots
+                    let currentGroup = [];
+                    for (let i = 0; i < words.length; i++) {
+                        currentGroup.push(words[i]);
+                        
+                        // Après 5 mots ou à la fin de la phrase
+                        if (currentGroup.length === 5 || i === words.length - 1) {
+                            const groupText = currentGroup.join(' ');
+                            chunks.push(groupText);
+                            
+                            // Répéter le groupe de mots
+                            chunks.push("Je répète");
+                            chunks.push("PAUSE_COURTE");
+                            chunks.push(groupText);
+                            chunks.push("PAUSE_3_SECONDS");
+                            
+                            currentGroup = [];
+                        }
                     }
+                    
+                    // Pause à la fin de la phrase
+                    chunks.push("PAUSE_LONGUE");
                 }
             }
             
@@ -899,7 +912,7 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 } else if (appData.currentReadingPhase === 1) {
                     document.getElementById('stop-dictation').textContent = 'Fin';
                 } else {
-                    document.getElementById('stop-dictation').textContent = 'Arrêter';
+                    document.getElementById('stop-dictation').textContent = 'Fin';
                 }
                 
                 document.getElementById('stop-dictation').disabled = false;
@@ -1085,12 +1098,9 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                 }, 1000);
                 
             } else {
-                // Arrêter simplement la lecture
-                document.getElementById('play-dictation').disabled = false;
-                document.getElementById('stop-dictation').disabled = true;
-                document.getElementById('reading-status').textContent = 'Lecture arrêtée';
-                document.getElementById('current-sentence').textContent = '';
-                document.getElementById('voice-animation').style.display = 'none';
+                // Terminer la troisième lecture et passer au chronomètre
+                document.getElementById('reading-status').textContent = 'Dernière lecture terminée - Soumettez votre dictée';
+                startCountdownWithVoice();
             }
             
             appData.currentChunkIndex = 0;
