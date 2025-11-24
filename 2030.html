@@ -787,18 +787,18 @@ Félicitons aussi tous ceux qui ont apporté leur concours à la rédaction de c
                         .replace(/\?/g, ' point d interrogation ')
                         .replace(/\./g, ' point ');
                     
-                    chunks.push(processedSentence.trim());
-                    
-                    // Pause de 5 secondes après chaque phrase
-                    chunks.push("PAUSE_5_SECONDS");
-                    
                     // Vérifier si la phrase a 8 mots ou plus
                     const words = sentence.trim().split(/\s+/);
+                    
+                    // Ajouter la phrase
+                    chunks.push(processedSentence.trim());
+                    
+                    // Si la phrase a 8 mots ou plus, ajouter une pause de 5 secondes
                     if (words.length >= 8) {
-                        chunks.push("Je répète");
-                        chunks.push("PAUSE_COURTE");
-                        chunks.push(processedSentence.trim());
                         chunks.push("PAUSE_5_SECONDS");
+                    } else {
+                        // Sinon, pause normale
+                        chunks.push("PAUSE_LONGUE");
                     }
                 }
             }
