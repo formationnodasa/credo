@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionnaire Galactique - Programme Légendaire</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c2e, #1a1a4a, #2a2a5e);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Animation de galaxie */
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+        }
+
+        .star.large {
+            width: 3px;
+            height: 3px;
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+        }
+
+        .nebula.blue {
+            background: radial-gradient(circle, #4fc3f7, #29b6f6, #0288d1);
+            width: 400px;
+            height: 400px;
+            top: 10%;
+            left: 10%;
+            animation: float 30s infinite linear;
+        }
+
+        .nebula.white {
+            background: radial-gradient(circle, #ffffff, #e3f2fd, #bbdefb);
+            width: 300px;
+            height: 300px;
+            bottom: 15%;
+            right: 10%;
+            animation: float 25s infinite linear reverse;
+        }
+
+        .nebula.purple {
+            background: radial-gradient(circle, #7e57c2, #5e35b1, #4527a0);
+            width: 350px;
+            height: 350px;
+            top: 60%;
+            left: 70%;
+            animation: float 35s infinite linear;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 50px) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #bbdefb, #4fc3f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(79, 195, 247, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #bbdefb;
+            margin-bottom: 20px;
+        }
+
+        .author {
+            font-size: 1.4rem;
+            color: #e3f2fd;
+            font-style: italic;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 30px;
+            flex: 1;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: fit-content;
+        }
+
+        .search-box {
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input::placeholder {
+            color: #bbdefb;
+        }
+
+        .filter-section {
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-title:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-title i {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-title.active i {
+            transform: rotate(90deg);
+        }
+
+        .filter-content {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .filter-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background: rgba(79, 195, 247, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: rgba(79, 195, 247, 0.5);
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+        }
+
+        .accent-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .accent-btn {
+            padding: 10px 5px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .accent-btn:hover {
+            background: rgba(121, 85, 72, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .accent-btn.active {
+            background: rgba(121, 85, 72, 0.5);
+            box-shadow: 0 0 10px rgba(121, 85, 72, 0.5);
+        }
+
+        .program-section {
+            margin-top: 30px;
+        }
+
+        .program-content {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .program-content.active {
+            display: block;
+        }
+
+        .program-day {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border-left: 3px solid #4fc3f7;
+        }
+
+        .program-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .day-name {
+            font-weight: bold;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-task {
+            font-size: 0.9rem;
+            color: #e3f2fd;
+            line-height: 1.6;
+        }
+
+        .day-task ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .day-task li {
+            margin-bottom: 5px;
+        }
+
+        .coach-section {
+            margin-top: 30px;
+        }
+
+        .coach-content {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .coach-content.active {
+            display: block;
+        }
+
+        .coach-advice {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .advice-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .advice-text {
+            font-size: 0.9rem;
+            color: #fff8e1;
+            line-height: 1.6;
+        }
+
+        .advice-text ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .advice-text li {
+            margin-bottom: 5px;
+        }
+
+        .training-mode {
+            background: rgba(79, 195, 247, 0.1) !important;
+            border-left: 3px solid #4fc3f7 !important;
+        }
+
+        .training-mode .advice-title {
+            color: #4fc3f7 !important;
+        }
+
+        .training-mode .advice-text {
+            color: #e3f2fd !important;
+        }
+
+        .important-note {
+            background: rgba(76, 175, 80, 0.1) !important;
+            border-left: 3px solid #4caf50 !important;
+            margin-top: 20px;
+        }
+
+        .important-note .advice-title {
+            color: #4caf50 !important;
+        }
+
+        .stats {
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            min-height: 600px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: #4fc3f7;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            background: rgba(79, 195, 247, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background: rgba(79, 195, 247, 0.6);
+            transform: scale(1.1);
+        }
+
+        .page-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .page-indicator {
+            font-size: 1.2rem;
+            color: #bbdefb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-jump {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .page-input {
+            width: 60px;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            text-align: center;
+        }
+
+        .jump-btn {
+            background: rgba(255, 152, 0, 0.3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .jump-btn:hover {
+            background: rgba(255, 152, 0, 0.6);
+        }
+
+        .words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            overflow-y: auto;
+            padding-right: 10px;
+            flex: 1;
+            max-height: none;
+        }
+
+        .word-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 180px;
+        }
+
+        .word-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .word-card.easy::before {
+            background: linear-gradient(to right, #4caf50, #66bb6a, #81c784);
+        }
+
+        .word-card.medium::before {
+            background: linear-gradient(to right, #ff9800, #ffa726, #ffb74d);
+        }
+
+        .word-card.hard::before {
+            background: linear-gradient(to right, #f44336, #ef5350, #e57373);
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .word {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: white;
+            word-break: break-word;
+            line-height: 1.3;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .word-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            min-width: 80px;
+        }
+
+        .letter-count {
+            background: rgba(156, 39, 176, 0.3);
+            color: #e1bee7;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(156, 39, 176, 0.5);
+        }
+
+        .difficulty-badge {
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .badge-easy {
+            background: rgba(76, 175, 80, 0.3);
+            color: #c8e6c9;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .badge-medium {
+            background: rgba(255, 152, 0, 0.3);
+            color: #ffe0b2;
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        .badge-hard {
+            background: rgba(244, 67, 54, 0.3);
+            color: #ffcdd2;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .pronunciation {
+            font-size: 1rem;
+            color: #bbdefb;
+            font-style: italic;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .word-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .speak-btn {
+            background: linear-gradient(to right, #4fc3f7, #29b6f6);
+            color: white;
+        }
+
+        .speak-btn:hover {
+            background: linear-gradient(to right, #29b6f6, #0288d1);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+        }
+
+        .definition-btn {
+            background: linear-gradient(to right, #ff9800, #ffb74d);
+            color: white;
+        }
+
+        .definition-btn:hover {
+            background: linear-gradient(to right, #ffb74d, #ff9800);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+        }
+
+        .definition-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 3px solid #ff9800;
+            animation: slideDown 0.3s ease;
+        }
+
+        .definition-content.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 200px; }
+        }
+
+        .meaning {
+            font-size: 1.05rem;
+            color: #e3f2fd;
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #bbdefb;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* Scrollbar personnalisé */
+        .words-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .words-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .words-container::-webkit-scrollbar-thumb {
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 10px;
+        }
+
+        .words-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 195, 247, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .words-container {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            
+            .main-content {
+                height: auto;
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .page-controls {
+                justify-content: center;
+            }
+            
+            .filter-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .accent-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .words-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-actions {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                height: auto;
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .accent-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .word-info {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="galaxy" id="galaxy"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">KXA</div>
+            <div class="subtitle">SALAMU - AMANI</div>
+            <div class="author">Ya Lwanga Credo Musao</div>
+        </div>
+        
+        <div class="content">
+            <div class="sidebar">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Rechercher un mot..." id="searchInput">
+                </div>
+                
+                <div class="filter-section">
+                    <h3 class="filter-title" id="difficulty-title">
+                        <i class="fas fa-chevron-right"></i> Niveau de Difficulté
+                    </h3>
+                    <div class="filter-content" id="difficulty-content">
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">Tous</button>
+                            <button class="filter-btn" data-filter="easy">Facile</button>
+                            <button class="filter-btn" data-filter="medium">Moyen</button>
+                            <button class="filter-btn" data-filter="hard">Difficile</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3 class="filter-title" id="accent-title">
+                        <i class="fas fa-chevron-right"></i> Filtres par Accents
+                    </h3>
+                    <div class="filter-content" id="accent-content">
+                        <div class="accent-buttons">
+                            <button class="accent-btn" data-accent="aigu">Accent Aigu (é)</button>
+                            <button class="accent-btn" data-accent="grave">Accent Grave (è)</button>
+                            <button class="accent-btn" data-accent="circonflexe">Circonflexe (ê)</button>
+                            <button class="accent-btn" data-accent="trema">Tréma (ë)</button>
+                            <button class="accent-btn" data-accent="cedille">Cédille (ç)</button>
+                            <button class="accent-btn" data-accent="trait-union">Trait d'union (-)</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="program-section">
+                    <h3 class="filter-title" id="program-title">
+                        <i class="fas fa-chevron-right"></i> Programme Hebdomadaire
+                    </h3>
+                    <div class="program-content" id="program-content">
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-calendar-day"></i> 📅 Lundi — Les mots faciles</div>
+                            <div class="day-task">
+                                Le lundi est consacré aux mots faciles. Pour cela, vous allez dans le menu "Niveau de difficulté" et vous sélectionnez "Facile".<br><br>
+                                Votre objectif est de lire au minimum 10 pages. Si vous souhaitez en lire davantage, c'est excellent. Mais si votre cerveau bloque avant les 10 pages, vous pouvez vous arrêter, à condition d'avoir fait un réel effort pour atteindre cet objectif. Le but est d'avancer toujours un peu plus.
+                            </div>
+                        </div>
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-sync-alt"></i> 📅 Mardi — Révision + Accents</div>
+                            <div class="day-task">
+                                Le mardi, vous revenez sur les mots que vous n'avez pas maîtrisés le lundi. C'est normal de ne pas tout retenir du premier coup.<br><br>
+                                Ensuite, vous devrez étudier 1 page au moins pour chaque type d'accent :
+                                <ul>
+                                    <li>Accent aigu</li>
+                                    <li>Accent grave</li>
+                                    <li>Accent circonflexe</li>
+                                    <li>Tréma</li>
+                                    <li>Cédille</li>
+                                    <li>Trait d'union</li>
+                                </ul>
+                                C'est un travail fondamental pour comprendre pourquoi un mot porte tel ou tel accent.
+                            </div>
+                        </div>
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-balance-scale"></i> 📅 Mercredi — Mots moyens</div>
+                            <div class="day-task">
+                                Le mercredi, vous travaillez les mots du niveau moyen. Rendez-vous dans "Niveau de difficulté", puis cliquez sur "Moyen".<br><br>
+                                Vous devez lire entre 7 et 8 pages, et surtout pas moins de 7 pages. C'est une journée où l'on renforce les acquis tout en montant en puissance.
+                            </div>
+                        </div>
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-couch"></i> 📅 Jeudi — Repos actif</div>
+                            <div class="day-task">
+                                Le jeudi est un jour de repos. Aucun programme obligatoire.<br><br>
+                                Mais si vous le souhaitez, vous pouvez relire calmement quelques mots ou revoir une notion que vous n'avez pas bien comprise.
+                            </div>
+                        </div>
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-fire"></i> 📅 Vendredi — Mots difficiles</div>
+                            <div class="day-task">
+                                Le vendredi, on attaque le niveau difficile. Allez dans "Niveau de difficulté", puis choisissez "Difficile".<br><br>
+                                Votre mission : lire 6 pages au minimum. Et surtout, notez dans votre cahier les pages où vous vous êtes arrêté, pour continuer exactement là où vous étiez la semaine suivante.
+                            </div>
+                        </div>
+                        <div class="program-day">
+                            <div class="day-name"><i class="fas fa-weekend"></i> 📅 Samedi & Dimanche — Repos total</div>
+                            <div class="day-task">
+                                Le week-end est réservé au repos. Le cerveau a besoin de souffler pour mieux enregistrer les mots.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coach-section">
+                    <h3 class="filter-title" id="coach-title">
+                        <i class="fas fa-chevron-right"></i> Consignes du Coach
+                    </h3>
+                    <div class="coach-content" id="coach-content">
+                        <div class="coach-advice">
+                            <div class="advice-title">
+                                <i class="fas fa-trophy"></i> Bienvenue champion(ne) !
+                            </div>
+                            <div class="advice-text">
+                                Avant de commencer votre entraînement, je vais vous expliquer le programme hebdomadaire que je vous propose pour devenir un véritable maître de l'épellation.<br><br>
+                                L'objectif de ce programme est simple : répéter régulièrement, progresser étape par étape, et renforcer votre mémoire. Nous aurons quatre séances de répétition par semaine, mais vous êtes libre d'augmenter le nombre de jours ou la durée, selon votre motivation.<br><br>
+                                Personnellement, je vous conseille même de répéter tous les jours, ne serait-ce que 30 minutes, car les mots du dictionnaire sont essentiels : ils vous aideront non seulement dans les concours, mais aussi dans votre expression quotidienne.
+                            </div>
+                        </div>
+                        
+                        <div class="coach-advice training-mode">
+                            <div class="advice-title">
+                                <i class="fas fa-play-circle"></i> 🔵 Mode 1 : "Lire → Écrire → Comparer"
+                            </div>
+                            <div class="advice-text">
+                                Dans ce premier mode, vous travaillez directement avec le mot affiché. Par exemple, vous voyez : <strong>Accrocher</strong>.<br><br>
+                                Voici comment faire :
+                                <ul>
+                                    <li>Vous lisez le mot sur votre écran</li>
+                                    <li>Vous prenez votre cahier</li>
+                                    <li>Vous écrivez le mot en visualisant le mot vu sur l'appareil</li>
+                                    <li>Vous comparez ce que vous avez écrit avec le mot affiché</li>
+                                </ul>
+                                Ce n'est pas grave si vous avez vu le mot avant de l'écrire. L'objectif est simple : plus vous écrivez, plus votre cerveau s'habitue au rythme et mémorise l'orthographe.<br><br>
+                                Vous pouvez dépasser la durée prévue (par exemple 30 ou 45 minutes) et viser 1h30, comme dans les entraînements qu'on faisait à la paroisse.
+                            </div>
+                        </div>
+                        
+                        <div class="coach-advice training-mode">
+                            <div class="advice-title">
+                                <i class="fas fa-sync-alt"></i> 🔵 Mode 2 : "Lire d'abord, revenir ensuite"
+                            </div>
+                            <div class="advice-text">
+                                Ce deuxième mode consiste à :
+                                <ul>
+                                    <li>Lire toute la page d'abord (ou plusieurs pages si vous êtes motivé)</li>
+                                    <li>Ensuite, revenir au début et commencer la répétition mot par mot</li>
+                                </ul>
+                                Par exemple :
+                                <ul>
+                                    <li>Vous lisez toute la page</li>
+                                    <li>Vous revenez au début</li>
+                                    <li>Vous écrivez "Accrocher", puis "Croustillant", puis tous les autres mots, en les comparant à chaque fois</li>
+                                </ul>
+                                Cette méthode vous permet d'avoir une vue globale des mots, de créer une mémoire visuelle, puis de renforcer votre mémoire par l'écriture.
+                            </div>
+                        </div>
+                        
+                        <div class="coach-advice">
+                            <div class="advice-title">
+                                <i class="fas fa-graduation-cap"></i> 🎓 Conseils du coach
+                            </div>
+                            <div class="advice-text">
+                                Si vous voulez devenir un grand joueur d'épellation, vous devez chercher à comprendre les mots, pas seulement les lire. Comprendre pourquoi il y a un accent, pourquoi telle lettre est là, pourquoi la prononciation est ainsi.<br><br>
+                                Pour cela, rendez-vous dans le menu principal, à la rubrique "Dictée — cours et exercices". Vous y trouverez toutes les explications nécessaires pour progresser en français et améliorer définitivement votre niveau.<br><br>
+                                Pour devenir un bon joueur d'épellation des mots du dictionnaire, il ne suffit pas de lire : il faut comprendre les mots, comprendre pourquoi il y a un accent, pourquoi une lettre se prononce ainsi.
+                            </div>
+                        </div>
+                        
+                        <div class="coach-advice important-note">
+                            <div class="advice-title">
+                                <i class="fas fa-exclamation-circle"></i> Note importante
+                            </div>
+                            <div class="advice-text">
+                                <strong>La règle d'or :</strong> Soyez toujours muni de votre cahier. La répétition par l'écriture est la clé du progrès. Visualiser le mot dans votre tête.<br><br>
+                                Continuez à travailler régulièrement. C'est votre constance qui fera de vous une championne ou un champion.<br><br>
+                                Veillez à toujours être muni de votre cahier de répétition à chaque entraînement. Vous avez également la possibilité d'ajouter autant de pages que vous le souhaitez. Et surtout exercez-vous à chaque entraînement en utilisant l'option "Mon niveau" afin de suivre vos progrès.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <h3 class="filter-title">
+                        <i class="fas fa-chart-bar"></i> Statistiques
+                    </h3>
+                    <div class="stat-item">
+                        <span>Mots affichés:</span>
+                        <span class="stat-value" id="wordsCount">20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Pages:</span>
+                        <span class="stat-value" id="pagesCount">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Prononciations:</span>
+                        <span class="stat-value" id="audioCount">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="page-header">
+                    <h2 class="page-title">Dictionnaire Galactique</h2>
+                    <div class="page-controls">
+                        <button class="page-btn" id="first-btn">
+                            <i class="fas fa-fast-backward"></i>
+                        </button>
+                        <button class="page-btn" id="prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="page-indicator">
+                            Page <span id="current-page">1</span> sur <span id="total-pages">1</span>
+                        </span>
+                        <button class="page-btn" id="next-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="page-btn" id="last-btn">
+                            <i class="fas fa-fast-forward"></i>
+                        </button>
+                        <div class="page-jump">
+                            <input type="number" class="page-input" id="page-input" min="1" value="1">
+                            <button class="jump-btn" id="jump-btn">Aller</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="words-container" id="words-container">
+                    <!-- Les mots seront insérés ici par JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Dictionnaire Galactique - Programme d'Entraînement Légendaire</p>
+            <p>© 2023 Ya Lwanga Credo Musao - Tous droits réservés</p>
+        </div>
+    </div>
+
+    <script>
+        // Données des mots avec définitions détaillées
+        const words = [
+            { 
+                word: "aà", 
+                meaning: "Terme linguistique désignant la lettre A avec accent grave, utilisée dans certaines langues pour indiquer une prononciation spécifique ou une distinction grammaticale importante.", 
+                pronunciation: "a ah-sahn grahv", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "Aà", 
+                meaning: "Variante majuscule du A accent grave, souvent utilisée en début de phrase ou pour les noms propres dans certaines langues où l'accentuation est conservée même en majuscules.", 
+                pronunciation: "ah ah-sahn grahv", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "bouchetonà", 
+                meaning: "Terme technique désignant une petite bouche ou orifice, souvent utilisé dans un contexte mécanique ou anatomique pour décrire une ouverture de petite dimension.", 
+                pronunciation: "boosh-toh-nah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "bras-le-corpsà", 
+                meaning: "Expression idiomatique signifiant prendre quelqu'un par le bras et le corps, généralement utilisée pour décrire une étreinte ferme ou une manière de saisir quelqu'un avec détermination.", 
+                pronunciation: "brah luh kor ah", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "brule-pourpointà", 
+                meaning: "Locution adverbiale signifiant de manière brusque et imprévue, sans préparation préalable. Souvent utilisée pour décrire une question posée directement sans détour.", 
+                pronunciation: "ah brewl poor-pwan", 
+                difficulty: "medium", 
+                accents: ["trait-union"] 
+            },
+            { 
+                word: "brûle-pourpointà", 
+                meaning: "Variante orthographique avec accent circonflexe de 'brûle-pourpoint', conservant le même sens mais avec l'orthographe traditionnelle française comprenant l'accent circonflexe.", 
+                pronunciation: "ah brewl poor-pwan", 
+                difficulty: "medium", 
+                accents: ["circonflexe", "trait-union"] 
+            },
+            { 
+                word: "califourchona", 
+                meaning: "Terme rare désignant une position particulière ou une manière de se tenir, probablement dérivé de expressions anciennes décrivant des postures corporelles spécifiques.", 
+                pronunciation: "kah-lee-foor-shoh-nah", 
+                difficulty: "hard", 
+                accents: [] 
+            },
+            { 
+                word: "capellaà", 
+                meaning: "Terme musical désignant un style de chant sans accompagnement instrumental, ou se référant à la chapelle dans un contexte historique ou architectural spécifique.", 
+                pronunciation: "kah-pel-lah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "capellaa", 
+                meaning: "Variante orthographique rare pouvant désigner une particularité musicale ou architecturale, avec une terminaison double marquant peut-être une origine linguistique spécifique.", 
+                pronunciation: "kah-pel-lah-ah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "cappellaà", 
+                meaning: "Forme alternative de 'capella' avec double consonne, souvent utilisée dans des contextes musicaux spécialisés ou pour désigner des caractéristiques architecturales précises.", 
+                pronunciation: "kahp-pel-lah", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "cloche-piedà", 
+                meaning: "Expression décrivant le fait de se déplacer ou de se tenir en équilibre sur un seul pied, communément utilisée dans les jeux d'enfants ou pour décrire une position instable.", 
+                pronunciation: "ah klohsh pyay", 
+                difficulty: "easy", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "clochepieda", 
+                meaning: "Forme contractée ou régionale de 'cloche-pied', pouvant désigner la même action mais avec une orthographe simplifiée ou adaptée à des usages locaux spécifiques.", 
+                pronunciation: "klohsh-pyay-dah", 
+                difficulty: "medium", 
+                accents: [] 
+            },
+            { 
+                word: "contrarioà", 
+                meaning: "Terme juridique ou logique signifiant 'au contraire', utilisé pour introduire un argument opposé ou pour indiquer une position contraire dans un débat ou raisonnement.", 
+                pronunciation: "ah kon-trah-ryoh", 
+                difficulty: "hard", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "contraireà", 
+                meaning: "Adverbe courant signifiant 'au contraire', utilisé pour exprimer une opposition ou une contradiction dans une conversation ou un texte argumentatif.", 
+                pronunciation: "oh kon-trair", 
+                difficulty: "easy", 
+                accents: ["grave"] 
+            },
+            { 
+                word: "contre-biaisà", 
+                meaning: "Terme technique désignant une orientation ou une direction opposée au biais habituel, utilisé dans divers domaines comme la menuiserie, le textile ou les analyses statistiques.", 
+                pronunciation: "duh kon-truh byay", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-bordà", 
+                meaning: "Expression maritime désignant une manœuvre ou une position opposée au bord habituel, utilisée dans la navigation pour décrire des changements de direction spécifiques.", 
+                pronunciation: "ah kon-truh bor", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-lumièreà", 
+                meaning: "Terme photographique ou artistique désignant une situation où la source lumineuse est face à l'observateur, créant des effets de silhouette ou des contrastes particuliers.", 
+                pronunciation: "ah kon-truh loo-myair", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union", "aigu"] 
+            },
+            { 
+                word: "contre-poilà", 
+                meaning: "Expression signifiant à contre-courant ou à rebours du sens naturel, souvent utilisée pour décrire une action effectuée dans le sens inverse de ce qui est habituel ou attendu.", 
+                pronunciation: "ah kon-truh pwal", 
+                difficulty: "hard", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "contre-saisonà", 
+                meaning: "Terme désignant une période ou des produits hors saison, utilisée en agriculture, commerce ou pour décrire des phénomènes météorologiques inhabituels pour la saison.", 
+                pronunciation: "or say-zon", 
+                difficulty: "medium", 
+                accents: ["grave", "trait-union"] 
+            },
+            { 
+                word: "croupetonsà", 
+                meaning: "Position accroupie sur les talons, souvent utilisée pour décrire une manière de s'asseoir ou de se reposer typique de certaines cultures ou situations informelles.", 
+                pronunciation: "ah kroop-ton", 
+                difficulty: "medium", 
+                accents: ["grave"] 
+            }
+        ];
+
+        // Variables pour gérer l'état
+        let currentPage = 1;
+        const wordsPerPage = 20;
+        let currentFilter = "all";
+        let currentAccent = null;
+        let audioCount = 0;
+
+        // Éléments DOM
+        const wordsContainer = document.getElementById('words-container');
+        const firstBtn = document.getElementById('first-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const lastBtn = document.getElementById('last-btn');
+        const jumpBtn = document.getElementById('jump-btn');
+        const pageInput = document.getElementById('page-input');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
+        const wordsCountSpan = document.getElementById('wordsCount');
+        const pagesCountSpan = document.getElementById('pagesCount');
+        const audioCountSpan = document.getElementById('audioCount');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const accentButtons = document.querySelectorAll('.accent-btn');
+        const difficultyTitle = document.getElementById('difficulty-title');
+        const difficultyContent = document.getElementById('difficulty-content');
+        const accentTitle = document.getElementById('accent-title');
+        const accentContent = document.getElementById('accent-content');
+        const programTitle = document.getElementById('program-title');
+        const programContent = document.getElementById('program-content');
+        const coachTitle = document.getElementById('coach-title');
+        const coachContent = document.getElementById('coach-content');
+
+        // Créer la galaxie
+        function createGalaxy() {
+            const galaxy = document.getElementById('galaxy');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() > 0.8 ? 'large' : (Math.random() > 0.5 ? 'medium' : 'small');
+                star.className = `star ${size}`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                galaxy.appendChild(star);
+            }
+            
+            // Créer les nébuleuses
+            const nebulaBlue = document.createElement('div');
+            nebulaBlue.className = 'nebula blue';
+            galaxy.appendChild(nebulaBlue);
+            
+            const nebulaWhite = document.createElement('div');
+            nebulaWhite.className = 'nebula white';
+            galaxy.appendChild(nebulaWhite);
+            
+            const nebulaPurple = document.createElement('div');
+            nebulaPurple.className = 'nebula purple';
+            galaxy.appendChild(nebulaPurple);
+        }
+
+        // Afficher les mots
+        function displayWords() {
+            wordsContainer.innerHTML = '';
+            
+            // Filtrer les mots
+            let filteredWords = words;
+            
+            // Filtre par difficulté
+            if (currentFilter !== "all") {
+                filteredWords = filteredWords.filter(word => word.difficulty === currentFilter);
+            }
+            
+            // Filtre par accent
+            if (currentAccent) {
+                filteredWords = filteredWords.filter(word => word.accents.includes(currentAccent));
+            }
+            
+            // Recherche
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
+                filteredWords = filteredWords.filter(word => 
+                    word.word.toLowerCase().includes(searchTerm) || 
+                    word.meaning.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Calculer la pagination
+            const totalPages = Math.ceil(filteredWords.length / wordsPerPage);
+            const startIndex = (currentPage - 1) * wordsPerPage;
+            const endIndex = Math.min(startIndex + wordsPerPage, filteredWords.length);
+            const pageWords = filteredWords.slice(startIndex, endIndex);
+            
+            // Afficher les mots de la page
+            pageWords.forEach((word, index) => {
+                const wordElement = createWordElement(word);
+                wordsContainer.appendChild(wordElement);
+            });
+            
+            // Mettre à jour les indicateurs
+            currentPageSpan.textContent = currentPage;
+            totalPagesSpan.textContent = totalPages;
+            wordsCountSpan.textContent = filteredWords.length;
+            pagesCountSpan.textContent = totalPages;
+            audioCountSpan.textContent = audioCount;
+            
+            // Gérer les boutons de navigation
+            firstBtn.disabled = currentPage === 1;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+            lastBtn.disabled = currentPage === totalPages;
+            
+            // Mettre à jour l'input de page
+            pageInput.value = currentPage;
+            pageInput.max = totalPages;
+        }
+
+        // Créer un élément de mot
+        function createWordElement(wordObj) {
+            const wordCard = document.createElement('div');
+            wordCard.className = `word-card ${wordObj.difficulty}`;
+            
+            // Calculer le nombre de lettres
+            const letterCount = wordObj.word.length;
+            
+            // Déterminer le badge de difficulté
+            let difficultyBadge = '';
+            let badgeClass = '';
+            switch(wordObj.difficulty) {
+                case 'easy':
+                    difficultyBadge = 'Facile';
+                    badgeClass = 'badge-easy';
+                    break;
+                case 'medium':
+                    difficultyBadge = 'Moyen';
+                    badgeClass = 'badge-medium';
+                    break;
+                case 'hard':
+                    difficultyBadge = 'Difficile';
+                    badgeClass = 'badge-hard';
+                    break;
+            }
+            
+            wordCard.innerHTML = `
+                <div class="word-header">
+                    <div class="word">${wordObj.word}</div>
+                    <div class="word-info">
+                        <div class="letter-count">${letterCount}</div>
+                        <div class="difficulty-badge ${badgeClass}">${difficultyBadge}</div>
+                    </div>
+                </div>
+                <div class="pronunciation">
+                    <span>${wordObj.pronunciation}</span>
+                </div>
+                <div class="word-actions">
+                    <button class="action-btn speak-btn" data-word="${wordObj.word}">
+                        <i class="fas fa-volume-up"></i> Prononcer
+                    </button>
+                    <button class="action-btn definition-btn" data-word="${wordObj.word}">
+                        <i class="fas fa-book"></i> Définition
+                    </button>
+                </div>
+                <div class="definition-content">
+                    <div class="meaning">${wordObj.meaning}</div>
+                </div>
+            `;
+            
+            // Ajouter l'écouteur d'événement pour le bouton de prononciation
+            const speakBtn = wordCard.querySelector('.speak-btn');
+            speakBtn.addEventListener('click', function() {
+                speakWord(wordObj.word);
+                audioCount++;
+                audioCountSpan.textContent = audioCount;
+            });
+            
+            // Ajouter l'écouteur d'événement pour le bouton de définition
+            const definitionBtn = wordCard.querySelector('.definition-btn');
+            const definitionContent = wordCard.querySelector('.definition-content');
+            definitionBtn.addEventListener('click', function() {
+                definitionContent.classList.toggle('active');
+                if (definitionContent.classList.contains('active')) {
+                    definitionBtn.innerHTML = '<i class="fas fa-times"></i> Fermer';
+                } else {
+                    definitionBtn.innerHTML = '<i class="fas fa-book"></i> Définition';
+                }
+            });
+            
+            return wordCard;
+        }
+
+        // Fonction pour prononcer un mot
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("La synthèse vocale n'est pas supportée par votre navigateur.");
+            }
+        }
+
+        // Aller à une page spécifique
+        function goToPage(page) {
+            const totalPages = Math.ceil(words.length / wordsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayWords();
+            }
+        }
+
+        // Initialisation
+        function init() {
+            createGalaxy();
+            displayWords();
+            
+            // Écouteurs d'événements pour la navigation
+            firstBtn.addEventListener('click', () => goToPage(1));
+            prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+            nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+            lastBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(words.length / wordsPerPage);
+                goToPage(totalPages);
+            });
+            
+            jumpBtn.addEventListener('click', () => {
+                const page = parseInt(pageInput.value);
+                goToPage(page);
+            });
+            
+            pageInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    const page = parseInt(pageInput.value);
+                    goToPage(page);
+                }
+            });
+            
+            // Filtres par difficulté
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    currentPage = 1;
+                    displayWords();
+                });
+            });
+            
+            // Filtres par accent
+            accentButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const accent = this.getAttribute('data-accent');
+                    
+                    // Toggle de l'état actif
+                    if (currentAccent === accent) {
+                        currentAccent = null;
+                        this.classList.remove('active');
+                    } else {
+                        currentAccent = accent;
+                        accentButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                    
+                    currentPage = 1;
+                    displayWords();
+                });
+            });
+            
+            // Recherche
+            searchInput.addEventListener('input', () => {
+                currentPage = 1;
+                displayWords();
+            });
+            
+            // Gestion des sections dépliables
+            difficultyTitle.addEventListener('click', () => {
+                difficultyTitle.classList.toggle('active');
+                difficultyContent.classList.toggle('active');
+            });
+            
+            accentTitle.addEventListener('click', () => {
+                accentTitle.classList.toggle('active');
+                accentContent.classList.toggle('active');
+            });
+            
+            programTitle.addEventListener('click', () => {
+                programTitle.classList.toggle('active');
+                programContent.classList.toggle('active');
+            });
+            
+            coachTitle.addEventListener('click', () => {
+                coachTitle.classList.toggle('active');
+                coachContent.classList.toggle('active');
+            });
+        }
+
+        // Démarrer l'application
+        init();
+    </script>
+</body>
+</html>
