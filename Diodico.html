@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Master - Devenez un Dieu de l'Épellation</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+            --repetition-day: #4a86e8; /* Nouvelle couleur pour les jours de répétition */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animation Galaxie */
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .nebula {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 30s infinite linear;
+        }
+        
+        .nebula-1 {
+            background: radial-gradient(circle, #6a11cb, transparent);
+            top: 10%;
+            left: 10%;
+        }
+        
+        .nebula-2 {
+            background: radial-gradient(circle, #2575fc, transparent);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -15s;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 50px) rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Modal de connexion */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .profile-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .profile-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c1121f;
+            transform: scale(1.05);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #f72585, #4cc9f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--success);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .training-section {
+            margin-bottom: 3rem;
+        }
+        
+        .training-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .training-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .training-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .training-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+        
+        .training-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .training-duration {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent), var(--success));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .schedule {
+            margin-bottom: 3rem;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1.5rem;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .day.active {
+            background: var(--success);
+            color: var(--dark);
+            font-weight: bold;
+        }
+        
+        .day.rest {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .day.repetition {
+            background: var(--repetition-day);
+            color: var(--light);
+            font-weight: bold;
+        }
+        
+        .day:hover {
+            transform: scale(1.1);
+        }
+        
+        .techniques {
+            margin-bottom: 3rem;
+        }
+        
+        .technique-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .technique-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .technique-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .technique-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--success);
+        }
+        
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .word-display {
+            font-size: 3rem;
+            margin: 2rem 0;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--light);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .input-area {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        input {
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 300px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .result {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            min-height: 2rem;
+        }
+        
+        .correct {
+            color: var(--success);
+        }
+        
+        .incorrect {
+            color: var(--danger);
+        }
+        
+        .motivation {
+            text-align: center;
+            font-style: italic;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Historique des sessions */
+        .history-section {
+            margin-bottom: 3rem;
+        }
+        
+        .session-history {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .session-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .session-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .session-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        /* Section Calendrier Mensuel */
+        .monthly-calendar-section {
+            margin-bottom: 3rem;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .month-navigation {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .month-year-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .monthly-calendar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .monthly-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1rem;
+        }
+        
+        .monthly-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem;
+            color: var(--success);
+        }
+        
+        .monthly-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .monthly-day.repetition {
+            background: var(--repetition-day);
+            color: var(--light);
+            font-weight: bold;
+        }
+        
+        .monthly-day.today {
+            border: 2px solid var(--accent);
+        }
+        
+        .monthly-day:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Programme d'entraînement */
+        .training-program {
+            margin-bottom: 3rem;
+        }
+        
+        .program-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .program-day {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .program-day.repetition-day {
+            background: rgba(74, 134, 232, 0.3);
+            border-left: 4px solid var(--repetition-day);
+        }
+        
+        .program-day h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        
+        .program-day ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .program-day li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .program-day li:before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .input-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input {
+                width: 100%;
+            }
+            
+            .profile-section {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .calendar-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animation Galaxie -->
+    <div class="galaxy" id="galaxy"></div>
+    
+    <!-- Modal de connexion -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h2>Bienvenue sur Spelling Master</h2>
+            <p>Entrez votre nom pour commencer votre aventure</p>
+            <input type="text" class="login-input" id="userNameInput" placeholder="Votre nom" maxlength="20">
+            <button id="startBtn" style="width: 100%;">Commencer l'aventure</button>
+        </div>
+    </div>
+    
+    <div class="container" id="mainContent" style="display: none;">
+        <!-- Section Profil -->
+        <section class="profile-section">
+            <div class="profile-info">
+                <div class="profile-avatar" id="userAvatar">U</div>
+                <div>
+                    <h2 id="userName">Utilisateur</h2>
+                    <p id="userLevel">Niveau: Débutant</p>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="totalSessions">0</div>
+                    <div class="profile-stat-label">Sessions</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="totalWords">0</div>
+                    <div class="profile-stat-label">Mots appris</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="currentStreak">0</div>
+                    <div class="profile-stat-label">Jours consécutifs</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Changer de profil</button>
+        </section>
+        
+        <header>
+            <h1>Spelling Master</h1>
+            <p class="subtitle">Devenez un Dieu de l'Épellation - Préparez-vous pour le concours</p>
+        </header>
+        
+        <section class="dashboard">
+            <div class="card">
+                <h2>Vos Statistiques</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="words-mastered">0</div>
+                        <div class="stat-label">Mots Maîtrisés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="success-rate">0%</div>
+                        <div class="stat-label">Taux de Réussite</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">Série Actuelle</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="overall-progress" style="width: 0%"></div>
+                </div>
+                <p>Progression globale</p>
+            </div>
+            
+            <div class="card">
+                <h2>Prochain Entraînement</h2>
+                <div id="next-training">
+                    <h3>Session de 45 minutes</h3>
+                    <p>Méthode de mémorisation avancée</p>
+                    <p>Demain à 18:00</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="session-progress" style="width: 30%"></div>
+                </div>
+                <p>Progression de la session</p>
+            </div>
+        </section>
+        
+        <!-- Section Programme d'Entraînement -->
+        <section class="training-program">
+            <h2>Programme Hebdomadaire d'Entraînement</h2>
+            <div class="program-schedule">
+                <div class="program-day repetition-day">
+                    <h3>Lundi - Répétition</h3>
+                    <ul>
+                        <li>Révision des mots de la semaine précédente</li>
+                        <li>Session de 45 minutes</li>
+                        <li>Technique: Répétition espacée</li>
+                        <li>Objectif: 50 mots révisés</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Mardi - Répétition</h3>
+                    <ul>
+                        <li>Nouveaux mots difficiles</li>
+                        <li>Session de 60 minutes</li>
+                        <li>Technique: Association d'images</li>
+                        <li>Objectif: 30 nouveaux mots</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Mercredi - Répétition</h3>
+                    <ul>
+                        <li>Mots complexes et exceptions</li>
+                        <li>Session de 45 minutes</li>
+                        <li>Technique: Segmentation</li>
+                        <li>Objectif: 40 mots maîtrisés</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Jeudi - Repos</h3>
+                    <ul>
+                        <li>Jour de repos actif</li>
+                        <li>Révision légère optionnelle</li>
+                        <li>Lecture de textes littéraires</li>
+                    </ul>
+                </div>
+                <div class="program-day repetition-day">
+                    <h3>Vendredi - Répétition</h3>
+                    <ul>
+                        <li>Simulation de concours</li>
+                        <li>Session de 60 minutes</li>
+                        <li>Technique: Méthode des Loci</li>
+                        <li>Objectif: Test complet</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Samedi - Repos</h3>
+                    <ul>
+                        <li>Jour de détente</li>
+                        <li>Pas d'entraînement formel</li>
+                    </ul>
+                </div>
+                <div class="program-day">
+                    <h3>Dimanche - Révision</h3>
+                    <ul>
+                        <li>Révision libre</li>
+                        <li>Session de 30 minutes max</li>
+                        <li>Focus sur les points faibles</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section Calendrier Mensuel -->
+        <section class="monthly-calendar-section">
+            <h2>Calendrier d'Entraînement</h2>
+            <div class="calendar-controls">
+                <button id="toggleCalendarBtn">Afficher le Calendrier (Janvier à Septembre)</button>
+                <div class="month-navigation">
+                    <button id="prevMonthBtn">←</button>
+                    <div class="month-year-display" id="monthYearDisplay">Janvier 2024</div>
+                    <button id="nextMonthBtn">→</button>
+                </div>
+            </div>
+            <div class="monthly-calendar" id="monthlyCalendar" style="display: none;">
+                <div class="monthly-calendar-grid" id="monthlyCalendarGrid">
+                    <!-- Le calendrier mensuel sera généré par JavaScript -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Historique des sessions -->
+        <section class="history-section">
+            <h2>Votre Historique d'Apprentissage</h2>
+            <div class="session-history" id="sessionHistory">
+                <!-- Les sessions seront ajoutées dynamiquement -->
+            </div>
+        </section>
+        
+        <section class="training-section">
+            <h2>Programmes d'Entraînement</h2>
+            <div class="training-options">
+                <div class="training-card" data-duration="30">
+                    <div class="training-icon">⚡</div>
+                    <h3 class="training-title">Session Rapide</h3>
+                    <p class="training-duration">30 minutes</p>
+                    <p>Révisez 50 mots courants avec techniques de mémorisation accélérée</p>
+                </div>
+                <div class="training-card" data-duration="45">
+                    <div class="training-icon">🔥</div>
+                    <h3 class="training-title">Session Standard</h3>
+                    <p class="training-duration">45 minutes</p>
+                    <p>Approfondissement avec techniques mnémotechniques et répétition espacée</p>
+                </div>
+                <div class="training-card" data-duration="60">
+                    <div class="training-icon">🚀</div>
+                    <h3 class="training-title">Session Intensive</h3>
+                    <p class="training-duration">60 minutes</p>
+                    <p>Perfectionnement avec mots complexes et simulation de concours</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="schedule">
+            <h2>Calendrier d'Entraînement Hebdomadaire</h2>
+            <p>Planification optimisée avec jours de répétition en bleu</p>
+            <div class="calendar" id="training-calendar">
+                <!-- Le calendrier sera généré par JavaScript -->
+            </div>
+        </section>
+        
+        <section class="techniques">
+            <h2>Techniques de Mémorisation</h2>
+            <div class="technique-list">
+                <div class="technique-item">
+                    <h3 class="technique-title">Répétition Espacée</h3>
+                    <p>Révision des mots à intervalles croissants pour une mémorisation à long terme</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Méthode des Loci</h3>
+                    <p>Associer chaque mot à un lieu pour faciliter le rappel</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Segmentation</h3>
+                    <p>Diviser les mots complexes en parties plus petites et mémorisables</p>
+                </div>
+                <div class="technique-item">
+                    <h3 class="technique-title">Association d'Images</h3>
+                    <p>Créer des images mentales pour chaque mot difficile</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="game-area">
+            <h2>Zone d'Entraînement</h2>
+            <p>Testez vos compétences en épellation avec des mots du dictionnaire</p>
+            
+            <div class="word-display" id="word-to-spell">Chargement...</div>
+            
+            <div class="input-area">
+                <input type="text" id="spelling-input" placeholder="Épelez le mot que vous entendez">
+                <button id="check-button">Vérifier</button>
+            </div>
+            
+            <div class="result" id="result-message"></div>
+            
+            <button id="hint-button">Indice</button>
+            <button id="next-word">Mot Suivant</button>
+            <button id="hear-word">🔊 Entendre le mot</button>
+            <div style="margin-top: 1rem;">
+                <label for="voiceSelect">Choisir la voix: </label>
+                <select id="voiceSelect">
+                    <option value="">Voix par défaut</option>
+                </select>
+            </div>
+        </section>
+        
+        <div class="motivation">
+            "La maîtrise vient non pas de la chance, mais de la pratique délibérée et de la persévérance."
+        </div>
+        
+        <footer>
+            <p>Spelling Master - Votre compagnon pour dominer l'épellation | Concours Janvier/Février</p>
+        </footer>
+    </div>
+
+    <script>
+        // Système de gestion des profils
+        const ProfileManager = {
+            currentUser: null,
+            allUsers: {},
+            
+            init() {
+                this.loadUsers();
+                this.checkExistingUser();
+                this.loadVoices();
+            },
+            
+            loadUsers() {
+                const savedUsers = localStorage.getItem('spellingMasterUsers');
+                if (savedUsers) {
+                    this.allUsers = JSON.parse(savedUsers);
+                }
+            },
+            
+            saveUsers() {
+                localStorage.setItem('spellingMasterUsers', JSON.stringify(this.allUsers));
+            },
+            
+            checkExistingUser() {
+                const lastUser = localStorage.getItem('spellingMasterLastUser');
+                if (lastUser && this.allUsers[lastUser]) {
+                    this.login(lastUser);
+                } else {
+                    this.showLoginModal();
+                }
+            },
+            
+            showLoginModal() {
+                document.getElementById('loginModal').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            },
+            
+            hideLoginModal() {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            },
+            
+            createUser(name) {
+                const userData = {
+                    name: name,
+                    joinDate: new Date().toISOString(),
+                    stats: {
+                        wordsMastered: 0,
+                        successRate: 0,
+                        currentStreak: 0,
+                        totalSessions: 0,
+                        totalWords: 0,
+                        currentStreakDays: 0,
+                        lastSessionDate: null
+                    },
+                    sessionHistory: [],
+                    level: 'Débutant',
+                    avatar: name.charAt(0).toUpperCase()
+                };
+                
+                this.allUsers[name] = userData;
+                this.saveUsers();
+                return userData;
+            },
+            
+            login(userName) {
+                if (!this.allUsers[userName]) {
+                    this.currentUser = this.createUser(userName);
+                } else {
+                    this.currentUser = this.allUsers[userName];
+                    this.updateStreak();
+                }
+                
+                localStorage.setItem('spellingMasterLastUser', userName);
+                this.updateProfileDisplay();
+                this.hideLoginModal();
+                this.loadSessionHistory();
+            },
+            
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('spellingMasterLastUser');
+                this.showLoginModal();
+            },
+            
+            updateStreak() {
+                const today = new Date().toDateString();
+                const lastSession = this.currentUser.stats.lastSessionDate;
+                
+                if (lastSession) {
+                    const lastSessionDate = new Date(lastSession).toDateString();
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    
+                    if (lastSessionDate === yesterday.toDateString()) {
+                        this.currentUser.stats.currentStreakDays++;
+                    } else if (lastSessionDate !== today) {
+                        this.currentUser.stats.currentStreakDays = 1;
+                    }
+                } else {
+                    this.currentUser.stats.currentStreakDays = 1;
+                }
+                
+                this.currentUser.stats.lastSessionDate = new Date().toISOString();
+                this.saveUsers();
+            },
+            
+            addSession(sessionData) {
+                if (!this.currentUser) return;
+                
+                const session = {
+                    date: new Date().toISOString(),
+                    score: sessionData.score,
+                    wordsPracticed: sessionData.wordsPracticed,
+                    duration: sessionData.duration
+                };
+                
+                this.currentUser.sessionHistory.unshift(session);
+                this.currentUser.stats.totalSessions++;
+                this.currentUser.stats.totalWords += sessionData.wordsPracticed;
+                
+                // Mettre à jour le niveau
+                this.updateLevel();
+                
+                this.saveUsers();
+                this.loadSessionHistory();
+            },
+            
+            updateLevel() {
+                const totalWords = this.currentUser.stats.totalWords;
+                if (totalWords >= 500) {
+                    this.currentUser.level = 'Expert';
+                } else if (totalWords >= 200) {
+                    this.currentUser.level = 'Avancé';
+                } else if (totalWords >= 100) {
+                    this.currentUser.level = 'Intermédiaire';
+                } else {
+                    this.currentUser.level = 'Débutant';
+                }
+            },
+            
+            updateProfileDisplay() {
+                if (!this.currentUser) return;
+                
+                document.getElementById('userName').textContent = this.currentUser.name;
+                document.getElementById('userAvatar').textContent = this.currentUser.avatar;
+                document.getElementById('userLevel').textContent = `Niveau: ${this.currentUser.level}`;
+                document.getElementById('totalSessions').textContent = this.currentUser.stats.totalSessions;
+                document.getElementById('totalWords').textContent = this.currentUser.stats.totalWords;
+                document.getElementById('currentStreak').textContent = this.currentUser.stats.currentStreakDays;
+                
+                // Mettre à jour les statistiques du jeu
+                document.getElementById('words-mastered').textContent = this.currentUser.stats.wordsMastered;
+                document.getElementById('success-rate').textContent = `${this.currentUser.stats.successRate}%`;
+                document.getElementById('streak').textContent = this.currentUser.stats.currentStreak;
+                
+                const progressPercentage = Math.min(100, (this.currentUser.stats.wordsMastered / 200) * 100);
+                document.getElementById('overall-progress').style.width = `${progressPercentage}%`;
+            },
+            
+            loadSessionHistory() {
+                if (!this.currentUser) return;
+                
+                const historyContainer = document.getElementById('sessionHistory');
+                historyContainer.innerHTML = '';
+                
+                // Afficher les 6 dernières sessions
+                const recentSessions = this.currentUser.sessionHistory.slice(0, 6);
+                
+                recentSessions.forEach(session => {
+                    const sessionCard = document.createElement('div');
+                    sessionCard.className = 'session-card';
+                    
+                    const date = new Date(session.date);
+                    const formattedDate = date.toLocaleDateString('fr-FR');
+                    
+                    sessionCard.innerHTML = `
+                        <div class="session-date">${formattedDate}</div>
+                        <div class="session-score">${session.score}%</div>
+                        <div>${session.wordsPracticed} mots</div>
+                        <div>${session.duration} min</div>
+                    `;
+                    
+                    historyContainer.appendChild(sessionCard);
+                });
+            },
+            
+            loadVoices() {
+                // Charger les voix disponibles
+                if ('speechSynthesis' in window) {
+                    // Attendre que les voix soient chargées
+                    speechSynthesis.onvoiceschanged = () => {
+                        const voices = speechSynthesis.getVoices();
+                        const voiceSelect = document.getElementById('voiceSelect');
+                        
+                        // Vider les options existantes
+                        voiceSelect.innerHTML = '<option value="">Voix par défaut</option>';
+                        
+                        // Ajouter les voix françaises
+                        voices.forEach(voice => {
+                            if (voice.lang.startsWith('fr')) {
+                                const option = document.createElement('option');
+                                option.value = voice.name;
+                                option.textContent = `${voice.name} (${voice.lang})`;
+                                voiceSelect.appendChild(option);
+                            }
+                        });
+                    };
+                    
+                    // Déclencher le chargement des voix
+                    speechSynthesis.getVoices();
+                }
+            }
+        };
+
+        // Données de l'application
+        const appData = {
+            dictionary: [
+                "Abyssal", "Clarté", "Diligent", "Éphémère", "Frémir",
+                "Générosité", "Habile", "Lucide", "Sérénité", "Véhément"
+            ],
+            currentWord: "",
+            currentSession: {
+                correctAnswers: 0,
+                totalWords: 0,
+                startTime: null
+            },
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+            selectedVoice: null
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            ProfileManager.init();
+            setupEventListeners();
+            generateCalendar();
+            createGalaxy();
+            generateMonthlyCalendar();
+        });
+
+        function createGalaxy() {
+            const galaxy = document.getElementById('galaxy');
+            
+            // Créer les étoiles
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 3;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                galaxy.appendChild(star);
+            }
+            
+            // Créer les nébuleuses
+            const nebula1 = document.createElement('div');
+            nebula1.className = 'nebula nebula-1';
+            galaxy.appendChild(nebula1);
+            
+            const nebula2 = document.createElement('div');
+            nebula2.className = 'nebula nebula-2';
+            galaxy.appendChild(nebula2);
+        }
+
+        function setupEventListeners() {
+            // Bouton de démarrage
+            document.getElementById('startBtn').addEventListener('click', function() {
+                const userName = document.getElementById('userNameInput').value.trim();
+                if (userName) {
+                    ProfileManager.login(userName);
+                    loadNextWord();
+                }
+            });
+            
+            // Entrée dans le champ de nom
+            document.getElementById('userNameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('startBtn').click();
+                }
+            });
+            
+            // Bouton de déconnexion
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                ProfileManager.logout();
+            });
+            
+            // Boutons du jeu
+            document.getElementById('check-button').addEventListener('click', checkSpelling);
+            document.getElementById('hint-button').addEventListener('click', showHint);
+            document.getElementById('next-word').addEventListener('click', loadNextWord);
+            document.getElementById('hear-word').addEventListener('click', function() {
+                speakWord(appData.currentWord);
+            });
+            
+            // Sélecteur de voix
+            document.getElementById('voiceSelect').addEventListener('change', function() {
+                appData.selectedVoice = this.value;
+            });
+            
+            document.getElementById('spelling-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkSpelling();
+                }
+            });
+            
+            // Boutons du calendrier mensuel
+            document.getElementById('toggleCalendarBtn').addEventListener('click', function() {
+                const calendar = document.getElementById('monthlyCalendar');
+                if (calendar.style.display === 'none') {
+                    calendar.style.display = 'block';
+                    this.textContent = 'Masquer le Calendrier';
+                } else {
+                    calendar.style.display = 'none';
+                    this.textContent = 'Afficher le Calendrier (Janvier à Septembre)';
+                }
+            });
+            
+            document.getElementById('prevMonthBtn').addEventListener('click', function() {
+                if (appData.currentMonth === 0) {
+                    appData.currentMonth = 11;
+                    appData.currentYear--;
+                } else {
+                    appData.currentMonth--;
+                }
+                generateMonthlyCalendar();
+            });
+            
+            document.getElementById('nextMonthBtn').addEventListener('click', function() {
+                if (appData.currentMonth === 11) {
+                    appData.currentMonth = 0;
+                    appData.currentYear++;
+                } else {
+                    appData.currentMonth++;
+                }
+                generateMonthlyCalendar();
+            });
+            
+            document.querySelectorAll('.training-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const duration = this.getAttribute('data-duration');
+                    startTrainingSession(duration);
+                });
+            });
+        }
+
+        function generateCalendar() {
+            const calendar = document.getElementById('training-calendar');
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day';
+                dayHeader.textContent = day;
+                dayHeader.style.fontWeight = 'bold';
+                calendar.appendChild(dayHeader);
+            });
+            
+            // Jours de répétition: lundi (1), mardi (2), mercredi (3), vendredi (5)
+            const repetitionDays = [1, 2, 3, 5];
+            
+            for (let i = 1; i <= 28; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = i;
+                
+                // Déterminer le jour de la semaine (0 = dimanche, 1 = lundi, etc.)
+                const dayOfWeek = (i % 7) || 7; // Ajustement pour avoir 1=lundi, 7=dimanche
+                
+                if (repetitionDays.includes(dayOfWeek)) {
+                    dayElement.classList.add('repetition');
+                } else if (i % 7 === 0) {
+                    dayElement.classList.add('rest');
+                } else if (i % 2 === 0) {
+                    dayElement.classList.add('active');
+                }
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function generateMonthlyCalendar() {
+            const monthNames = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
+            
+            const grid = document.getElementById('monthlyCalendarGrid');
+            const display = document.getElementById('monthYearDisplay');
+            
+            // Mettre à jour l'affichage du mois et de l'année
+            display.textContent = `${monthNames[appData.currentMonth]} ${appData.currentYear}`;
+            
+            // Vider la grille
+            grid.innerHTML = '';
+            
+            // Ajouter les en-têtes des jours
+            const dayHeaders = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'monthly-day-header';
+                dayHeader.textContent = day;
+                grid.appendChild(dayHeader);
+            });
+            
+            // Obtenir le premier jour du mois
+            const firstDay = new Date(appData.currentYear, appData.currentMonth, 1);
+            const startingDay = firstDay.getDay(); // 0 = dimanche, 1 = lundi, etc.
+            
+            // Ajuster pour commencer le lundi
+            const startOffset = startingDay === 0 ? 6 : startingDay - 1;
+            
+            // Obtenir le nombre de jours dans le mois
+            const daysInMonth = new Date(appData.currentYear, appData.currentMonth + 1, 0).getDate();
+            
+            // Jours de répétition: lundi (1), mardi (2), mercredi (3), vendredi (5)
+            const repetitionDays = [1, 2, 3, 5];
+            
+            // Remplir les cases vides avant le premier jour
+            for (let i = 0; i < startOffset; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'monthly-day';
+                grid.appendChild(emptyDay);
+            }
+            
+            // Remplir les jours du mois
+            const today = new Date();
+            const isCurrentMonth = today.getMonth() === appData.currentMonth && today.getFullYear() === appData.currentYear;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'monthly-day';
+                dayElement.textContent = day;
+                
+                // Calculer le jour de la semaine (0 = dimanche, 1 = lundi, etc.)
+                const date = new Date(appData.currentYear, appData.currentMonth, day);
+                const dayOfWeek = date.getDay();
+                
+                // Ajuster pour avoir 1=lundi, 7=dimanche
+                const adjustedDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+                
+                // Marquer les jours de répétition
+                if (repetitionDays.includes(adjustedDayOfWeek)) {
+                    dayElement.classList.add('repetition');
+                }
+                
+                // Marquer le jour actuel
+                if (isCurrentMonth && day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                grid.appendChild(dayElement);
+            }
+        }
+
+        function loadNextWord() {
+            if (!ProfileManager.currentUser) return;
+            
+            const randomIndex = Math.floor(Math.random() * appData.dictionary.length);
+            appData.currentWord = appData.dictionary[randomIndex];
+            
+            const displayElement = document.getElementById('word-to-spell');
+            displayElement.textContent = appData.currentWord;
+            displayElement.classList.remove('correct', 'incorrect');
+            
+            document.getElementById('spelling-input').value = '';
+            document.getElementById('result-message').textContent = '';
+            
+            speakWord(appData.currentWord);
+            
+            // Démarrer la session si ce n'est pas déjà fait
+            if (!appData.currentSession.startTime) {
+                appData.currentSession.startTime = new Date();
+                appData.currentSession.correctAnswers = 0;
+                appData.currentSession.totalWords = 0;
+            }
+        }
+
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                
+                // Utiliser la voix sélectionnée si disponible
+                if (appData.selectedVoice) {
+                    const voices = speechSynthesis.getVoices();
+                    const selectedVoice = voices.find(voice => voice.name === appData.selectedVoice);
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                    }
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function checkSpelling() {
+            if (!ProfileManager.currentUser) return;
+            
+            const userInput = document.getElementById('spelling-input').value.trim();
+            const correctWord = appData.currentWord;
+            const resultElement = document.getElementById('result-message');
+            const wordElement = document.getElementById('word-to-spell');
+            
+            appData.currentSession.totalWords++;
+            
+            if (userInput.toLowerCase() === correctWord.toLowerCase()) {
+                resultElement.textContent = "Correct! Excellente orthographe!";
+                resultElement.className = 'result correct';
+                wordElement.classList.add('correct');
+                
+                // Mettre à jour les statistiques
+                ProfileManager.currentUser.stats.wordsMastered++;
+                ProfileManager.currentUser.stats.currentStreak++;
+                ProfileManager.currentUser.stats.successRate = Math.min(100, 
+                    ((ProfileManager.currentUser.stats.wordsMastered / appData.currentSession.totalWords) * 100).toFixed(1)
+                );
+                
+                appData.currentSession.correctAnswers++;
+                
+                wordElement.style.animation = 'bounce 1s';
+                setTimeout(() => {
+                    wordElement.style.animation = '';
+                }, 1000);
+            } else {
+                resultElement.textContent = `Incorrect. La bonne orthographe est: ${appData.currentWord}`;
+                resultElement.className = 'result incorrect';
+                wordElement.classList.add('incorrect');
+                
+                ProfileManager.currentUser.stats.currentStreak = 0;
+                ProfileManager.currentUser.stats.successRate = Math.max(0, 
+                    ((appData.currentSession.correctAnswers / appData.currentSession.totalWords) * 100).toFixed(1)
+                );
+            }
+            
+            ProfileManager.updateProfileDisplay();
+            ProfileManager.saveUsers();
+            
+            setTimeout(loadNextWord, 3000);
+        }
+
+        function showHint() {
+            const word = appData.currentWord;
+            const hintLength = Math.ceil(word.length / 3);
+            const hint = word.substring(0, hintLength) + '...';
+            
+            document.getElementById('result-message').textContent = `Indice: ${hint}`;
+            document.getElementById('result-message').className = 'result';
+        }
+
+        function startTrainingSession(duration) {
+            if (!ProfileManager.currentUser) return;
+            
+            alert(`Début de la session d'entraînement de ${duration} minutes!`);
+            
+            const sessionProgress = document.getElementById('session-progress');
+            sessionProgress.style.width = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 100 / (duration * 60 / 100);
+                sessionProgress.style.width = `${Math.min(progress, 100)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Enregistrer la session
+                    const sessionScore = appData.currentSession.totalWords > 0 ? 
+                        Math.round((appData.currentSession.correctAnswers / appData.currentSession.totalWords) * 100) : 0;
+                    
+                    ProfileManager.addSession({
+                        score: sessionScore,
+                        wordsPracticed: appData.currentSession.totalWords,
+                        duration: duration
+                    });
+                    
+                    alert(`Session terminée! Score: ${sessionScore}% - ${appData.currentSession.correctAnswers}/${appData.currentSession.totalWords} mots corrects`);
+                    
+                    // Réinitialiser la session
+                    appData.currentSession = {
+                        correctAnswers: 0,
+                        totalWords: 0,
+                        startTime: null
+                    };
+                }
+            }, 100);
+        }
+
+        function generateTrainingSchedule() {
+            // Cette fonction reste similaire à l'originale
+            // ... (code inchangé)
+        }
+
+        function updateNextTraining() {
+            // Cette fonction reste similaire à l'originale
+            // ... (code inchangé)
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
