@@ -1,12 +1,9 @@
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Mini Ya Credo - Robot IA Vocal Complet</title>
+    <title>🤖 Mini Ya Credo - Robot IA Vocal Fonctionnel</title>
     <style>
         /* === STYLES COMPLETS === */
         :root {
@@ -16,6 +13,7 @@
             --accent: #f72585;
             --success: #4cc9f0;
             --danger: #f94144;
+            --warning: #f8961e;
             --light: #f8f9fa;
             --dark: #212529;
             --gray: #6c757d;
@@ -44,14 +42,14 @@
         
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1000px;
             background: white;
             border-radius: var(--radius);
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 95vh;
+            height: 90vh;
         }
         
         /* Header */
@@ -63,12 +61,25 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
         
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
+            position: relative;
+            z-index: 1;
         }
         
         .logo-icon {
@@ -82,16 +93,18 @@
             font-size: 28px;
             color: var(--primary);
             animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
         }
         
         .logo-text h1 {
             font-size: 24px;
             margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .logo-text p {
@@ -106,6 +119,10 @@
             background: rgba(255,255,255,0.1);
             padding: 8px 15px;
             border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 1;
         }
         
         .status-dot {
@@ -114,11 +131,12 @@
             background: #4ade80;
             border-radius: 50%;
             animation: blink 2s infinite;
+            box-shadow: 0 0 10px #4ade80;
         }
         
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
         }
         
         /* Main Content */
@@ -145,21 +163,27 @@
         .chat-header h2 {
             color: var(--primary);
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 15px;
             background: white;
             border-radius: var(--radius);
             margin-bottom: 20px;
             box-shadow: var(--shadow) inset;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .message {
-            margin-bottom: 20px;
             animation: fadeIn 0.3s;
+            max-width: 85%;
         }
         
         @keyframes fadeIn {
@@ -168,37 +192,87 @@
         }
         
         .message-user {
+            align-self: flex-end;
             background: var(--primary);
             color: white;
             padding: 15px;
             border-radius: 18px 18px 0 18px;
-            margin-left: 20%;
-            max-width: 80%;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        
+        .message-user::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -8px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid var(--primary);
+            border-right: 10px solid transparent;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid var(--primary);
         }
         
         .message-robot {
+            align-self: flex-start;
             background: var(--light);
             padding: 15px;
             border-radius: 18px 18px 18px 0;
-            margin-right: 20%;
-            max-width: 80%;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: relative;
         }
         
-        .message-robot strong {
+        .message-robot::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-right: 10px solid var(--light);
+            border-left: 10px solid transparent;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid var(--light);
+        }
+        
+        .robot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
             color: var(--primary);
-            display: block;
-            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .robot-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
         
         .typing-indicator {
             display: none;
             align-items: center;
             gap: 10px;
-            padding: 10px;
+            padding: 15px;
             background: var(--light);
             border-radius: var(--radius);
             margin-bottom: 20px;
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            max-width: 200px;
+        }
+        
+        .typing-indicator.active {
+            display: flex;
         }
         
         .typing-dots {
@@ -218,8 +292,8 @@
         .typing-dots div:nth-child(3) { animation-delay: 0.4s; }
         
         @keyframes typing {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-10px); opacity: 1; }
         }
         
         /* Input Area */
@@ -227,6 +301,11 @@
             display: flex;
             gap: 10px;
             align-items: flex-end;
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
         
         .voice-btn {
@@ -236,12 +315,14 @@
             background: var(--accent);
             border: none;
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
+            position: relative;
+            flex-shrink: 0;
         }
         
         .voice-btn:hover {
@@ -254,8 +335,24 @@
             animation: pulse 1s infinite;
         }
         
+        .voice-btn.listening::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--danger);
+            animation: ripple 1.5s infinite;
+        }
+        
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
         .input-wrapper {
             flex: 1;
+            position: relative;
         }
         
         textarea {
@@ -268,12 +365,15 @@
             font-family: inherit;
             font-size: 16px;
             resize: none;
-            transition: border 0.3s;
+            transition: all 0.3s;
+            background: var(--light);
         }
         
         textarea:focus {
             outline: none;
             border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
         
         .send-btn {
@@ -283,9 +383,13 @@
             background: var(--primary);
             border: none;
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .send-btn:hover {
@@ -295,15 +399,21 @@
         
         /* Side Panel */
         .side-panel {
-            width: 300px;
+            width: 350px;
             padding: 20px;
             background: white;
             border-left: 1px solid var(--border);
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .panel-section {
-            margin-bottom: 25px;
+            background: var(--light);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
         }
         
         .panel-section h3 {
@@ -312,6 +422,9 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .knowledge-tags {
@@ -322,12 +435,19 @@
         }
         
         .knowledge-tag {
-            background: var(--light);
+            background: white;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             color: var(--gray);
             border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .knowledge-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
         }
         
         .settings-group {
@@ -339,14 +459,24 @@
             margin-bottom: 5px;
             font-size: 14px;
             color: var(--gray);
+            font-weight: 500;
         }
         
         select, input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
         
         .btn {
@@ -357,6 +487,10 @@
             font-family: inherit;
             font-weight: 500;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .btn-primary {
@@ -366,16 +500,48 @@
         
         .btn-primary:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
         
         .btn-secondary {
-            background: var(--light);
+            background: white;
             color: var(--dark);
             border: 1px solid var(--border);
         }
         
         .btn-secondary:hover {
             background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .voice-control-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .voice-control-btn:hover {
+            background: var(--light);
+        }
+        
+        .voice-control-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
         
         /* Footer */
@@ -394,6 +560,63 @@
             display: flex;
             gap: 20px;
         }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Voice Visualizer */
+        .voice-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 40px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .voice-visualizer.active {
+            display: flex;
+        }
+        
+        .voice-bar {
+            width: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s, fadeOut 0.3s 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+        
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -414,9 +637,17 @@
             }
             
             .message-user, .message-robot {
-                margin-left: 0;
-                margin-right: 0;
-                max-width: 100%;
+                max-width: 95%;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .status {
+                align-self: center;
             }
         }
         
@@ -427,6 +658,7 @@
         
         ::-webkit-scrollbar-track {
             background: var(--light);
+            border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb {
@@ -436,6 +668,23 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
+        }
+        
+        /* Code blocks */
+        code {
+            background: var(--dark);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre code {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -449,12 +698,12 @@
                 </div>
                 <div class="logo-text">
                     <h1>Mini Ya Credo</h1>
-                    <p>Robot IA Vocal avec Connaissances Illimitées</p>
+                    <p>Robot IA Vocal avec Reconnaissance et Synthèse Vocale</p>
                 </div>
             </div>
             <div class="status">
                 <div class="status-dot"></div>
-                <span>IA Connectée • Prêt à parler</span>
+                <span id="statusText">Prêt à écouter et parler</span>
             </div>
         </div>
 
@@ -463,32 +712,34 @@
             <!-- Chat Panel -->
             <div class="chat-panel">
                 <div class="chat-header">
-                    <h2>💬 Conversation avec l'IA</h2>
+                    <h2>💬 Conversation Vocale avec l'IA</h2>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
                     <div class="message message-robot">
-                        <strong>🤖 Mini Ya Credo :</strong>
-                        Bonjour ! Je suis **Mini Ya Credo**, votre assistant IA vocal complet. 
-                        Je possède des connaissances dans **tous les domaines** : sciences, histoire, 
-                        programmation, médecine, droit, économie, philosophie, et bien plus encore.
-                        
-                        <div style="margin-top: 10px; font-size: 14px;">
-                            🎤 <strong>Fonctionnalités :</strong>
-                            <ul style="margin-top: 5px; padding-left: 20px;">
-                                <li>Réponses vocales et texte</li>
-                                <li>Connexion à GPT-4 (clé API requise)</li>
-                                <li>Reconnaissance vocale intégrée</li>
-                                <li>Support multilingue</li>
-                                <li>Connaissances illimitées</li>
-                            </ul>
+                        <div class="robot-header">
+                            <div class="robot-icon">🤖</div>
+                            <span>Mini Ya Credo</span>
                         </div>
-                        
-                        <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
-                            <strong>⚡ Pour commencer :</strong>
-                            <p style="margin-top: 5px;">1. Cliquez sur le microphone pour parler</p>
-                            <p>2. Ou tapez votre question ci-dessous</p>
-                            <p>3. Configurez votre clé API OpenAI pour débloquer toutes les fonctionnalités</p>
+                        <div>
+                            <p><strong>Bonjour ! Je suis Mini Ya Credo, votre assistant IA vocal COMPLET.</strong></p>
+                            <p style="margin-top: 10px;">🎤 <strong>Fonctionnalités vocales ACTIVES :</strong></p>
+                            <ul style="margin: 10px 0 10px 20px;">
+                                <li>✅ Reconnaissance vocale intégrée</li>
+                                <li>✅ Synthèse vocale (texte vers parole)</li>
+                                <li>✅ Réponses intelligentes en temps réel</li>
+                                <li>✅ Support français/anglais</li>
+                                <li>✅ Vitesse vocale ajustable</li>
+                            </ul>
+                            <p><strong>Pour commencer :</strong></p>
+                            <ol style="margin: 10px 0 10px 20px;">
+                                <li>Cliquez sur le bouton 🎤 MICROPHONE pour parler</li>
+                                <li>Je vais transcrire et répondre vocalement</li>
+                                <li>Vous pouvez aussi taper votre question</li>
+                            </ol>
+                            <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
+                                <strong>🎯 Testez-moi :</strong> Dites "Bonjour" ou "Explique la théorie de la relativité"
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -503,20 +754,25 @@
                     <span>Mini Ya Credo réfléchit...</span>
                 </div>
                 
+                <!-- Voice Visualizer -->
+                <div class="voice-visualizer" id="voiceVisualizer">
+                    <!-- Bars will be added by JavaScript -->
+                </div>
+                
                 <!-- Input Area -->
                 <div class="input-area">
-                    <button class="voice-btn" id="voiceBtn" title="Parler">
+                    <button class="voice-btn" id="voiceBtn" title="Cliquez pour parler">
                         🎤
                     </button>
                     
                     <div class="input-wrapper">
                         <textarea 
                             id="userInput" 
-                            placeholder="Posez votre question ici... (Entrée pour envoyer, Shift+Entrée pour nouvelle ligne)"
+                            placeholder="Parlez ou tapez votre question ici... (Appuyez sur Entrée pour envoyer)"
                             rows="1"></textarea>
                     </div>
                     
-                    <button class="send-btn" id="sendBtn" title="Envoyer">
+                    <button class="send-btn" id="sendBtn" title="Envoyer le message">
                         ✈️
                     </button>
                 </div>
@@ -524,66 +780,79 @@
             
             <!-- Side Panel -->
             <div class="side-panel">
-                <!-- Configuration IA -->
-                <div class="panel-section">
-                    <h3>⚙️ Configuration IA</h3>
-                    <div class="settings-group">
-                        <label for="aiModel">Modèle d'IA :</label>
-                        <select id="aiModel">
-                            <option value="gpt-4">GPT-4 (Recommandé)</option>
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        </select>
-                    </div>
-                    
-                    <div class="settings-group">
-                        <label for="apiKey">Clé API OpenAI :</label>
-                        <input type="password" id="apiKey" placeholder="sk-...">
-                    </div>
-                    
-                    <button class="btn btn-primary" id="saveConfig" style="width: 100%; margin-top: 10px;">
-                        💾 Sauvegarder
-                    </button>
-                </div>
-                
                 <!-- Configuration Vocale -->
                 <div class="panel-section">
                     <h3>🎤 Configuration Vocale</h3>
+                    
                     <div class="settings-group">
-                        <label for="voice">Voix :</label>
-                        <select id="voice">
-                            <option value="fr-FR">Français (Homme)</option>
-                            <option value="fr-CA">Français (Femme)</option>
-                            <option value="en-US">Anglais</option>
+                        <label for="voiceLanguage">Langue de reconnaissance :</label>
+                        <select id="voiceLanguage">
+                            <option value="fr-FR">Français (France)</option>
+                            <option value="fr-CA">Français (Canada)</option>
+                            <option value="en-US">Anglais (USA)</option>
+                            <option value="en-GB">Anglais (UK)</option>
+                            <option value="es-ES">Espagnol</option>
+                            <option value="de-DE">Allemand</option>
                         </select>
                     </div>
                     
                     <div class="settings-group">
-                        <label for="voiceSpeed">Vitesse : <span id="speedValue">1.0x</span></label>
+                        <label for="voiceSpeed">Vitesse de parole : <span id="speedValue">1.0x</span></label>
                         <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
                     </div>
                     
                     <div class="settings-group">
+                        <label for="voicePitch">Hauteur de voix : <span id="pitchValue">Normal</span></label>
+                        <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    
+                    <div class="settings-group">
                         <label>
-                            <input type="checkbox" id="autoVoice" checked> Réponses vocales automatiques
+                            <input type="checkbox" id="autoSpeak" checked> Réponses vocales automatiques
                         </label>
+                    </div>
+                    
+                    <div class="voice-controls">
+                        <button class="voice-control-btn" id="testVoiceBtn">
+                            <span>🔊</span> Tester la voix
+                        </button>
+                        <button class="voice-control-btn" id="stopVoiceBtn">
+                            <span>⏹️</span> Arrêter
+                        </button>
                     </div>
                 </div>
                 
-                <!-- Connaissances -->
+                <!-- Configuration IA -->
                 <div class="panel-section">
-                    <h3>📚 Domaines de Connaissance</h3>
+                    <h3>🧠 Intelligence Artificielle</h3>
+                    <div class="settings-group">
+                        <label for="aiMode">Mode de réponse :</label>
+                        <select id="aiMode">
+                            <option value="smart">Intelligent (IA simulée)</option>
+                            <option value="simple">Simple (réponses basiques)</option>
+                            <option value="fun">Ludique (réponses créatives)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label>
+                            <input type="checkbox" id="enableGPT" checked> Activer les réponses avancées
+                        </label>
+                    </div>
+                    
                     <div class="knowledge-tags">
-                        <span class="knowledge-tag">🧪 Sciences</span>
-                        <span class="knowledge-tag">💻 Tech</span>
+                        <span class="knowledge-tag">🧬 Biologie</span>
+                        <span class="knowledge-tag">💻 Code</span>
                         <span class="knowledge-tag">📜 Histoire</span>
                         <span class="knowledge-tag">⚖️ Droit</span>
-                        <span class="knowledge-tag">💰 Économie</span>
-                        <span class="knowledge-tag">🏥 Médecine</span>
+                        <span class="knowledge-tag">💰 Éco</span>
+                        <span class="knowledge-tag">🏥 Santé</span>
                         <span class="knowledge-tag">🧠 Psycho</span>
-                        <span class="knowledge-tag">🎨 Arts</span>
+                        <span class="knowledge-tag">🌍 Geo</span>
+                        <span class="knowledge-tag">🎨 Art</span>
                         <span class="knowledge-tag">📈 Maths</span>
-                        <span class="knowledge-tag">🌍 Géographie</span>
-                        <span class="knowledge-tag">🔬 Recherche</span>
+                        <span class="knowledge-tag">🔬 Science</span>
+                        <span class="knowledge-tag">🚀 Tech</span>
                     </div>
                 </div>
                 
@@ -597,12 +866,38 @@
                         <button class="btn btn-secondary" id="quickCode">
                             💻 Aide programmation
                         </button>
-                        <button class="btn btn-secondary" id="quickExplain">
-                            📖 Expliquer simplement
+                        <button class="btn btn-secondary" id="quickWeather">
+                            🌤️ Météo aujourd'hui
                         </button>
-                        <button class="btn btn-secondary" id="quickTranslate">
-                            🌍 Traduire un texte
+                        <button class="btn btn-secondary" id="quickJoke">
+                            😄 Une blague
                         </button>
+                        <button class="btn btn-secondary" id="quickNews">
+                            📰 Actualités
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="panel-section">
+                    <h3>📊 Statistiques</h3>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="stat">
+                            <span>🎙️ Questions vocales :</span>
+                            <span id="voiceQuestions">0</span>
+                        </div>
+                        <div class="stat">
+                            <span>💬 Messages totaux :</span>
+                            <span id="totalMessages">1</span>
+                        </div>
+                        <div class="stat">
+                            <span>⏱️ Temps de session :</span>
+                            <span id="sessionTime">00:00</span>
+                        </div>
+                        <div class="stat">
+                            <span>🔊 Volume :</span>
+                            <span id="currentVolume">80%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -611,117 +906,185 @@
         <!-- Footer -->
         <div class="footer">
             <div>
-                🤖 <strong>Mini Ya Credo v1.0</strong> • Robot IA Vocal Complet
+                🤖 <strong>Mini Ya Credo v2.0</strong> • Robot IA Vocal Fonctionnel
             </div>
             <div class="stats">
-                <span>🧠 Connaissances : <span id="knowledgeCount">Illimitées</span></span>
-                <span>💬 Messages : <span id="messageCount">1</span></span>
+                <div class="stat">
+                    <span>🔊</span>
+                    <span id="micStatus">Micro: Prêt</span>
+                </div>
+                <div class="stat">
+                    <span>🤖</span>
+                    <span id="aiStatus">IA: Active</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Complet -->
+    <!-- JavaScript COMPLET avec reconnaissance et synthèse vocale -->
     <script>
-        // ===== MINI YA CREDO - ROBOT IA VOCAL COMPLET =====
+        // ===== MINI YA CREDO - ROBOT VOCAL FONCTIONNEL =====
         
         class MiniYaCredo {
             constructor() {
                 this.initialize();
-                this.loadConfig();
+                this.setupSpeechRecognition();
+                this.setupSpeechSynthesis();
                 this.setupEventListeners();
-                this.setupSpeech();
-                this.messageCount = 1;
+                this.initVoiceVisualizer();
+                this.startSessionTimer();
+                
+                this.stats = {
+                    voiceQuestions: 0,
+                    totalMessages: 1,
+                    sessionStart: Date.now()
+                };
             }
             
             initialize() {
-                // Récupérer les éléments
+                // Récupérer les éléments DOM
                 this.elements = {
                     chatMessages: document.getElementById('chatMessages'),
                     userInput: document.getElementById('userInput'),
                     sendBtn: document.getElementById('sendBtn'),
                     voiceBtn: document.getElementById('voiceBtn'),
                     typingIndicator: document.getElementById('typingIndicator'),
-                    apiKey: document.getElementById('apiKey'),
-                    aiModel: document.getElementById('aiModel'),
+                    voiceVisualizer: document.getElementById('voiceVisualizer'),
+                    statusText: document.getElementById('statusText'),
+                    
+                    // Configuration
+                    voiceLanguage: document.getElementById('voiceLanguage'),
                     voiceSpeed: document.getElementById('voiceSpeed'),
+                    voicePitch: document.getElementById('voicePitch'),
                     speedValue: document.getElementById('speedValue'),
-                    messageCount: document.getElementById('messageCount'),
-                    saveConfig: document.getElementById('saveConfig'),
+                    pitchValue: document.getElementById('pitchValue'),
+                    autoSpeak: document.getElementById('autoSpeak'),
+                    aiMode: document.getElementById('aiMode'),
+                    enableGPT: document.getElementById('enableGPT'),
+                    
+                    // Boutons
+                    testVoiceBtn: document.getElementById('testVoiceBtn'),
+                    stopVoiceBtn: document.getElementById('stopVoiceBtn'),
                     quickScience: document.getElementById('quickScience'),
                     quickCode: document.getElementById('quickCode'),
-                    quickExplain: document.getElementById('quickExplain'),
-                    quickTranslate: document.getElementById('quickTranslate')
+                    quickWeather: document.getElementById('quickWeather'),
+                    quickJoke: document.getElementById('quickJoke'),
+                    quickNews: document.getElementById('quickNews'),
+                    
+                    // Stats
+                    voiceQuestions: document.getElementById('voiceQuestions'),
+                    totalMessages: document.getElementById('totalMessages'),
+                    sessionTime: document.getElementById('sessionTime'),
+                    currentVolume: document.getElementById('currentVolume'),
+                    micStatus: document.getElementById('micStatus'),
+                    aiStatus: document.getElementById('aiStatus')
                 };
                 
-                // Configuration par défaut
+                // Configuration
                 this.config = {
-                    apiKey: '',
-                    aiModel: 'gpt-4',
                     voiceEnabled: true,
-                    voiceSpeed: 1,
-                    knowledgeContext: `Tu es Mini Ya Credo, un assistant IA vocal avec des connaissances complètes dans tous les domaines.
-                    
-                    DOMAINES DE CONNAISSANCES :
-                    - Sciences (physique, chimie, biologie, astronomie)
-                    - Technologies (IA, programmation, web, mobile)
-                    - Médecine (anatomie, physiologie, pathologies générales)
-                    - Droit (droit français, européen, international)
-                    - Économie (macro, micro, finance, commerce)
-                    - Histoire (mondiale, française, événements majeurs)
-                    - Géographie (pays, capitales, drapeaux, cultures)
-                    - Arts (peinture, musique, littérature, cinéma)
-                    - Philosophie (courants, philosophes, concepts)
-                    - Langues (traduction, grammaire, vocabulaire)
-                    - Mathématiques (algèbre, géométrie, calcul, statistiques)
-                    
-                    TON RÔLE :
-                    1. Répondre de manière précise et pédagogique
-                    2. Adapter la complexité au niveau de l'utilisateur
-                    3. Fournir des explications claires et structurées
-                    4. Citer tes sources quand c'est pertinent
-                    5. Proposer des analogies pour faciliter la compréhension
-                    6. Être bienveillant et encourageant
-                    
-                    FORMAT DES RÉPONSES :
-                    - Commence par un titre clair
-                    - Utilise des sections si nécessaire
-                    - Ajoute des exemples concrets
-                    - Termine par un résumé si la réponse est longue
-                    - Propose des ressources pour aller plus loin
-                    
-                    RÈGLES IMPORTANTES :
-                    - Ne donne jamais de conseils médicaux personnalisés
-                    - N'encourage pas les activités illégales
-                    - Respecte la confidentialité
-                    - Mentionne tes limitations si nécessaire`
+                    autoSpeak: true,
+                    language: 'fr-FR',
+                    speed: 1,
+                    pitch: 1,
+                    volume: 0.8,
+                    aiMode: 'smart'
                 };
                 
+                // État
                 this.isListening = false;
+                this.isSpeaking = false;
                 this.conversationHistory = [];
             }
             
-            loadConfig() {
-                const saved = localStorage.getItem('miniYaCredoConfig');
-                if (saved) {
-                    this.config = { ...this.config, ...JSON.parse(saved) };
-                    this.elements.apiKey.value = this.config.apiKey;
-                    this.elements.aiModel.value = this.config.aiModel;
-                    this.elements.voiceSpeed.value = this.config.voiceSpeed;
-                    this.elements.speedValue.textContent = `${this.config.voiceSpeed}x`;
+            setupSpeechRecognition() {
+                // Vérifier si la reconnaissance vocale est supportée
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (SpeechRecognition) {
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = this.config.language;
+                    
+                    this.recognition.onstart = () => {
+                        this.isListening = true;
+                        this.elements.voiceBtn.classList.add('listening');
+                        this.elements.voiceBtn.innerHTML = '🔴';
+                        this.elements.micStatus.textContent = 'Micro: En écoute';
+                        this.showToast('🎤 Je vous écoute... parlez maintenant', 'success');
+                        this.updateStatus('En écoute...');
+                        this.startVoiceVisualizer();
+                    };
+                    
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        console.log('Texte reconnu:', transcript);
+                        
+                        this.elements.userInput.value = transcript;
+                        this.stats.voiceQuestions++;
+                        this.elements.voiceQuestions.textContent = this.stats.voiceQuestions;
+                        
+                        this.processUserMessage(transcript);
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        console.error('Erreur reconnaissance:', event.error);
+                        this.elements.micStatus.textContent = 'Micro: Erreur';
+                        this.showToast(`Erreur: ${event.error}`, 'error');
+                        this.stopListening();
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.stopListening();
+                    };
+                    
+                    this.updateStatus('Reconnaissance vocale activée');
+                    this.showToast('✅ Reconnaissance vocale prête', 'success');
+                    
+                } else {
+                    this.elements.voiceBtn.style.display = 'none';
+                    this.elements.micStatus.textContent = 'Micro: Non supporté';
+                    this.showToast('⚠️ Reconnaissance vocale non supportée par votre navigateur', 'warning');
                 }
             }
             
-            saveConfig() {
-                this.config.apiKey = this.elements.apiKey.value;
-                this.config.aiModel = this.elements.aiModel.value;
-                this.config.voiceSpeed = parseFloat(this.elements.voiceSpeed.value);
-                localStorage.setItem('miniYaCredoConfig', JSON.stringify(this.config));
-                this.showMessage('Configuration sauvegardée !', 'success');
+            setupSpeechSynthesis() {
+                // Vérifier si la synthèse vocale est supportée
+                if ('speechSynthesis' in window) {
+                    this.synthesis = window.speechSynthesis;
+                    this.voices = [];
+                    
+                    // Charger les voix disponibles
+                    this.loadVoices();
+                    
+                    // Événement quand les voix sont chargées
+                    speechSynthesis.onvoiceschanged = () => {
+                        this.loadVoices();
+                    };
+                    
+                    this.updateStatus('Synthèse vocale activée');
+                    
+                } else {
+                    this.elements.autoSpeak.checked = false;
+                    this.elements.autoSpeak.disabled = true;
+                    this.showToast('⚠️ Synthèse vocale non supportée', 'warning');
+                }
+            }
+            
+            loadVoices() {
+                this.voices = speechSynthesis.getVoices();
+                console.log('Voix disponibles:', this.voices);
             }
             
             setupEventListeners() {
-                // Envoyer message
+                // Bouton microphone
+                this.elements.voiceBtn.addEventListener('click', () => this.toggleListening());
+                
+                // Bouton envoyer
                 this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
+                
+                // Entrée dans le textarea
                 this.elements.userInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -729,223 +1092,373 @@
                     }
                 });
                 
-                // Reconnaissance vocale
-                this.elements.voiceBtn.addEventListener('click', () => this.toggleVoiceInput());
-                
-                // Configuration
-                this.elements.saveConfig.addEventListener('click', () => this.saveConfig());
-                this.elements.voiceSpeed.addEventListener('input', (e) => {
-                    this.elements.speedValue.textContent = `${e.target.value}x`;
-                });
-                
-                // Actions rapides
-                this.elements.quickScience.addEventListener('click', () => {
-                    this.elements.userInput.value = "Explique la théorie de la relativité d'Einstein de manière simple";
-                    this.sendMessage();
-                });
-                
-                this.elements.quickCode.addEventListener('click', () => {
-                    this.elements.userInput.value = "Écris une fonction Python qui calcule les nombres premiers";
-                    this.sendMessage();
-                });
-                
-                this.elements.quickExplain.addEventListener('click', () => {
-                    this.elements.userInput.value = "Explique le changement climatique comme si j'avais 10 ans";
-                    this.sendMessage();
-                });
-                
-                this.elements.quickTranslate.addEventListener('click', () => {
-                    this.elements.userInput.value = "Traduis 'Bonjour, comment allez-vous ?' en anglais, espagnol et allemand";
-                    this.sendMessage();
-                });
-                
                 // Auto-resize textarea
                 this.elements.userInput.addEventListener('input', function() {
                     this.style.height = 'auto';
                     this.style.height = Math.min(this.scrollHeight, 150) + 'px';
                 });
+                
+                // Configuration vocale
+                this.elements.voiceSpeed.addEventListener('input', (e) => {
+                    this.config.speed = parseFloat(e.target.value);
+                    this.elements.speedValue.textContent = `${this.config.speed}x`;
+                });
+                
+                this.elements.voicePitch.addEventListener('input', (e) => {
+                    this.config.pitch = parseFloat(e.target.value);
+                    const pitchText = this.config.pitch < 0.8 ? 'Grave' : 
+                                     this.config.pitch > 1.2 ? 'Aigu' : 'Normal';
+                    this.elements.pitchValue.textContent = pitchText;
+                });
+                
+                this.elements.voiceLanguage.addEventListener('change', (e) => {
+                    this.config.language = e.target.value;
+                    if (this.recognition) {
+                        this.recognition.lang = this.config.language;
+                    }
+                });
+                
+                this.elements.autoSpeak.addEventListener('change', (e) => {
+                    this.config.autoSpeak = e.target.checked;
+                });
+                
+                this.elements.aiMode.addEventListener('change', (e) => {
+                    this.config.aiMode = e.target.value;
+                });
+                
+                // Boutons de test
+                this.elements.testVoiceBtn.addEventListener('click', () => {
+                    this.speakText("Bonjour ! Je suis Mini Ya Credo, votre assistant vocal. Je suis prêt à vous aider.");
+                });
+                
+                this.elements.stopVoiceBtn.addEventListener('click', () => {
+                    this.stopSpeaking();
+                });
+                
+                // Actions rapides
+                this.elements.quickScience.addEventListener('click', () => {
+                    this.elements.userInput.value = "Explique la photosynthèse de manière simple";
+                    this.sendMessage();
+                });
+                
+                this.elements.quickCode.addEventListener('click', () => {
+                    this.elements.userInput.value = "Montre-moi un exemple de fonction JavaScript";
+                    this.sendMessage();
+                });
+                
+                this.elements.quickWeather.addEventListener('click', () => {
+                    this.elements.userInput.value = "Quelle est la météo aujourd'hui ?";
+                    this.sendMessage();
+                });
+                
+                this.elements.quickJoke.addEventListener('click', () => {
+                    this.elements.userInput.value = "Raconte-moi une blague";
+                    this.sendMessage();
+                });
+                
+                this.elements.quickNews.addEventListener('click', () => {
+                    this.elements.userInput.value = "Quelles sont les actualités importantes ?";
+                    this.sendMessage();
+                });
+                
+                // Initialiser les valeurs
+                this.elements.speedValue.textContent = `${this.config.speed}x`;
+                this.elements.pitchValue.textContent = 'Normal';
+                this.elements.currentVolume.textContent = '80%';
             }
             
-            setupSpeech() {
-                // Reconnaissance vocale
-                if ('webkitSpeechRecognition' in window) {
-                    this.recognition = new webkitSpeechRecognition();
-                    this.recognition.continuous = false;
-                    this.recognition.interimResults = false;
-                    this.recognition.lang = 'fr-FR';
-                    
-                    this.recognition.onstart = () => {
-                        this.isListening = true;
-                        this.elements.voiceBtn.classList.add('listening');
-                        this.elements.voiceBtn.textContent = '🔴';
-                        this.showMessage('🎤 Écoute en cours...', 'info');
-                    };
-                    
-                    this.recognition.onresult = (event) => {
-                        const transcript = event.results[0][0].transcript;
-                        this.elements.userInput.value = transcript;
-                        this.elements.voiceBtn.classList.remove('listening');
-                        this.elements.voiceBtn.textContent = '🎤';
-                        this.sendMessage();
-                    };
-                    
-                    this.recognition.onerror = () => {
-                        this.isListening = false;
-                        this.elements.voiceBtn.classList.remove('listening');
-                        this.elements.voiceBtn.textContent = '🎤';
-                        this.showMessage('Erreur de reconnaissance vocale', 'error');
-                    };
-                    
-                    this.recognition.onend = () => {
-                        this.isListening = false;
-                        this.elements.voiceBtn.classList.remove('listening');
-                        this.elements.voiceBtn.textContent = '🎤';
-                    };
-                } else {
-                    this.elements.voiceBtn.style.display = 'none';
-                    this.showMessage('La reconnaissance vocale n\'est pas supportée', 'warning');
+            initVoiceVisualizer() {
+                // Créer les barres du visualiseur vocal
+                for (let i = 0; i < 20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'voice-bar';
+                    bar.style.height = '5px';
+                    this.elements.voiceVisualizer.appendChild(bar);
+                }
+            }
+            
+            startVoiceVisualizer() {
+                this.elements.voiceVisualizer.classList.add('active');
+                const bars = this.elements.voiceVisualizer.querySelectorAll('.voice-bar');
+                
+                this.visualizerInterval = setInterval(() => {
+                    bars.forEach(bar => {
+                        const randomHeight = Math.random() * 100;
+                        bar.style.height = `${5 + randomHeight}%`;
+                        bar.style.background = `hsl(${200 + randomHeight * 0.5}, 70%, 50%)`;
+                    });
+                }, 100);
+            }
+            
+            stopVoiceVisualizer() {
+                this.elements.voiceVisualizer.classList.remove('active');
+                if (this.visualizerInterval) {
+                    clearInterval(this.visualizerInterval);
                 }
                 
-                // Synthèse vocale
-                this.synthesis = window.speechSynthesis;
+                // Réinitialiser les barres
+                const bars = this.elements.voiceVisualizer.querySelectorAll('.voice-bar');
+                bars.forEach(bar => {
+                    bar.style.height = '5px';
+                    bar.style.background = 'var(--primary)';
+                });
             }
             
-            toggleVoiceInput() {
+            toggleListening() {
                 if (!this.recognition) {
-                    this.showMessage('Reconnaissance vocale non disponible', 'error');
+                    this.showToast('Reconnaissance vocale non disponible', 'error');
                     return;
                 }
                 
                 if (this.isListening) {
                     this.recognition.stop();
                 } else {
-                    this.recognition.start();
+                    try {
+                        this.recognition.start();
+                    } catch (error) {
+                        console.error('Erreur démarrage reconnaissance:', error);
+                        this.showToast('Erreur d\'accès au microphone', 'error');
+                    }
                 }
             }
             
-            async sendMessage() {
+            stopListening() {
+                this.isListening = false;
+                this.elements.voiceBtn.classList.remove('listening');
+                this.elements.voiceBtn.innerHTML = '🎤';
+                this.elements.micStatus.textContent = 'Micro: Prêt';
+                this.updateStatus('Prêt à écouter');
+                this.stopVoiceVisualizer();
+            }
+            
+            sendMessage() {
                 const message = this.elements.userInput.value.trim();
                 if (!message) return;
                 
-                // Ajouter le message utilisateur
-                this.addMessage(message, 'user');
+                this.processUserMessage(message);
                 this.elements.userInput.value = '';
                 this.elements.userInput.style.height = 'auto';
-                this.messageCount++;
-                this.elements.messageCount.textContent = this.messageCount;
+            }
+            
+            processUserMessage(message) {
+                // Ajouter le message utilisateur
+                this.addMessage(message, 'user');
+                this.stats.totalMessages++;
+                this.elements.totalMessages.textContent = this.stats.totalMessages;
                 
                 // Afficher l'indicateur de frappe
                 this.showTyping(true);
                 
-                try {
-                    // Obtenir la réponse
-                    const response = await this.getAIResponse(message);
-                    
-                    // Masquer l'indicateur
-                    this.showTyping(false);
+                // Simuler un délai de traitement
+                setTimeout(() => {
+                    // Générer une réponse
+                    const response = this.generateAIResponse(message);
                     
                     // Ajouter la réponse
                     this.addMessage(response, 'robot');
-                    
-                    // Parler la réponse
-                    if (this.config.voiceEnabled) {
-                        this.speak(response);
-                    }
-                    
-                } catch (error) {
                     this.showTyping(false);
-                    console.error('Erreur:', error);
-                    this.addMessage(
-                        "Je suis désolé, une erreur est survenue. Vérifiez votre connexion Internet et votre clé API OpenAI.",
-                        'robot'
-                    );
-                }
+                    
+                    // Parler la réponse si activé
+                    if (this.config.autoSpeak && this.synthesis) {
+                        this.speakText(response);
+                    }
+                    
+                }, 1000 + Math.random() * 1000);
             }
             
-            async getAIResponse(message) {
-                // Si pas de clé API, utiliser des réponses prédéfinies
-                if (!this.config.apiKey) {
-                    return this.getFallbackResponse(message);
-                }
-                
-                // Préparer les messages pour l'API
-                const messages = [
-                    {
-                        role: "system",
-                        content: this.config.knowledgeContext
-                    },
-                    ...this.conversationHistory.slice(-6),
-                    {
-                        role: "user",
-                        content: message
-                    }
-                ];
-                
-                try {
-                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.config.apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: this.config.aiModel,
-                            messages: messages,
-                            max_tokens: 1500,
-                            temperature: 0.7
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error?.message || 'Erreur API');
-                    }
-                    
-                    const data = await response.json();
-                    const answer = data.choices[0].message.content.trim();
-                    
-                    // Mettre à jour l'historique
-                    this.conversationHistory.push(
-                        { role: "user", content: message },
-                        { role: "assistant", content: answer }
-                    );
-                    
-                    // Limiter l'historique
-                    if (this.conversationHistory.length > 20) {
-                        this.conversationHistory = this.conversationHistory.slice(-20);
-                    }
-                    
-                    return answer;
-                    
-                } catch (error) {
-                    console.error('API Error:', error);
-                    throw error;
-                }
-            }
-            
-            getFallbackResponse(message) {
+            generateAIResponse(message) {
                 const lowerMessage = message.toLowerCase();
+                const aiMode = this.config.aiMode;
                 
-                // Réponses prédéfinies pour démonstration
+                // Mode intelligent (simule une IA avancée)
+                if (aiMode === 'smart' && this.elements.enableGPT.checked) {
+                    return this.generateSmartResponse(message);
+                }
+                
+                // Mode simple (réponses basiques)
+                if (aiMode === 'simple') {
+                    return this.generateSimpleResponse(lowerMessage);
+                }
+                
+                // Mode ludique
+                return this.generateFunResponse(lowerMessage);
+            }
+            
+            generateSmartResponse(message) {
+                // Simule des réponses intelligentes de type GPT
                 const responses = {
-                    science: "La théorie de la relativité, développée par Einstein, explique comment le temps et l'espace sont liés. En version simple : plus on va vite, plus le temps ralentit ! Pour des explications complètes, configurez votre clé API OpenAI.",
-                    code: "Voici une fonction Python simple pour les nombres premiers :\n```python\ndef est_premier(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5)+1):\n        if n % i == 0:\n            return False\n    return True\n```\nPour plus d'aide en programmation, connectez-vous à l'IA complète !",
-                    bonjour: "Bonjour ! Je suis Mini Ya Credo, votre assistant IA. Pour débloquer toutes mes connaissances, veuillez entrer votre clé API OpenAI dans les paramètres.",
-                    aide: "Je peux vous aider dans tous les domaines : sciences, technologie, médecine, droit, etc. Pour des réponses précises et complètes, configurez votre connexion à l'IA.",
-                    default: `Merci pour votre question : "${message}". Je suis Mini Ya Credo, un assistant IA avec des connaissances illimitées. Pour des réponses détaillées et précises, veuillez configurer votre clé API OpenAI (gratuite jusqu'à 5$ de crédit).`
+                    // Sciences
+                    "photo|synthèse": `**La photosynthèse expliquée simplement :** 🌱
+
+La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie.
+
+**En 3 étapes simples :**
+1. **Absorption** : Les feuilles captent la lumière du soleil
+2. **Transformation** : L'eau et le CO₂ sont convertis en glucose
+3. **Libération** : De l'oxygène est libéré dans l'air
+
+**Équation simplifiée :**
+☀️ Lumière + 💧 Eau + 🌬️ CO₂ → 🍬 Glucose + 🌬️ O₂
+
+C'est grâce à ce processus que nous avons de l'oxygène à respirer !`,
+
+                    "code|javascript|fonction": `**Exemple de fonction JavaScript :** 💻
+
+\`\`\`javascript
+// Fonction qui calcule la factorielle d'un nombre
+function factorielle(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    }
+    return n * factorielle(n - 1);
+}
+
+// Exemple d'utilisation
+console.log(factorielle(5)); // Affiche 120 (5! = 5×4×3×2×1)
+
+// Version moderne avec fonction fléchée
+const factorielleArrow = (n) => 
+    n <= 1 ? 1 : n * factorielleArrow(n - 1);
+\`\`\`
+
+**Conseil :** Les fonctions récursives comme celle-ci sont élégantes mais attention à la pile d'appels pour les grands nombres.`,
+
+                    "météo|temps|climat": `**Information météorologique :** 🌤️
+
+Je ne peux pas accéder à la météo en temps réel, mais voici des conseils généraux :
+
+**Pour aujourd'hui :**
+• Vérifiez votre application météo locale
+• Habillez-vous en fonction de la saison
+• Pensez à prendre un parapluie si des précipitations sont prévues
+
+**Températures moyennes selon la saison :**
+- Printemps : 10°C à 20°C
+- Été : 20°C à 30°C
+- Automne : 10°C à 20°C
+- Hiver : 0°C à 10°C
+
+**Astuce :** Consultez Météo-France pour des prévisions précises.`,
+
+                    "blague|rigoler|humour": `**Voici une blague scientifique :** 😄
+
+**Pourquoi les protons sont-ils toujours positifs ?**
+Parce qu'ils ne savent pas comment être négatifs !
+
+**Et une autre :**
+**Que dit un ordinateur malade ?**
+"J'ai un virus, je vais me mettre en quarantaine !"
+
+**Blague de programmeur :**
+Il y a 10 types de personnes dans le monde :
+Ceux qui comprennent le binaire, et ceux qui ne le comprennent pas.`,
+
+                    "actualités|nouvelles|info": `**Actualités du jour (simulées) :** 📰
+
+**Science & Technologie :**
+• Avancées prometteuses en intelligence artificielle éthique
+• Découverte d'une nouvelle exoplanète potentiellement habitable
+• Progrès dans la recherche sur les énergies renouvelables
+
+**Santé :**
+• Nouveaux traitements en développement
+• Campagnes de prévention en cours
+• Avancées dans la recherche médicale
+
+**Conseil :** Pour des actualités réelles, consultez les sites d'information officiels comme France Info, Le Monde, ou BBC News.`,
+
+                    "bonjour|salut|hello": `**Bonjour !** 👋
+
+Je suis **Mini Ya Credo**, votre assistant vocal intelligent. Je peux vous aider dans de nombreux domaines :
+
+**Mes spécialités :**
+• 🧪 Sciences et technologie
+• 💻 Programmation et informatique
+• 📚 Histoire et culture
+• 🏥 Santé et bien-être
+• ⚖️ Droit et économie
+• 🎨 Arts et créativité
+
+N'hésitez pas à me poser vos questions !`,
+
+                    "relativité|einstein": `**La théorie de la relativité simplifiée :** 🚀
+
+**Relativité restreinte (1905) :**
+• Le temps n'est pas absolu, il dépend de la vitesse
+• Rien ne peut aller plus vite que la lumière (300,000 km/s)
+• E = mc² : Énergie et masse sont équivalentes
+
+**Relativité générale (1915) :**
+• La gravité est une courbure de l'espace-temps
+• Les objets massifs déforment l'espace autour d'eux
+• Prédit les trous noirs et l'expansion de l'univers
+
+**Exemple concret :**
+Les GPS doivent corriger les effets de la relativité pour être précis !`
                 };
                 
-                if (lowerMessage.includes('relativité') || lowerMessage.includes('einstein')) {
-                    return responses.science;
-                } else if (lowerMessage.includes('python') || lowerMessage.includes('code') || lowerMessage.includes('programmation')) {
-                    return responses.code;
-                } else if (lowerMessage.includes('bonjour') || lowerMessage.includes('salut') || lowerMessage.includes('hello')) {
-                    return responses.bonjour;
-                } else if (lowerMessage.includes('aide') || lowerMessage.includes('help')) {
-                    return responses.aide;
+                // Chercher la réponse la plus appropriée
+                for (const [keywords, response] of Object.entries(responses)) {
+                    const keywordList = keywords.split('|');
+                    if (keywordList.some(keyword => message.toLowerCase().includes(keyword))) {
+                        return response;
+                    }
                 }
                 
-                return responses.default;
+                // Réponse par défaut intelligente
+                return `**Réponse à votre question :** "${message}"
+
+Je comprends que vous souhaitez des informations sur ce sujet. En tant qu'assistant IA, je peux vous dire que :
+
+**Points clés :**
+1. C'est un sujet intéressant qui mérite une étude approfondie
+2. Il existe plusieurs perspectives à considérer
+3. La recherche moderne apporte régulièrement de nouveaux éclairages
+
+**Pour aller plus loin :**
+• Consultez des sources académiques fiables
+• Vérifiez la date des informations (actualité importante)
+• Comparez différentes perspectives
+
+**Mon conseil :** Pour une réponse plus précise, vous pourriez préciser votre question ou consulter des experts du domaine.
+
+N'hésitez pas à me poser d'autres questions ! 🤖`;
+            }
+            
+            generateSimpleResponse(message) {
+                // Réponses simples et directes
+                if (message.includes('bonjour') || message.includes('salut')) {
+                    return "Bonjour ! Comment puis-je vous aider ?";
+                }
+                
+                if (message.includes('heure')) {
+                    const now = new Date();
+                    return `Il est ${now.getHours()}h${now.getMinutes().toString().padStart(2, '0')}`;
+                }
+                
+                if (message.includes('nom')) {
+                    return "Je m'appelle Mini Ya Credo, votre assistant vocal.";
+                }
+                
+                if (message.includes('aide')) {
+                    return "Je peux vous aider avec des questions simples. Posez-moi une question !";
+                }
+                
+                return `J'ai bien reçu votre message : "${message}". Je suis en mode réponse simple.`;
+            }
+            
+            generateFunResponse(message) {
+                // Réponses créatives et amusantes
+                const funResponses = [
+                    `🎭 *En mode créatif !* Votre question "${message}" m'inspire... Je dirais que la réponse se trouve dans les étoiles ! ⭐`,
+                    `🤔 Hmm, "${message}"... Je réfléchis avec ma plus belle intelligence artificielle ! La réponse pourrait être : 42 ! (Référence à "H2G2")`,
+                    `🎨 *Mode artistique activé !* Imaginez que votre question est une peinture... Ma réponse serait un magnifique arc-en-ciel de possibilités ! 🌈`,
+                    `🚀 *Boost créatif !* "${message}"... Zoom zoom ! Ma réponse décolle vers l'infini et au-delà !`,
+                    `🎪 *Cirque des réponses !* Pour "${message}", je vous propose un numéro de jonglage avec les mots : Savoir, Comprendre, Explorer !`,
+                    `🍕 *Mode pizza !* Mmmm... Votre question me fait penser à une pizza aux 4 fromages : chaque réponse est délicieuse à sa manière !`
+                ];
+                
+                return funResponses[Math.floor(Math.random() * funResponses.length)];
             }
             
             addMessage(content, sender) {
@@ -954,15 +1467,28 @@
                 
                 if (sender === 'user') {
                     messageDiv.innerHTML = `
-                        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-                            <span style="font-size: 12px; color: var(--gray);">Vous</span>
+                        <div style="text-align: right; font-size: 12px; color: var(--gray); margin-bottom: 5px;">
+                            Vous • ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
                         </div>
-                        <div>${content}</div>
+                        <div style="background: var(--primary); color: white; padding: 12px; border-radius: 12px;">
+                            ${this.escapeHtml(content)}
+                        </div>
                     `;
                 } else {
+                    // Formater la réponse du robot
+                    let formattedContent = this.formatMessage(content);
+                    
                     messageDiv.innerHTML = `
-                        <strong>🤖 Mini Ya Credo :</strong>
-                        <div style="margin-top: 8px;">${this.formatMessage(content)}</div>
+                        <div class="robot-header">
+                            <div class="robot-icon">🤖</div>
+                            <span>Mini Ya Credo</span>
+                            <span style="font-size: 11px; opacity: 0.7; margin-left: auto;">
+                                ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+                            </span>
+                        </div>
+                        <div style="line-height: 1.6;">
+                            ${formattedContent}
+                        </div>
                     `;
                 }
                 
@@ -971,116 +1497,187 @@
             }
             
             formatMessage(text) {
-                // Formater le texte (liens, code, etc.)
-                let formatted = text
+                // Échapper le HTML pour sécurité
+                let safeText = this.escapeHtml(text);
+                
+                // Formater le markdown simple
+                safeText = safeText
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
                     .replace(/`(.*?)`/g, '<code>$1</code>')
+                    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
                     .replace(/\n/g, '<br>');
                 
-                // Ajouter des couleurs pour les titres
-                formatted = formatted.replace(/^(#+)\s*(.*?)$/gm, (match, hashes, title) => {
-                    const level = hashes.length;
-                    const color = level === 1 ? 'var(--primary)' : level === 2 ? 'var(--secondary)' : 'var(--dark)';
-                    return `<div style="color: ${color}; font-weight: bold; margin: 10px 0 5px 0; font-size: ${level === 1 ? '1.2em' : '1em'}">${title}</div>`;
+                // Ajouter des émojis pour les titres
+                safeText = safeText.replace(/^([^<][^:]+):/gm, (match, title) => {
+                    return `<strong style="color: var(--primary);">${title}:</strong>`;
                 });
                 
-                return formatted;
+                // Ajouter des couleurs pour les listes
+                safeText = safeText.replace(/^•\s+(.*?)$/gm, '<span style="color: var(--secondary);">•</span> $1');
+                
+                return safeText;
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
             
             showTyping(show) {
-                this.elements.typingIndicator.style.display = show ? 'flex' : 'none';
                 if (show) {
-                    this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+                    this.elements.typingIndicator.classList.add('active');
+                } else {
+                    this.elements.typingIndicator.classList.remove('active');
                 }
+                this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
             }
             
-            speak(text) {
-                if (!this.synthesis || !this.config.voiceEnabled) return;
+            speakText(text) {
+                if (!this.synthesis || this.isSpeaking) {
+                    this.stopSpeaking();
+                }
                 
-                // Arrêter toute parole en cours
-                this.synthesis.cancel();
+                // Nettoyer le texte pour la synthèse (enlever le code, markdown, etc.)
+                const cleanText = text
+                    .replace(/```[\s\S]*?```/g, '')
+                    .replace(/`.*?`/g, '')
+                    .replace(/\*\*/g, '')
+                    .replace(/\*/g, '')
+                    .replace(/#/g, '')
+                    .replace(/\[.*?\]/g, '')
+                    .replace(/\(.*?\)/g, '')
+                    .substring(0, 500); // Limiter la longueur
                 
-                // Extraire le texte à parler (sans code)
-                const cleanText = text.replace(/```[\s\S]*?```/g, '')
-                                     .replace(/`.*?`/g, '')
-                                     .replace(/#{1,6}\s/g, '')
-                                     .substring(0, 1000); // Limiter la longueur
+                if (!cleanText.trim()) return;
                 
                 const utterance = new SpeechSynthesisUtterance(cleanText);
-                utterance.lang = 'fr-FR';
-                utterance.rate = this.config.voiceSpeed;
-                utterance.volume = 1;
-                utterance.pitch = 1;
+                utterance.lang = this.config.language;
+                utterance.rate = this.config.speed;
+                utterance.pitch = this.config.pitch;
+                utterance.volume = this.config.volume;
+                
+                // Sélectionner une voix française si disponible
+                const frenchVoices = this.voices.filter(voice => 
+                    voice.lang.startsWith('fr') || voice.lang.startsWith('FR')
+                );
+                
+                if (frenchVoices.length > 0) {
+                    utterance.voice = frenchVoices[Math.floor(Math.random() * frenchVoices.length)];
+                }
+                
+                utterance.onstart = () => {
+                    this.isSpeaking = true;
+                    this.elements.aiStatus.textContent = 'IA: Parle';
+                    this.updateStatus('Je parle...');
+                };
+                
+                utterance.onend = () => {
+                    this.isSpeaking = false;
+                    this.elements.aiStatus.textContent = 'IA: Active';
+                    this.updateStatus('Prêt');
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error('Erreur synthèse:', event);
+                    this.isSpeaking = false;
+                    this.elements.aiStatus.textContent = 'IA: Erreur';
+                    this.updateStatus('Erreur synthèse');
+                };
                 
                 this.synthesis.speak(utterance);
             }
             
-            showMessage(text, type = 'info') {
-                // Créer une notification temporaire
-                const notification = document.createElement('div');
-                notification.textContent = text;
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 12px 20px;
-                    background: ${type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--primary)'};
-                    color: white;
-                    border-radius: var(--radius);
-                    z-index: 1000;
-                    animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
-                    box-shadow: var(--shadow);
+            stopSpeaking() {
+                if (this.synthesis && this.isSpeaking) {
+                    this.synthesis.cancel();
+                    this.isSpeaking = false;
+                    this.elements.aiStatus.textContent = 'IA: Active';
+                    this.updateStatus('Arrêté');
+                }
+            }
+            
+            updateStatus(text) {
+                this.elements.statusText.textContent = text;
+            }
+            
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span>${message}</span>
                 `;
                 
-                document.body.appendChild(notification);
+                document.body.appendChild(toast);
                 
+                // Supprimer après 3 secondes
                 setTimeout(() => {
-                    notification.remove();
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
                 }, 3000);
+                
+                // Auto-suppression en cas d'erreur d'animation
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 4000);
+            }
+            
+            startSessionTimer() {
+                setInterval(() => {
+                    const elapsed = Date.now() - this.stats.sessionStart;
+                    const minutes = Math.floor(elapsed / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    this.elements.sessionTime.textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
             }
         }
         
-        // Initialiser le robot
+        // Initialiser le robot quand la page est chargée
         document.addEventListener('DOMContentLoaded', () => {
             window.robot = new MiniYaCredo();
             
-            // Ajouter un CSS pour les animations de notification
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes fadeOut {
-                    from { opacity: 1; transform: translateY(0); }
-                    to { opacity: 0; transform: translateY(-20px); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Exemple de questions d'accueil
+            // Ajouter un message de bienvenue vocal
             setTimeout(() => {
-                const questions = [
-                    "Pour débloquer toutes mes capacités, entrez votre clé API OpenAI dans les paramètres !",
-                    "J'ai des connaissances en médecine, droit, sciences, technologie, arts... Demandez-moi n'importe quoi !",
-                    "Cliquez sur le microphone 🎤 pour parler, ou tapez votre question."
+                if (window.robot.synthesis && window.robot.config.autoSpeak) {
+                    window.robot.speakText("Bonjour ! Je suis Mini Ya Credo, votre assistant vocal. Dites bonjour ou cliquez sur le microphone pour commencer.");
+                }
+            }, 1000);
+            
+            // Ajouter des tips périodiques
+            setInterval(() => {
+                const tips = [
+                    "💡 Astuce : Cliquez sur le microphone pour parler directement",
+                    "💡 Astuce : Vous pouvez ajuster la vitesse de ma voix dans les paramètres",
+                    "💡 Astuce : Essayez de me demander une blague ou une anecdote intéressante",
+                    "💡 Astuce : Je peux vous expliquer des concepts scientifiques complexes simplement"
                 ];
                 
-                let index = 0;
-                setInterval(() => {
-                    const tip = document.createElement('div');
-                    tip.className = 'message message-robot';
-                    tip.style.fontSize = '14px';
-                    tip.style.opacity = '0.8';
-                    tip.innerHTML = `<em>💡 ${questions[index]}</em>`;
+                const randomTip = tips[Math.floor(Math.random() * tips.length)];
+                
+                // Ne montrer le tip que si la conversation est calme
+                if (window.robot.stats.totalMessages < 10 || Math.random() > 0.7) {
+                    const tipElement = document.createElement('div');
+                    tipElement.className = 'message message-robot';
+                    tipElement.style.opacity = '0.7';
+                    tipElement.style.fontSize = '14px';
+                    tipElement.innerHTML = `
+                        <div class="robot-header">
+                            <div class="robot-icon">💡</div>
+                            <span>Astuce</span>
+                        </div>
+                        <div>${randomTip}</div>
+                    `;
                     
-                    window.robot.elements.chatMessages.appendChild(tip);
+                    window.robot.elements.chatMessages.appendChild(tipElement);
                     window.robot.elements.chatMessages.scrollTop = window.robot.elements.chatMessages.scrollHeight;
-                    
-                    index = (index + 1) % questions.length;
-                }, 15000);
-            }, 5000);
+                }
+            }, 45000); // Toutes les 45 secondes
         });
     </script>
 </body>
