@@ -3,555 +3,870 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Champs Lexicaux - Multijoueur</title>
+    <title>Quiz Lexical - Multijoueur</title>
     <style>
-        /* ========== STYLES COMPLETS ========== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* ========== STYLES AMÉLIORÉS ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #4361ee;
-            --secondary: #3a0ca3;
+            --primary-dark: #3a0ca3;
+            --secondary: #4cc9f0;
             --accent: #f72585;
-            --success: #4cc9f0;
-            --danger: #f94144;
-            --warning: #f8961e;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
             --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --gray-light: #ecf0f1;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
         }
-        
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
         }
-        
+
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            position: relative;
         }
-        
+
         .screen {
             display: none;
-            padding: 30px;
+            padding: 40px;
         }
-        
+
         .screen.active {
             display: block;
-            animation: fadeIn 0.5s ease;
+            animation: slideIn 0.5s ease;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        /* ========== ÉCRAN ACCUEIL ========== */
-        .logo {
+
+        /* ========== ÉCRAN D'ACCUEIL AMÉLIORÉ ========== */
+        .welcome-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--gray-light);
         }
-        
-        .logo h1 {
+
+        .welcome-header h1 {
+            font-size: 2.5rem;
             color: var(--dark);
             margin-bottom: 10px;
-            font-size: 2.2rem;
-        }
-        
-        .logo p {
-            color: var(--gray);
-        }
-        
-        .card {
-            background: var(--gray-light);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .card:hover {
-            border-color: var(--primary);
-        }
-        
-        .card h2 {
-            color: var(--dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .code-input {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .code-input input {
-            font-size: 24px;
-            text-align: center;
-            letter-spacing: 10px;
-            font-weight: bold;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
         }
-        
+
+        .welcome-header h1 i {
+            color: var(--primary);
+        }
+
+        .welcome-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .player-setup {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--gray-light);
+            transition: var(--transition);
+        }
+
+        .player-setup:hover {
+            border-color: var(--primary);
+        }
+
+        .player-setup h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.4rem;
+        }
+
+        .player-setup h2 i {
+            color: var(--primary);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .input-with-icon input,
+        .input-with-icon select {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .input-with-icon input:focus,
+        .input-with-icon select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Boutons améliorés */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .btn {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
             background: var(--primary);
             color: white;
+            transform: translateY(-3px);
         }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .btn-secondary {
-            background: var(--gray-light);
-            color: var(--dark);
-            border: 2px solid var(--gray);
-        }
-        
-        .btn-start {
-            background: linear-gradient(135deg, #4cc9f0, #2a9d8f);
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
             color: white;
-            font-size: 18px;
-            padding: 18px;
         }
-        
-        .btn-start:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
         }
-        
+
         .btn-danger {
-            background: var(--danger);
+            background: linear-gradient(135deg, var(--danger), #c0392b);
             color: white;
         }
-        
-        .btn-answer {
-            background: var(--accent);
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d68910);
             color: white;
         }
-        
-        .btn-answer:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .instructions {
-            background: #e3f2fd;
-            border-radius: 10px;
+
+        .code-display {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             padding: 20px;
-            margin-top: 30px;
-            border-left: 5px solid var(--primary);
+            border-radius: var(--radius);
+            text-align: center;
+            margin: 30px 0;
+            animation: pulse 2s infinite;
         }
-        
-        .instructions ul {
-            padding-left: 20px;
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .code-display h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .code-number {
+            font-family: 'Courier New', monospace;
+            font-size: 3.5rem;
+            font-weight: bold;
+            letter-spacing: 10px;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-instruction {
+            font-size: 0.9rem;
+            opacity: 0.8;
             margin-top: 10px;
         }
-        
-        .instructions li {
-            margin-bottom: 8px;
-            color: var(--gray);
+
+        .join-section {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid var(--gray-light);
         }
-        
-        /* ========== SALLE D'ATTENTE ========== */
-        .header {
+
+        .code-input-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .code-input {
+            font-size: 2rem;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 15px;
+            padding: 15px;
+            border: 3px dashed var(--gray-light);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .code-input:focus {
+            border-color: var(--primary);
+            background: #f8f9ff;
+        }
+
+        /* ========== SALLE D'ATTENTE AMÉLIORÉE ========== */
+        .lobby-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gray-light);
         }
-        
-        .room-code {
-            background: var(--primary);
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .room-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-family: monospace;
-            font-size: 24px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
             font-weight: bold;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .stats {
+
+        .game-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
         }
-        
-        .stat {
-            background: var(--gray-light);
-            padding: 15px;
-            border-radius: 10px;
+
+        .stat-card {
+            background: var(--light);
+            padding: 25px;
+            border-radius: var(--radius);
             text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
         }
-        
-        .stat span {
-            display: block;
-            font-weight: 600;
-            font-size: 18px;
-            margin-top: 5px;
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
         }
-        
-        .players-list {
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        .stat-card .label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .players-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
         }
-        
+
         .player-card {
             background: white;
             border: 2px solid var(--gray-light);
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: var(--radius);
+            padding: 25px;
             text-align: center;
+            transition: var(--transition);
             position: relative;
         }
-        
+
+        .player-card.host {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, #fff9e6, #fff3cd);
+        }
+
         .player-card.host::before {
             content: '👑';
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: -15px;
+            right: -15px;
+            font-size: 1.8rem;
             background: white;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow);
         }
-        
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
         .player-name {
             font-weight: 600;
+            font-size: 1.2rem;
             margin-bottom: 5px;
+            color: var(--dark);
         }
-        
-        .invite-box {
+
+        .player-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 10px;
+        }
+
+        .invite-container {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .invite-container h3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .invite-link {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
-        
-        .invite-box input {
+
+        .invite-link input {
             flex: 1;
+            padding: 15px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
         }
-        
-        /* ========== ÉCRAN DE JEU ========== */
-        .game-header {
+
+        /* ========== ÉCRAN DE JEU AMÉLIORÉ ========== */
+        .game-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 2px solid var(--gray-light);
         }
-        
-        .room-code-small {
-            background: var(--primary);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-family: monospace;
-            font-weight: bold;
+
+        .game-meta {
+            display: flex;
+            align-items: center;
+            gap: 25px;
         }
-        
+
+        .question-counter {
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
         .timer-container {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .timer-circle {
             position: relative;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 15px;
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
         }
-        
-        .timer-progress {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(var(--primary) 0deg, var(--gray-light) 0deg);
+
+        .timer-svg {
+            transform: rotate(-90deg);
         }
-        
+
+        .timer-circle-bg {
+            fill: none;
+            stroke: var(--gray-light);
+            stroke-width: 8;
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+
         .timer-text {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
+            font-size: 4rem;
             font-weight: bold;
             color: var(--dark);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
-        .category-display {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .category-badge {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .hint-box {
-            flex: 1;
-            background: #fff3cd;
-            border-left: 4px solid var(--warning);
-            padding: 15px;
-            border-radius: 8px;
-            min-width: 200px;
-        }
-        
-        .question-container {
-            background: var(--light);
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 25px;
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-radius: var(--radius);
+            padding: 40px;
+            margin: 30px 0;
             text-align: center;
             border: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .question-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
         .question-text {
-            font-size: 24px;
+            font-size: 2rem;
             font-weight: 600;
             color: var(--dark);
+            margin: 20px 0;
             line-height: 1.4;
         }
-        
-        .answer-section {
-            margin: 25px 0;
+
+        .hint-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
         }
-        
+
+        .answer-container {
+            margin: 30px 0;
+        }
+
+        .answer-input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
         .answer-input {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 10px;
+            padding: 20px 25px;
+            font-size: 1.2rem;
+            border: 3px solid var(--gray-light);
+            border-radius: 12px;
+            transition: var(--transition);
+            background: white;
+            text-align: center;
         }
-        
+
+        .answer-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            outline: none;
+        }
+
         .answer-input:disabled {
-            background: #f5f5f5;
+            background: var(--gray-light);
             cursor: not-allowed;
         }
-        
-        .scores-list {
-            background: var(--gray-light);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+
+        .scores-panel {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-top: 30px;
         }
-        
+
         .score-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
+            padding: 15px;
             background: white;
             border-radius: 8px;
             margin-bottom: 10px;
             border-left: 4px solid var(--primary);
+            transition: var(--transition);
         }
-        
-        .score-name {
-            font-weight: 600;
+
+        .score-item.current-player {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left-color: var(--secondary);
         }
-        
-        .score-points {
-            background: var(--primary);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
+
+        .score-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-rank {
             font-weight: bold;
+            color: var(--gray);
+            min-width: 30px;
         }
-        
-        .game-status {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: #e8f5e9;
-            border-radius: 8px;
-            color: #2e7d32;
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-details .name {
             font-weight: 600;
+            font-size: 1.1rem;
         }
-        
-        /* ========== RÉSULTATS ========== */
+
+        .player-details .status {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .score-value.answered {
+            color: var(--success);
+        }
+
+        /* ========== RÉSULTATS AMÉLIORÉS ========== */
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .results-title {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
         .podium {
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            gap: 20px;
-            margin: 30px 0;
-            height: 200px;
+            gap: 30px;
+            margin: 50px 0;
+            height: 300px;
         }
-        
+
         .podium-place {
-            background: var(--gray-light);
-            border-radius: 10px 10px 0 0;
-            padding: 20px;
+            width: 200px;
+            background: var(--light);
+            border-radius: 15px 15px 0 0;
             text-align: center;
-            width: 150px;
+            position: relative;
+            padding: 30px 20px;
         }
-        
+
         .podium-place.first {
-            height: 180px;
+            height: 250px;
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             order: 2;
         }
-        
+
         .podium-place.second {
-            height: 150px;
+            height: 200px;
             background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
             order: 1;
         }
-        
+
         .podium-place.third {
-            height: 120px;
+            height: 150px;
             background: linear-gradient(135deg, #cd7f32, #e6a65c);
             order: 3;
         }
-        
+
         .podium-rank {
-            font-size: 18px;
+            font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark);
         }
-        
+
         .podium-player {
-            font-size: 20px;
+            font-size: 1.8rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin: 20px 0;
+            color: var(--dark);
         }
-        
+
         .podium-score {
-            font-size: 24px;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--dark);
         }
-        
+
         .results-list {
-            margin: 30px 0;
+            max-width: 600px;
+            margin: 40px auto;
         }
-        
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-        }
-        
+
         /* ========== NOTIFICATIONS ========== */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--primary);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
             transform: translateX(400px);
             transition: transform 0.3s ease;
             z-index: 1000;
-            max-width: 350px;
+            max-width: 400px;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
+
         .notification.show {
             transform: translateX(0);
         }
-        
-        .loading {
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification i {
+            font-size: 1.5rem;
+        }
+
+        .notification.success i {
+            color: var(--success);
+        }
+
+        .notification.error i {
+            color: var(--danger);
+        }
+
+        .notification.warning i {
+            color: var(--warning);
+        }
+
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            color: white;
-            font-size: 20px;
-            display: none;
+            flex-direction: column;
+            gap: 20px;
         }
-        
-        .loading.active {
+
+        .loading-overlay.active {
             display: flex;
         }
-        
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .container {
@@ -559,222 +874,334 @@
             }
             
             .screen {
-                padding: 20px;
+                padding: 25px;
             }
             
-            .logo h1 {
-                font-size: 1.8rem;
+            .welcome-header h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
             }
             
-            .stats {
+            .action-buttons {
                 grid-template-columns: 1fr;
             }
             
-            .players-list {
+            .code-number {
+                font-size: 2.5rem;
+                letter-spacing: 5px;
+            }
+            
+            .code-input-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-input {
+                font-size: 1.5rem;
+                letter-spacing: 10px;
+            }
+            
+            .game-stats {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .timer-circle {
-                width: 120px;
-                height: 120px;
+            .players-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timer-container {
+                width: 150px;
+                height: 150px;
             }
             
             .timer-text {
-                font-size: 36px;
+                font-size: 3rem;
             }
             
             .question-text {
-                font-size: 20px;
+                font-size: 1.6rem;
             }
             
             .podium {
                 flex-direction: column;
                 align-items: center;
                 height: auto;
-                gap: 10px;
+                gap: 20px;
             }
             
             .podium-place {
                 width: 100%;
-                max-width: 250px;
+                max-width: 300px;
                 height: auto !important;
-                border-radius: 10px;
-                padding: 15px;
+                border-radius: 15px;
+                margin-bottom: 20px;
             }
         }
-        
+
         @media (max-width: 480px) {
-            .players-list {
+            .screen {
+                padding: 20px;
+            }
+            
+            .game-stats {
                 grid-template-columns: 1fr;
             }
             
-            .category-display {
-                flex-direction: column;
-                align-items: stretch;
+            .players-grid {
+                grid-template-columns: 1fr;
             }
             
-            .hint-box {
-                min-width: auto;
+            .question-text {
+                font-size: 1.4rem;
+            }
+            
+            .answer-input {
+                font-size: 1rem;
+                padding: 15px;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <!-- Écran d'accueil -->
         <div id="home-screen" class="screen active">
-            <div class="logo">
-                <h1>🧠 Quiz des Champs Lexicaux</h1>
-                <p>Multijoueur en temps réel - 2 à 5 joueurs</p>
+            <div class="welcome-header">
+                <h1>
+                    <i class="fas fa-brain"></i>
+                    <span>Quiz des Champs Lexicaux</span>
+                </h1>
+                <p>Affrontez vos amis dans un quiz multijoueur en temps réel !</p>
             </div>
-            
-            <div class="card">
-                <h2>🎮 Créer une salle</h2>
-                <div class="form-group">
-                    <input type="text" id="player-name" placeholder="Votre pseudo" maxlength="15">
-                </div>
-                <div class="form-group">
-                    <label>Nombre de questions</label>
-                    <select id="total-questions">
-                        <option value="5">5 questions</option>
-                        <option value="10" selected>10 questions</option>
-                        <option value="15">15 questions</option>
-                        <option value="20">20 questions</option>
-                        <option value="25">25 questions</option>
-                        <option value="30">30 questions</option>
-                    </select>
-                </div>
-                <button id="create-btn" class="btn btn-primary">Créer une nouvelle salle</button>
-            </div>
-            
-            <div style="text-align: center; margin: 20px 0; color: #666;">─ OU ─</div>
-            
-            <div class="card">
-                <h2>🔑 Rejoindre une salle</h2>
-                <div class="form-group">
-                    <input type="text" id="join-player-name" placeholder="Votre pseudo" maxlength="15">
-                </div>
-                <div class="form-group">
-                    <label>Code de la salle (4 chiffres)</label>
-                    <div class="code-input">
-                        <input type="number" id="room-code" placeholder="1234" min="1000" max="9999" maxlength="4">
+
+            <div class="player-setup">
+                <h2><i class="fas fa-user-circle"></i> Qui êtes-vous ?</h2>
+                <div class="input-group">
+                    <label for="player-name">Votre pseudo</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="player-name" placeholder="Entrez votre nom" maxlength="15">
                     </div>
                 </div>
-                <button id="join-btn" class="btn btn-secondary">Rejoindre la salle</button>
             </div>
-            
-            <div class="instructions">
-                <h3>📝 Comment jouer ?</h3>
-                <ul>
-                    <li>1. Créez une salle ou rejoignez-en une avec un code</li>
-                    <li>2. L'hôte choisit le nombre total de questions</li>
-                    <li>3. 12 secondes pour répondre à chaque question</li>
-                    <li>4. Les réponses doivent correspondre au champ lexical</li>
-                    <li>5. 10 points pour le premier, 5 points en cas d'égalité</li>
-                </ul>
+
+            <div class="action-buttons">
+                <button id="create-game-btn" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Créer une nouvelle salle</span>
+                </button>
+                
+                <button id="join-game-btn" class="btn btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Rejoindre une salle</span>
+                </button>
+            </div>
+
+            <!-- Section création (cachée par défaut) -->
+            <div id="create-section" style="display: none;">
+                <div class="code-display" id="created-code-display">
+                    <h3><i class="fas fa-key"></i> Code de votre salle</h3>
+                    <div class="code-number" id="game-code-display">----</div>
+                    <p class="code-instruction">Partagez ce code avec vos amis pour qu'ils puissent vous rejoindre</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="total-questions"><i class="fas fa-question-circle"></i> Nombre de questions</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-list-ol"></i>
+                        <select id="total-questions">
+                            <option value="5">5 questions</option>
+                            <option value="10" selected>10 questions</option>
+                            <option value="15">15 questions</option>
+                            <option value="20">20 questions</option>
+                            <option value="25">25 questions</option>
+                            <option value="30">30 questions</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button id="confirm-create-btn" class="btn btn-success" style="flex: 1;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Confirmer la création</span>
+                    </button>
+                    <button id="cancel-create-btn" class="btn btn-danger" style="width: auto;">
+                        <i class="fas fa-times"></i>
+                        <span>Annuler</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section rejoindre (cachée par défaut) -->
+            <div id="join-section" style="display: none;">
+                <div class="join-section">
+                    <h2><i class="fas fa-door-open"></i> Rejoindre une salle existante</h2>
+                    <p>Entrez le code à 4 chiffres partagé par l'hôte :</p>
+                    
+                    <div class="code-input-grid">
+                        <input type="text" 
+                               id="join-code-input" 
+                               class="code-input" 
+                               placeholder="1234" 
+                               maxlength="4"
+                               inputmode="numeric"
+                               pattern="[0-9]*">
+                        <button id="confirm-join-btn" class="btn btn-success" style="height: auto; padding: 15px 30px;">
+                            <i class="fas fa-play"></i>
+                            <span>Rejoindre</span>
+                        </button>
+                    </div>
+                    
+                    <button id="cancel-join-btn" class="btn btn-danger" style="margin-top: 20px; width: 100%;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </button>
+                </div>
             </div>
         </div>
-        
+
         <!-- Salle d'attente -->
         <div id="lobby-screen" class="screen">
-            <div class="header">
-                <h2>🎪 Salle de jeu</h2>
-                <div class="room-code" id="lobby-room-code">1234</div>
+            <div class="lobby-header">
+                <div class="room-info">
+                    <div class="room-badge" id="lobby-room-code">
+                        <i class="fas fa-hashtag"></i>
+                        <span id="room-code-number">1234</span>
+                    </div>
+                    <div>
+                        <h2 id="lobby-title">Salle d'attente</h2>
+                        <p style="color: var(--gray);">En attente des joueurs...</p>
+                    </div>
+                </div>
+                <button id="leave-lobby-btn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Quitter</span>
+                </button>
             </div>
-            
-            <div class="stats">
-                <div class="stat">
-                    <div>Questions</div>
-                    <span id="lobby-total-questions">10</span>
+
+            <div class="game-stats">
+                <div class="stat-card">
+                    <i class="fas fa-question-circle"></i>
+                    <div class="number" id="lobby-total-questions">10</div>
+                    <div class="label">Questions</div>
                 </div>
-                <div class="stat">
-                    <div>Joueurs</div>
-                    <span id="player-count">1</span>/5
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="number" id="player-count">1</div>
+                    <div class="label">Joueurs</div>
                 </div>
-                <div class="stat">
-                    <div>Hôte</div>
-                    <span id="host-name">Vous</span>
+                <div class="stat-card">
+                    <i class="fas fa-crown"></i>
+                    <div id="host-name" class="number">Vous</div>
+                    <div class="label">Hôte</div>
                 </div>
             </div>
-            
-            <h3>👥 Joueurs connectés</h3>
-            <div id="players-list" class="players-list">
+
+            <h3><i class="fas fa-user-friends"></i> Joueurs connectés</h3>
+            <div id="players-list" class="players-grid">
                 <!-- Joueurs dynamiques -->
             </div>
-            
-            <div id="host-controls" style="margin: 30px 0; text-align: center;">
-                <button id="start-game-btn" class="btn btn-start" disabled>▶️ Démarrer la partie</button>
-                <p style="color: #666; margin-top: 10px; font-size: 14px;">
-                    L'hôte peut démarrer quand au moins 2 joueurs sont présents
+
+            <div id="host-controls" style="text-align: center; margin: 40px 0;">
+                <button id="start-game-btn" class="btn btn-success" style="padding: 20px 40px; font-size: 1.2rem;" disabled>
+                    <i class="fas fa-play-circle"></i>
+                    <span>Démarrer la partie</span>
+                </button>
+                <p style="color: var(--gray); margin-top: 15px;">
+                    <i class="fas fa-info-circle"></i>
+                    Vous pouvez démarrer quand au moins 2 joueurs sont connectés
                 </p>
             </div>
-            
-            <div class="invite-box">
-                <input type="text" id="invite-link" value="Partagez le code de la salle" readonly>
-                <button id="copy-invite-btn" class="btn btn-secondary" style="width: auto; padding: 0 20px;">Copier</button>
+
+            <div class="invite-container">
+                <h3><i class="fas fa-share-alt"></i> Inviter des amis</h3>
+                <p>Partagez ce code avec vos amis pour qu'ils puissent vous rejoindre :</p>
+                <div class="invite-link">
+                    <input type="text" id="invite-link-input" value="Code : 1234" readonly>
+                    <button id="copy-invite-btn" class="btn btn-primary" style="width: auto; padding: 15px 25px;">
+                        <i class="fas fa-copy"></i>
+                        <span>Copier</span>
+                    </button>
+                </div>
             </div>
-            
-            <button id="leave-lobby-btn" class="btn btn-danger" style="margin-top: 20px;">Quitter la salle</button>
         </div>
-        
+
         <!-- Écran de jeu -->
         <div id="game-screen" class="screen">
-            <div class="game-header">
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <div class="room-code-small" id="game-room-code">1234</div>
-                    <div>Question <span id="current-q-num">1</span>/<span id="total-q">10</span></div>
+            <div class="game-top-bar">
+                <div class="game-meta">
+                    <div class="room-badge" style="font-size: 1.2rem;">
+                        <i class="fas fa-hashtag"></i>
+                        <span id="game-room-code">1234</span>
+                    </div>
+                    <div class="question-counter">
+                        Question <span id="current-q-num">1</span>/<span id="total-q">10</span>
+                    </div>
                 </div>
-                <button id="quit-game-btn" class="btn btn-danger" style="width: auto; padding: 8px 16px;">Quitter</button>
+                <button id="quit-game-btn" class="btn btn-danger">
+                    <i class="fas fa-times"></i>
+                    <span>Quitter</span>
+                </button>
             </div>
-            
+
             <div class="timer-container">
-                <div class="timer-circle">
-                    <div class="timer-progress" id="timer-progress"></div>
-                    <div class="timer-text" id="timer-text">12</div>
-                </div>
-                <div style="margin-top: 10px; font-weight: 600; color: #666;">⏱️ Temps restant</div>
+                <svg class="timer-svg" width="200" height="200" viewBox="0 0 200 200">
+                    <circle class="timer-circle-bg" cx="100" cy="100" r="90"></circle>
+                    <circle class="timer-circle" cx="100" cy="100" r="90" id="timer-circle"></circle>
+                </svg>
+                <div class="timer-text" id="timer-text">12</div>
             </div>
-            
-            <div class="category-display">
-                <div class="category-badge" id="current-category">PR</div>
-                <div class="hint-box" id="hint-box">
-                    Toutes les réponses commencent par <strong id="hint-prefix">PR</strong>
-                </div>
-            </div>
-            
-            <div class="question-container">
+
+            <div class="question-box">
+                <div class="category-tag" id="current-category">PR</div>
                 <div class="question-text" id="question-text">
-                    La question apparaîtra ici...
+                    Chargement de la question...
+                </div>
+                <div class="hint-box" id="hint-box">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Toutes les réponses commencent par <strong id="hint-prefix">PR</strong></span>
                 </div>
             </div>
-            
-            <div class="answer-section">
-                <input type="text" 
-                       id="answer-input" 
-                       class="answer-input" 
-                       placeholder="Tapez votre réponse..." 
-                       autocomplete="off"
-                       maxlength="30">
-                <button id="submit-answer-btn" class="btn btn-answer">✓ Envoyer la réponse</button>
+
+            <div class="answer-container">
+                <div class="answer-input-wrapper">
+                    <input type="text" 
+                           id="answer-input" 
+                           class="answer-input" 
+                           placeholder="Tapez votre réponse ici..." 
+                           autocomplete="off"
+                           maxlength="30">
+                </div>
+                <button id="submit-answer-btn" class="btn btn-primary" style="width: 100%; padding: 20px; font-size: 1.2rem;">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Envoyer la réponse</span>
+                </button>
+                <div id="answer-feedback" style="text-align: center; margin-top: 15px; min-height: 24px;"></div>
             </div>
-            
-            <h3 style="margin: 25px 0 15px 0;">🏆 Scores en direct</h3>
-            <div id="scores-list" class="scores-list">
-                <!-- Scores dynamiques -->
+
+            <div class="scores-panel">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-chart-line"></i> Classement en direct</h3>
+                <div id="scores-list">
+                    <!-- Scores dynamiques -->
+                </div>
             </div>
-            
-            <div class="game-status" id="game-status">
+
+            <div id="game-status" style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; color: #2e7d32; font-weight: 600;">
                 En attente de la première question...
             </div>
         </div>
-        
+
         <!-- Écran des résultats -->
         <div id="results-screen" class="screen">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1>🏆 Résultats finaux</h1>
-                <p style="color: #666; margin-top: 10px;">Salle: <span id="results-room-code" style="font-weight: bold;">1234</span></p>
+            <div class="results-header">
+                <div class="results-title">
+                    <i class="fas fa-trophy"></i>
+                    <span>Résultats finaux</span>
+                </div>
+                <p style="color: var(--gray);">Salle : <strong id="results-room-code">1234</strong></p>
             </div>
-            
+
             <div class="podium">
                 <div class="podium-place second">
                     <div class="podium-rank">2ème</div>
@@ -792,26 +1219,37 @@
                     <div class="podium-score" id="third-score">0 pts</div>
                 </div>
             </div>
-            
-            <h3 style="margin: 30px 0 15px 0;">📊 Classement complet</h3>
-            <div id="full-results-list" class="results-list">
-                <!-- Classement complet -->
+
+            <div class="results-list">
+                <h3 style="text-align: center; margin-bottom: 20px;"><i class="fas fa-list-ol"></i> Classement complet</h3>
+                <div id="full-results-list">
+                    <!-- Classement complet -->
+                </div>
             </div>
-            
-            <div style="display: flex; gap: 15px; margin-top: 30px;">
-                <button id="play-again-btn" class="btn btn-primary">🔄 Rejouer</button>
-                <button id="back-home-btn" class="btn btn-secondary">🏠 Accueil</button>
+
+            <div style="display: flex; gap: 20px; margin-top: 40px;">
+                <button id="play-again-btn" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-redo"></i>
+                    <span>Nouvelle partie</span>
+                </button>
+                <button id="back-home-btn" class="btn btn-secondary" style="flex: 1;">
+                    <i class="fas fa-home"></i>
+                    <span>Retour à l'accueil</span>
+                </button>
             </div>
         </div>
     </div>
-    
-    <!-- Notifications -->
-    <div id="notification" class="notification"></div>
-    <div id="loading" class="loading">Chargement...</div>
 
-    <!-- ========== TOUT LE JAVASCRIPT ========== -->
+    <!-- Notifications et chargement -->
+    <div id="notification" class="notification"></div>
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Connexion en cours...</div>
+    </div>
+
+    <!-- ========== SCRIPT COMPLET ========== -->
     <script>
-        // Configuration Firebase (TON CODE)
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
             authDomain: "match-en-ligne.firebaseapp.com",
@@ -821,45 +1259,22 @@
             appId: "1:706011207623:web:17374990a6202b64f0abe2",
             measurementId: "G-D9XYRE3W2M"
         };
-        
+
         // Initialiser Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        
-        // ========== DONNÉES DES QUESTIONS ==========
+
+        // Données des questions
         const QUESTIONS_DATA = {
-            "Pr": [
-                "Précision", "Profond", "Profession", "Progrès", "Promesse",
-                "Proverbe", "Précieux", "Préparation", "Précaution", "Privilège"
-            ],
-            "Se": [
-                "Sensation", "Séduction", "Sérénité", "Secret", "Séparation",
-                "Sérieux", "Sentiment", "Service", "Seconde", "Septième"
-            ],
-            "Tr": [
-                "Transformation", "Tristesse", "Travail", "Traitement", "Tradition",
-                "Tragédie", "Trentième", "Triomphe", "Transparence", "Trésor"
-            ],
-            "Ac": [
-                "Accompagnement", "Accès", "Action", "Activité", "Achat",
-                "Accident", "Accord", "Acquisition", "Acteur", "Acclamation", "Acrimonie"
-            ],
-            "Ca": [
-                "Caractère", "Carte", "Cascade", "Cadeau", "Caisse",
-                "Caméra", "Campagne", "Canal", "Capacité", "Capitale",
-                "Carrière", "Carton", "Casquette"
-            ],
-            "Me": [
-                "Mémoire", "Méthode", "Mélodie", "Menu", "Mécontentement",
-                "Mesure", "Merveille", "Méditation", "Messagerie", "Mémorable", "Météo"
-            ],
-            "Di": [
-                "Direction", "Difficulté", "Discipline", "Dialogue", "Diversité",
-                "Diplomatie", "Dictionnaire", "Disparition", "Dimension", "Directionnel",
-                "Divertissement", "Diamant", "Diamètre", "Discothèque"
-            ]
+            "Pr": ["Précision", "Profond", "Profession", "Progrès", "Promesse", "Proverbe", "Précieux", "Préparation", "Précaution", "Privilège"],
+            "Se": ["Sensation", "Séduction", "Sérénité", "Secret", "Séparation", "Sérieux", "Sentiment", "Service", "Seconde", "Septième"],
+            "Tr": ["Transformation", "Tristesse", "Travail", "Traitement", "Tradition", "Tragédie", "Trentième", "Triomphe", "Transparence", "Trésor"],
+            "Ac": ["Accompagnement", "Accès", "Action", "Activité", "Achat", "Accident", "Accord", "Acquisition", "Acteur", "Acclamation", "Acrimonie"],
+            "Ca": ["Caractère", "Carte", "Cascade", "Cadeau", "Caisse", "Caméra", "Campagne", "Canal", "Capacité", "Capitale", "Carrière", "Carton", "Casquette"],
+            "Me": ["Mémoire", "Méthode", "Mélodie", "Menu", "Mécontentement", "Mesure", "Merveille", "Méditation", "Messagerie", "Mémorable", "Météo"],
+            "Di": ["Direction", "Difficulté", "Discipline", "Dialogue", "Diversité", "Diplomatie", "Dictionnaire", "Disparition", "Dimension", "Directionnel", "Divertissement", "Diamant", "Diamètre", "Discothèque"]
         };
-        
+
         // Variables globales
         let playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         let playerName = '';
@@ -868,45 +1283,42 @@
         let gameUnsubscribe = null;
         let timerInterval = null;
         let selectedQuestions = [];
-        let currentQuestionIndex = 0;
-        
-        // ========== FONCTIONS UTILITAIRES ==========
+        let playerColor = getRandomColor();
+
+        // Fonctions utilitaires
+        function getRandomColor() {
+            const colors = ['#4361ee', '#4cc9f0', '#f72585', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
         }
-        
-        function showNotification(message, type = 'info') {
+
+        function showNotification(message, type = 'info', duration = 3000) {
             const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = 'notification';
-            
-            if (type === 'success') {
-                notification.style.background = '#4CAF50';
-            } else if (type === 'error') {
-                notification.style.background = '#f44336';
-            } else if (type === 'warning') {
-                notification.style.background = '#ff9800';
-            }
-            
-            notification.classList.add('show');
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <div>${message}</div>
+            `;
+            notification.className = `notification ${type} show`;
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 3000);
+            }, duration);
         }
-        
+
         function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+            document.getElementById('loading').classList.toggle('active', show);
         }
-        
+
         function generateGameCode() {
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
-        
-        // ========== GÉNÉRATION DES QUESTIONS ALÉATOIRES ==========
+
         function generateRandomQuestions(totalQuestions) {
             const allCategories = Object.keys(QUESTIONS_DATA);
             const selected = [];
@@ -919,10 +1331,8 @@
                 if (remaining <= 0) break;
                 
                 const categoryQuestions = [...QUESTIONS_DATA[category]];
-                // Mélanger les questions de la catégorie
                 categoryQuestions.sort(() => Math.random() - 0.5);
                 
-                // Prendre jusqu'à 15 questions max de cette catégorie
                 const toTake = Math.min(remaining, Math.min(15, categoryQuestions.length));
                 const selectedFromCategory = categoryQuestions.slice(0, toTake);
                 
@@ -937,57 +1347,39 @@
                 remaining -= toTake;
             }
             
-            // Si on n'a pas assez de questions, compléter avec d'autres catégories
-            if (remaining > 0) {
-                // On reprend depuis le début avec des catégories différentes
-                for (const category of shuffledCategories) {
-                    if (remaining <= 0) break;
-                    
-                    const alreadyUsed = selected.filter(q => q.category === category).length;
-                    const available = QUESTIONS_DATA[category].length - alreadyUsed;
-                    
-                    if (available > 0) {
-                        const toTake = Math.min(remaining, available);
-                        const remainingQuestions = QUESTIONS_DATA[category]
-                            .filter(q => !selected.some(sq => sq.question === q))
-                            .slice(0, toTake);
-                        
-                        remainingQuestions.forEach(question => {
-                            selected.push({
-                                category: category,
-                                question: question,
-                                hint: `${category}** - Toutes les réponses commencent par ${category}`
-                            });
-                        });
-                        
-                        remaining -= toTake;
-                    }
-                }
-            }
-            
             return selected;
         }
-        
-        // ========== GESTION DE LA SALLE ==========
+
+        // Gestion de la création de salle
         async function createGame() {
             playerName = document.getElementById('player-name').value.trim();
-            const totalQuestions = parseInt(document.getElementById('total-questions').value);
             
             if (!playerName) {
-                showNotification('Veuillez entrer un pseudo', 'error');
+                showNotification('Veuillez entrer votre nom', 'error');
                 return;
             }
+
+            // Afficher la section création
+            document.getElementById('create-section').style.display = 'block';
+            document.getElementById('join-section').style.display = 'none';
+            
+            // Générer et afficher le code
+            currentGameCode = generateGameCode();
+            document.getElementById('game-code-display').textContent = currentGameCode;
+            
+            // Mettre à jour le lien d'invitation
+            document.getElementById('invite-link-input').value = `Code : ${currentGameCode}`;
+        }
+
+        async function confirmCreateGame() {
+            const totalQuestions = parseInt(document.getElementById('total-questions').value);
             
             if (totalQuestions < 5 || totalQuestions > 30) {
-                showNotification('Nombre de questions invalide (5-30)', 'error');
+                showNotification('Nombre de questions invalide', 'error');
                 return;
             }
-            
+
             showLoading(true);
-            
-            // Générer un code unique
-            currentGameCode = generateGameCode();
-            isHost = true;
             
             // Générer les questions aléatoires
             selectedQuestions = generateRandomQuestions(totalQuestions);
@@ -1007,37 +1399,54 @@
                             name: playerName,
                             score: 0,
                             hasAnswered: false,
-                            isHost: true
+                            isHost: true,
+                            color: playerColor,
+                            joinedAt: new Date().toISOString()
                         }
                     },
                     currentQuestion: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActivity: new Date().toISOString()
                 });
                 
+                isHost = true;
                 showNotification('Salle créée avec succès !', 'success');
                 joinGameRoom();
                 showLoading(false);
                 
             } catch (error) {
-                showNotification('Erreur lors de la création: ' + error.message, 'error');
+                showNotification('Erreur lors de la création : ' + error.message, 'error');
                 showLoading(false);
             }
         }
-        
+
+        // Gestion de la jonction
         async function joinGame() {
-            playerName = document.getElementById('join-player-name').value.trim();
-            currentGameCode = document.getElementById('room-code').value.trim();
+            playerName = document.getElementById('player-name').value.trim();
             
             if (!playerName) {
-                showNotification('Veuillez entrer un pseudo', 'error');
+                showNotification('Veuillez entrer votre nom', 'error');
                 return;
             }
+
+            // Afficher la section rejoindre
+            document.getElementById('join-section').style.display = 'block';
+            document.getElementById('create-section').style.display = 'none';
+            
+            // Focus sur l'input du code
+            setTimeout(() => {
+                document.getElementById('join-code-input').focus();
+            }, 100);
+        }
+
+        async function confirmJoinGame() {
+            currentGameCode = document.getElementById('join-code-input').value.trim();
             
             if (!currentGameCode || currentGameCode.length !== 4 || isNaN(currentGameCode)) {
-                showNotification('Code de salle invalide (4 chiffres)', 'error');
+                showNotification('Code invalide. Entrez 4 chiffres.', 'error');
                 return;
             }
-            
+
             showLoading(true);
             
             try {
@@ -1052,14 +1461,12 @@
                 
                 const game = doc.data();
                 
-                // Vérifier le statut
                 if (game.status !== 'waiting') {
                     showNotification('Cette partie a déjà commencé', 'error');
                     showLoading(false);
                     return;
                 }
                 
-                // Vérifier le nombre de joueurs
                 if (Object.keys(game.players).length >= 5) {
                     showNotification('Salle pleine (5 joueurs maximum)', 'error');
                     showLoading(false);
@@ -1072,8 +1479,11 @@
                         name: playerName,
                         score: 0,
                         hasAnswered: false,
-                        isHost: false
-                    }
+                        isHost: false,
+                        color: playerColor,
+                        joinedAt: new Date().toISOString()
+                    },
+                    lastActivity: new Date().toISOString()
                 });
                 
                 isHost = false;
@@ -1083,64 +1493,78 @@
                 showLoading(false);
                 
             } catch (error) {
-                showNotification('Erreur: ' + error.message, 'error');
+                showNotification('Erreur : ' + error.message, 'error');
                 showLoading(false);
             }
         }
-        
+
         function joinGameRoom() {
             showScreen('lobby-screen');
             
             // Mettre à jour l'affichage
-            document.getElementById('lobby-room-code').textContent = currentGameCode;
-            document.getElementById('invite-link').value = `Code: ${currentGameCode}`;
+            document.getElementById('room-code-number').textContent = currentGameCode;
+            document.getElementById('results-room-code').textContent = currentGameCode;
+            document.getElementById('game-room-code').textContent = currentGameCode;
+            document.getElementById('invite-link-input').value = `Code : ${currentGameCode}`;
             
-            // S'abonner aux mises à jour de la salle
+            // S'abonner aux mises à jour
             if (gameUnsubscribe) gameUnsubscribe();
             
             gameUnsubscribe = db.collection('games').doc(currentGameCode)
                 .onSnapshot(doc => {
-                    if (!doc.exists) return;
+                    if (!doc.exists) {
+                        showNotification('La salle a été fermée', 'error');
+                        setTimeout(() => location.reload(), 2000);
+                        return;
+                    }
                     
                     const game = doc.data();
                     updateLobby(game);
                     
-                    // Si la partie commence
                     if (game.status === 'active') {
                         startGameSession(game);
                     }
                     
-                    // Si la partie est terminée
                     if (game.status === 'finished') {
                         showResults(game);
                     }
                 });
         }
-        
+
         function updateLobby(game) {
             // Mettre à jour les stats
             document.getElementById('lobby-total-questions').textContent = game.settings.totalQuestions;
+            document.getElementById('total-q').textContent = game.settings.totalQuestions;
             document.getElementById('player-count').textContent = Object.keys(game.players).length;
             
-            // Trouver le nom de l'hôte
+            // Trouver et afficher l'hôte
             const host = Object.values(game.players).find(p => p.isHost);
-            document.getElementById('host-name').textContent = host ? host.name : '--';
+            if (host) {
+                document.getElementById('host-name').textContent = host.name;
+                document.getElementById('lobby-title').textContent = `Salle de ${host.name}`;
+            }
             
             // Mettre à jour la liste des joueurs
             const playersList = document.getElementById('players-list');
             playersList.innerHTML = '';
             
-            Object.entries(game.players).forEach(([id, player]) => {
+            Object.entries(game.players).forEach(([id, player], index) => {
                 const playerCard = document.createElement('div');
-                playerCard.className = 'player-card' + (player.isHost ? ' host' : '');
+                playerCard.className = `player-card ${player.isHost ? 'host' : ''}`;
                 playerCard.innerHTML = `
+                    <div class="player-avatar" style="background: linear-gradient(135deg, ${player.color}, ${player.color}99);">
+                        ${player.name.charAt(0).toUpperCase()}
+                    </div>
                     <div class="player-name">${player.name}</div>
-                    <div style="color: #666; font-size: 14px;">${player.score} points</div>
+                    <div style="color: var(--gray); font-size: 0.9rem; margin: 5px 0;">
+                        ${player.isHost ? 'Hôte' : 'Joueur'}
+                    </div>
+                    <div class="player-score">${player.score} pts</div>
                 `;
                 playersList.appendChild(playerCard);
             });
             
-            // Afficher/masquer les contrôles de l'hôte
+            // Contrôles de l'hôte
             const startBtn = document.getElementById('start-game-btn');
             const hostControls = document.getElementById('host-controls');
             
@@ -1151,10 +1575,9 @@
                 hostControls.style.display = 'none';
             }
         }
-        
+
         async function startGame() {
             try {
-                // Démarrer la première question
                 const firstQuestion = selectedQuestions[0];
                 
                 await db.collection('games').doc(currentGameCode).update({
@@ -1167,29 +1590,25 @@
                         hint: firstQuestion.hint,
                         category: firstQuestion.category,
                         correctAnswer: firstQuestion.question
-                    }
+                    },
+                    lastActivity: new Date().toISOString()
                 });
                 
             } catch (error) {
-                showNotification('Erreur: ' + error.message, 'error');
+                showNotification('Erreur : ' + error.message, 'error');
             }
         }
-        
-        // ========== JEU EN COURS ==========
+
+        // Jeu en cours
         function startGameSession(game) {
             showScreen('game-screen');
             
-            // Mettre à jour l'affichage
-            document.getElementById('game-room-code').textContent = currentGameCode;
-            document.getElementById('total-q').textContent = game.settings.totalQuestions;
-            
-            // Démarrer le timer pour la première question
             if (game.currentQuestion) {
                 updateGameInterface(game);
                 startTimer(game.currentQuestion.startTime);
             }
         }
-        
+
         function updateGameInterface(game) {
             if (!game.currentQuestion) return;
             
@@ -1205,72 +1624,85 @@
             // Mettre à jour les scores
             updateScores(game.players);
             
-            // Activer/désactiver l'input de réponse
+            // Gérer l'input de réponse
             const currentPlayer = game.players[playerId];
             const answerInput = document.getElementById('answer-input');
             const submitBtn = document.getElementById('submit-answer-btn');
+            const feedback = document.getElementById('answer-feedback');
             
             if (currentPlayer?.hasAnswered) {
                 answerInput.disabled = true;
                 answerInput.placeholder = 'Vous avez déjà répondu';
                 submitBtn.disabled = true;
-                document.getElementById('game-status').textContent = 'Vous avez répondu à cette question';
+                feedback.textContent = 'Vous avez répondu à cette question';
+                feedback.style.color = 'var(--success)';
             } else {
                 answerInput.disabled = false;
                 answerInput.placeholder = 'Tapez votre réponse...';
                 submitBtn.disabled = false;
                 answerInput.focus();
-                document.getElementById('game-status').textContent = 'Répondez avant les autres !';
+                feedback.textContent = '';
             }
         }
-        
+
         function updateScores(players) {
             const scoresList = document.getElementById('scores-list');
             scoresList.innerHTML = '';
             
-            // Trier par score décroissant
             const sortedPlayers = Object.entries(players)
                 .sort(([, a], [, b]) => b.score - a.score);
             
-            sortedPlayers.forEach(([id, player]) => {
+            sortedPlayers.forEach(([id, player], index) => {
                 const scoreItem = document.createElement('div');
-                scoreItem.className = 'score-item';
+                scoreItem.className = `score-item ${id === playerId ? 'current-player' : ''}`;
                 scoreItem.innerHTML = `
-                    <div class="score-name">${player.name} ${player.isHost ? '👑' : ''}</div>
-                    <div class="score-points">${player.score} pts</div>
+                    <div class="player-info">
+                        <div class="player-rank">${index + 1}</div>
+                        <div class="player-details">
+                            <div class="name">${player.name} ${player.isHost ? '👑' : ''}</div>
+                            <div class="status">${player.hasAnswered ? '✓ Répondu' : '⏳ En attente'}</div>
+                        </div>
+                    </div>
+                    <div class="score-value ${player.hasAnswered ? 'answered' : ''}">${player.score} pts</div>
                 `;
                 scoresList.appendChild(scoreItem);
             });
         }
-        
-        // ========== TIMER SYNCHRONISÉ ==========
+
+        // Timer
         function startTimer(startTimeFirestore) {
             clearInterval(timerInterval);
             
-            // Convertir le timestamp Firebase
             const startTime = startTimeFirestore.toDate().getTime();
-            const totalTime = 12000; // 12 secondes
+            const totalTime = 12000;
             const endTime = startTime + totalTime;
+            const circle = document.getElementById('timer-circle');
+            const circumference = 2 * Math.PI * 90;
+            circle.style.strokeDasharray = circumference;
             
             function update() {
                 const now = Date.now();
                 const timeLeft = Math.max(0, endTime - now);
                 const seconds = Math.ceil(timeLeft / 1000);
                 
-                // Mettre à jour l'affichage
                 document.getElementById('timer-text').textContent = seconds;
                 
-                // Mettre à jour la barre de progression
-                const progress = (timeLeft / totalTime) * 360;
-                document.getElementById('timer-progress').style.background = 
-                    `conic-gradient(var(--primary) ${progress}deg, var(--gray-light) ${progress}deg)`;
+                const progress = (timeLeft / totalTime) * circumference;
+                circle.style.strokeDashoffset = progress;
                 
-                // Timer terminé
+                // Changer la couleur quand le temps est court
+                if (seconds <= 5) {
+                    circle.style.stroke = 'var(--danger)';
+                } else if (seconds <= 8) {
+                    circle.style.stroke = 'var(--warning)';
+                } else {
+                    circle.style.stroke = 'var(--primary)';
+                }
+                
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     document.getElementById('timer-text').textContent = '0';
                     
-                    // Si on est l'hôte, passer à la question suivante après 2 secondes
                     if (isHost) {
                         setTimeout(() => nextQuestion(), 2000);
                     }
@@ -1280,8 +1712,8 @@
             update();
             timerInterval = setInterval(update, 100);
         }
-        
-        // ========== GESTION DES RÉPONSES ==========
+
+        // Gestion des réponses
         async function submitAnswer() {
             const answer = document.getElementById('answer-input').value.trim();
             if (!answer) {
@@ -1296,28 +1728,22 @@
                 const game = doc.data();
                 const currentQ = game.currentQuestion;
                 
-                // Vérifier si le joueur a déjà répondu
                 if (game.players[playerId]?.hasAnswered) {
-                    showNotification('Vous avez déjà répondu à cette question', 'warning');
+                    showNotification('Vous avez déjà répondu', 'warning');
                     return;
                 }
                 
-                // Normaliser la réponse (minuscules, sans accents)
                 const normalize = str => str.toLowerCase()
                     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                     .replace(/[^a-z0-9]/g, '');
                 
                 const isCorrect = normalize(answer) === normalize(currentQ.correctAnswer);
                 
-                // Calculer les points
                 let points = 0;
                 let otherCorrectAnswer = false;
                 
-                // Vérifier si d'autres joueurs ont déjà répondu correctement
                 Object.entries(game.players).forEach(([id, player]) => {
-                    if (id !== playerId && player.hasAnswered) {
-                        // On suppose qu'ils ont répondu correctement (dans une version complète, 
-                        // on stockerait cette information)
+                    if (id !== playerId && player.hasAnswered && player.lastAnswerCorrect) {
                         otherCorrectAnswer = true;
                     }
                 });
@@ -1329,28 +1755,26 @@
                     showNotification('Réponse incorrecte', 'error');
                 }
                 
-                // Mettre à jour le joueur
                 await db.collection('games').doc(currentGameCode).update({
                     [`players.${playerId}.score`]: game.players[playerId].score + points,
                     [`players.${playerId}.hasAnswered`]: true,
                     [`players.${playerId}.lastAnswer`]: answer,
-                    [`players.${playerId}.lastAnswerCorrect`]: isCorrect
+                    [`players.${playerId}.lastAnswerCorrect`]: isCorrect,
+                    lastActivity: new Date().toISOString()
                 });
                 
-                // Désactiver l'input
                 document.getElementById('answer-input').disabled = true;
                 document.getElementById('submit-answer-btn').disabled = true;
                 
-                // Si on est l'hôte, vérifier si tout le monde a répondu
                 if (isHost) {
                     checkAllPlayersAnswered();
                 }
                 
             } catch (error) {
-                showNotification('Erreur: ' + error.message, 'error');
+                showNotification('Erreur : ' + error.message, 'error');
             }
         }
-        
+
         async function checkAllPlayersAnswered() {
             const doc = await db.collection('games').doc(currentGameCode).get();
             if (!doc.exists) return;
@@ -1359,11 +1783,10 @@
             const allAnswered = Object.values(game.players).every(p => p.hasAnswered);
             
             if (allAnswered) {
-                // Attendre 2 secondes pour voir les résultats
                 setTimeout(() => nextQuestion(), 2000);
             }
         }
-        
+
         async function nextQuestion() {
             const doc = await db.collection('games').doc(currentGameCode).get();
             if (!doc.exists) return;
@@ -1371,13 +1794,11 @@
             const game = doc.data();
             const nextIndex = game.settings.currentQuestionIndex + 1;
             
-            // Vérifier si c'est la dernière question
             if (nextIndex >= game.settings.totalQuestions) {
                 await endGame();
                 return;
             }
             
-            // Passer à la question suivante
             const nextQuestion = selectedQuestions[nextIndex];
             
             await db.collection('games').doc(currentGameCode).update({
@@ -1390,30 +1811,29 @@
                     category: nextQuestion.category,
                     correctAnswer: nextQuestion.question
                 },
-                // Réinitialiser les réponses des joueurs
-                ...Object.keys(game.players).reduce((acc, playerId) => {
-                    acc[`players.${playerId}.hasAnswered`] = false;
+                ...Object.keys(game.players).reduce((acc, pid) => {
+                    acc[`players.${pid}.hasAnswered`] = false;
+                    acc[`players.${pid}.lastAnswer`] = '';
+                    acc[`players.${pid}.lastAnswerCorrect`] = false;
                     return acc;
-                }, {})
+                }, {}),
+                lastActivity: new Date().toISOString()
             });
         }
-        
+
         async function endGame() {
             await db.collection('games').doc(currentGameCode).update({
-                status: 'finished'
+                status: 'finished',
+                finishedAt: new Date().toISOString()
             });
         }
-        
+
         function showResults(game) {
             showScreen('results-screen');
             
-            document.getElementById('results-room-code').textContent = currentGameCode;
-            
-            // Trier les joueurs par score
             const sortedPlayers = Object.values(game.players)
                 .sort((a, b) => b.score - a.score);
             
-            // Mettre à jour le podium
             if (sortedPlayers[0]) {
                 document.getElementById('first-place').textContent = sortedPlayers[0].name;
                 document.getElementById('first-score').textContent = sortedPlayers[0].score + ' pts';
@@ -1427,35 +1847,34 @@
                 document.getElementById('third-score').textContent = sortedPlayers[2].score + ' pts';
             }
             
-            // Liste complète
             const resultsList = document.getElementById('full-results-list');
             resultsList.innerHTML = '';
             
             sortedPlayers.forEach((player, index) => {
                 const resultItem = document.createElement('div');
-                resultItem.className = 'result-item';
+                resultItem.className = 'score-item';
                 resultItem.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span style="font-weight: bold; font-size: 20px; color: #666;">${index + 1}</span>
-                        <span style="font-weight: 600; font-size: 18px;">${player.name}</span>
-                        ${player.isHost ? '<span style="background: gold; padding: 2px 8px; border-radius: 10px; font-size: 12px;">HÔTE</span>' : ''}
+                    <div class="player-info">
+                        <div class="player-rank" style="font-size: 1.5rem;">${index + 1}</div>
+                        <div class="player-details">
+                            <div class="name" style="font-size: 1.3rem;">${player.name}</div>
+                            ${player.isHost ? '<div style="color: var(--warning); font-size: 0.9rem;">Hôte</div>' : ''}
+                        </div>
                     </div>
-                    <span style="font-weight: bold; font-size: 24px; color: var(--primary);">${player.score} pts</span>
+                    <div class="score-value" style="font-size: 2rem;">${player.score} pts</div>
                 `;
                 resultsList.appendChild(resultItem);
             });
         }
-        
-        // ========== GESTION DE LA DÉCONNEXION ==========
+
         async function leaveGame() {
             if (currentGameCode) {
                 try {
-                    // Retirer le joueur de la salle
                     await db.collection('games').doc(currentGameCode).update({
-                        [`players.${playerId}`]: firebase.firestore.FieldValue.delete()
+                        [`players.${playerId}`]: firebase.firestore.FieldValue.delete(),
+                        lastActivity: new Date().toISOString()
                     });
                     
-                    // Si c'était l'hôte, supprimer la salle
                     const doc = await db.collection('games').doc(currentGameCode).get();
                     if (doc.exists) {
                         const game = doc.data();
@@ -1468,37 +1887,51 @@
                 }
             }
             
-            // Nettoyer
             if (gameUnsubscribe) gameUnsubscribe();
             if (timerInterval) clearInterval(timerInterval);
             
-            // Réinitialiser
             currentGameCode = '';
             isHost = false;
             selectedQuestions = [];
-            currentQuestionIndex = 0;
             
-            // Retour à l'accueil
             showScreen('home-screen');
+            document.getElementById('create-section').style.display = 'none';
+            document.getElementById('join-section').style.display = 'none';
         }
-        
-        // ========== ÉVÉNEMENTS ==========
+
+        // Événements
         document.addEventListener('DOMContentLoaded', () => {
-            // Pré-remplir les noms
-            document.getElementById('player-name').value = `Joueur${Math.floor(Math.random() * 1000)}`;
-            document.getElementById('join-player-name').value = document.getElementById('player-name').value;
+            // Pré-remplir le nom
+            const names = ['Alex', 'Sarah', 'Thomas', 'Emma', 'Lucas', 'Chloé', 'Maxime', 'Julie'];
+            document.getElementById('player-name').value = `${names[Math.floor(Math.random() * names.length)]}${Math.floor(Math.random() * 100)}`;
             
-            // Boutons de l'accueil
-            document.getElementById('create-btn').addEventListener('click', createGame);
-            document.getElementById('join-btn').addEventListener('click', joinGame);
+            // Navigation principale
+            document.getElementById('create-game-btn').addEventListener('click', createGame);
+            document.getElementById('join-game-btn').addEventListener('click', joinGame);
+            document.getElementById('cancel-create-btn').addEventListener('click', () => {
+                document.getElementById('create-section').style.display = 'none';
+            });
+            document.getElementById('cancel-join-btn').addEventListener('click', () => {
+                document.getElementById('join-section').style.display = 'none';
+            });
+            document.getElementById('confirm-create-btn').addEventListener('click', confirmCreateGame);
+            document.getElementById('confirm-join-btn').addEventListener('click', confirmJoinGame);
+            
+            // Input du code de rejoindre
+            document.getElementById('join-code-input').addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+                if (e.target.value.length === 4) {
+                    document.getElementById('confirm-join-btn').focus();
+                }
+            });
             
             // Salle d'attente
             document.getElementById('start-game-btn').addEventListener('click', startGame);
             document.getElementById('copy-invite-btn').addEventListener('click', () => {
-                const link = document.getElementById('invite-link');
+                const link = document.getElementById('invite-link-input');
                 link.select();
                 document.execCommand('copy');
-                showNotification('Code copié !', 'success');
+                showNotification('Code copié dans le presse-papier !', 'success');
             });
             document.getElementById('leave-lobby-btn').addEventListener('click', leaveGame);
             
@@ -1511,14 +1944,15 @@
             
             // Résultats
             document.getElementById('play-again-btn').addEventListener('click', () => {
-                showScreen('home-screen');
                 playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+                playerColor = getRandomColor();
+                showScreen('home-screen');
             });
             document.getElementById('back-home-btn').addEventListener('click', () => {
                 showScreen('home-screen');
             });
             
-            // Gérer la fermeture de la page
+            // Fermeture de la page
             window.addEventListener('beforeunload', leaveGame);
         });
     </script>
