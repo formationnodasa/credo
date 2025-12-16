@@ -1,77 +1,810 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🗳️ Système de Vote SÉCURISÉ - Élections 2024</title>
+    <title>🗳️ VotixPro - Système de Vote en Ligne</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
+            authDomain: "match-en-ligne.firebaseapp.com",
+            projectId: "match-en-ligne",
+            storageBucket: "match-en-ligne.firebasestorage.app",
+            messagingSenderId: "706011207623",
+            appId: "1:706011207623:web:17374990a6202b64f0abe2",
+            measurementId: "G-D9XYRE3W2M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Exposer Firebase au global scope
+        window.firebaseApp = app;
+        window.firebaseDB = db;
+        window.firebaseFunctions = { collection, addDoc, getDocs, updateDoc, doc, query, where };
+        
+        console.log("✅ Firebase initialisé avec succès !");
+    </script>
+    
     <style>
-        /* [Tout le CSS reste identique - trop long pour répéter] */
-        /* Gardez exactement le même CSS que dans le code précédent */
+        /* ===== VARIABLES ===== */
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #554FD8;
+            --secondary: #FF6584;
+            --accent: #36D1DC;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --dark: #2D3047;
+            --light: #F8F9FA;
+            --gray: #6C757D;
+            --gray-light: #E9ECEF;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* ===== LAYOUT ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+        
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* ===== SECTIONS ===== */
+        .section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-title i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .section-subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        /* ===== CODE SECTION ===== */
+        .code-input-container {
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 20px 25px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-group input::placeholder {
+            color: #999;
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.7s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #45a049);
+            color: white;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, var(--danger), #d32f2f);
+            color: white;
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3);
+        }
+        
+        /* ===== CANDIDATES ===== */
+        .candidates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .candidate-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .candidate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        
+        .candidate-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .candidate-card.selected {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.02));
+        }
+        
+        .candidate-card.selected::before {
+            transform: scaleX(1);
+            background: linear-gradient(90deg, var(--success), #45a049);
+        }
+        
+        .candidate-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .candidate-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .candidate-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .candidate-party {
+            display: inline-block;
+            background: var(--gray-light);
+            color: var(--dark);
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .candidate-description {
+            color: var(--gray);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 25px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border-left: 5px solid;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .alert-success {
+            background: linear-gradient(45deg, #d4efdf, #a3e4c1);
+            color: #27ae60;
+            border-left-color: #27ae60;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(45deg, #fadbd8, #f5b7b1);
+            color: #e74c3c;
+            border-left-color: #e74c3c;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(45deg, #fdebd0, #f8c471);
+            color: #f39c12;
+            border-left-color: #f39c12;
+        }
+        
+        .alert-info {
+            background: linear-gradient(45deg, #d6eaf8, #aed6f1);
+            color: #3498db;
+            border-left-color: #3498db;
+        }
+        
+        /* ===== RESULTS ===== */
+        .results-container {
+            margin-top: 40px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .results-table th {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .results-table td {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 0.95rem;
+        }
+        
+        .results-table tr:hover td {
+            background: #f8f9fa;
+        }
+        
+        .vote-progress {
+            background: var(--gray-light);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .vote-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--accent));
+            border-radius: 5px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .vote-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+        
+        /* ===== LOADING ===== */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .spinner {
+            border: 4px solid var(--gray-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: modalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+        
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .section {
+                padding: 25px;
+            }
+            
+            .candidates-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* ===== DECORATIONS ===== */
+        .floating-element {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+        
+        .wave svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 100px;
+        }
+        
+        .wave .shape-fill {
+            fill: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ===== UTILITIES ===== */
+        .text-center { text-align: center; }
+        .mb-20 { margin-bottom: 20px; }
+        .mb-30 { margin-bottom: 30px; }
+        .mt-20 { margin-top: 20px; }
+        .mt-30 { margin-top: 30px; }
+        .d-none { display: none !important; }
+        .d-block { display: block !important; }
     </style>
 </head>
 <body>
+    <!-- Floating Decorations -->
+    <div class="floating-element" style="top: 10%; left: 5%;"></div>
+    <div class="floating-element" style="top: 20%; right: 10%;"></div>
+    <div class="floating-element" style="bottom: 30%; left: 15%;"></div>
+    
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-shield-alt"></i> SYSTÈME DE VOTE SÉCURISÉ</h1>
-            <p>Un vote = Un code = Une seule fois • Système inviolable</p>
-            <p class="header-badge"><i class="fas fa-user-lock"></i> Authentification forte • Vote unique • Audit complet</p>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-vote-yea"></i> VOTIXPRO
+                </div>
+                <h1 class="title">Système de Vote Professionnel</h1>
+                <p class="subtitle">Plateforme sécurisée pour des élections transparentes et fiables</p>
+                
+                <div class="badge-container">
+                    <div class="badge">
+                        <i class="fas fa-shield-alt"></i> Sécurité maximale
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-user-lock"></i> Authentification unique
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-chart-bar"></i> Résultats en temps réel
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-cloud"></i> Stockage Firebase
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- Code Section -->
+        <!-- Code Entry Section -->
         <div id="codeSection" class="section active">
-            <h2 class="section-title"><i class="fas fa-fingerprint"></i> AUTHENTIFICATION STRICTE</h2>
+            <h2 class="section-title">
+                <i class="fas fa-key"></i> Accès au Vote
+            </h2>
+            <p class="section-subtitle">Entrez votre code personnel pour accéder au système de vote</p>
             
             <div id="alertCode" class="alert alert-danger">
                 <i class="fas fa-exclamation-circle"></i> <span id="alertText"></span>
             </div>
             
-            <div class="code-container">
-                <div class="code-input-group">
+            <div class="code-input-container">
+                <div class="input-group">
                     <input type="text" id="voteCode" class="code-input" 
-                           placeholder="Entrez votre code personnel unique" 
+                           placeholder="Votre code de vote (ex: K7P4J9M2N6)" 
                            maxlength="10" autocomplete="off" autofocus>
                     <button id="validateCode" class="btn btn-primary">
-                        <i class="fas fa-user-check"></i> VÉRIFIER L'IDENTITÉ
+                        <i class="fas fa-check-circle"></i> Vérifier le Code
                     </button>
                 </div>
                 
-                <div class="code-hint">
-                    <i class="fas fa-info-circle"></i> Exemple de code valide : <strong>K7P4J9M2N6</strong>
-                    <br><small>Chaque code ne peut être utilisé qu'une seule fois</small>
+                <div style="background: var(--gray-light); padding: 20px; border-radius: var(--radius-sm); text-align: center;">
+                    <p style="margin-bottom: 10px;">
+                        <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                        <strong>Codes de démonstration :</strong>
+                    </p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                        <code style="background: white; padding: 8px 15px; border-radius: 6px; font-family: monospace; color: var(--primary);">
+                            K7P4J9M2N6
+                        </code>
+                        <code style="background: white; padding: 8px 15px; border-radius: 6px; font-family: monospace; color: var(--primary);">
+                            Q1R8S3T5V9
+                        </code>
+                        <code style="background: white; padding: 8px 15px; border-radius: 6px; font-family: monospace; color: var(--primary);">
+                            W2X4Y6Z7B8
+                        </code>
+                    </div>
                 </div>
             </div>
             
-            <div style="background: rgba(67, 97, 238, 0.05); padding: 25px; border-radius: 12px; margin-top: 30px; border-left: 4px solid var(--primary);">
-                <h3 style="color: var(--primary); margin-bottom: 15px;">
-                    <i class="fas fa-lock"></i> GARANTIES DE SÉCURITÉ
+            <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, rgba(108, 99, 255, 0.05), rgba(54, 209, 220, 0.05)); border-radius: var(--radius-sm);">
+                <h3 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-lock"></i> Comment fonctionne le système ?
                 </h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="background: var(--success); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check"></i>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <strong>1</strong>
                         </div>
-                        <span>1 code = 1 vote unique</span>
+                        <div>
+                            <strong>Entrez votre code unique</strong>
+                            <p style="color: var(--gray); margin-top: 5px;">Chaque électeur reçoit un code personnel</p>
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="background: var(--success); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check"></i>
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <strong>2</strong>
                         </div>
-                        <span>Impossible de voter sans code</span>
+                        <div>
+                            <strong>Sélectionnez votre candidat</strong>
+                            <p style="color: var(--gray); margin-top: 5px;">Choisissez parmi 10 candidats qualifiés</p>
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="background: var(--success); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check"></i>
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <strong>3</strong>
                         </div>
-                        <span>Codes invalidés après usage</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="background: var(--success); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Confirmez votre vote</strong>
+                            <p style="color: var(--gray); margin-top: 5px;">Validation définitive et sécurisée</p>
                         </div>
-                        <span>Session unique par code</span>
                     </div>
                 </div>
             </div>
@@ -79,48 +812,55 @@
         
         <!-- Voting Section -->
         <div id="votingSection" class="section">
-            <h2 class="section-title"><i class="fas fa-vote-yea"></i> VOTE DÉFINITIF</h2>
-            
-            <div style="background: linear-gradient(45deg, #d4efdf, #a3e4c1); padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid var(--success);">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fas fa-user-check"></i> Sélectionnez votre candidat
+                    </h2>
+                    <p class="section-subtitle">Cliquez sur un candidat pour faire votre choix</p>
+                </div>
+                <div style="background: linear-gradient(45deg, var(--success), #45a049); color: white; padding: 10px 20px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-user-shield"></i>
                     <div>
-                        <strong><i class="fas fa-user-shield"></i> IDENTITÉ VÉRIFIÉE</strong>
-                        <p style="margin: 5px 0 0 0; color: #27ae60;">Code : <span id="currentCodeDisplay" style="font-family: monospace; font-weight: bold;"></span></p>
-                    </div>
-                    <div id="sessionTimer" style="background: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; color: var(--primary);">
-                        <i class="fas fa-clock"></i> Session : 05:00
+                        <small>Connecté avec le code</small>
+                        <div id="currentCodeDisplay" style="font-family: monospace; font-weight: bold; font-size: 1.1rem;"></div>
                     </div>
                 </div>
             </div>
             
-            <div id="alertVote" class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle"></i> Sélectionnez un candidat avant de valider.
+            <div id="alertVote" class="alert alert-warning d-none">
+                <i class="fas fa-exclamation-triangle"></i> Veuillez sélectionner un candidat avant de continuer.
             </div>
             
             <div class="candidates-grid" id="candidatesContainer">
-                <!-- Généré par JavaScript -->
+                <!-- Les candidats seront générés ici -->
             </div>
             
-            <div style="text-align: center; margin-top: 50px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
-                <button id="submitVote" class="btn btn-success" style="padding: 20px 60px; font-size: 1.2rem;">
-                    <i class="fas fa-check-double"></i> VALIDER MON VOTE DÉFINITIF
+            <div class="text-center mt-30">
+                <button id="submitVote" class="btn btn-success" style="padding: 20px 50px; font-size: 1.1rem;">
+                    <i class="fas fa-paper-plane"></i> Soumettre mon vote
                 </button>
-                <button id="cancelVote" class="btn btn-danger" style="margin-left: 20px;">
-                    <i class="fas fa-times"></i> ANNULER
+                <button id="cancelVote" class="btn btn-danger" style="margin-left: 15px;">
+                    <i class="fas fa-times"></i> Annuler
                 </button>
             </div>
         </div>
         
         <!-- Results Section -->
         <div id="resultsSection" class="section">
-            <h2 class="section-title"><i class="fas fa-chart-bar"></i> RÉSULTATS OFFICIELS</h2>
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i> Résultats en temps réel
+            </h2>
+            <p class="section-subtitle">Statistiques et progression des votes</p>
             
-            <div class="results-stats" id="resultsStats">
-                <!-- Généré dynamiquement -->
+            <div class="stats-grid" id="resultsStats">
+                <!-- Statistiques générées dynamiquement -->
             </div>
             
             <div class="results-container">
-                <canvas id="resultsChart" width="400" height="200"></canvas>
+                <div style="height: 400px;">
+                    <canvas id="resultsChart"></canvas>
+                </div>
             </div>
             
             <div style="overflow-x: auto; margin-top: 40px;">
@@ -136,636 +876,366 @@
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
-                        <!-- Généré dynamiquement -->
+                        <!-- Résultats générés dynamiquement -->
                     </tbody>
                 </table>
             </div>
-        </div>
-        
-        <!-- Vote Confirmed Section -->
-        <div id="voteConfirmedSection" class="section">
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 6rem; color: var(--success); margin-bottom: 30px;">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h1 style="color: var(--primary); margin-bottom: 20px;">VOTE ENREGISTRÉ !</h1>
-                <p style="font-size: 1.2rem; color: #666; max-width: 600px; margin: 0 auto 40px; line-height: 1.6;">
-                    Votre vote a été validé avec succès et est désormais définitif.
-                </p>
-                
-                <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto 40px; text-align: left;">
-                    <h3 style="color: var(--primary); margin-bottom: 20px;">
-                        <i class="fas fa-receipt"></i> RECONNAISSANCE DE VOTE
-                    </h3>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Code utilisé :</strong> 
-                        <span id="receiptCode" style="font-family: monospace; background: #eee; padding: 5px 10px; border-radius: 4px; margin-left: 10px;"></span>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Candidat choisi :</strong> 
-                        <span id="receiptCandidate" style="font-weight: bold; color: var(--primary); margin-left: 10px;"></span>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Heure du vote :</strong> 
-                        <span id="receiptTime" style="margin-left: 10px;"></span>
-                    </div>
-                    <div>
-                        <strong>Code de vérification :</strong> 
-                        <span id="receiptVerification" style="font-family: monospace; font-weight: bold; color: var(--success); margin-left: 10px;"></span>
-                    </div>
-                </div>
-                
-                <button id="viewResultsBtn" class="btn btn-primary" style="padding: 15px 40px;">
-                    <i class="fas fa-chart-bar"></i> VOIR LES RÉSULTATS
+            
+            <div class="text-center mt-30">
+                <button id="backToVote" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> Retour au vote
                 </button>
             </div>
         </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <h3 style="color: var(--primary); margin-bottom: 15px;">Traitement en cours</h3>
+            <p>Validation sécurisée de votre vote...</p>
+            <p style="color: var(--gray); margin-top: 10px; font-size: 0.9rem;">
+                <i class="fas fa-shield-alt"></i> Connexion sécurisée à Firebase
+            </p>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmation -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 style="color: var(--success); margin-bottom: 15px;">Vote confirmé !</h2>
+            <p id="confirmationMessage" style="color: var(--gray); margin-bottom: 30px; line-height: 1.6;">
+                Votre vote a été enregistré avec succès.
+            </p>
+            <button id="viewResultsBtn" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-chart-bar"></i> Voir les résultats
+            </button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p style="margin-bottom: 10px;">Système de Vote Professionnel &copy; 2024</p>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <span style="display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-server" style="color: var(--accent);"></i>
+                <span>Firebase Database</span>
+            </span>
+            <span style="display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-shield-alt" style="color: var(--success);"></i>
+                <span>SSL Sécurisé</span>
+            </span>
+            <span style="display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-code" style="color: var(--primary);"></i>
+                <span>GitHub Ready</span>
+            </span>
+        </div>
     </div>
 
-    <!-- JavaScript CORRIGÉ - VOICI LA SOLUTION -->
+    <!-- JavaScript avec Firebase -->
     <script>
         // ============================================
-        // SYSTÈME DE VOTE SÉCURISÉ - VERSION CORRIGÉE
+        // CONFIGURATION
         // ============================================
         
-        // Classe de gestion de la base de données SÉCURISÉE
-        class SecureVoteDatabase {
-            constructor() {
-                this.STORAGE_KEY = 'secure_voting_system_2024';
-                this.USED_CODES_KEY = 'used_vote_codes_2024';
-                this.SESSION_KEY = 'voting_session_2024';
-                this.initSecureDatabase();
-            }
-            
-            initSecureDatabase() {
-                // Initialiser si vide
-                if (!localStorage.getItem(this.STORAGE_KEY)) {
-                    const initialData = {
-                        votes: Array(10).fill(0),
-                        totalVotes: 0,
-                        voters: {},
-                        sessionCount: 0,
-                        lastUpdated: new Date().toISOString(),
-                        securityHash: this.generateSecurityHash()
-                    };
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(initialData));
-                    localStorage.setItem(this.USED_CODES_KEY, JSON.stringify([]));
-                }
-            }
-            
-            // VÉRIFICATION STRICTE du code
-            verifyVoteCode(code) {
-                const usedCodes = JSON.parse(localStorage.getItem(this.USED_CODES_KEY) || '[]');
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                
-                // Vérifier si le code est déjà utilisé
-                if (usedCodes.includes(code)) {
-                    return { valid: false, reason: 'Ce code a déjà été utilisé pour voter.' };
-                }
-                
-                // Vérifier si le code existe dans la liste
-                if (!validCodes.includes(code)) {
-                    return { valid: false, reason: 'Code invalide.' };
-                }
-                
-                // Vérifier si l'utilisateur a déjà une session active
-                if (sessionStorage.getItem('current_vote_code') === code) {
-                    return { valid: true, reason: 'Session déjà active.' };
-                }
-                
-                return { valid: true, reason: 'Code valide.' };
-            }
-            
-            // ENREGISTREMENT SÉCURISÉ du vote
-            registerVote(code, candidateId) {
-                // 1. Vérifier à nouveau le code (double vérification)
-                const verification = this.verifyVoteCode(code);
-                if (!verification.valid) {
-                    throw new Error(verification.reason);
-                }
-                
-                // 2. Récupérer les données
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                const usedCodes = JSON.parse(localStorage.getItem(this.USED_CODES_KEY) || '[]');
-                
-                // 3. Enregistrer le vote
-                data.votes[candidateId - 1]++;
-                data.totalVotes++;
-                data.voters[code] = {
-                    candidate: candidateId,
-                    timestamp: new Date().toISOString(),
-                    ip: 'anonymous'
-                };
-                data.sessionCount++;
-                data.lastUpdated = new Date().toISOString();
-                data.securityHash = this.generateSecurityHash();
-                
-                // 4. Marquer le code comme utilisé
-                if (!usedCodes.includes(code)) {
-                    usedCodes.push(code);
-                }
-                
-                // 5. Sauvegarder
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-                localStorage.setItem(this.USED_CODES_KEY, JSON.stringify(usedCodes));
-                
-                // 6. Créer une session de vote
-                sessionStorage.setItem('has_voted', 'true');
-                sessionStorage.setItem('vote_code', code);
-                sessionStorage.setItem('vote_candidate', candidateId.toString());
-                sessionStorage.setItem('vote_timestamp', new Date().toISOString());
-                
-                // 7. Cookie de sauvegarde
-                this.createSecureBackup();
-                
-                return {
-                    success: true,
-                    voteId: Date.now().toString(36).toUpperCase(),
-                    timestamp: new Date().toISOString()
-                };
-            }
-            
-            // RÉCUPÉRATION des votes (lecture seule)
-            getVotes() {
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                return data.votes;
-            }
-            
-            getStatistics() {
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                return {
-                    totalVotes: data.totalVotes,
-                    votes: data.votes,
-                    lastUpdated: data.lastUpdated,
-                    sessionCount: data.sessionCount,
-                    securityHash: data.securityHash
-                };
-            }
-            
-            // VÉRIFICATION si un code a été utilisé
-            isCodeUsed(code) {
-                const usedCodes = JSON.parse(localStorage.getItem(this.USED_CODES_KEY) || '[]');
-                return usedCodes.includes(code);
-            }
-            
-            // SÉCURITÉ : Hash de vérification
-            generateSecurityHash() {
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                const str = data.votes.join('') + data.totalVotes + Date.now();
-                return btoa(str).substring(0, 32);
-            }
-            
-            // SAUVEGARDE SÉCURISÉE
-            createSecureBackup() {
-                const data = JSON.parse(localStorage.getItem(this.STORAGE_KEY));
-                const backup = {
-                    votes: data.votes,
-                    total: data.totalVotes,
-                    hash: data.securityHash,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Stockage multi-couches
-                try {
-                    // Couche 1: Cookies
-                    document.cookie = `vote_backup=${JSON.stringify(backup)}; max-age=604800; path=/; secure; samesite=strict`;
-                    
-                    // Couche 2: IndexedDB (si disponible)
-                    if ('indexedDB' in window) {
-                        this.saveToIndexedDB(backup);
-                    }
-                } catch (e) {
-                    console.warn('Sauvegarde échouée:', e);
-                }
-            }
-            
-            saveToIndexedDB(backup) {
-                const request = indexedDB.open('VoteBackupDB', 1);
-                
-                request.onupgradeneeded = function(e) {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('backups')) {
-                        db.createObjectStore('backups', { keyPath: 'timestamp' });
-                    }
-                };
-                
-                request.onsuccess = function(e) {
-                    const db = e.target.result;
-                    const transaction = db.transaction(['backups'], 'readwrite');
-                    const store = transaction.objectStore('backups');
-                    store.put(backup);
-                };
-            }
-            
-            // RÉINITIALISATION (pour tests uniquement)
-            resetForTesting() {
-                localStorage.removeItem(this.STORAGE_KEY);
-                localStorage.removeItem(this.USED_CODES_KEY);
-                sessionStorage.clear();
-                this.initSecureDatabase();
-                alert('Système réinitialisé pour tests');
-            }
-        }
-        
-        // ============================================
-        // DONNÉES STATIQUES
-        // ============================================
-        
-        const candidates = [
-            { id: 1, name: "Marie Dubois", party: "Parti Progressiste", color: "#3498db" },
-            { id: 2, name: "Jean Martin", party: "Alliance Démocratique", color: "#2ecc71" },
-            { id: 3, name: "Sophie Bernard", party: "Mouvement Écologique", color: "#1abc9c" },
-            { id: 4, name: "Thomas Leroy", party: "Union Républicaine", color: "#e74c3c" },
-            { id: 5, name: "Camille Petit", party: "Parti Social", color: "#9b59b6" },
-            { id: 6, name: "Alexandre Moreau", party: "Centre Libéral", color: "#f39c12" },
-            { id: 7, name: "Julie Fontaine", party: "Parti des Régions", color: "#d35400" },
-            { id: 8, name: "Mohamed Ali", party: "Diversité et Progrès", color: "#34495e" },
-            { id: 9, name: "Isabelle Lambert", party: "Parti de la Famille", color: "#16a085" },
+        const CANDIDATES = [
+            { id: 1, name: "Élise Moreau", party: "Alliance Progressiste", color: "#3498db" },
+            { id: 2, name: "Antoine Laurent", party: "Union Démocratique", color: "#2ecc71" },
+            { id: 3, name: "Sophie Dubois", party: "Écologie & Avenir", color: "#1abc9c" },
+            { id: 4, name: "Thomas Martin", party: "Conservateurs Unis", color: "#e74c3c" },
+            { id: 5, name: "Camille Rousseau", party: "Parti Social", color: "#9b59b6" },
+            { id: 6, name: "Alexandre Bernard", party: "Centre Libéral", color: "#f39c12" },
+            { id: 7, name: "Julie Petit", party: "Parti Social", color: "#9b59b6" },
+
+{ id: 8, name: "Mohamed Ali", party: "Diversité Citoyenne", color: "#34495e" },
+            { id: 9, name: "Isabelle Lambert", party: "Parti des Familles", color: "#16a085" },
             { id: 10, name: "Pierre Garnier", party: "Nouvelle Vision", color: "#8e44ad" }
         ];
         
-        // CODES DE VOTE VALIDES (150 codes)
-        const validCodes = [
+        const VALID_CODES = [
             "K7P4J9M2N6", "Q1R8S3T5V9", "W2X4Y6Z7B8", "C3D5F7G9H2", "J4K6L8M1N3",
             "P5Q7R9S2T4", "V6W8X1Y3Z5", "B7C9D2F4G6", "H8J1K3L5M7", "N9P2Q4R6S8",
             "T1V3W5X7Y9", "Z2B4C6D8F1", "G3H5J7K9L2", "M4N6P8Q1R3", "S5T7V9W2X4",
             "Y6Z8B1C3D5", "F7G9H2J4K6", "L8M1N3P5Q7", "R9S2T4V6W8", "X1Y3Z5B7C9",
             "D2F4G6H8J1", "K3L5M7N9P2", "Q4R6S8T1V3", "W5X7Y9Z2B4", "C6D8F1G3H5",
-            "J7K9L2M4N6", "P8Q1R3S5T7", "V9W2X4Y6Z8", "B1C3D5F7G9", "H2J4K6L8M1",
-            "N3P5Q7R9S2", "T4V6W8X1Y3", "Z5B7C9D2F4", "G6H8J1K3L5", "M7N9P2Q4R6",
-            "S8T1V3W5X7", "Y9Z2B4C6D8", "F1G3H5J7K9", "L2M4N6P8Q1", "R3S5T7V9W2",
-            "X4Y6Z8B1C3", "D5F7G9H2J4", "K6L8M1N3P5", "Q7R9S2T4V6", "W8X1Y3Z5B7",
-            "C9D2F4G6H8", "J1K3L5M7N9", "P2Q4R6S8T1", "V3W5X7Y9Z2", "B4C6D8F1G3",
-            "H5J7K9L2M4", "N6P8Q1R3S5", "T7V9W2X4Y6", "Z8B1C3D5F7", "G9H2J4K6L8",
-            "M1N3P5Q7R9", "S2T4V6W8X1", "Y3Z5B7C9D2", "F4G6H8J1K3", "L5M7N9P2Q4",
-            "R6S8T1V3W5", "X7Y9Z2B4C6", "D8F1G3H5J7", "K9L2M4N6P8", "Q1R3S5T7V9",
-            "W2X4Y6Z8B1", "C3D5F7G9H2", "J4K6L8M1N3", "P5Q7R9S2T4", "V6W8X1Y3Z5",
-            "B7C9D2F4G6", "H8J1K3L5M7", "N9P2Q4R6S8", "T1V3W5X7Y9", "Z2B4C6D8F1",
-            "G3H5J7K9L2", "M4N6P8Q1R3", "S5T7V9W2X4", "Y6Z8B1C3D5", "F7G9H2J4K6",
-            "L8M1N3P5Q7", "R9S2T4V6W8", "X1Y3Z5B7C9", "D2F4G6H8J1", "K3L5M7N9P2",
-            "Q4R6S8T1V3", "W5X7Y9Z2B4", "C6D8F1G3H5", "J7K9L2M4N6", "P8Q1R3S5T7",
-            "V9W2X4Y6Z8", "B1C3D5F7G9", "H2J4K6L8M1", "N3P5Q7R9S2", "T4V6W8X1Y3",
-            "Z5B7C9D2F4", "G6H8J1K3L5", "M7N9P2Q4R6", "S8T1V3W5X7", "Y9Z2B4C6D8",
-            "F1G3H5J7K9", "L2M4N6P8Q1", "R3S5T7V9W2", "X4Y6Z8B1C3", "D5F7G9H2J4",
-            "K6L8M1N3P5", "Q7R9S2T4V6", "W8X1Y3Z5B7", "C9D2F4G6H8", "J1K3L5M7N9",
-            "P2Q4R6S8T1", "V3W5X7Y9Z2", "B4C6D8F1G3", "H5J7K9L2M4", "N6P8Q1R3S5",
-            "T7V9W2X4Y6", "Z8B1C3D5F7", "G9H2J4K6L8", "M1N3P5Q7R9", "S2T4V6W8X1",
-            "Y3Z5B7C9D2", "F4G6H8J1K3", "L5M7N9P2Q4", "R6S8T1V3W5", "X7Y9Z2B4C6",
-            "D8F1G3H5J7", "K9L2M4N6P8", "Q1R3S5T7V9", "W2X4Y6Z8B1", "C3D5F7G9H2",
-            "J4K6L8M1N3", "P5Q7R9S2T4", "V6W8X1Y3Z5", "B7C9D2F4G6", "H8J1K3L5M7",
-            "N9P2Q4R6S8", "T1V3W5X7Y9", "Z2B4C6D8F1", "G3H5J7K9L2", "M4N6P8Q1R3",
-            "S5T7V9W2X4", "Y6Z8B1C3D5", "F7G9H2J4K6", "L8M1N3P5Q7", "R9S2T4V6W8"
+            "J7K9L2M4N6", "P8Q1R3S5T7", "V9W2X4Y6Z8", "B1C3D5F7G9", "H2J4K6L8M1"
         ];
         
         // ============================================
-        // VARIABLES GLOBALES
+        // ÉTAT GLOBAL
         // ============================================
         
-        const db = new SecureVoteDatabase();
         let selectedCandidate = null;
         let currentVoteCode = null;
-        let sessionTimer = null;
-        let timeLeft = 300; // 5 minutes en secondes
+        let chartInstance = null;
         
         // ============================================
         // INITIALISATION
         // ============================================
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // Vérifier l'état de la session
-            checkSessionState();
-            
-            // Initialiser l'interface
-            initInterface();
-            
-            // Configurer les événements
-            setupEventHandlers();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await waitForFirebase();
+            initApp();
         });
         
-        function checkSessionState() {
-            // Si l'utilisateur a déjà voté dans cette session
-            if (sessionStorage.getItem('has_voted') === 'true') {
-                showVoteConfirmed();
+        async function waitForFirebase() {
+            let attempts = 0;
+            while (!window.firebaseDB && attempts < 30) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.firebaseDB) {
+                console.error('Firebase non chargé');
+                showAlert('Erreur de connexion à la base de données', 'danger');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function initApp() {
+            generateCandidates();
+            setupEventListeners();
+            checkExistingSession();
+            
+            // Afficher un message de bienvenue
+            setTimeout(() => {
+                showAlert('🎉 Bienvenue sur VotixPro ! Entrez votre code pour commencer.', 'info');
+            }, 1000);
+        }
+        
+        // ============================================
+        // FIREBASE FUNCTIONS
+        // ============================================
+        
+        async function verifyCodeInFirebase(code) {
+            try {
+                const db = window.firebaseDB;
+                const { collection, query, where, getDocs } = window.firebaseFunctions;
+                
+                const codesRef = collection(db, 'vote_codes');
+                const q = query(codesRef, where('code', '==', code));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    return { valid: false, reason: 'Code invalide' };
+                }
+                
+                const codeData = querySnapshot.docs[0].data();
+                
+                if (codeData.used) {
+                    return { valid: false, reason: 'Code déjà utilisé' };
+                }
+                
+                return { valid: true, data: codeData };
+                
+            } catch (error) {
+                console.error('Erreur Firebase:', error);
+                return { valid: false, reason: 'Erreur de connexion' };
+            }
+        }
+        
+        async function registerVoteInFirebase(code, candidateId) {
+            try {
+                const db = window.firebaseDB;
+                const { collection, addDoc, updateDoc, doc } = window.firebaseFunctions;
+                
+                // 1. Enregistrer le vote
+                const votesRef = collection(db, 'votes');
+                const voteData = {
+                    code: code,
+                    candidateId: candidateId,
+                    timestamp: new Date().toISOString(),
+                    ip: await getClientIP()
+                };
+                
+                await addDoc(votesRef, voteData);
+                
+                // 2. Marquer le code comme utilisé
+                const codesRef = collection(db, 'vote_codes');
+                const q = query(codesRef, where('code', '==', code));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const codeDoc = querySnapshot.docs[0];
+                    await updateDoc(doc(db, 'vote_codes', codeDoc.id), {
+                        used: true,
+                        usedAt: new Date().toISOString(),
+                        candidateId: candidateId
+                    });
+                }
+                
+                // 3. Incrémenter le compteur du candidat
+                await updateCandidateCount(candidateId);
+                
+                return { success: true, voteId: Date.now().toString(36).toUpperCase() };
+                
+            } catch (error) {
+                console.error('Erreur d\'enregistrement:', error);
+                throw new Error('Erreur lors de l\'enregistrement du vote');
+            }
+        }
+        
+        async function updateCandidateCount(candidateId) {
+            try {
+                const db = window.firebaseDB;
+                const { collection, doc, updateDoc, increment } = window.firebaseFunctions;
+                
+                const candidatesRef = collection(db, 'candidates');
+                const candidateDoc = doc(db, 'candidates', candidateId.toString());
+                
+                await updateDoc(candidateDoc, {
+                    votes: increment(1),
+                    lastVote: new Date().toISOString()
+                });
+                
+            } catch (error) {
+                console.error('Erreur mise à jour candidat:', error);
+            }
+        }
+        
+        async function getVoteResults() {
+            try {
+                const db = window.firebaseDB;
+                const { collection, getDocs } = window.firebaseFunctions;
+                
+                const candidatesRef = collection(db, 'candidates');
+                const snapshot = await getDocs(candidatesRef);
+                
+                const results = {};
+                let totalVotes = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    results[data.id] = data.votes || 0;
+                    totalVotes += data.votes || 0;
+                });
+                
+                return { results, totalVotes };
+                
+            } catch (error) {
+                console.error('Erreur récupération résultats:', error);
+                return { results: {}, totalVotes: 0 };
+            }
+        }
+        
+        async function initializeFirebaseData() {
+            try {
+                const db = window.firebaseDB;
+                const { collection, addDoc, getDocs } = window.firebaseFunctions;
+                
+                // Vérifier si les données existent déjà
+                const candidatesRef = collection(db, 'candidates');
+                const snapshot = await getDocs(candidatesRef);
+                
+                if (snapshot.empty) {
+                    // Initialiser les candidats
+                    for (const candidate of CANDIDATES) {
+                        await addDoc(candidatesRef, {
+                            id: candidate.id,
+                            name: candidate.name,
+                            party: candidate.party,
+                            votes: 0,
+                            color: candidate.color,
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+                    
+                    // Initialiser les codes
+                    const codesRef = collection(db, 'vote_codes');
+                    for (const code of VALID_CODES) {
+                        await addDoc(codesRef, {
+                            code: code,
+                            used: false,
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+                    
+                    console.log('✅ Données Firebase initialisées');
+                }
+                
+            } catch (error) {
+                console.error('Erreur initialisation Firebase:', error);
+            }
+        }
+        
+        // ============================================
+        // FONCTIONS PRINCIPALES
+        // ============================================
+        
+        function checkExistingSession() {
+            const savedCode = localStorage.getItem('last_vote_code');
+            const hasVoted = localStorage.getItem('has_voted');
+            
+            if (hasVoted === 'true' && savedCode) {
+                showResults();
                 return;
             }
             
-            // Si une session est en cours
-            const activeCode = sessionStorage.getItem('current_vote_code');
-            if (activeCode) {
-                currentVoteCode = activeCode;
+            if (savedCode && !hasVoted) {
+                currentVoteCode = savedCode;
                 showSection('votingSection');
-                startSessionTimer();
                 updateCodeDisplay();
             }
         }
         
-        function initInterface() {
-            generateCandidates();
-            
-            // Masquer toutes les sections sauf codeSection
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById('codeSection').style.display = 'block';
-        }
-        
-        function setupEventHandlers() {
-            // Validation du code
-            document.getElementById('validateCode').addEventListener('click', validateVoteCode);
-            document.getElementById('voteCode').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') validateVoteCode();
-            });
-            
-            // Blocage du copier-coller
-            document.getElementById('voteCode').addEventListener('paste', function(e) {
-                e.preventDefault();
-                showAlert('⚠️ Le collage est désactivé pour des raisons de sécurité.', 'warning');
-            });
-            
-            // Soumission du vote
-            document.getElementById('submitVote').addEventListener('click', submitVote);
-            
-            // Annulation
-            document.getElementById('cancelVote').addEventListener('click', function() {
-                if (confirm('Êtes-vous sûr de vouloir annuler votre vote ?')) {
-                    resetVotingSession();
-                    showSection('codeSection');
-                }
-            });
-            
-            // Navigation
-            document.getElementById('viewResultsBtn').addEventListener('click', function() {
-                showResults();
-            });
-            
-            // Protection F5/Ctrl+R
-            window.addEventListener('beforeunload', function(e) {
-                if (currentVoteCode && !sessionStorage.getItem('has_voted')) {
-                    db.createSecureBackup();
-                }
-            });
-        }
-        
-        // ============================================
-        // FONCTIONS PRINCIPALES CORRIGÉES
-        // ============================================
-        
-        function validateVoteCode() {
+        async function validateVoteCode() {
             const codeInput = document.getElementById('voteCode');
             const code = codeInput.value.trim().toUpperCase();
             
-            // Validation de base
             if (!code) {
-                showAlert('Veuillez entrer votre code de vote.', 'danger');
+                showAlert('Veuillez entrer un code de vote', 'danger');
                 codeInput.focus();
                 return;
             }
             
             if (code.length !== 10) {
-                showAlert('Le code doit contenir exactement 10 caractères.', 'danger');
+                showAlert('Le code doit contenir 10 caractères', 'danger');
                 return;
             }
             
-            // VÉRIFICATION STRICTE
-            const verification = db.verifyVoteCode(code);
+            showLoading(true);
             
-            if (!verification.valid) {
-                showAlert(verification.reason, 'danger');
-                
-                // Effacer le champ après une erreur
-                if (verification.reason.includes('déjà été utilisé')) {
-                    codeInput.value = '';
-                }
-                return;
-            }
-            
-            // CODE VALIDE - Démarrer une nouvelle session
-            currentVoteCode = code;
-            sessionStorage.setItem('current_vote_code', code);
-            
-            showAlert('✅ Code validé ! Vous pouvez maintenant voter.', 'success');
-            
-            // Transition vers la section de vote
-            setTimeout(() => {
-                hideAlert();
-                showSection('votingSection');
-                updateCodeDisplay();
-                startSessionTimer();
-                resetCandidateSelection();
-            }, 1500);
-        }
-        
-        function submitVote() {
-            // Vérifications finales
-            if (!selectedCandidate) {
-                showAlert('Veuillez sélectionner un candidat.', 'warning', 'votingSection');
-                return;
-            }
-            
-            if (!currentVoteCode) {
-                showAlert('Session invalide. Veuillez recommencer.', 'danger');
-                showSection('codeSection');
-                return;
-            }
-            
-            // Confirmation finale
-            const candidate = candidates.find(c => c.id === selectedCandidate);
-            const confirmation = confirm(
-                `CONFIRMATION FINALE\n\n` +
-                `Vous êtes sur le point de voter pour :\n` +
-                `👤 ${candidate.name}\n` +
-                `🏛️ ${candidate.party}\n\n` +
-                `Cette action est IRRÉVERSIBLE.\n` +
-                `Votre code ${currentVoteCode} sera invalidé.\n\n` +
-                `Confirmez-vous votre choix ?`
-            );
-            
-            if (!confirmation) return;
-            
-            // Enregistrement sécurisé
             try {
-                const result = db.registerVote(currentVoteCode, selectedCandidate);
+                const verification = await verifyCodeInFirebase(code);
                 
-                if (result.success) {
-                    // Nettoyer la session
-                    clearSessionTimer();
-                    sessionStorage.removeItem('current_vote_code');
-                    
-                    // Afficher la confirmation
-                    showVoteConfirmed(result.voteId);
-                    
-                    // Mettre à jour l'affichage du reçu
-                    updateReceiptDetails(candidate, result);
+                if (!verification.valid) {
+                    showAlert(verification.reason, 'danger');
+                    showLoading(false);
+                    return;
                 }
-            } catch (error) {
-                showAlert(`Erreur : ${error.message}`, 'danger');
-                console.error('Erreur d\'enregistrement:', error);
-            }
-        }
-        
-        // ============================================
-        // GESTION DE LA SESSION
-        // ============================================
-        
-        function startSessionTimer() {
-            clearSessionTimer();
-            timeLeft = 300; // 5 minutes
-            
-            sessionTimer = setInterval(() => {
-                timeLeft--;
                 
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                document.getElementById('sessionTimer').innerHTML = 
-                    `<i class="fas fa-clock"></i> Session : ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                // Code valide
+                currentVoteCode = code;
+                localStorage.setItem('last_vote_code', code);
                 
-                if (timeLeft <= 0) {
-                    clearSessionTimer();
-                    showAlert('⏰ Session expirée. Veuillez recommencer.', 'warning');
-                    resetVotingSession();
-                    showSection('codeSection');
-                }
-            }, 1000);
-        }
-        
-        function clearSessionTimer() {
-            if (sessionTimer) {
-                clearInterval(sessionTimer);
-                sessionTimer = null;
-            }
-        }
-        
-        function resetVotingSession() {
-            currentVoteCode = null;
-            selectedCandidate = null;
-            sessionStorage.removeItem('current_vote_code');
-            clearSessionTimer();
-            
-            document.querySelectorAll('.candidate-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-        }
-        
-        // ============================================
-        // FONCTIONS D'AFFICHAGE
-        // ============================================
-        
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.style.display = 'block';
-                
-                // Animation d'entrée
-                section.style.opacity = '0';
-                section.style.transform = 'translateY(20px)';
+                showAlert('✅ Code validé avec succès !', 'success');
                 
                 setTimeout(() => {
-                    section.style.transition = 'all 0.5s ease';
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
-                }, 10);
-            }
-            
-            // Masquer les alertes
-            hideAlert();
-        }
-        
-        function showVoteConfirmed(voteId) {
-            showSection('voteConfirmedSection');
-            
-            // Désactiver le code utilisé
-            const usedCodes = JSON.parse(localStorage.getItem('used_vote_codes_2024') || '[]');
-            if (!usedCodes.includes(currentVoteCode)) {
-                usedCodes.push(currentVoteCode);
-                localStorage.setItem('used_vote_codes_2024', JSON.stringify(usedCodes));
-            }
-        }
-        
-        function showResults() {
-            showSection('resultsSection');
-            
-            const stats = db.getStatistics();
-            
-            // Mettre à jour les statistiques
-            document.getElementById('resultsStats').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${stats.totalVotes}</div>
-                    <div class="stat-label">Votes Totaux</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${stats.sessionCount}</div>
-                    <div class="stat-label">Sessions</div>
-
-</div>
-                <div class="stat-card">
-                    <div class="stat-value">${candidates.length}</div>
-                    <div class="stat-label">Candidats</div>
-                </div>
-            `;
-            
-            // Mettre à jour le tableau
-            const resultsBody = document.getElementById('resultsBody');
-            resultsBody.innerHTML = '';
-            
-            const totalVotes = stats.votes.reduce((a, b) => a + b, 0);
-            
-            candidates.forEach((candidate, index) => {
-                const voteCount = stats.votes[index];
-                const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+                    showSection('votingSection');
+                    updateCodeDisplay();
+                    showLoading(false);
+                }, 1500);
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${index + 1}</strong></td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 20px; height: 20px; background: ${candidate.color}; border-radius: 4px;"></div>
-                            <strong>${candidate.name}</strong>
-                        </div>
-                    </td>
-                    <td>${candidate.party}</td>
-                    <td><strong style="font-size: 1.2rem;">${voteCount}</strong></td>
-                    <td><strong style="color: ${candidate.color};">${percentage}%</strong></td>
-                    <td>
-                        <div class="vote-progress">
-                            <div class="vote-progress-bar" style="width: ${percentage}%"></div>
-                        </div>
-                    </td>
-                `;
-                resultsBody.appendChild(row);
-            });
-        }
-        
-        function updateCodeDisplay() {
-            if (currentVoteCode) {
-                // Afficher les 3 premiers et 3 derniers caractères seulement
-                const maskedCode = currentVoteCode.substring(0, 3) + 
-                                  '••••' + 
-                                  currentVoteCode.substring(7);
-                document.getElementById('currentCodeDisplay').textContent = maskedCode;
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'danger');
+                showLoading(false);
             }
-        }
-        
-        function updateReceiptDetails(candidate, voteResult) {
-            document.getElementById('receiptCode').textContent = currentVoteCode;
-            document.getElementById('receiptCandidate').textContent = `${candidate.name} (${candidate.party})`;
-            document.getElementById('receiptTime').textContent = new Date(voteResult.timestamp).toLocaleString('fr-FR');
-            document.getElementById('receiptVerification').textContent = voteResult.voteId;
         }
         
         function generateCandidates() {
             const container = document.getElementById('candidatesContainer');
             container.innerHTML = '';
             
-            candidates.forEach((candidate, index) => {
+            CANDIDATES.forEach((candidate, index) => {
                 const card = document.createElement('div');
                 card.className = 'candidate-card';
                 card.dataset.id = candidate.id;
                 
-                // Générer les initiales
+                // Initiales pour l'avatar
                 const initials = candidate.name.split(' ')
                     .map(name => name[0])
                     .join('')
@@ -779,42 +1249,201 @@
                     </div>
                     <div class="candidate-name">${candidate.name}</div>
                     <div class="candidate-party">${candidate.party}</div>
-                    <div class="candidate-description">${candidatesDescriptions[index] || candidate.description}</div>
+                    <div class="candidate-description">${getCandidateDescription(index)}</div>
                 `;
                 
-                card.addEventListener('click', function() {
-                    selectCandidate(candidate.id);
-                });
-                
+                card.addEventListener('click', () => selectCandidate(candidate.id));
                 container.appendChild(card);
             });
         }
         
         function selectCandidate(candidateId) {
-            // Désélectionner tous
             document.querySelectorAll('.candidate-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Sélectionner le nouveau
             const selectedCard = document.querySelector(`.candidate-card[data-id="${candidateId}"]`);
             selectedCard.classList.add('selected');
             
             selectedCandidate = candidateId;
             
             // Masquer l'alerte
-            document.getElementById('alertVote').style.display = 'none';
+            document.getElementById('alertVote').classList.add('d-none');
         }
         
-        function resetCandidateSelection() {
-            selectedCandidate = null;
-            document.querySelectorAll('.candidate-card').forEach(card => {
-                card.classList.remove('selected');
+        async function submitVote() {
+            if (!selectedCandidate) {
+                document.getElementById('alertVote').classList.remove('d-none');
+                return;
+            }
+            
+            if (!currentVoteCode) {
+                showAlert('Session expirée, veuillez ré-entrer votre code', 'danger');
+                showSection('codeSection');
+                return;
+            }
+            
+            const candidate = CANDIDATES.find(c => c.id === selectedCandidate);
+            const confirmMessage = `
+                Confirmez-vous votre vote pour :
+                
+                👤 ${candidate.name}
+                🏛️ ${candidate.party}
+                
+                ⚠️ Cette action est irréversible
+                🔒 Votre code ${currentVoteCode} sera invalidé
+            `;
+            
+            if (!confirm(confirmMessage)) return;
+            
+            showLoading(true);
+            
+            try {
+                const result = await registerVoteInFirebase(currentVoteCode, selectedCandidate);
+                
+                if (result.success) {
+                    // Marquer comme ayant voté
+                    localStorage.setItem('has_voted', 'true');
+                    
+                    // Afficher confirmation
+                    document.getElementById('confirmationMessage').innerHTML = `
+                        Votre vote pour <strong>${candidate.name}</strong> a été enregistré.<br>
+                        <small>Code de vérification : ${result.voteId}</small>
+                    `;
+                    
+                    document.getElementById('confirmationModal').style.display = 'flex';
+                    
+                    // Réinitialiser
+                    selectedCandidate = null;
+                    document.getElementById('voteCode').value = '';
+                    
+                    showLoading(false);
+                }
+                
+            } catch (error) {
+                showAlert('Erreur : ' + error.message, 'danger');
+                showLoading(false);
+            }
+        }
+        
+        async function showResults() {
+            showSection('resultsSection');
+            
+            try {
+                const { results, totalVotes } = await getVoteResults();
+                
+                // Mettre à jour les statistiques
+                document.getElementById('resultsStats').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${totalVotes}</div>
+                        <div class="stat-label">Total des votes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${CANDIDATES.length}</div>
+                        <div class="stat-label">Candidats</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${VALID_CODES.length}</div>
+                        <div class="stat-label">Codes disponibles</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${new Date().toLocaleDateString('fr-FR')}</div>
+                        <div class="stat-label">Date</div>
+                    </div>
+                `;
+                
+                // Mettre à jour le tableau
+                const resultsBody = document.getElementById('resultsBody');
+                resultsBody.innerHTML = '';
+                
+                CANDIDATES.forEach((candidate, index) => {
+                    const voteCount = results[candidate.id] || 0;
+                    const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${index + 1}</strong></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 20px; height: 20px; background: ${candidate.color}; border-radius: 4px;"></div>
+                                <strong>${candidate.name}</strong>
+                            </div>
+                        </td>
+                        <td>${candidate.party}</td>
+                        <td><strong style="font-size: 1.2rem;">${voteCount}</strong></td>
+                        <td><strong style="color: ${candidate.color};">${percentage}%</strong></td>
+                        <td>
+                            <div class="vote-progress">
+                                <div class="vote-progress-bar" style="width: ${percentage}%"></div>
+                            </div>
+                        </td>
+                    `;
+                    resultsBody.appendChild(row);
+                });
+                
+                // Mettre à jour le graphique
+                updateChart(results);
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des résultats', 'danger');
+            }
+        }
+        
+        // ============================================
+        // FONCTIONS UTILITAIRES
+        // ============================================
+        
+        function setupEventListeners() {
+            // Validation code
+            document.getElementById('validateCode').addEventListener('click', validateVoteCode);
+            document.getElementById('voteCode').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') validateVoteCode();
             });
-            document.getElementById('alertVote').style.display = 'none';
+            
+            // Soumission vote
+            document.getElementById('submitVote').addEventListener('click', submitVote);
+            
+            // Annulation
+            document.getElementById('cancelVote').addEventListener('click', () => {
+                if (confirm('Annuler votre vote et retourner à l\'accueil ?')) {
+                    showSection('codeSection');
+                }
+            });
+            
+            // Modal
+            document.getElementById('viewResultsBtn').addEventListener('click', () => {
+                document.getElementById('confirmationModal').style.display = 'none';
+                showResults();
+            });
+            
+            // Navigation
+            document.getElementById('backToVote').addEventListener('click', () => {
+                showSection('codeSection');
+            });
+            
+            // Initialiser les données Firebase
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    initializeFirebaseData();
+                }
+            });
         }
         
-        function showAlert(message, type, section = 'codeSection') {
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            hideAlert();
+        }
+        
+        function showAlert(message, type) {
             const alert = document.getElementById('alertCode');
             const alertText = document.getElementById('alertText');
             
@@ -822,13 +1451,8 @@
             alert.className = `alert alert-${type}`;
             alert.style.display = 'block';
             
-            // Scroll vers l'alerte
-            setTimeout(() => {
-                alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-            
-            // Auto-masquage pour les succès
-            if (type === 'success') {
+            // Auto-masquage pour succès/info
+            if (type === 'success' || type === 'info') {
                 setTimeout(() => {
                     alert.style.display = 'none';
                 }, 3000);
@@ -839,115 +1463,41 @@
             document.getElementById('alertCode').style.display = 'none';
         }
         
-        // ============================================
-        // PROTECTIONS SUPPLÉMENTAIRES
-        // ============================================
-        
-        // Empêcher l'inspection des données
-        Object.defineProperty(window, 'db', {
-            get: () => {
-                console.warn('Accès à la base de données refusé pour raisons de sécurité');
-                return null;
-            }
-        });
-        
-        // Détecter les tentatives de contournement
-        window.addEventListener('storage', function(e) {
-            if (e.key && e.key.includes('vote') && e.newValue !== e.oldValue) {
-                console.log('Modification détectée, vérification de l'intégrité...');
-                // Vérifier l'intégrité des données
-                const currentHash = db.generateSecurityHash();
-                const storedData = JSON.parse(localStorage.getItem('secure_voting_system_2024'));
-                if (storedData.securityHash !== currentHash) {
-                    alert('⚠️ Intégrité des données compromise ! Le système va se réinitialiser.');
-                    db.resetForTesting();
-                }
-            }
-        });
-        
-        // Protection contre la fermeture pendant le vote
-        let isVoting = false;
-        
-        window.addEventListener('beforeunload', function(e) {
-            if (currentVoteCode && !sessionStorage.getItem('has_voted')) {
-                e.preventDefault();
-                e.returnValue = 'Votre vote n\'a pas été enregistré. Êtes-vous sûr de vouloir quitter ?';
-                return e.returnValue;
-            }
-        });
-        
-        // ============================================
-        // FONCTION DE TEST (À SUPPRIMER EN PRODUCTION)
-        // ============================================
-        
-        function testVotingSystem() {
-            console.log('=== TEST DU SYSTÈME DE VOTE ===');
-            console.log('1. Codes valides disponibles:', validCodes.length);
-            console.log('2. Base de données initialisée:', localStorage.getItem('secure_voting_system_2024') !== null);
-            console.log('3. Codes utilisés:', JSON.parse(localStorage.getItem('used_vote_codes_2024') || '[]').length);
-            
-            // Test de sécurité : essayer d'utiliser un code deux fois
-            const testCode = validCodes[0];
-            const verification1 = db.verifyVoteCode(testCode);
-            console.log('4. Premier essai avec code', testCode, ':', verification1.valid ? '✅ Accepté' : '❌ Refusé');
-            
-            if (verification1.valid) {
-                // Simuler un vote
-                try {
-                    db.registerVote(testCode, 1);
-                    console.log('5. Vote enregistré avec succès');
-                    
-                    // Essayer de réutiliser le même code
-                    const verification2 = db.verifyVoteCode(testCode);
-                    console.log('6. Deuxième essai avec même code:', verification2.valid ? '❌ ERREUR: Accepté' : '✅ Refusé (correct)');
-                } catch (e) {
-                    console.log('5. Erreur d\'enregistrement:', e.message);
-                }
-            }
-            
-            console.log('=== FIN DU TEST ===');
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
         
-        // Exécuter le test au chargement (optionnel)
-        // testVotingSystem();
+        function updateCodeDisplay() {
+            if (currentVoteCode) {
+                const masked = currentVoteCode.substring(0, 3) + '••••' + currentVoteCode.substring(7);
+                document.getElementById('currentCodeDisplay').textContent = masked;
+            }
+        }
         
-        // ============================================
-        // DESCRIPTIONS DES CANDIDATS (pour compléter)
-        // ============================================
-        
-        const candidatesDescriptions = [
-            "Ancienne ministre de l'Éducation, engagée pour l'innovation et la justice sociale.",
-            "Économiste renommé, spécialiste des finances publiques et de la croissance durable.",
-            "Militante environnementale, défenseuse du développement durable et de la biodiversité.",
-            "Ancien maire, expert en sécurité et défense des valeurs traditionnelles.",
-            "Syndicaliste, engagée pour les droits des travailleurs et la protection sociale.",
-            "Entrepreneur, partisan de l'économie de marché et des libertés individuelles.",
-            "Maire rurale, défenseuse des territoires et de la décentralisation.",
-            "Journaliste, promoteur de la diversité culturelle et de l'intégration.",
-            "Assistante sociale, engagée pour la famille et les services publics.",
-            "Chercheur en intelligence artificielle, partisan de la transformation numérique."
-        ];
-        
-        // ============================================
-        // INITIALISATION DE CHART.JS
-        // ============================================
-        
-        let voteChart = null;
-        
-        function initializeChart() {
+        function updateChart(results) {
             const ctx = document.getElementById('resultsChart')?.getContext('2d');
             if (!ctx) return;
             
-            voteChart = new Chart(ctx, {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            const labels = CANDIDATES.map(c => c.name);
+            const data = CANDIDATES.map(c => results[c.id] || 0);
+            const colors = CANDIDATES.map(c => c.color);
+            
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: candidates.map(c => c.name),
+                    labels: labels,
                     datasets: [{
-                        label: 'Votes',
-                        data: db.getVotes(),
-                        backgroundColor: candidates.map(c => c.color),
-                        borderColor: candidates.map(c => c.color),
-                        borderWidth: 1
+                        label: 'Nombre de votes',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c + 'CC'),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        hoverBackgroundColor: colors.map(c => c + 'DD')
                     }]
                 },
                 options: {
@@ -969,7 +1519,19 @@
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                precision: 0
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
                             }
                         }
                     }
@@ -977,68 +1539,49 @@
             });
         }
         
-        // Initialiser le graphique quand la page est prête
-        if (document.readyState === 'complete') {
-            initializeChart();
-        } else {
-            window.addEventListener('load', initializeChart);
+        async function getClientIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch {
+                return 'unknown';
+            }
+        }
+        
+        function getCandidateDescription(index) {
+            const descriptions = [
+                "Expert en politiques éducatives et innovation sociale.",
+                "Spécialiste des finances publiques et croissance économique.",
+                "Défenseur de l'environnement et du développement durable.",
+                "Expert en sécurité et valeurs traditionnelles.",
+                "Défenseur des droits sociaux et protection des travailleurs.",
+                "Partisan de l'économie de marché et libertés individuelles.",
+                "Expert en développement territorial et décentralisation.",
+                "Promoteur de la diversité et inclusion sociale.",
+                "Défenseur de la famille et services publics.",
+                "Expert en transformation numérique et intelligence artificielle."
+            ];
+            return descriptions[index] || "Candidat engagé pour l'avenir.";
         }
         
         // ============================================
-        // FONCTION DE DÉMONSTRATION
+        // INITIALISATION AUTO
         // ============================================
         
-        // Pour démo : bouton pour voir comment ça fonctionne (à supprimer en prod)
-        function showDemoInfo() {
-            const info = `
-            🔒 SYSTÈME SÉCURISÉ - DÉMONSTRATION 🔒
-            
-            ✅ FONCTIONNEMENT CORRECT :
-            1. Chaque code = UN SEUL VOTE
-            2. Impossible de voter sans code valide
-            3. Impossible de réutiliser un code
-            4. Session limitée à 5 minutes
-            5. Données persistantes
-            
-            🧪 TESTEZ VOUS-MÊME :
-            1. Utilisez le code "K7P4J9M2N6"
-            2. Votez pour un candidat
-            3. Essayez de réutiliser le même code → IMPOSSIBLE !
-            4. Essayez sans code → IMPOSSIBLE !
-            
-            🛡️ PROTECTIONS :
-            • Vérification en double
-            • Session unique par code
-            • Timer de sécurité
-            • Anti-copier-coller
-            • Sauvegarde multi-couches
-            `;
-            
-            alert(info);
-        }
-        
-        // Ajouter un bouton démo discret
-        const demoBtn = document.createElement('button');
-        demoBtn.innerHTML = '?';
-        demoBtn.style.position = 'fixed';
-        demoBtn.style.bottom = '20px';
-        demoBtn.style.right = '20px';
-        demoBtn.style.width = '40px';
-        demoBtn.style.height = '40px';
-        demoBtn.style.borderRadius = '50%';
-        demoBtn.style.background = 'var(--primary)';
-        demoBtn.style.color = 'white';
-        demoBtn.style.border = 'none';
-        demoBtn.style.cursor = 'pointer';
-        demoBtn.style.zIndex = '1000';
-        demoBtn.style.fontSize = '20px';
-        demoBtn.style.fontWeight = 'bold';
-        demoBtn.onclick = showDemoInfo;
-        document.body.appendChild(demoBtn);
+        // Initialiser Firebase après chargement
+        setTimeout(async () => {
+            const firebaseReady = await waitForFirebase();
+            if (firebaseReady) {
+                await initializeFirebaseData();
+                console.log('✅ Système VotixPro prêt !');
+            }
+        }, 2000);
     </script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
+
 
