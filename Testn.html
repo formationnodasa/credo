@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🗳️ Système de Vote - Élections 2024</title>
-    
-    <!-- Design professionnel -->
+    <title>🗳️ VOTE INSTANT - Écrit VOTE pour voter !</title>
     <style>
         * {
             margin: 0;
@@ -14,262 +12,281 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
+            padding: 20px;
+            color: white;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
         }
         
         /* Header */
         .header {
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
-            padding: 40px;
+            padding: 40px 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
+            margin-bottom: 30px;
             backdrop-filter: blur(10px);
-        }
-        
-        .logo {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
         .title {
-            font-size: 2.8rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: bold;
             margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             opacity: 0.9;
         }
         
-        /* Sections */
-        .section {
-            display: none;
+        /* Main Voting Area */
+        .vote-box {
             background: white;
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 0.5s ease;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
+        .code-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px dashed #dee2e6;
+        }
+        
+        .code-text {
+            font-family: 'Courier New', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            letter-spacing: 10px;
+            margin: 10px 0;
+        }
+        
+        .vote-input-container {
+            margin: 40px 0;
+        }
+        
+        .vote-input {
+            font-size: 3rem;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            border: 4px solid #ddd;
+            border-radius: 15px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .vote-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .vote-button {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .vote-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+        }
+        
+        .vote-button:active {
+            transform: translateY(-2px);
+        }
+        
+        /* Timer */
+        .timer-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .timer {
+            font-size: 4rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* Results */
+        .results-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            color: #2c3e50;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .results-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .result-item:hover {
+            transform: translateX(10px);
+            background: #e9ecef;
+        }
+        
+        .vote-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        /* Live Results */
+        .live-results {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            border-top: 3px solid #2ecc71;
+        }
+        
+        .live-stat {
+            text-align: center;
+        }
+        
+        .live-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        .live-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: none;
+            animation: pulse 0.5s;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .alert-success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 2px solid #2ecc71;
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .vote-input { width: 100%; font-size: 2rem; }
+            .timer { font-size: 2.5rem; }
+            .live-results { flex-direction: column; gap: 10px; }
+            .code-text { font-size: 1.8rem; letter-spacing: 5px; }
+        }
+        
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .active {
-            display: block;
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
         }
         
-        .section-title {
-            font-size: 2rem;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        /* Code Input */
-        .code-container {
-            max-width: 600px;
-            margin: 30px auto;
-        }
-        
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .code-input {
-            flex: 1;
-            padding: 20px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-        
-        .code-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-        
-        /* Buttons */
-        .btn {
-            padding: 18px 35px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-        }
-        
-        /* Candidats */
-        .candidates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-        
-        .candidate-card {
-            background: white;
-            border: 2px solid #eee;
-            border-radius: 15px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .candidate-card:hover {
-            transform: translateY(-10px);
-            border-color: #667eea;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
-        }
-        
-        .candidate-card.selected {
-            border-color: #2ecc71;
-            background: #f0fff4;
-        }
-        
-        .candidate-number {
-            background: #667eea;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        .candidate-name {
-            font-size: 1.4rem;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .candidate-party {
-            color: #667eea;
-            font-weight: 500;
-            margin-bottom: 15px;
-        }
-        
-        /* Alerts */
-        .alert {
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .alert-success {
-            background: #d4efdf;
-            color: #27ae60;
-            border-left: 5px solid #27ae60;
-        }
-        
-        .alert-danger {
-            background: #fadbd8;
-            color: #e74c3c;
-            border-left: 5px solid #e74c3c;
-        }
-        
-        /* Loading */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 60px;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .candidates-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .title {
-                font-size: 2rem;
-            }
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #f00;
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -277,420 +294,495 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">
-                <i class="fas fa-vote-yea"></i> VOTIX
-            </div>
-            <h1 class="title">Système de Vote Électronique</h1>
-            <p class="subtitle">Plateforme sécurisée pour les élections 2024</p>
+            <h1 class="title">🗳️ VOTE INSTANT</h1>
+            <p class="subtitle">Écrivez "VOTE" en majuscules pour voter une seule fois !</p>
         </div>
         
-        <!-- Code Section -->
-        <div id="codeSection" class="section active">
-            <h2 class="section-title">
-                <i class="fas fa-key"></i> Accès au Vote
-            </h2>
-            <p>Entrez votre code personnel pour accéder au système de vote</p>
-            
-            <div id="alertCode" class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i> <span id="alertText"></span>
+        <!-- Code Display -->
+        <div class="vote-box fade-in">
+            <div class="code-display">
+                <h3 style="color: #666; margin-bottom: 15px;">VOTER AVEC LE CODE :</h3>
+                <div class="code-text" id="currentCode">K7P4J9M2N6</div>
+                <p style="color: #888; font-size: 0.9rem;">
+                    Ce code change toutes les 24 heures
+                </p>
             </div>
             
-            <div class="code-container">
-                <div class="input-group">
-                    <input type="text" id="voteCode" class="code-input" 
-                           placeholder="Ex: K7P4J9M2N6" 
-                           maxlength="10" autocomplete="off" autofocus>
-                    <button id="validateCode" class="btn btn-primary">
-                        <i class="fas fa-check"></i> Valider
-                    </button>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <p style="color: #666; margin-bottom: 15px;">
-                        <i class="fas fa-info-circle"></i> Codes de démonstration
-                    </p>
-                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <code style="background: #f8f9fa; padding: 8px 15px; border-radius: 6px; font-family: monospace;">
-                            K7P4J9M2N6
-                        </code>
-                        <code style="background: #f8f9fa; padding: 8px 15px; border-radius: 6px; font-family: monospace;">
-                            Q1R8S3T5V9
-                        </code>
-                        <code style="background: #f8f9fa; padding: 8px 15px; border-radius: 6px; font-family: monospace;">
-                            W2X4Y6Z7B8
-                        </code>
-                    </div>
-                </div>
+            <!-- Alert Message -->
+            <div class="alert" id="alertMessage"></div>
+            
+            <!-- Vote Input -->
+            <div class="vote-input-container">
+                <input type="text" 
+                       class="vote-input" 
+                       id="voteInput"
+                       maxlength="4"
+                       placeholder="VOTE"
+                       autocomplete="off"
+                       autocapitalize="characters"
+                       autofocus>
+                <p style="color: #666; margin-top: 10px;">
+                    Écrivez exactement "<strong style="color: #2c3e50;">VOTE</strong>" en majuscules
+                </p>
             </div>
+            
+            <!-- Vote Button -->
+            <button class="vote-button" onclick="validateVote()">
+                ✅ VALIDER LE VOTE
+            </button>
         </div>
         
-        <!-- Voting Section -->
-        <div id="votingSection" class="section">
-            <h2 class="section-title">
-                <i class="fas fa-user-check"></i> Sélectionnez votre candidat
-            </h2>
-            
-            <div id="alertVote" class="alert alert-danger" style="display: none;">
-                <i class="fas fa-exclamation-triangle"></i> Sélectionnez un candidat
-            </div>
-            
-            <div class="candidates-grid" id="candidatesContainer">
-                <!-- Les candidats seront générés ici -->
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <button id="submitVote" class="btn btn-success" style="padding: 20px 50px;">
-                    <i class="fas fa-paper-plane"></i> Soumettre mon vote
-                </button>
+        <!-- Timer -->
+        <div class="timer-container fade-in">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #ffd700;">
+                ⏰ TEMPS RESTANT POUR VOTER
+            </h3>
+            <div class="timer" id="timer">24:00:00</div>
+            <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
+                Prochain code dans : <span id="nextCodeTime">24h00m</span>
+            </p>
+        </div>
+        
+        <!-- Results -->
+        <div class="results-box fade-in">
+            <h3 class="results-title">📊 RÉSULTATS EN DIRECT</h3>
+            <div id="resultsContainer">
+                <!-- Les résultats seront ajoutés ici -->
             </div>
         </div>
         
-        <!-- Loading -->
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <h3>Validation en cours...</h3>
-            <p>Votre vote est en cours de traitement</p>
+        <!-- Instructions -->
+        <div class="instructions fade-in">
+            <h3>📝 COMMENT VOTER :</h3>
+            <ol style="margin-left: 20px; line-height: 2;">
+                <li>Regardez le code en haut de la page</li>
+                <li>Écrivez <strong>"VOTE"</strong> en majuscules dans le champ</li>
+                <li>Cliquez sur "VALIDER LE VOTE"</li>
+                <li>Votre vote est enregistré à vie !</li>
+            </ol>
+            <p style="margin-top: 15px; color: #ffd700; font-weight: bold;">
+                ⚠️ Vous ne pouvez voter qu'une seule fois par code !
+            </p>
+        </div>
+    </div>
+    
+    <!-- Live Results Bar -->
+    <div class="live-results">
+        <div class="live-stat">
+            <div class="live-value" id="totalVotes">0</div>
+            <div class="live-label">VOTES</div>
+        </div>
+        <div class="live-stat">
+            <div class="live-value" id="activeCode">K7P4J9M2N6</div>
+            <div class="live-label">CODE ACTUEL</div>
+        </div>
+        <div class="live-stat">
+            <div class="live-value" id="timeLeft">24:00:00</div>
+            <div class="live-label">TEMPS RESTANT</div>
         </div>
     </div>
 
-    <!-- JavaScript SIMPLE et FONCTIONNEL -->
+    <!-- JavaScript SIMPLE et EFFICACE -->
     <script>
         // ============================================
-        // DONNÉES DU SYSTÈME
+        // CONFIGURATION
         // ============================================
         
-        const candidates = [
-            { id: 1, name: "Marie Dubois", party: "Parti Progressiste" },
-            { id: 2, name: "Jean Martin", party: "Alliance Démocratique" },
-            { id: 3, name: "Sophie Bernard", party: "Mouvement Écologique" },
-            { id: 4, name: "Thomas Leroy", party: "Union Républicaine" },
-            { id: 5, name: "Camille Petit", party: "Parti Social" },
-            { id: 6, name: "Alexandre Moreau", party: "Centre Libéral" },
-            { id: 7, name: "Julie Fontaine", party: "Parti des Régions" },
-            { id: 8, name: "Mohamed Ali", party: "Diversité et Progrès" },
-            { id: 9, name: "Isabelle Lambert", party: "Parti de la Famille" },
-            { id: 10, name: "Pierre Garnier", party: "Nouvelle Vision" }
-        ];
-        
-        // CODES VALIDES (150 codes comme demandé)
-        const validCodes = [
+        // Codes valides (change toutes les 24h)
+        const VOTE_CODES = [
             "K7P4J9M2N6", "Q1R8S3T5V9", "W2X4Y6Z7B8", "C3D5F7G9H2", "J4K6L8M1N3",
-            "P5Q7R9S2T4", "V6W8X1Y3Z5", "B7C9D2F4G6", "H8J1K3L5M7", "N9P2Q4R6S8",
-            "T1V3W5X7Y9", "Z2B4C6D8F1", "G3H5J7K9L2", "M4N6P8Q1R3", "S5T7V9W2X4",
-            "Y6Z8B1C3D5", "F7G9H2J4K6", "L8M1N3P5Q7", "R9S2T4V6W8", "X1Y3Z5B7C9",
-            "D2F4G6H8J1", "K3L5M7N9P2", "Q4R6S8T1V3", "W5X7Y9Z2B4", "C6D8F1G3H5",
-            "J7K9L2M4N6", "P8Q1R3S5T7", "V9W2X4Y6Z8", "B1C3D5F7G9", "H2J4K6L8M1"
+            "P5Q7R9S2T4", "V6W8X1Y3Z5", "B7C9D2F4G6", "H8J1K3L5M7", "N9P2Q4R6S8"
+        ];
+        
+        // Candidats
+        const CANDIDATES = [
+            { id: 1, name: "Marie DUBOIS", color: "#3498db" },
+            { id: 2, name: "Jean MARTIN", color: "#2ecc71" },
+            { id: 3, name: "Sophie BERNARD", color: "#e74c3c" },
+            { id: 4, name: "Thomas LEROY", color: "#f39c12" },
+            { id: 5, name: "Camille PETIT", color: "#9b59b6" },
+            { id: 6, name: "Alexandre MOREAU", color: "#1abc9c" },
+            { id: 7, name: "Julie FONTAINE", color: "#d35400" },
+            { id: 8, name: "Mohamed ALI", color: "#34495e" },
+            { id: 9, name: "Isabelle LAMBERT", color: "#27ae60" },
+            { id: 10, name: "Pierre GARNIER", color: "#8e44ad" }
         ];
         
         // ============================================
-        // VARIABLES GLOBALES
+        // ÉTAT GLOBAL
         // ============================================
         
-        let selectedCandidate = null;
-        let currentVoteCode = null;
-        let usedCodes = JSON.parse(localStorage.getItem('usedCodes') || '[]');
-        let votes = JSON.parse(localStorage.getItem('votes')) || {};
+        let currentCodeIndex = 0;
+        let totalSeconds = 24 * 60 * 60; // 24 heures
+        let timerInterval = null;
+        let hasVoted = false;
         
         // ============================================
         // INITIALISATION
         // ============================================
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("✅ Système de vote initialisé !");
+            console.log("🚀 Système VOTE INSTANT prêt !");
             
-            // Initialiser les votes si vide
-            if (Object.keys(votes).length === 0) {
-                candidates.forEach(candidate => {
-                    votes[candidate.id] = 0;
-                });
-                localStorage.setItem('votes', JSON.stringify(votes));
-            }
+            // Récupérer ou créer les données
+            initializeData();
             
-            // Générer les candidats
-            generateCandidates();
+            // Configurer le code actuel
+            setupCurrentCode();
             
-            // Configurer les événements
-            setupEventListeners();
+            // Démarrer le timer
+            startTimer();
             
-            // Vérifier session existante
-            checkExistingSession();
+            // Charger les résultats
+            loadResults();
+            
+            // Focus sur l'input
+            document.getElementById('voteInput').focus();
+            
+            // Événement Entrée
+            document.getElementById('voteInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    validateVote();
+                }
+            });
+            
+            // Forcer majuscules
+            document.getElementById('voteInput').addEventListener('input', function(e) {
+                this.value = this.value.toUpperCase().slice(0, 4);
+            });
         });
         
         // ============================================
         // FONCTIONS PRINCIPALES
         // ============================================
         
-        function checkExistingSession() {
-            const savedCode = localStorage.getItem('lastCode');
-            if (savedCode && !usedCodes.includes(savedCode)) {
-                currentVoteCode = savedCode;
-                showSection('votingSection');
+        function initializeData() {
+            // Créer les données si elles n'existent pas
+            if (!localStorage.getItem('voteSystemData')) {
+                const initialData = {
+                    votes: {},
+                    usedCodes: {},
+                    totalVotes: 0,
+                    startTime: Date.now()
+                };
+                localStorage.setItem('voteSystemData', JSON.stringify(initialData));
+            }
+            
+            // Vérifier si l'utilisateur a déjà voté
+            const userKey = getCurrentCode() + '_' + getDeviceId();
+            const data = getData();
+            if (data.usedCodes[userKey]) {
+                hasVoted = true;
+                showAlert('⚠️ Vous avez déjà voté avec ce code !', 'error');
             }
         }
         
-        function validateVoteCode() {
-            const codeInput = document.getElementById('voteCode');
-            const code = codeInput.value.trim().toUpperCase();
+        function setupCurrentCode() {
+            // Déterminer le code actuel basé sur la date
+            const now = new Date();
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            currentCodeIndex = dayOfYear % VOTE_CODES.length;
             
-            // Réinitialiser l'alerte
-            document.getElementById('alertCode').style.display = 'none';
+            const currentCode = VOTE_CODES[currentCodeIndex];
             
-            // Validation de base
-            if (!code) {
-                showAlert('Veuillez entrer un code de vote', 'danger');
-                codeInput.focus();
+            // Mettre à jour l'affichage
+            document.getElementById('currentCode').textContent = currentCode;
+            document.getElementById('activeCode').textContent = currentCode;
+            
+            // Vérifier si le code a changé
+            const lastCode = localStorage.getItem('lastVoteCode');
+            if (lastCode !== currentCode) {
+                // Nouveau code, réinitialiser le timer
+                totalSeconds = 24 * 60 * 60;
+                localStorage.setItem('lastVoteCode', currentCode);
+                localStorage.setItem('codeStartTime', Date.now());
+            } else {
+                // Calculer le temps restant
+                const startTime = parseInt(localStorage.getItem('codeStartTime') || Date.now());
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                totalSeconds = Math.max(0, 24 * 60 * 60 - elapsed);
+            }
+        }
+        
+        function validateVote() {
+            if (hasVoted) {
+                showAlert('Vous avez déjà voté avec ce code !', 'error');
                 return;
             }
             
-            if (code.length !== 10) {
-                showAlert('Le code doit contenir 10 caractères', 'danger');
+            const voteText = document.getElementById('voteInput').value.trim();
+            
+            // Vérifier si c'est bien "VOTE"
+            if (voteText !== 'VOTE') {
+                showAlert('❌ Vous devez écrire "VOTE" en majuscules !', 'error');
+                createErrorAnimation();
                 return;
             }
             
-            // Vérifier si le code est valide
-            if (!validCodes.includes(code)) {
-                showAlert('Code invalide. Vérifiez votre code.', 'danger');
+            // Vérifier la longueur
+            if (voteText.length !== 4) {
+                showAlert('❌ Exactement 4 lettres : V-O-T-E', 'error');
                 return;
             }
             
-            // Vérifier si le code a déjà été utilisé
-            if (usedCodes.includes(code)) {
-                showAlert('Ce code a déjà été utilisé pour voter.', 'danger');
+            // SUCCÈS ! Enregistrer le vote
+            registerVote();
+        }
+        
+        function registerVote() {
+            // Générer un vote aléatoire (pour la démo)
+            const randomCandidate = CANDIDATES[Math.floor(Math.random() * CANDIDATES.length)];
+            
+            // Enregistrer les données
+            const data = getData();
+            const userKey = getCurrentCode() + '_' + getDeviceId();
+            
+            // Vérifier double vote
+            if (data.usedCodes[userKey]) {
+                showAlert('⚠️ Vous avez déjà voté !', 'error');
+                hasVoted = true;
                 return;
             }
             
-            // CODE VALIDE !
-            currentVoteCode = code;
-            localStorage.setItem('lastCode', code);
+            // Enregistrer le vote
+            data.usedCodes[userKey] = {
+                candidate: randomCandidate.id,
+                timestamp: Date.now(),
+                code: getCurrentCode()
+            };
+            
+            // Incrémenter les votes du candidat
+            if (!data.votes[randomCandidate.id]) {
+                data.votes[randomCandidate.id] = 0;
+            }
+            data.votes[randomCandidate.id]++;
+            data.totalVotes++;
+            
+            // Sauvegarder
+            saveData(data);
+            
+            // Marquer comme ayant voté
+            hasVoted = true;
+            
+            // Effacer l'input
+            document.getElementById('voteInput').value = '';
             
             // Afficher succès
-            showAlert('✅ Code validé avec succès !', 'success');
+            showAlert(`✅ VOTE ENREGISTRÉ ! Pour ${randomCandidate.name}`, 'success');
             
-            // Transition vers le vote
+            // Animation de confetti
+            createConfetti();
+            
+            // Mettre à jour les résultats
+            loadResults();
+            
+            // Bloquer le champ
+            document.getElementById('voteInput').disabled = true;
+            
+            // Message final
             setTimeout(() => {
-                showSection('votingSection');
-                document.getElementById('alertCode').style.display = 'none';
+                showAlert('🎉 Merci pour votre participation ! Votre vote est enregistré à vie.', 'success');
             }, 1000);
         }
         
-        function generateCandidates() {
-            const container = document.getElementById('candidatesContainer');
+        // ============================================
+        // TIMER ET CHRONOMÈTRE
+        // ============================================
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    updateTimerDisplay();
+                    
+                    // Vérifier si le temps est écoulé
+                    if (totalSeconds === 0) {
+                        codeExpired();
+                    }
+                }
+            }, 1000);
+            
+            updateTimerDisplay();
+        }
+        
+        function updateTimerDisplay() {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timer').textContent = timeString;
+            document.getElementById('timeLeft').textContent = timeString;
+            
+            // Calculer le temps du prochain code
+            const nextHours = (hours === 0 && minutes === 0 && seconds === 0) ? 24 : hours;
+            document.getElementById('nextCodeTime').textContent = `${nextHours}h${minutes.toString().padStart(2, '0')}m`;
+        }
+        
+        function codeExpired() {
+            showAlert('🔄 Code expiré ! Nouveau code généré.', 'success');
+            
+            // Changer de code
+            currentCodeIndex = (currentCodeIndex + 1) % VOTE_CODES.length;
+            setupCurrentCode();
+            
+            // Réinitialiser le vote
+            hasVoted = false;
+            document.getElementById('voteInput').disabled = false;
+            document.getElementById('voteInput').focus();
+            
+            // Redémarrer le timer
+            totalSeconds = 24 * 60 * 60;
+            startTimer();
+        }
+        
+        // ============================================
+        // RÉSULTATS
+        // ============================================
+        
+        function loadResults() {
+            const data = getData();
+            const container = document.getElementById('resultsContainer');
+            const totalVotesElement = document.getElementById('totalVotes');
+            
+            // Mettre à jour le total
+            totalVotesElement.textContent = data.totalVotes;
+            
+            // Trier les candidats par votes
+            const sortedCandidates = [...CANDIDATES].sort((a, b) => {
+                const votesA = data.votes[a.id] || 0;
+                const votesB = data.votes[b.id] || 0;
+                return votesB - votesA;
+            });
+            
+            // Afficher les résultats
             container.innerHTML = '';
             
-            candidates.forEach((candidate, index) => {
-                const card = document.createElement('div');
-                card.className = 'candidate-card';
-                card.dataset.id = candidate.id;
+            sortedCandidates.forEach(candidate => {
+                const votes = data.votes[candidate.id] || 0;
+                const percentage = data.totalVotes > 0 ? ((votes / data.totalVotes) * 100).toFixed(1) : 0;
                 
-                card.innerHTML = `
-                    <div class="candidate-number">${index + 1}</div>
-                    <div class="candidate-name">${candidate.name}</div>
-                    <div class="candidate-party">${candidate.party}</div>
-                    <div class="candidate-description">${getCandidateDescription(index)}</div>
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${candidate.color}; 
+                                    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            ${candidate.id}
+                        </div>
+                        <div>
+                            <strong style="color: #2c3e50;">${candidate.name}</strong>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                                <div style="width: 150px; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden;">
+                                    <div style="width: ${percentage}%; height: 100%; background: ${candidate.color};"></div>
+                                </div>
+                                <span style="color: #666; font-size: 0.9rem;">${percentage}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vote-count">${votes}</div>
                 `;
                 
-                card.addEventListener('click', () => selectCandidate(candidate.id));
-                container.appendChild(card);
+                container.appendChild(resultItem);
             });
-        }
-        
-        function selectCandidate(candidateId) {
-            // Désélectionner tous les candidats
-            document.querySelectorAll('.candidate-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Sélectionner le nouveau candidat
-            const selectedCard = document.querySelector(`.candidate-card[data-id="${candidateId}"]`);
-            selectedCard.classList.add('selected');
-            
-            selectedCandidate = candidateId;
-            
-            // Masquer l'alerte
-            document.getElementById('alertVote').style.display = 'none';
-        }
-        
-        function submitVote() {
-            // Vérifications
-            if (!selectedCandidate) {
-                document.getElementById('alertVote').style.display = 'block';
-                return;
-            }
-            
-            if (!currentVoteCode) {
-                showAlert('Session expirée. Veuillez ré-entrer votre code.', 'danger');
-                showSection('codeSection');
-                return;
-            }
-            
-            // Confirmation
-            const candidate = candidates.find(c => c.id === selectedCandidate);
-            const confirmation = confirm(
-                `CONFIRMER VOTRE VOTE\n\n` +
-                `Vous votez pour : ${candidate.name}\n` +
-                `Parti : ${candidate.party}\n\n` +
-                `Cette action est définitive.`
-            );
-            
-            if (!confirmation) return;
-            
-            // Afficher loading
-            showLoading(true);
-            
-            // Simuler traitement (2 secondes)
-            setTimeout(() => {
-                // Enregistrer le vote
-                votes[selectedCandidate]++;
-                localStorage.setItem('votes', JSON.stringify(votes));
-                
-                // Marquer le code comme utilisé
-                if (!usedCodes.includes(currentVoteCode)) {
-                    usedCodes.push(currentVoteCode);
-                    localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
-                }
-                
-                // Réinitialiser
-                selectedCandidate = null;
-                currentVoteCode = null;
-                localStorage.removeItem('lastCode');
-                
-                // Afficher confirmation
-                showLoading(false);
-                alert(`✅ VOTE CONFIRMÉ !\n\nVous avez voté pour ${candidate.name}.\nMerci pour votre participation !`);
-                
-                // Retourner à l'accueil
-                document.getElementById('voteCode').value = '';
-                showSection('codeSection');
-                
-            }, 2000);
         }
         
         // ============================================
-        // FONCTIONS UTILITAIRES
+        // UTILITAIRES
         // ============================================
         
-        function setupEventListeners() {
-            // Validation code
-            document.getElementById('validateCode').addEventListener('click', validateVoteCode);
-            document.getElementById('voteCode').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') validateVoteCode();
-            });
-            
-            // Soumission vote
-            document.getElementById('submitVote').addEventListener('click', submitVote);
+        function getData() {
+            return JSON.parse(localStorage.getItem('voteSystemData') || '{}');
         }
         
-        function showSection(sectionId) {
-            // Masquer toutes les sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Afficher la section demandée
-            document.getElementById(sectionId).classList.add('active');
+        function saveData(data) {
+            localStorage.setItem('voteSystemData', JSON.stringify(data));
+        }
+        
+        function getCurrentCode() {
+            return VOTE_CODES[currentCodeIndex];
+        }
+        
+        function getDeviceId() {
+            // Générer un ID unique pour l'appareil
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
         }
         
         function showAlert(message, type) {
-            const alert = document.getElementById('alertCode');
-            const alertText = document.getElementById('alertText');
-            
-            alertText.textContent = message;
-            alert.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+            const alert = document.getElementById('alertMessage');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
             alert.style.display = 'block';
             
-            // Auto-masquage pour les succès
-            if (type === 'success') {
+            // Auto-masquage
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, type === 'success' ? 5000 : 3000);
+        }
+        
+        function createErrorAnimation() {
+            const input = document.getElementById('voteInput');
+            input.style.borderColor = '#e74c3c';
+            input.style.boxShadow = '0 0 20px rgba(231, 76, 60, 0.5)';
+            
+            setTimeout(() => {
+                input.style.borderColor = '#ddd';
+                input.style.boxShadow = 'none';
+            }, 500);
+        }
+        
+        function createConfetti() {
+            for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
-                    alert.style.display = 'none';
-                }, 2000);
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-20px';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.opacity = '1';
+                    document.body.appendChild(confetti);
+                    
+                    // Animation
+                    const animation = confetti.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                    ], {
+                        duration: 1000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                    });
+                    
+                    animation.onfinish = () => confetti.remove();
+                }, i * 20);
             }
         }
         
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-        }
-        
-        function getCandidateDescription(index) {
-            const descriptions = [
-                "Ancienne ministre de l'Éducation, engagée pour l'innovation sociale.",
-                "Économiste renommé, spécialiste de la croissance durable.",
-                "Militante environnementale, défenseuse du développement durable.",
-                "Expert en sécurité et défense des valeurs traditionnelles.",
-                "Engagée pour les droits des travailleurs et protection sociale.",
-                "Partisan de l'économie de marché et libertés individuelles.",
-                "Défenseuse des territoires et de la décentralisation.",
-                "Promoteur de la diversité culturelle et intégration.",
-                "Engagée pour la famille et les services publics.",
-                "Expert en transformation numérique et intelligence artificielle."
-            ];
-            return descriptions[index] || "Candidat engagé pour l'avenir.";
-        }
-        
         // ============================================
-        // POUR TESTER FACILEMENT
+        // SAUVEGARDE AUTOMATIQUE
         // ============================================
         
-        // Exposer des fonctions de test
-        window.resetSystem = function() {
-            if (confirm('Réinitialiser tout le système ?')) {
-                localStorage.clear();
-                usedCodes = [];
-                votes = {};
-                candidates.forEach(candidate => {
-                    votes[candidate.id] = 0;
-                });
-                localStorage.setItem('votes', JSON.stringify(votes));
-                alert('✅ Système réinitialisé !');
-                location.reload();
-            }
-        };
+        // Sauvegarder avant fermeture
+        window.addEventListener('beforeunload', function() {
+            const data = getData();
+            data.lastSave = Date.now();
+            saveData(data);
+        });
         
-        window.showResults = function() {
-            let results = "📊 RÉSULTATS :\n\n";
-            candidates.forEach(candidate => {
-                results += `${candidate.name}: ${votes[candidate.id] || 0} votes\n`;
-            });
-            alert(results);
-        };
+        // Sauvegarde périodique
+        setInterval(() => {
+            const data = getData();
+            data.autoSave = Date.now();
+            saveData(data);
+        }, 30000); // Toutes les 30 secondes
         
-        // Ajouter un bouton d'info
-        setTimeout(() => {
-            const infoBtn = document.createElement('button');
-            infoBtn.innerHTML = '?';
-            infoBtn.style.position = 'fixed';
-            infoBtn.style.bottom = '20px';
-            infoBtn.style.right = '20px';
-            infoBtn.style.width = '50px';
-            infoBtn.style.height = '50px';
-            infoBtn.style.borderRadius = '50%';
-            infoBtn.style.background = '#667eea';
-            infoBtn.style.color = 'white';
-            infoBtn.style.border = 'none';
-            infoBtn.style.cursor = 'pointer';
-            infoBtn.style.fontSize = '20px';
-            infoBtn.style.fontWeight = 'bold';
-            infoBtn.style.zIndex = '1000';
-            infoBtn.onclick = function() {
-                alert(
-                    '💡 COMMENT TESTER :\n\n' +
-                    '1. Utilisez un code : K7P4J9M2N6\n' +
-                    '2. Sélectionnez un candidat\n' +
-                    '3. Validez votre vote\n' +
-                    '4. Essayez de réutiliser le code → IMPOSSIBLE !\n\n' +
-                    '🎯 Fonctionnalités :\n' +
-                    '• Codes uniques\n' +
-                    '• Vote unique par code\n' +
-                    '• Données persistantes\n' +
-                    '• Interface professionnelle'
-                );
-            };
-            document.body.appendChild(infoBtn);
-        }, 1000);
-        
-        console.log("🎉 Système prêt ! Testez avec le code: K7P4J9M2N6");
+        console.log("✅ Système prêt ! Testez en écrivant 'VOTE'");
     </script>
-    
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
 </body>
 </html>
