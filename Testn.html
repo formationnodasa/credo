@@ -193,6 +193,81 @@
             color: #ffaaaa;
         }
         
+        .whatsapp-section {
+            background-color: rgba(37, 211, 102, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid rgba(37, 211, 102, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .whatsapp-content {
+            text-align: left;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .whatsapp-title {
+            font-size: 1.8rem;
+            color: #25d366;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .whatsapp-description {
+            font-size: 1.2rem;
+            color: #a0ffc0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .whatsapp-benefits {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .whatsapp-benefits li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .whatsapp-button {
+            background: linear-gradient(90deg, #25d366, #128c7e);
+            color: white;
+            border: none;
+            padding: 20px 35px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            white-space: nowrap;
+        }
+        
+        .whatsapp-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(37, 211, 102, 0.4);
+            background: linear-gradient(90deg, #2eff7c, #1ab394);
+        }
+        
+        .whatsapp-icon {
+            font-size: 2rem;
+        }
+        
         .cta-button {
             background: linear-gradient(90deg, #d4af37, #f7ef8a);
             color: #1a1a2e;
@@ -420,9 +495,18 @@
                 font-size: 3rem;
             }
             
-            .cta-button {
+            .cta-button, .whatsapp-button {
                 padding: 15px 30px;
                 font-size: 1.3rem;
+            }
+            
+            .whatsapp-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .whatsapp-content {
+                text-align: center;
             }
             
             .modal-content {
@@ -450,6 +534,11 @@
             
             .time-label {
                 font-size: 1rem;
+            }
+            
+            .whatsapp-button {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -503,6 +592,28 @@
             <i class="fas fa-pen-fancy"></i> S'INSCRIRE MAINTENANT
         </button>
         
+        <!-- Nouvelle section WhatsApp -->
+        <div class="whatsapp-section">
+            <div class="whatsapp-content">
+                <h3 class="whatsapp-title">
+                    <i class="fab fa-whatsapp whatsapp-icon"></i> Rejoignez notre communauté WhatsApp !
+                </h3>
+                <p class="whatsapp-description">
+                    Ne ratez aucune information importante sur le concours d'éloquence ! Rejoignez le groupe officiel WhatsApp d'Excellentia Academia pour :
+                </p>
+                <ul class="whatsapp-benefits">
+                    <li><i class="fas fa-bullhorn"></i> Recevoir les dernières annonces en temps réel</li>
+                    <li><i class="fas fa-calendar-alt"></i> Être informé des dates importantes et changements</li>
+                    <li><i class="fas fa-question-circle"></i> Poser vos questions aux organisateurs</li>
+                    <li><i class="fas fa-users"></i> Échanger avec les autres participants</li>
+                    <li><i class="fas fa-lightbulb"></i> Recevoir des conseils et astuces pour votre discours</li>
+                </ul>
+            </div>
+            <button class="whatsapp-button" onclick="joinWhatsAppGroup()">
+                <i class="fab fa-whatsapp"></i> REJOINDRE LE GROUPE
+            </button>
+        </div>
+        
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
@@ -515,6 +626,7 @@
                 <li>Préparez un discours de 5 minutes sur un des thèmes proposés</li>
                 <li>Les participants sélectionnés seront contactés avant le 15 février 2026</li>
                 <li>La finale du concours se tiendra le 15 mars 2026</li>
+                <li><strong>Rejoignez notre groupe WhatsApp pour ne rien rater !</strong></li>
             </ul>
         </div>
         
@@ -551,8 +663,18 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="telephone">Numéro de téléphone</label>
-                    <input type="tel" id="telephone" name="telephone" class="form-input" placeholder="+33 1 23 45 67 89">
+                    <label class="form-label" for="telephone">Numéro de téléphone *</label>
+                    <input type="tel" id="telephone" name="telephone" class="form-input" required placeholder="+33 1 23 45 67 89">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="whatsapp">Avez-vous WhatsApp ? *</label>
+                    <select id="whatsapp" name="whatsapp" class="form-select" required>
+                        <option value="" disabled selected>Sélectionnez une option</option>
+                        <option value="oui">Oui, je l'utilise régulièrement</option>
+                        <option value="oui-mais">Oui, mais je ne l'utilise pas souvent</option>
+                        <option value="non">Non, je ne l'ai pas</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -594,6 +716,13 @@
                     </label>
                 </div>
                 
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="whatsapp_group" style="margin-right: 10px;">
+                        Je souhaite rejoindre le groupe WhatsApp d'Excellentia Academia pour recevoir les dernières informations
+                    </label>
+                </div>
+                
                 <button type="submit" class="submit-button">
                     <i class="fas fa-paper-plane"></i> SOUMETTRE MON INSCRIPTION
                 </button>
@@ -604,13 +733,21 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h3 style="color: #f7ef8a; font-size: 2rem; margin-bottom: 20px;">Inscription envoyée avec succès !</h3>
-                <p style="color: #a0c8ff; font-size: 1.2rem; line-height: 1.6;">
+                <p style="color: #a0c8ff; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;">
                     Merci pour votre inscription au Concours d'Éloquence Excellentia Academia 2026.<br>
                     Vous recevrez un email de confirmation dans les 48 heures.
                 </p>
-                <button id="closeAfterSubmit" class="cta-button" style="margin-top: 30px;">
-                    <i class="fas fa-home"></i> RETOUR À L'ACCUEIL
-                </button>
+                <p style="color: #25d366; font-size: 1.3rem; font-weight: bold; margin-bottom: 30px;">
+                    <i class="fab fa-whatsapp"></i> N'oubliez pas de rejoindre notre groupe WhatsApp pour ne rien rater !
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button id="closeAfterSubmit" class="cta-button">
+                        <i class="fas fa-home"></i> RETOUR À L'ACCUEIL
+                    </button>
+                    <button class="whatsapp-button" onclick="joinWhatsAppGroup()">
+                        <i class="fab fa-whatsapp"></i> REJOINDRE WHATSAPP
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -633,6 +770,18 @@
         const closeAfterSubmit = document.getElementById('closeAfterSubmit');
         const inscriptionForm = document.getElementById('inscriptionForm');
         const confirmationMessage = document.getElementById('confirmationMessage');
+        
+        // Fonction pour rejoindre le groupe WhatsApp
+        function joinWhatsAppGroup() {
+            // Votre lien WhatsApp
+            const whatsappLink = "https://chat.whatsapp.com/EuFshU5EEZ7LpxQrC7OQuM";
+            
+            // Ouvrir dans un nouvel onglet
+            window.open(whatsappLink, '_blank');
+            
+            // Afficher un message
+            alert("Vous allez être redirigé vers le groupe WhatsApp d'Excellentia Academia. Bienvenue dans notre communauté !");
+        }
         
         // Ouvrir le modal
         openFormButton.addEventListener('click', () => {
