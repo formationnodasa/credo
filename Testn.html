@@ -53,11 +53,29 @@
         .logo {
             font-size: 2.8rem;
             font-weight: bold;
-            color: #d4af37;
             letter-spacing: 3px;
             text-transform: uppercase;
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
             margin-bottom: 5px;
+        }
+        
+        .excel {
+            color: #1e90ff; /* Bleu pour Excel */
+        }
+        
+        .lentia {
+            color: #ff4444; /* Rouge pour lentia */
+        }
+        
+        .academia {
+            color: #0d47a1; /* Bleu foncé pour Academia */
+        }
+        
+        .graduation-cap {
+            font-size: 2.5rem;
+            margin-left: 15px;
+            vertical-align: middle;
+            color: #d4af37;
         }
         
         .subtitle {
@@ -196,6 +214,125 @@
             box-shadow: 0 15px 25px rgba(212, 175, 55, 0.6);
         }
         
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid #d4af37;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            background-color: rgba(255, 107, 107, 0.1);
+            transform: rotate(90deg);
+        }
+        
+        .modal-title {
+            font-size: 2.2rem;
+            color: #f7ef8a;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-container {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #a0c8ff;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-button {
+            background: linear-gradient(90deg, #1e90ff, #0d47a1);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(13, 71, 161, 0.4);
+        }
+        
+        .hidden-form {
+            display: none;
+        }
+        
         .progress-container {
             width: 100%;
             background-color: rgba(255, 255, 255, 0.1);
@@ -261,6 +398,11 @@
                 font-size: 2rem;
             }
             
+            .graduation-cap {
+                font-size: 1.8rem;
+                margin-left: 10px;
+            }
+            
             .event-title {
                 font-size: 1.8rem;
             }
@@ -281,6 +423,14 @@
             .cta-button {
                 padding: 15px 30px;
                 font-size: 1.3rem;
+            }
+            
+            .modal-content {
+                padding: 25px;
+            }
+            
+            .modal-title {
+                font-size: 1.8rem;
             }
         }
         
@@ -308,7 +458,10 @@
 <body>
     <div class="container">
         <div class="logo-container">
-            <div class="logo">Excellentia Academia</div>
+            <div class="logo">
+                <span class="excel">Excel</span><span class="lentia">lentia</span> <span class="academia">Academia</span>
+                <span class="graduation-cap">🎓</span>
+            </div>
             <div class="subtitle">Excellence par l'Éloquence</div>
         </div>
         
@@ -346,7 +499,7 @@
             </div>
         </div>
         
-        <button class="cta-button" onclick="openRegistration()">
+        <button class="cta-button" id="openFormButton">
             <i class="fas fa-pen-fancy"></i> S'INSCRIRE MAINTENANT
         </button>
         
@@ -358,9 +511,8 @@
         <div class="instructions">
             <h3><i class="fas fa-info-circle"></i> Comment s'inscrire :</h3>
             <ul>
-                <li>Remplissez le formulaire d'inscription en ligne sur le site d'Excellentia Academia</li>
+                <li>Remplissez le formulaire d'inscription en ligne</li>
                 <li>Préparez un discours de 5 minutes sur un des thèmes proposés</li>
-                <li>Joignez une vidéo de présentation (optionnelle mais recommandée)</li>
                 <li>Les participants sélectionnés seront contactés avant le 15 février 2026</li>
                 <li>La finale du concours se tiendra le 15 mars 2026</li>
             </ul>
@@ -370,6 +522,97 @@
             <p><i class="far fa-clock"></i> Compte à rebours en temps réel | <i class="fas fa-sync-alt"></i> Actualisez la page pour la dernière mise à jour</p>
             <p>Excellentia Academia © 2025 - 2026 | Concours d'Éloquence - "La puissance de la parole"</p>
         </footer>
+    </div>
+    
+    <!-- Modal pour le formulaire d'inscription -->
+    <div class="modal-overlay" id="formModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            
+            <h2 class="modal-title">
+                <span class="excel">Excel</span><span class="lentia">lentia</span> <span class="academia">Academia</span>
+                <span class="graduation-cap">🎓</span><br>
+                Formulaire d'Inscription
+            </h2>
+            
+            <!-- Formulaire intégré via iframe (invisible pour l'utilisateur) -->
+            <iframe name="hiddenIframe" class="hidden-form"></iframe>
+            
+            <!-- Formulaire visible pour l'utilisateur -->
+            <form id="inscriptionForm" class="form-container" action="https://formspree.io/f/mldqkngp" method="POST" target="hiddenIframe">
+                <div class="form-group">
+                    <label class="form-label" for="nom">Nom complet *</label>
+                    <input type="text" id="nom" name="nom" class="form-input" required placeholder="Votre nom et prénom">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Adresse email *</label>
+                    <input type="email" id="email" name="email" class="form-input" required placeholder="exemple@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="telephone">Numéro de téléphone</label>
+                    <input type="tel" id="telephone" name="telephone" class="form-input" placeholder="+33 1 23 45 67 89">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="universite">Université / Établissement *</label>
+                    <input type="text" id="universite" name="universite" class="form-input" required placeholder="Votre établissement d'enseignement">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="niveau">Niveau d'études *</label>
+                    <select id="niveau" name="niveau" class="form-select" required>
+                        <option value="" disabled selected>Sélectionnez votre niveau</option>
+                        <option value="licence">Licence</option>
+                        <option value="master">Master</option>
+                        <option value="doctorat">Doctorat</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="theme">Thème proposé pour votre discours *</label>
+                    <select id="theme" name="theme" class="form-select" required>
+                        <option value="" disabled selected>Choisissez un thème</option>
+                        <option value="liberte">La liberté d'expression à l'ère numérique</option>
+                        <option value="education">L'éducation comme clé de l'émancipation</option>
+                        <option value="environnement">Notre responsabilité envers les générations futures</option>
+                        <option value="autre">Autre (précisez dans le message)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="message">Pourquoi souhaitez-vous participer à ce concours ? *</label>
+                    <textarea id="message" name="message" class="form-textarea" required placeholder="Expliquez en quelques phrases votre motivation..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="conditions" required style="margin-right: 10px;">
+                        J'accepte les conditions de participation et autorise le traitement de mes données personnelles *
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-paper-plane"></i> SOUMETTRE MON INSCRIPTION
+                </button>
+            </form>
+            
+            <div id="confirmationMessage" class="hidden-form" style="text-align: center; padding: 30px;">
+                <div style="font-size: 4rem; color: #d4af37; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="color: #f7ef8a; font-size: 2rem; margin-bottom: 20px;">Inscription envoyée avec succès !</h3>
+                <p style="color: #a0c8ff; font-size: 1.2rem; line-height: 1.6;">
+                    Merci pour votre inscription au Concours d'Éloquence Excellentia Academia 2026.<br>
+                    Vous recevrez un email de confirmation dans les 48 heures.
+                </p>
+                <button id="closeAfterSubmit" class="cta-button" style="margin-top: 30px;">
+                    <i class="fas fa-home"></i> RETOUR À L'ACCUEIL
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -383,6 +626,83 @@
         // Mettre à jour le compte à rebours toutes les secondes
         const countdownInterval = setInterval(updateCountdown, 1000);
         
+        // Éléments du modal
+        const formModal = document.getElementById('formModal');
+        const openFormButton = document.getElementById('openFormButton');
+        const closeModal = document.getElementById('closeModal');
+        const closeAfterSubmit = document.getElementById('closeAfterSubmit');
+        const inscriptionForm = document.getElementById('inscriptionForm');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        
+        // Ouvrir le modal
+        openFormButton.addEventListener('click', () => {
+            formModal.style.display = 'flex';
+        });
+        
+        // Fermer le modal
+        closeModal.addEventListener('click', () => {
+            formModal.style.display = 'none';
+        });
+        
+        // Fermer le modal après soumission
+        closeAfterSubmit.addEventListener('click', () => {
+            formModal.style.display = 'none';
+            // Réinitialiser le formulaire
+            inscriptionForm.reset();
+            // Revenir au formulaire
+            inscriptionForm.classList.remove('hidden-form');
+            confirmationMessage.classList.add('hidden-form');
+        });
+        
+        // Fermer le modal en cliquant à l'extérieur
+        formModal.addEventListener('click', (e) => {
+            if (e.target === formModal) {
+                formModal.style.display = 'none';
+            }
+        });
+        
+        // Gérer la soumission du formulaire
+        inscriptionForm.addEventListener('submit', function(e) {
+            // Empêcher le rechargement de la page
+            e.preventDefault();
+            
+            // Récupérer les données du formulaire
+            const formData = new FormData(this);
+            
+            // Envoyer les données via fetch (alternative à Formspree)
+            fetch(this.action, {
+                method: this.method,
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Afficher le message de confirmation
+                    inscriptionForm.classList.add('hidden-form');
+                    confirmationMessage.classList.remove('hidden-form');
+                    
+                    // Réinitialiser le formulaire
+                    this.reset();
+                    
+                    // Mettre à jour le bouton d'inscription sur la page principale
+                    if (Date.now() < targetDate) {
+                        openFormButton.innerHTML = '<i class="fas fa-check-circle"></i> INSCRIPTION ENVOYÉE !';
+                        openFormButton.style.background = 'linear-gradient(90deg, #4CAF50, #2E7D32)';
+                        openFormButton.style.cursor = 'default';
+                        openFormButton.onclick = null;
+                    }
+                } else {
+                    alert("Une erreur s'est produite. Veuillez réessayer.");
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert("Erreur de connexion. Veuillez vérifier votre connexion internet.");
+            });
+        });
+        
         function updateCountdown() {
             // Obtenir la date et l'heure actuelles
             const now = new Date().getTime();
@@ -390,7 +710,7 @@
             // Calculer la différence entre maintenant et la date limite
             const distance = targetDate - now;
             
-            // Calculer la progression (temps écoulé depuis le début des inscriptions)
+            // Calculer la progression
             let progress = 0;
             let remainingPercentage = 100;
             
@@ -414,10 +734,10 @@
                     <div class="urgent-title"><i class="fas fa-times-circle"></i> INSCRIPTIONS FERMÉES</div>
                     <div class="urgent-text">Les inscriptions pour le concours d'éloquence 2026 sont maintenant closes. Rendez-vous l'année prochaine !</div>
                 `;
-                document.querySelector('.cta-button').innerHTML = '<i class="fas fa-lock"></i> INSCRIPTIONS TERMINÉES';
-                document.querySelector('.cta-button').style.background = 'linear-gradient(90deg, #666, #999)';
-                document.querySelector('.cta-button').style.cursor = 'not-allowed';
-                document.querySelector('.cta-button').onclick = null;
+                openFormButton.innerHTML = '<i class="fas fa-lock"></i> INSCRIPTIONS TERMINÉES';
+                openFormButton.style.background = 'linear-gradient(90deg, #666, #999)';
+                openFormButton.style.cursor = 'not-allowed';
+                openFormButton.onclick = null;
                 return;
             }
             
@@ -444,19 +764,12 @@
             }
         }
         
-        // Fonction pour formater le temps (ajouter un 0 si nécessaire)
+        // Fonction pour formater le temps
         function formatTime(time) {
             return time < 10 ? `0${time}` : time;
         }
         
-        // Fonction pour simuler l'ouverture du formulaire d'inscription
-        function openRegistration() {
-            alert("Redirection vers le formulaire d'inscription...\n\nDans une version réelle, cette action ouvrirait le formulaire d'inscription en ligne.");
-            // Dans une version réelle, vous redirigeriez vers une URL :
-            // window.open('https://excellentia-academia.fr/inscription-concours-eloquence', '_blank');
-        }
-        
-        // Exécuter la fonction une première fois pour éviter le délai initial
+        // Exécuter la fonction une première fois
         updateCountdown();
     </script>
 </body>
