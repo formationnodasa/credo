@@ -284,10 +284,9 @@
         }
         
         .prizes-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 25px;
         }
         
@@ -295,18 +294,18 @@
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 25px 20px;
-            flex: 1;
-            min-width: 250px;
-            max-width: 320px;
             border: 2px solid rgba(212, 175, 55, 0.4);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .prize-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 25px rgba(212, 175, 55, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
             border-color: #d4af37;
         }
         
@@ -336,35 +335,37 @@
         }
         
         .prize-rank {
-            font-size: 1.8rem;
-            font-weight: bold;
+            font-size: 1.6rem;
             color: #ffd700;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            text-align: center;
         }
         
         .prize-amount {
-            font-size: 2.2rem;
-            font-weight: bold;
+            font-size: 2rem;
             color: #f7ef8a;
             margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(247, 239, 138, 0.7);
+            text-shadow: 0 0 8px rgba(247, 239, 138, 0.7);
+            font-weight: bold;
         }
         
         .prize-label {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #a0c8ff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-style: italic;
+            text-align: center;
         }
         
         .prize-details {
             list-style: none;
             padding: 0;
             margin-top: 15px;
+            width: 100%;
         }
         
         .prize-details li {
@@ -373,27 +374,64 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
         }
         
         .prize-details i {
             color: #d4af37;
             width: 20px;
+            text-align: center;
+        }
+        
+        .registration-fee {
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px dashed rgba(212, 175, 55, 0.5);
+            text-align: center;
+        }
+        
+        .fee-title {
+            font-size: 1.2rem;
+            color: #f7ef8a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .fee-amount {
+            font-size: 1.8rem;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .fee-note {
+            font-size: 0.9rem;
+            color: #a0c8ff;
+            font-style: italic;
         }
         
         .other-rewards {
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
-            margin-top: 20px;
+            margin-top: 25px;
             border: 1px solid rgba(212, 175, 55, 0.3);
         }
         
         .rewards-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #f7ef8a;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
         
@@ -416,23 +454,18 @@
         
         .reward-item:hover {
             background: rgba(212, 175, 55, 0.1);
-            transform: translateX(5px);
         }
         
         .reward-icon {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: #d4af37;
             min-width: 40px;
         }
         
         .reward-text {
             color: #cccccc;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             line-height: 1.4;
-        }
-        
-        .reward-text strong {
-            color: #f7ef8a;
         }
         
         .whatsapp-section {
@@ -740,7 +773,11 @@
             }
             
             .prize-amount {
-                font-size: 2.8rem;
+                font-size: 2.4rem;
+            }
+            
+            .fee-amount {
+                font-size: 2.2rem;
             }
             
             .cta-button {
@@ -761,6 +798,10 @@
             .modal-title {
                 font-size: 2.2rem;
             }
+            
+            .prizes-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         
         @media (min-width: 480px) and (max-width: 767px) {
@@ -775,6 +816,20 @@
             
             .time-value {
                 font-size: 3rem;
+            }
+            
+            .prizes-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 479px) {
+            .prizes-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -836,6 +891,15 @@
         </div>
         <div class="progress-text" id="progress-text">Temps restant avant la fermeture des inscriptions : 100%</div>
         
+        <!-- Frais d'inscription -->
+        <div class="registration-fee">
+            <div class="fee-title">
+                <i class="fas fa-ticket-alt"></i> Frais de Participation
+            </div>
+            <div class="fee-amount">5.000 Fc</div>
+            <div class="fee-note">Montant unique pour tous les participants</div>
+        </div>
+        
         <!-- Section des Prix et Récompenses -->
         <div class="prizes-section">
             <h2 class="prizes-title">
@@ -867,7 +931,6 @@
                     <div class="prize-label">Prix d'Honneur</div>
                     <ul class="prize-details">
                         <li><i class="fas fa-medal"></i> Médaille d'Argent</li>
-                        <li><i class="fas fa-trophy"></i> Trophée</li>
                         <li><i class="fas fa-award"></i> Brevet de Mérite</li>
                         <li><i class="fas fa-certificate"></i> Attestation de Distinction</li>
                     </ul>
@@ -882,9 +945,8 @@
                     <div class="prize-label">Prix Spécial du Jury</div>
                     <ul class="prize-details">
                         <li><i class="fas fa-medal"></i> Médaille de Bronze</li>
-                        <li><i class="fas fa-trophy"></i> Trophée</li>
                         <li><i class="fas fa-award"></i> Brevet de Mérite</li>
-                        <li><i class="fas fa-certificate"></i> Attestation de Mérite</li>
+                        <li><i class="fas fa-certificate"></i> Attestation de Participation</li>
                     </ul>
                 </div>
             </div>
@@ -899,7 +961,7 @@
                             <i class="fas fa-medal"></i>
                         </div>
                         <div class="reward-text">
-                            <strong>Médailles</strong> pour les 5 finalistes
+                            <span style="color: #f7ef8a;">Médailles</span> pour les 5 finalistes
                         </div>
                     </div>
                     <div class="reward-item">
@@ -907,7 +969,7 @@
                             <i class="fas fa-award"></i>
                         </div>
                         <div class="reward-text">
-                            <strong>Brevets de Participation</strong> pour tous les participants
+                            <span style="color: #f7ef8a;">Brevets de Participation</span> pour tous les participants
                         </div>
                     </div>
                     <div class="reward-item">
@@ -915,15 +977,15 @@
                             <i class="fas fa-certificate"></i>
                         </div>
                         <div class="reward-text">
-                            <strong>Attestations officielles</strong> de participation
+                            <span style="color: #f7ef8a;">Attestations officielles</span> de participation
                         </div>
                     </div>
                     <div class="reward-item">
                         <div class="reward-icon">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
                         <div class="reward-text">
-                            <strong>Opportunités de réseautage</strong> avec les professionnels
+                            <span style="color: #f7ef8a;">Formation gratuite</span> en techniques d'éloquence
                         </div>
                     </div>
                 </div>
@@ -935,6 +997,7 @@
             <h3><i class="fas fa-info-circle"></i> Comment s'inscrire :</h3>
             <ul>
                 <li><strong>Remplissez le formulaire d'inscription</strong> en cliquant sur le bouton ci-dessus</li>
+                <li><strong>Payez les frais de participation de 5.000 Fc</strong> selon les instructions reçues</li>
                 <li><strong>Préparez un discours de 3 minutes</strong> sur un des thèmes proposés</li>
                 <li><strong>Les participants sélectionnés</strong> seront contactés avant le 20 février 2026</li>
             </ul>
@@ -1042,7 +1105,7 @@
                 <div class="form-checkbox">
                     <input type="checkbox" id="conditions" name="conditions" required>
                     <label for="conditions">
-                        J'accepte les conditions de participation et autorise le traitement de mes données personnelles *
+                        Je comprends et j'accepte les frais de participation de 5.000 Fc *
                     </label>
                 </div>
                 
@@ -1067,7 +1130,7 @@
                 </h3>
                 <p style="color: #a0c8ff; font-size: 1rem; line-height: 1.5; margin-bottom: 15px;">
                     Merci pour votre inscription au Concours d'Éloquence 2026.
-                    Vous recevrez un message whatsapp de confirmation sous 48h.
+                    Vous recevrez un message whatsapp avec les détails pour le paiement des frais de participation (5.000 Fc).
                 </p>
                 <p style="color: #25d366; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;">
                     <i class="fab fa-whatsapp"></i> Rejoignez notre groupe WhatsApp !
