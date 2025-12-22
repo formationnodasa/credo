@@ -1,838 +1,1542 @@
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu Multijoueur - Connexion par Code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Multijoueur - Temps Réel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <style>
+        /* RESET ET BASE */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: white;
+            color: #333;
+            overflow-x: hidden;
         }
-        
+
         .container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            font-size: 42px;
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-        
-        .logo p {
-            color: #aaa;
-            font-size: 16px;
-        }
-        
-        .player-info {
-            margin-bottom: 30px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #ddd;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #00dbde;
-            box-shadow: 0 0 15px rgba(0, 219, 222, 0.3);
-        }
-        
-        input::placeholder {
-            color: #aaa;
-        }
-        
-        .color-picker {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .color-preview {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 3px solid white;
-        }
-        
-        .game-mode {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 30px 0;
-        }
-        
-        .mode-btn {
+            max-width: 100%;
+            min-height: 100vh;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            position: relative;
         }
-        
-        .mode-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-            border-color: rgba(0, 219, 222, 0.5);
-        }
-        
-        .mode-btn i {
-            font-size: 24px;
-        }
-        
-        .create-mode {
-            color: #00dbde;
-        }
-        
-        .join-mode {
-            color: #fc00ff;
-        }
-        
-        .room-section {
-            display: none;
-            margin-top: 30px;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
+
+        /* ANIMATIONS */
+        @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .room-code-display {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-            border: 2px dashed rgba(0, 219, 222, 0.5);
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
-        
-        .code {
-            font-size: 48px;
-            font-weight: 800;
-            letter-spacing: 5px;
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin: 20px 0;
-            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        
-        .code-label {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 5px;
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        
-        .action-btns {
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes timerProgress {
+            from { stroke-dashoffset: 169.56; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        .animate-pulse { animation: pulse 2s infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-fade-in { animation: fadeIn 0.5s ease; }
+        .animate-blink { animation: blink 1.5s infinite; }
+        .animate-bounce { animation: bounce 0.5s ease; }
+
+        /* ÉCRANS */
+        .screen {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* INDICATEUR CONNEXION */
+        .connection-status {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
             display: flex;
-            gap: 15px;
-            margin-top: 25px;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
-        
-        .action-btn {
-            flex: 1;
-            padding: 18px;
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: #f44336;
+            animation: none;
+        }
+
+        /* ÉCRAN ACCUEIL */
+        .logo {
+            text-align: center;
+            margin: 40px 0 60px;
+            color: white;
+        }
+
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .logo i {
+            margin-right: 15px;
+            color: #FFD700;
+        }
+
+        /* BOUTONS */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-small {
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 15px;
+            padding: 18px 30px;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .btn-large {
+            padding: 20px 40px;
+            font-size: 1.2rem;
+        }
+
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            width: auto;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* STATS */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat i {
+            color: #FFD700;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h2 {
+            flex: 1;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+
+        /* CODE SALLE */
+        .room-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .code-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #667eea;
+            margin: 15px 0;
+            letter-spacing: 5px;
+        }
+
+        .players-count {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-        }
-        
-        .copy-btn {
-            background: linear-gradient(45deg, #00dbde, #0083b0);
-            color: white;
-        }
-        
-        .share-btn {
-            background: linear-gradient(45deg, #fc00ff, #8a2be2);
-            color: white;
-        }
-        
-        .start-btn {
-            background: linear-gradient(45deg, #00b09b, #96c93d);
-            color: white;
-            width: 100%;
-            padding: 20px;
-            font-size: 18px;
-        }
-        
-        .back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-top: 20px;
-        }
-        
-        .players-list {
-            background: rgba(0, 0, 0, 0.3);
+            font-size: 1.2rem;
+            color: #333;
+            padding: 15px;
+            background: #f8f9fa;
             border-radius: 15px;
-            padding: 25px;
-            margin: 30px 0;
-            max-height: 300px;
-            overflow-y: auto;
         }
-        
-        .player-item {
+
+        .players-count i {
+            color: #667eea;
+        }
+
+        /* SÉLECTION QUESTIONS */
+        .settings {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .settings h3 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .question-count h4 {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .count-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 480px) {
+            .count-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .count-btn {
+            padding: 15px 5px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .count-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .count-btn.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .selected-count {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #333;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .selected-count span {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        /* LISTE JOUEURS */
+        .players-list {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .players-list h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .players {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .player {
             display: flex;
             align-items: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
+            gap: 15px;
+            padding: 18px 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: all 0.3s ease;
         }
-        
-        .player-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+
+        .player:hover {
             transform: translateX(5px);
+            background: #f0f4ff;
         }
-        
-        .player-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 15px;
+
+        .player.host {
+            background: linear-gradient(135deg, #fff8e1, #ffe082);
+            border-left: 5px solid #FFD700;
         }
-        
-        .player-name {
-            flex: 1;
-            font-size: 18px;
-            font-weight: 600;
+
+        .player i {
+            font-size: 1.2rem;
+            color: #667eea;
         }
-        
-        .player-status {
-            padding: 5px 15px;
+
+        .player.host i {
+            color: #FF8E53;
+        }
+
+        /* FORMULAIRE REJOINDRE */
+        .join-form {
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-        
-        .status-online {
-            background: rgba(0, 255, 0, 0.2);
-            color: #00ff00;
+
+        .input-group {
+            margin-bottom: 25px;
         }
-        
-        .status-offline {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff4444;
+
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #333;
+            font-weight: 500;
         }
-        
-        .game-screen {
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-message {
+            color: #f44336;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffebee;
+            border-radius: 12px;
             display: none;
         }
-        
-        .game-header {
+
+        /* SALLE D'ATTENTE */
+        .waiting-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-display.small .code-value {
+            font-size: 2rem;
+        }
+
+        .players-count.large {
+            font-size: 1.5rem;
+            padding: 20px 30px;
+        }
+
+        .waiting-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            margin: 0 auto 25px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .host-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-settings {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        /* ÉCRAN DE JEU */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-counter {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            background: #f0f4ff;
+            padding: 12px 25px;
+            border-radius: 12px;
+        }
+
+        .timer-container {
+            position: relative;
+        }
+
+        .timer-circle {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .timer-svg {
+            transform: rotate(-90deg);
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 4;
+        }
+
+        .timer-fg {
+            fill: none;
+            stroke: #FF6B6B;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 169.56;
+            stroke-dashoffset: 169.56;
+        }
+
+        .timer-circle span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #FF6B6B;
+        }
+
+        .score-display {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            background: linear-gradient(135deg, #FFD700, #FF8E53);
+            padding: 12px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .lexical-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .prefix {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: #f0f4ff;
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+
+        .voice-toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .voice-toggle.muted {
+            background: #666;
+        }
+
+        .question-text {
+            text-align: center;
             margin-bottom: 30px;
         }
-        
-        .game-canvas {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            width: 100%;
-            height: 400px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+
+        .question-text h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
-        
-        .game-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 30px 0;
+
+        .question-hint {
+            font-size: 1.1rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 15px;
         }
-        
-        .control-btn {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .control-btn:hover {
-            background: rgba(0, 219, 222, 0.3);
-            transform: scale(1.05);
-        }
-        
-        .quit-btn {
-            background: rgba(255, 0, 0, 0.3);
-            color: white;
-            border: 2px solid rgba(255, 0, 0, 0.5);
-        }
-        
-        .notification {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-left: 5px solid #00dbde;
-            display: none;
-            z-index: 1000;
-            max-width: 350px;
-            animation: slideIn 0.5s;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .stats {
+
+        .answer-input {
             display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
+            gap: 15px;
+            margin-bottom: 25px;
         }
-        
-        .stat-item {
+
+        .answer-input input {
+            flex: 1;
+            padding: 18px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .answer-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .quick-answers {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-answer-btn {
+            padding: 12px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-answer-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .players-scoreboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .players-scoreboard h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .scoreboard {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .scoreboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .scoreboard-item.current {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196F3;
+        }
+
+        .scoreboard-item.leading {
+            background: linear-gradient(135deg, #fff8e1, #ffe082);
+        }
+
+        .player-rank {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #667eea;
+            min-width: 30px;
+        }
+
+        .player-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .player-score {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #FF6B6B;
+        }
+
+        /* ÉCRAN RÉSULTATS */
+        .results-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .results-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .game-summary {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .winner-podium {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .podium {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .medal {
+            font-size: 4rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .winner-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .winner-score {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .results-list {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .results-list h3 {
+            margin-bottom: 20px;
+            color: #333;
             text-align: center;
         }
-        
-        .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            display: block;
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+
+        .results-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px 20px;
-            }
-            
-            .logo h1 {
-                font-size: 32px;
-            }
-            
-            .code {
-                font-size: 36px;
-            }
-            
-            .action-btns {
-                flex-direction: column;
-            }
-            
-            .game-controls {
-                grid-template-columns: repeat(2, 1fr);
-            }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+        }
+
+        .modal-icon.success { color: #4CAF50; }
+        .modal-icon.error { color: #f44336; }
+
+        /* NOTIFICATIONS */
+        .game-notifications {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.correct {
+            border-left: 5px solid #4CAF50;
+        }
+
+        .notification.wrong {
+            border-left: 5px solid #f44336;
+        }
+
+        .notification.new-player {
+            border-left: 5px solid #2196F3;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .logo h1 { font-size: 2.2rem; }
+            .code-value { font-size: 2.8rem; }
+            .question-text h2 { font-size: 1.5rem; }
+            .game-info { flex-direction: column; gap: 20px; }
+            .answer-input { flex-direction: column; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .logo h1 { font-size: 1.8rem; }
+            .header h2 { font-size: 1.5rem; }
+            .btn-primary, .btn-secondary { padding: 16px 25px; }
+            .stats { flex-direction: column; gap: 15px; }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
-    
-    <!-- Écran Principal -->
-    <div id="mainScreen" class="container">
-        <div class="logo">
-            <h1><i class="fas fa-gamepad"></i> MULTIPLAYER</h1>
-            <p>Connectez-vous et jouez avec vos amis en temps réel</p>
+    <div class="container">
+        <!-- Indicateur de connexion -->
+        <div class="connection-status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">En ligne</span>
         </div>
-        
-        <div class="player-info">
-            <div class="input-group">
-                <label for="playerName"><i class="fas fa-user"></i> Votre Pseudo</label>
-                <input type="text" id="playerName" placeholder="Entrez votre nom de joueur" maxlength="15" value="Joueur">
+
+        <!-- Écran d'accueil -->
+        <div id="homeScreen" class="screen active">
+            <div class="logo animate-pulse">
+                <h1><i class="fas fa-brain"></i> QUIZ MULTI</h1>
+                <p class="subtitle">Affrontez vos amis en temps réel</p>
             </div>
             
-            <div class="input-group">
-                <label for="playerColor"><i class="fas fa-palette"></i> Votre Couleur</label>
-                <div class="color-picker">
-                    <input type="color" id="playerColor" value="#ff4757">
-                    <div id="colorPreview" class="color-preview"></div>
+            <div class="button-group">
+                <button id="createRoomBtn" class="btn-primary animate-float">
+                    <i class="fas fa-plus-circle"></i> Créer une salle
+                </button>
+                <button id="joinRoomBtn" class="btn-secondary">
+                    <i class="fas fa-door-open"></i> Rejoindre une salle
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <i class="fas fa-users"></i>
+                    <span id="onlineCount">0</span> joueurs en ligne
+                </div>
+                <div class="stat">
+                    <i class="fas fa-trophy"></i>
+                    <span id="gamesPlayed">0</span> parties jouées
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran création de salle -->
+        <div id="createScreen" class="screen">
+            <div class="header">
+                <button class="back-btn" id="backFromCreate">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Créer une salle</h2>
+            </div>
+            
+            <div class="room-info animate-fade-in">
+                <div class="code-display">
+                    <div class="code-label">Code de la salle</div>
+                    <div id="roomCode" class="code-value animate-blink"></div>
+                    <button id="copyCodeBtn" class="btn-small">
+                        <i class="fas fa-copy"></i> Copier
+                    </button>
+                </div>
+                
+                <div class="players-count">
+                    <i class="fas fa-user-friends"></i>
+                    <span id="playerCountCreate">1</span>/10 joueurs
+                </div>
+            </div>
+
+            <div class="settings">
+                <h3>Paramètres de la partie</h3>
+                
+                <div class="question-count">
+                    <h4>Nombre de questions</h4>
+                    <div class="count-grid">
+                        <button class="count-btn" data-count="10">10</button>
+                        <button class="count-btn" data-count="20">20</button>
+                        <button class="count-btn" data-count="30">30</button>
+                        <button class="count-btn" data-count="40">40</button>
+                        <button class="count-btn" data-count="50">50</button>
+                        <button class="count-btn" data-count="60">60</button>
+                        <button class="count-btn" data-count="70">70</button>
+                        <button class="count-btn" data-count="80">80</button>
+                        <button class="count-btn" data-count="90">90</button>
+                        <button class="count-btn" data-count="100">100</button>
+                    </div>
+                    <div class="selected-count">
+                        Sélectionné : <span id="selectedCount">10</span> questions
+                    </div>
+                </div>
+            </div>
+
+            <div class="players-list">
+                <h3>Joueurs dans la salle</h3>
+                <div id="playersListCreate" class="players">
+                    <div class="player host">
+                        <i class="fas fa-crown"></i>
+                        <span id="playerName">Vous (Hôte)</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="startGameBtn" class="btn-primary btn-large" disabled>
+                <i class="fas fa-play"></i> Commencer la partie
+            </button>
+        </div>
+
+        <!-- Écran rejoindre salle -->
+        <div id="joinScreen" class="screen">
+            <div class="header">
+                <button class="back-btn" id="backFromJoin">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Rejoindre une salle</h2>
+            </div>
+            
+            <div class="join-form animate-fade-in">
+                <div class="input-group">
+                    <label for="roomCodeInput">
+                        <i class="fas fa-key"></i> Code de la salle
+                    </label>
+                    <input type="text" id="roomCodeInput" placeholder="Ex: ABC123" maxlength="6">
+                </div>
+                
+                <div class="input-group">
+                    <label for="playerNameInput">
+                        <i class="fas fa-user"></i> Votre pseudo
+                    </label>
+                    <input type="text" id="playerNameInput" placeholder="Entrez votre pseudo" maxlength="20">
+                </div>
+                
+                <button id="joinRoomConfirmBtn" class="btn-primary btn-large">
+                    <i class="fas fa-sign-in-alt"></i> Rejoindre
+                </button>
+                
+                <div id="joinError" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Écran salle d'attente -->
+        <div id="waitingScreen" class="screen">
+            <div class="header">
+                <button class="back-btn" id="backFromWaiting">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Salle d'attente</h2>
+            </div>
+            
+            <div class="waiting-info">
+                <div class="code-display small">
+                    <div class="code-label">Code salle</div>
+                    <div id="waitingRoomCode" class="code-value"></div>
+                </div>
+                
+                <div class="players-count large">
+                    <i class="fas fa-user-friends"></i>
+                    <span id="playerCountWaiting">1</span>/10 joueurs
                 </div>
             </div>
             
-            <div class="input-group">
-                <label for="gameType"><i class="fas fa-chess-board"></i> Type de Jeu</label>
-                <select id="gameType">
-                    <option value="arena">🏟️ Arena Battle</option>
-                    <option value="race">🏎️ Course Rapide</option>
-                    <option value="quiz">❓ Quiz Challenge</option>
-                    <option value="puzzle">🧩 Puzzle Coop</option>
-                    <option value="custom">🎮 Jeu Personnalisé</option>
-                </select>
+            <div class="players-list full">
+                <h3>Joueurs connectés</h3>
+                <div id="playersListWaiting" class="players">
+                    <!-- Liste des joueurs -->
+                </div>
             </div>
-        </div>
-        
-        <div class="game-mode">
-            <button class="mode-btn create-mode" onclick="showCreateRoom()">
-                <i class="fas fa-plus-circle"></i>
-                <span>Créer une Salle</span>
-            </button>
             
-            <button class="mode-btn join-mode" onclick="showJoinRoom()">
-                <i class="fas fa-sign-in-alt"></i>
-                <span>Rejoindre une Salle</span>
-            </button>
-        </div>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-value" id="onlineCount">0</span>
-                <span>En ligne</span>
+            <div id="waitingMessage" class="waiting-message">
+                <div class="spinner"></div>
+                <p>En attente du lancement de la partie par l'hôte...</p>
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="activeRoomsCount">0</span>
-                <span>Salles actives</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Écran Création de Salle -->
-    <div id="createScreen" class="container" style="display: none;">
-        <div class="logo">
-            <h2><i class="fas fa-crown"></i> CRÉER UNE SALLE</h2>
-            <p>Créez votre propre espace de jeu</p>
-        </div>
-        
-        <div class="input-group">
-            <label for="roomName"><i class="fas fa-door-open"></i> Nom de la Salle</label>
-            <input type="text" id="roomName" placeholder="Nom de votre salle (ex: 'Arena des Champions')" value="Salle de Jeu">
-        </div>
-        
-        <div class="input-group">
-            <label for="maxPlayers"><i class="fas fa-users"></i> Nombre Maximum de Joueurs</label>
-            <select id="maxPlayers">
-                <option value="2">2 Joueurs</option>
-                <option value="4" selected>4 Joueurs</option>
-                <option value="6">6 Joueurs</option>
-                <option value="8">8 Joueurs</option>
-                <option value="10">10 Joueurs</option>
-            </select>
-        </div>
-        
-        <div class="input-group">
-            <label><i class="fas fa-lock"></i> Visibilité</label>
-            <div style="display: flex; gap: 20px; margin-top: 10px;">
-                <label style="display: flex; align-items: center; gap: 10px;">
-                    <input type="radio" name="visibility" value="public" checked> 
-                    <i class="fas fa-globe"></i> Publique
-                </label>
-                <label style="display: flex; align-items: center; gap: 10px;">
-                    <input type="radio" name="visibility" value="private"> 
-                    <i class="fas fa-lock"></i> Privée
-                </label>
-            </div>
-        </div>
-        
-        <button class="action-btn start-btn" onclick="createRoom()">
-            <i class="fas fa-play-circle"></i> Créer la Salle et Générer le Code
-        </button>
-        
-        <button class="action-btn back-btn" onclick="showMainScreen()">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
-    </div>
-    
-    <!-- Écran Code Généré -->
-    <div id="roomCreatedScreen" class="container" style="display: none;">
-        <div class="logo">
-            <h2 style="color: #00dbde;"><i class="fas fa-check-circle"></i> SALLE CRÉÉE !</h2>
-            <p>Partagez ce code avec vos amis pour qu'ils vous rejoignent</p>
-        </div>
-        
-        <div class="room-code-display">
-            <div class="code-label">CODE DE LA SALLE</div>
-            <div id="roomCode" class="code">ABCD12</div>
-            <div class="code-label">Donnez ce code à vos amis</div>
-        </div>
-        
-        <div class="action-btns">
-            <button class="action-btn copy-btn" onclick="copyRoomCode()">
-                <i class="far fa-copy"></i> Copier le Code
-            </button>
-            <button class="action-btn share-btn" onclick="shareRoomCode()">
-                <i class="fas fa-share-alt"></i> Partager
-            </button>
-        </div>
-        
-        <div class="players-list" id="waitingPlayers">
-            <h3><i class="fas fa-users"></i> Joueurs en attente (1/4)</h3>
-            <div id="playersContainer"></div>
-        </div>
-        
-        <button class="action-btn start-btn" id="startGameBtn" style="display: none;" onclick="startGame()">
-            <i class="fas fa-play"></i> Démarrer la Partie (1/4)
-        </button>
-        
-        <button class="action-btn back-btn" onclick="leaveRoom()">
-            <i class="fas fa-sign-out-alt"></i> Quitter la Salle
-        </button>
-    </div>
-    
-    <!-- Écran Rejoindre Salle -->
-    <div id="joinScreen" class="container" style="display: none;">
-        <div class="logo">
-            <h2><i class="fas fa-sign-in-alt"></i> REJOINDRE UNE SALLE</h2>
-            <p>Entrez le code de la salle pour rejoindre vos amis</p>
-        </div>
-        
-        <div class="input-group">
-            <label for="joinCode"><i class="fas fa-key"></i> Code de la Salle</label>
-            <input type="text" id="joinCode" placeholder="Entrez le code (ex: ABCD12)" maxlength="6" style="text-transform: uppercase; letter-spacing: 3px; font-size: 24px; text-align: center;">
-        </div>
-        
-        <div style="margin: 30px 0; text-align: center;">
-            <div style="font-size: 14px; color: #aaa; margin-bottom: 10px;">OU</div>
-            <button class="mode-btn" onclick="showPublicRooms()" style="background: rgba(0, 219, 222, 0.2);">
-                <i class="fas fa-globe-europe"></i>
-                <span>Voir les salles publiques disponibles</span>
-            </button>
-        </div>
-        
-        <button class="action-btn start-btn" onclick="joinRoom()">
-            <i class="fas fa-door-open"></i> Rejoindre la Salle
-        </button>
-        
-        <button class="action-btn back-btn" onclick="showMainScreen()">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
-    </div>
-    
-    <!-- Écran Liste des Salles Publiques -->
-    <div id="publicRoomsScreen" class="container" style="display: none;">
-        <div class="logo">
-            <h2><i class="fas fa-globe"></i> SALLES PUBLIQUES</h2>
-            <p>Sélectionnez une salle pour rejoindre</p>
-        </div>
-        
-        <div class="players-list" id="publicRoomsList">
-            <!-- Les salles seront ajoutées ici dynamiquement -->
-        </div>
-        
-        <button class="action-btn back-btn" onclick="showJoinScreen()">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
-    </div>
-    
-    <!-- Écran de Jeu -->
-    <div id="gameScreen" class="container" style="display: none;">
-        <div class="game-header">
-            <div>
-                <h3><span id="currentRoomCode">ABCD12</span></h3>
-                <p id="gameStatus">En attente...</p>
-            </div>
-            <div>
-                <button class="control-btn quit-btn" onclick="quitGame()">
-                    <i class="fas fa-sign-out-alt"></i> Quitter
+            
+            <div id="hostControls" class="host-controls">
+                <div class="game-settings">
+                    <p><i class="fas fa-question-circle"></i> Questions sélectionnées : <span id="selectedCountWaiting">10</span></p>
+                </div>
+                <button id="startGameWaitingBtn" class="btn-primary btn-large">
+                    <i class="fas fa-rocket"></i> Lancer la partie
                 </button>
             </div>
         </div>
-        
-        <canvas id="gameCanvas" class="game-canvas" width="800" height="400"></canvas>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-value" id="gameTime">00:00</span>
-                <span>Temps</span>
+
+        <!-- Écran du jeu -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <div class="game-info">
+                    <div class="question-counter">
+                        Question <span id="currentQuestion">1</span>/<span id="totalQuestions">10</span>
+                    </div>
+                    <div class="timer-container">
+                        <div class="timer-circle">
+                            <svg class="timer-svg" width="60" height="60">
+                                <circle class="timer-bg" cx="30" cy="30" r="27"></circle>
+                                <circle class="timer-fg" cx="30" cy="30" r="27"></circle>
+                            </svg>
+                            <span id="timer">12</span>
+                        </div>
+                    </div>
+                    <div class="score-display">
+                        <i class="fas fa-trophy"></i>
+                        <span id="playerScore">0</span> pts
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="playerScore">0</span>
-                <span>Score</span>
+            
+            <div class="question-container">
+                <div class="question-header">
+                    <div class="lexical-field">
+                        <i class="fas fa-font"></i> Champ lexical avec
+                        <span id="lexicalPrefix" class="prefix">Im</span>
+                    </div>
+                    <div id="voiceToggle" class="voice-toggle">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+                
+                <div class="question-text">
+                    <h2 id="questionText">Trouvez un mot qui commence par "Im"</h2>
+                    <p class="question-hint" id="questionHint"></p>
+                </div>
+                
+                <div class="answer-input">
+                    <input type="text" id="answerInput" placeholder="Écrivez votre réponse ici..." autocomplete="off">
+                    <button id="submitAnswerBtn" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Valider
+                    </button>
+                </div>
+                
+                <div class="quick-answers">
+                    <button class="quick-answer-btn" data-prefix="Im">Im</button>
+                    <button class="quick-answer-btn" data-prefix="Pe">Pe</button>
+                    <button class="quick-answer-btn" data-prefix="Di">Di</button>
+                    <button class="quick-answer-btn" data-prefix="Em">Em</button>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="totalPlayers">0</span>
-                <span>Joueurs</span>
+            
+            <div class="players-scoreboard">
+                <h3><i class="fas fa-chart-line"></i> Classement en direct</h3>
+                <div id="scoreboard" class="scoreboard">
+                    <!-- Classement des joueurs -->
+                </div>
+            </div>
+            
+            <div class="game-notifications">
+                <!-- Notifications en temps réel -->
             </div>
         </div>
-        
-        <div class="game-controls">
-            <div></div>
-            <button class="control-btn" onclick="movePlayer('up')">
-                <i class="fas fa-arrow-up"></i>
-            </button>
-            <div></div>
-            
-            <button class="control-btn" onclick="movePlayer('left')">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div class="control-btn" style="background: rgba(0, 219, 222, 0.3);">
-                <i class="fas fa-crosshairs"></i>
+
+        <!-- Écran résultats -->
+        <div id="resultsScreen" class="screen">
+            <div class="results-header">
+                <h2><i class="fas fa-flag-checkered"></i> Fin de la partie</h2>
+                <p class="game-summary">
+                    <span id="totalQuestionsPlayed">10</span> questions - 
+                    <span id="totalPlayers">2</span> joueurs
+                </p>
             </div>
-            <button class="control-btn" onclick="movePlayer('right')">
-                <i class="fas fa-arrow-right"></i>
-            </button>
             
-            <div></div>
-            <button class="control-btn" onclick="movePlayer('down')">
-                <i class="fas fa-arrow-down"></i>
-            </button>
-            <div></div>
+            <div class="winner-podium">
+                <div class="podium first">
+                    <div class="medal">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="winner-name" id="winnerName">-</div>
+                    <div class="winner-score" id="winnerScore">0 pts</div>
+                </div>
+                
+                <div class="results-list">
+                    <h3>Classement final</h3>
+                    <div id="finalScoreboard">
+                        <!-- Classement final -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-actions">
+                <button id="playAgainBtn" class="btn-primary">
+                    <i class="fas fa-redo"></i> Rejouer
+                </button>
+                <button id="backToHomeBtn" class="btn-secondary">
+                    <i class="fas fa-home"></i> Retour à l'accueil
+                </button>
+            </div>
         </div>
-        
-        <div class="players-list" id="gamePlayersList">
-            <h4><i class="fas fa-trophy"></i> Classement en direct</h4>
+
+        <!-- Modal de notification -->
+        <div id="notificationModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 id="notificationTitle"></h3>
+                <p id="notificationMessage"></p>
+                <button class="btn-primary" id="closeNotification">OK</button>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js"></script>
-
     <script>
-        // ================= CONFIGURATION FIREBASE =================
+        // CONFIGURATION FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyBr8Fzdvh1En3rAxGFipOYfgr0YDeeM_Bo",
-            authDomain: "match-en-ligne.firebaseapp.com",
-            databaseURL: "https://match-en-ligne-default-rtdb.firebaseio.com",
-            projectId: "match-en-ligne",
-            storageBucket: "match-en-ligne.firebasestorage.app",
-            messagingSenderId: "706011207623",
-            appId: "1:706011207623:web:17374990a6202b64f0abe2",
-            measurementId: "G-D9XYRE3W2M"
+            apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
+            authDomain: "match-a2ac6.firebaseapp.com",
+            projectId: "match-a2ac6",
+            storageBucket: "match-a2ac6.firebasestorage.app",
+            messagingSenderId: "376894292796",
+            appId: "1:376894292796:web:1eb138830c92aae8df5439",
+            measurementId: "G-2RSRSSFCDZ"
         };
 
-        // Initialiser Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const auth = firebase.auth();
+        // BASE DE DONNÉES DES QUESTIONS
+        const questionsDatabase = {
+            "Im": [
+                {word: "Imbécile", hint: "personne stupide ou idiote"},
+                {word: "Immaculé", hint: "parfaitement propre ou pur"},
+                {word: "Immatériel", hint: "qui n'a pas de corps physique"},
+                {word: "Imminent", hint: "qui va se produire très bientôt"},
+                {word: "Immobile", hint: "qui ne bouge pas"},
+                {word: "Immortel", hint: "qui ne meurt pas ou qui vit éternellement"},
+                {word: "Immuable", hint: "qui ne change pas"},
+                {word: "Immuabilité", hint: "état de ce qui ne change pas"},
+                {word: "Immunité", hint: "protection contre une maladie ou une infection"},
+                {word: "Impartial", hint: "qui ne prend pas parti"},
+                {word: "Impassible", hint: "qui ne montre pas d'émotion"},
+                {word: "Impératif", hint: "qui est nécessaire ou obligatoire"},
+                {word: "Imperturbable", hint: "qui ne se laisse pas perturber"},
+                {word: "Impie", hint: "qui manque de respect envers la religion"},
+                {word: "Implacable", hint: "qui ne peut pas être apaisé ou arrêté"},
+                {word: "Impossible", hint: "qui ne peut pas être réalisé ou accompli"},
+                {word: "Improbable", hint: "peu probable, qui a peu de chances de se produire"},
+                {word: "Improviste", hint: "sans préparation, de manière impromptue"},
+                {word: "Improviser", hint: "créer ou faire quelque chose spontanément"},
+                {word: "Imaginer", hint: "créer des images mentales ou des idées dans son esprit"},
+                {word: "Impressionnant", hint: "qui produit une forte impression"},
+                {word: "Impacter", hint: "avoir un effet ou une influence sur quelque chose"},
+                {word: "Impair", hint: "qui est impair, qui ne peut pas être divisé par deux"},
+                {word: "Imagination", hint: "capacité à créer des images, des idées"},
 
-        // ================= VARIABLES GLOBALES =================
-        let playerId = null;
-        let playerName = "Joueur";
-        let playerColor = "#ff4757";
-        let currentRoomId = null;
-        let isHost = false;
-        let gameActive = false;
-        let gameStartTime = null;
-        let gameTimerInterval = null;
-        let canvas, ctx;
+{word: "Imiter", hint: "copier ou reproduire le comportement de quelqu'un"},
+                {word: "Imitation", hint: "action de copier ou de reproduire quelque chose"},
+                {word: "Imbattable", hint: "qui ne peut pas être vaincu, qui est invaincu"},
+                {word: "Imbelliqueux", hint: "qui cherche la discorde ou le conflit"},
+                {word: "Immigration", hint: "action de s'installer dans un pays étranger"}
+            ],
+            "Di": [
+                {word: "Direction", hint: "position ou trajectoire vers laquelle on se déplace"},
+                {word: "Difficulté", hint: "obstacle ou défi qui rend quelque chose difficile"},
+                {word: "Discipline", hint: "obéissance à des règles pour atteindre un objectif"},
+                {word: "Dialogue", hint: "conversation entre deux personnes ou plus"},
+                {word: "Diversité", hint: "variété ou différence dans un groupe"},
+                {word: "Diplomatie", hint: "art de négocier et résoudre les conflits"},
+                {word: "Dictionnaire", hint: "livre qui répertorie les mots et définitions"},
+                {word: "Disparition", hint: "fait de ne plus être présent ou visible"},
+                {word: "Dimension", hint: "mesure de la taille ou de l'étendue"},
+                {word: "Directionnel", hint: "qui se rapporte à la direction"}
+            ],
+            "Em": [
+                {word: "Emotion", hint: "réaction affective intense"},
+                {word: "Empathie", hint: "capacité de comprendre les sentiments des autres"},
+                {word: "Emploi", hint: "travail ou occupation rémunéré"},
+                {word: "Empreinte", hint: "marque laissée par un objet ou une personne"},
+                {word: "Emotionnel", hint: "qui est lié aux émotions"},
+                {word: "Empire", hint: "vaste territoire gouverné par un souverain"},
+                {word: "Emblème", hint: "symbole qui représente une idée ou organisation"},
+                {word: "Empoisonnement", hint: "état d'avoir été intoxiqué"},
+                {word: "Ermite", hint: "personne qui vit seule, retirée du monde"},
+                {word: "Emphase", hint: "insistance particulière mise sur quelque chose"}
+            ],
+            "Pe": [
+                {word: "Pensée", hint: "activité intellectuelle, réflexion"},
+                {word: "Personne", hint: "être humain, individu"},
+                {word: "Peur", hint: "sentiment d'inquiétude, d'appréhension"},
+                {word: "Peur", hint: "sentiment d'anxiété face à un danger"},
+                {word: "Perdre", hint: "ne plus avoir, cesser de posséder"},
+                {word: "Penser", hint: "exercer son esprit, réfléchir"},
+                {word: "Peser", hint: "déterminer le poids de quelque chose"},
+                {word: "Pénétrer", hint: "entrer dans, pénétrer à l'intérieur"},
+                {word: "Percer", hint: "traverser de part en part"},
+                {word: "Perfection", hint: "état de ce qui est parfait"}
+            ],
+            "No": [
+                {word: "Nourriture", hint: "substances consommées pour se nourrir"},
+                {word: "Nouvelle", hint: "information sur des événements récents"},
+                {word: "Nostalgie", hint: "sentiment de désir envers le passé"},
+                {word: "Normalité", hint: "état d'être normal ou conforme"},
+                {word: "Notoriété", hint: "renommée ou célébrité"},
+                {word: "Notre", hint: "qui appartient à nous"},
+                {word: "Nocif", hint: "qui peut causer des dommages"},
+                {word: "Novice", hint: "personne inexpérimentée"},
+                {word: "Nourrir", hint: "donner de la nourriture"},
+                {word: "Nomade", hint: "personne qui se déplace souvent"}
+            ]
+        };
 
-        // ================= INITIALISATION =================
-        window.onload = function() {
-            // Initialiser les éléments
-            initializeElements();
+        // ÉTAT GLOBAL DU JEU
+        let gameState = {
+            playerId: null,
+            playerName: '',
+            roomCode: null,
+            isHost: false,
+            selectedQuestions: 10,
+            currentQuestion: 0,
+            score: 0,
+            connected: false,
+            voiceEnabled: true,
+            pageHidden: false,
+            questions: [],
+            players: {},
+            timer: null,
+            timeLeft: 12
+        };
+
+        // RÉFÉRENCES FIREBASE
+        let firebaseApp, database;
+        
+        // INITIALISATION DE L'APPLICATION
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation des écouteurs d'événements
+            initializeEventListeners();
+            // Initialisation de Firebase
+            initializeFirebase();
+            // Gestion de la visibilité de la page
+            initializePageVisibility();
+            // Génération d'un ID joueur unique
+            generatePlayerId();
+        });
+
+        // GÉNÉRATION D'UN ID JOUEUR UNIQUE
+        function generatePlayerId() {
+            if (!gameState.playerId) {
+                gameState.playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+            return gameState.playerId;
+        }
+
+        // INITIALISATION DES ÉCOUTEURS D'ÉVÉNEMENTS
+        function initializeEventListeners() {
+            // Boutons de l'écran d'accueil
+            document.getElementById('createRoomBtn').addEventListener('click', createRoom);
+            document.getElementById('joinRoomBtn').addEventListener('click', showJoinScreen);
             
-            // Connexion anonyme
-            auth.signInAnonymously()
-                .then((userCredential) => {
-                    playerId = userCredential.user.uid;
-                    console.log("Connecté avec ID:", playerId);
-                    updateOnlineStatus();
-                    updateStats();
-                })
-                .catch((error) => {
-                    showNotification("Erreur de connexion: " + error.message);
+            // Boutons de retour
+            document.getElementById('backFromCreate').addEventListener('click', () => showScreen('homeScreen'));
+            document.getElementById('backFromJoin').addEventListener('click', () => showScreen('homeScreen'));
+            document.getElementById('backFromWaiting').addEventListener('click', leaveRoom);
+            
+            // Création de salle
+            document.getElementById('copyCodeBtn').addEventListener('click', copyRoomCode);
+            document.querySelectorAll('.count-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectQuestionCount(parseInt(this.dataset.count));
                 });
-        };
-
-        function initializeElements() {
-            // Gestion de la couleur
-            const colorInput = document.getElementById('playerColor');
-            const colorPreview = document.getElementById('colorPreview');
+            });
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
             
-            playerColor = colorInput.value;
-            colorPreview.style.backgroundColor = playerColor;
-            
-            colorInput.addEventListener('input', function() {
-                playerColor = this.value;
-                colorPreview.style.backgroundColor = playerColor;
+            // Rejoindre une salle
+            document.getElementById('joinRoomConfirmBtn').addEventListener('click', joinRoom);
+            document.getElementById('roomCodeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') joinRoom();
+            });
+            document.getElementById('playerNameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') joinRoom();
             });
             
-            // Initialiser le canvas
-            canvas = document.getElementById('gameCanvas');
-            ctx = canvas.getContext('2d');
+            // Salle d'attente
+            document.getElementById('startGameWaitingBtn').addEventListener('click', startGame);
             
-            // Rendre le canvas responsive
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+            // Écran de jeu
+            document.getElementById('submitAnswerBtn').addEventListener('click', submitAnswer);
+            document.getElementById('answerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') submitAnswer();
+            });
+            document.getElementById('voiceToggle').addEventListener('click', toggleVoice);
+            document.querySelectorAll('.quick-answer-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('answerInput').value = this.dataset.prefix;
+                    document.getElementById('answerInput').focus();
+                });
+            });
             
-            // Mettre à jour les stats toutes les 5 secondes
-            setInterval(updateStats, 5000);
+            // Écran de résultats
+            document.getElementById('playAgainBtn').addEventListener('click', playAgain);
+            document.getElementById('backToHomeBtn').addEventListener('click', () => showScreen('homeScreen'));
+            
+            // Modal
+            document.getElementById('closeNotification').addEventListener('click', closeNotification);
+            
+            // Mise à jour du pseudo
+            document.getElementById('playerNameInput').addEventListener('input', function() {
+                gameState.playerName = this.value.trim();
+            });
         }
 
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            const width = container.clientWidth;
-            const height = Math.min(400, width * 0.5);
+        // INITIALISATION DE FIREBASE
+        function initializeFirebase() {
+            try {
+                // Vérifier si Firebase est déjà chargé
+                if (typeof firebase === 'undefined') {
+                    console.error('Firebase non chargé');
+                    showNotification('Erreur', 'Firebase non chargé. Vérifiez votre connexion.');
+                    return;
+                }
+                
+                // Initialiser Firebase
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                gameState.connected = true;
+                
+                // Mettre à jour l'indicateur de connexion
+                updateConnectionStatus(true);
+                
+                // Surveiller les statistiques globales
+                monitorGlobalStats();
+                
+                console.log('Firebase initialisé avec succès');
+            } catch (error) {
+                console.error('Erreur d\'initialisation Firebase:', error);
+                gameState.connected = false;
+                updateConnectionStatus(false);
+                showNotification('Hors ligne', 'Mode hors ligne activé. Fonctionnalités limitées.');
+            }
+        }
+
+        // GESTION DE LA VISIBILITÉ DE LA PAGE
+        function initializePageVisibility() {
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    gameState.pageHidden = true;
+                    setTimeout(() => {
+                        if (gameState.pageHidden) {
+                            document.getElementById('statusDot').classList.add('offline');
+                            document.getElementById('statusText').textContent = 'Absent';
+                        }
+                    }, 2000);
+                } else {
+                    gameState.pageHidden = false;
+                    updateConnectionStatus(gameState.connected);
+                }
+            });
+        }
+
+        // MISE À JOUR DE L'INDICATEUR DE CONNEXION
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
             
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
+            if (connected) {
+                statusDot.classList.remove('offline');
+                statusDot.style.background = '#4CAF50';
+                statusText.textContent = 'En ligne';
+            } else {
+                statusDot.classList.add('offline');
+                statusDot.style.background = '#f44336';
+                statusText.textContent = 'Hors ligne';
+            }
         }
 
-        // ================= GESTION DES ÉCRANS =================
-        function showMainScreen() {
-            hideAllScreens();
-            document.getElementById('mainScreen').style.display = 'block';
+        // SURVEILLANCE DES STATISTIQUES GLOBALES
+        function monitorGlobalStats() {
+            if (!database) return;
+            
+            const statsRef = database.ref('stats');
+            statsRef.on('value', (snapshot) => {
+                const stats = snapshot.val() || { online: 0, games: 0 };
+                document.getElementById('onlineCount').textContent = stats.online;
+                document.getElementById('gamesPlayed').textContent = stats.games;
+            });
         }
 
-        function showCreateRoom() {
-            playerName = document.getElementById('playerName').value.trim() || "Joueur";
-            if (!playerName) {
-                showNotification("⚠️ Entrez un nom de joueur");
-                return;
+        // AFFICHAGE D'UN ÉCRAN
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // CRÉATION D'UNE SALLE
+        function createRoom() {
+            // Générer un code de salle unique
+            const roomCode = generateRoomCode();
+            gameState.roomCode = roomCode;
+            gameState.isHost = true;
+            
+            // Générer un pseudo par défaut si vide
+            if (!gameState.playerName) {
+                gameState.playerName = 'Joueur_' + Math.floor(Math.random() * 1000);
             }
             
-            hideAllScreens();
-            document.getElementById('createScreen').style.display = 'block';
-        }
-
-        function showJoinRoom() {
-            playerName = document.getElementById('playerName').value.trim() || "Joueur";
-            hideAllScreens();
-            document.getElementById('joinScreen').style.display = 'block';
-            
-            // Focus sur le champ de code
-            setTimeout(() => {
-                document.getElementById('joinCode').focus();
-            }, 100);
-        }
-
-        function showJoinScreen() {
-            hideAllScreens();
-            document.getElementById('joinScreen').style.display = 'block';
-        }
-
-        function showPublicRooms() {
-            hideAllScreens();
-            document.getElementById('publicRoomsScreen').style.display = 'block';
-            loadPublicRooms();
-        }
-
-        function hideAllScreens() {
-            const screens = ['mainScreen', 'createScreen', 'roomCreatedScreen', 
-                           'joinScreen', 'publicRoomsScreen', 'gameScreen'];
-            screens.forEach(screen => {
-                document.getElementById(screen).style.display = 'none';
-            });
-        }
-
-        // ================= CRÉATION DE SALLE =================
-        function createRoom() {
-            const roomName = document.getElementById('roomName').value.trim() || "Salle de Jeu";
-            const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
-            const isPrivate = document.querySelector('input[name="visibility"]:checked').value === 'private';
-            
-            // Générer un code unique de 6 caractères
-            const roomCode = generateRoomCode();
-            currentRoomId = roomCode;
-            isHost = true;
-            
-            // Créer la salle dans Firebase
-            database.ref('rooms/' + roomCode).set({
-                name: roomName,
-                host: playerId,
-                hostName: playerName,
-                gameType: document.getElementById('gameType').value,
-                players: {
-                    [playerId]: {
-                        name: playerName,
-                        color: playerColor,
-                        score: 0,
-                        x: Math.random() * 700 + 50,
-                        y: Math.random() * 300 + 50,
-                        online: true,
-                        isHost: true,
-                        joinedAt: Date.now()
-                    }
-                },
-                maxPlayers: maxPlayers,
-                status: 'waiting',
-                isPrivate: isPrivate,
-                createdAt: Date.now()
-            }).then(() => {
-                // Afficher l'écran avec le code
-                showRoomCreatedScreen(roomCode);
-                
-                // Écouter les joueurs qui rejoignent
-                listenToRoom(roomCode);
-                
-                showNotification("✅ Salle créée avec succès!");
-            }).catch(error => {
-                showNotification("❌ Erreur: " + error.message);
-            });
-        }
-
-        function showRoomCreatedScreen(roomCode) {
-            hideAllScreens();
-            document.getElementById('roomCreatedScreen').style.display = 'block';
+            // Afficher le code de la salle
             document.getElementById('roomCode').textContent = roomCode;
+            document.getElementById('waitingRoomCode').textContent = roomCode;
             
-            // Mettre à jour la liste des joueurs
-            updatePlayersList();
+            // Réinitialiser les paramètres
+            selectQuestionCount(10);
+            
+            // Initialiser la liste des joueurs
+            updatePlayerList([{ id: gameState.playerId, name: gameState.playerName, score: 0, isHost: true }], 'playersListCreate');
+            updatePlayerList([{ id: gameState.playerId, name: gameState.playerName, score: 0, isHost: true }], 'playersListWaiting');
+            
+            // Activer le bouton de démarrage
+            document.getElementById('startGameBtn').disabled = false;
+            
+            // Sauvegarder la salle dans Firebase
+            saveRoomToFirebase(roomCode);
+            
+            // Afficher l'écran de création
+            showScreen('createScreen');
         }
 
+        // GÉNÉRATION D'UN CODE DE SALLE UNIQUE
         function generateRoomCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
@@ -842,651 +1546,648 @@
             return code;
         }
 
-        // ================= REJOINDRE UNE SALLE =================
-        function joinRoom() {
-            const roomCode = document.getElementById('joinCode').value.trim().toUpperCase();
+        // SAUVEGARDE DE LA SALLE DANS FIREBASE
+        function saveRoomToFirebase(roomCode) {
+            if (!database) return;
             
-            if (!roomCode || roomCode.length !== 6) {
-                showNotification("⚠️ Entrez un code de 6 caractères");
+            const roomRef = database.ref('rooms/' + roomCode);
+            const roomData = {
+                code: roomCode,
+                hostId: gameState.playerId,
+                hostName: gameState.playerName,
+                status: 'waiting',
+                questionCount: gameState.selectedQuestions,
+                players: {
+                    [gameState.playerId]: {
+                        name: gameState.playerName,
+                        score: 0,
+                        isHost: true,
+                        connected: true
+                    }
+                },
+                createdAt: Date.now(),
+                currentQuestion: 0,
+                gameStarted: false
+            };
+            
+            roomRef.set(roomData);
+            
+            // Écouter les changements dans la salle
+            roomRef.on('value', (snapshot) => handleRoomUpdates(snapshot));
+            
+            // Nettoyer la salle en cas de déconnexion
+            window.addEventListener('beforeunload', () => {
+                if (gameState.isHost) {
+                    roomRef.remove();
+                } else {
+                    roomRef.child('players/' + gameState.playerId).remove();
+                }
+            });
+        }
+
+        // GESTION DES MISES À JOUR DE LA SALLE
+        function handleRoomUpdates(snapshot) {
+            if (!snapshot.exists()) {
+                showNotification('Salle fermée', 'L\'hôte a fermé la salle.');
+                showScreen('homeScreen');
                 return;
             }
             
-            currentRoomId = roomCode;
-            isHost = false;
+            const roomData = snapshot.val();
+            const players = Object.entries(roomData.players || {}).map(([id, player]) => ({
+                id,
+                name: player.name,
+                score: player.score || 0,
+                isHost: player.isHost || false
+            }));
+            
+            // Mettre à jour le nombre de joueurs
+            const playerCount = players.length;
+            document.getElementById('playerCountCreate').textContent = playerCount;
+            document.getElementById('playerCountWaiting').textContent = playerCount;
+            
+            // Mettre à jour la liste des joueurs
+            updatePlayerList(players, 'playersListCreate');
+            updatePlayerList(players, 'playersListWaiting');
+            
+            // Si le jeu a démarré
+            if (roomData.gameStarted && !gameState.questions.length) {
+                initializeGame(roomData);
+            }
+            
+            // Si c'est une nouvelle question
+            if (roomData.currentQuestion > gameState.currentQuestion) {
+                loadQuestion(roomData.currentQuestion, roomData.questions);
+            }
+        }
+
+        // COPIE DU CODE DE LA SALLE
+        function copyRoomCode() {
+            const code = document.getElementById('roomCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('Code copié', 'Le code a été copié dans le presse-papier !');
+            }).catch(err => {
+                console.error('Erreur de copie:', err);
+            });
+        }
+
+        // SÉLECTION DU NOMBRE DE QUESTIONS
+        function selectQuestionCount(count) {
+            gameState.selectedQuestions = count;
+            
+            // Mettre à jour l'affichage
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('selectedCountWaiting').textContent = count;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.count-btn').forEach(btn => {
+                if (parseInt(btn.dataset.count) === count) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+            
+            // Mettre à jour Firebase si hôte
+            if (gameState.isHost && gameState.roomCode && database) {
+                database.ref('rooms/' + gameState.roomCode + '/questionCount').set(count);
+            }
+        }
+
+        // AFFICHAGE DE L'ÉCRAN DE REJOINDRE
+        function showJoinScreen() {
+            showScreen('joinScreen');
+            document.getElementById('roomCodeInput').focus();
+        }
+
+        // REJOINDRE UNE SALLE
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            
+            // Validation
+            if (!roomCode || roomCode.length !== 6) {
+                showError('Veuillez entrer un code de salle valide (6 caractères)');
+                return;
+            }
+            
+            if (!playerName) {
+                showError('Veuillez entrer votre pseudo');
+                return;
+            }
+            
+            gameState.roomCode = roomCode;
+            gameState.playerName = playerName;
+            gameState.isHost = false;
             
             // Vérifier si la salle existe
-            database.ref('rooms/' + roomCode).once('value').then((snapshot) => {
-                const room = snapshot.val();
-                
-                if (!room) {
-                    showNotification("❌ Code incorrect. Aucune salle trouvée.");
+            if (!database) {
+                showError('Erreur de connexion. Veuillez réessayer.');
+                return;
+            }
+            
+            const roomRef = database.ref('rooms/' + roomCode);
+            roomRef.once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    showError('Code de salle invalide');
                     return;
                 }
                 
-                if (room.status !== 'waiting') {
-                    showNotification("❌ La partie est déjà en cours ou terminée.");
+                const roomData = snapshot.val();
+                
+                // Vérifier si la partie a déjà commencé
+                if (roomData.gameStarted) {
+                    showError('La partie a déjà commencé');
                     return;
                 }
                 
-                const playerCount = room.players ? Object.keys(room.players).length : 0;
-                if (playerCount >= room.maxPlayers) {
-                    showNotification("❌ La salle est pleine (" + playerCount + "/" + room.maxPlayers + ")");
+                // Vérifier le nombre maximum de joueurs
+                const playerCount = Object.keys(roomData.players || {}).length;
+                if (playerCount >= 10) {
+                    showError('La salle est pleine (10 joueurs maximum)');
                     return;
                 }
                 
                 // Rejoindre la salle
-                database.ref('rooms/' + roomCode + '/players/' + playerId).set({
-                    name: playerName,
-                    color: playerColor,
-                    score: 0,
-                    x: Math.random() * 700 + 50,
-                    y: Math.random() * 300 + 50,
-                    online: true,
-                    isHost: false,
-                    joinedAt: Date.now()
-                }).then(() => {
-                    // Écouter les changements dans la salle
-                    listenToRoom(roomCode);
-                    
-                    // Afficher l'écran d'attente
-                    showRoomCreatedScreen(roomCode);
-                    showNotification("✅ Connecté à la salle " + roomCode);
-                });
+                joinRoomInFirebase(roomCode, playerName);
                 
             }).catch(error => {
-                showNotification("❌ Erreur: " + error.message);
+                console.error('Erreur:', error);
+                showError('Erreur de connexion au serveur');
             });
         }
 
-        function loadPublicRooms() {
-            database.ref('rooms').on('value', (snapshot) => {
-                const rooms = snapshot.val();
-                const roomsList = document.getElementById('publicRoomsList');
-                roomsList.innerHTML = '';
-                
-                if (!rooms) {
-                    roomsList.innerHTML = '<p style="text-align: center; padding: 30px; color: #aaa;">Aucune salle publique disponible</p>';
-                    return;
-                }
-                
-                let publicRoomsCount = 0;
-                
-                for (let roomCode in rooms) {
-                    const room = rooms[roomCode];
-                    
-                    // Afficher seulement les salles publiques en attente
-                    if (!room.isPrivate && room.status === 'waiting') {
-                        const playerCount = room.players ? Object.keys(room.players).length : 0;
-                        
-                        if (playerCount < room.maxPlayers) {
-                            publicRoomsCount++;
-                            
-                            const roomElement = document.createElement('div');
-                            roomElement.className = 'player-item';
-                            roomElement.style.cursor = 'pointer';
-                            roomElement.onclick = function() {
-                                document.getElementById('joinCode').value = roomCode;
-                                showJoinScreen();
-                            };
-                            
-                            roomElement.innerHTML = `
-                                <div style="flex: 1;">
-                                    <div class="player-name">${room.name}</div>
-                                    <div style="font-size: 12px; color: #aaa;">
-                                        <i class="fas fa-user"></i> ${playerCount}/${room.maxPlayers} joueurs
-                                        <span style="margin-left: 15px;">${room.gameType}</span>
-                                    </div>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 18px; font-weight: bold; color: #00dbde;">${roomCode}</div>
-                                    <div style="font-size: 12px; color: #aaa;">Code</div>
-                                </div>
-                            `;
-                            
-                            roomsList.appendChild(roomElement);
-                        }
-                    }
-                }
-                
-                if (publicRoomsCount === 0) {
-                    roomsList.innerHTML = '<p style="text-align: center; padding: 30px; color: #aaa;">Aucune salle publique disponible</p>';
-                }
+        // REJOINDRE UNE SALLE DANS FIREBASE
+        function joinRoomInFirebase(roomCode, playerName) {
+            const roomRef = database.ref('rooms/' + roomCode);
+            const playerData = {
+                name: playerName,
+                score: 0,
+                isHost: false,
+                connected: true
+            };
+            
+            roomRef.child('players/' + gameState.playerId).set(playerData);
+            
+            // Écouter les mises à jour de la salle
+            roomRef.on('value', (snapshot) => handleRoomUpdates(snapshot));
+            
+            // Afficher l'écran d'attente
+            document.getElementById('waitingRoomCode').textContent = roomCode;
+            document.getElementById('selectedCountWaiting').textContent = snapshot.val().questionCount || 10;
+            document.getElementById('hostControls').style.display = 'none';
+            document.getElementById('waitingMessage').style.display = 'block';
+            
+            showScreen('waitingScreen');
+            
+            // Nettoyer en cas de déconnexion
+            window.addEventListener('beforeunload', () => {
+                roomRef.child('players/' + gameState.playerId).remove();
             });
         }
 
-        // ================= GESTION DE LA SALLE =================
-        function listenToRoom(roomCode) {
-            // Écouter les changements dans la salle
-            database.ref('rooms/' + roomCode).on('value', (snapshot) => {
-                const room = snapshot.val();
-                
-                if (!room) {
-                    showNotification("La salle a été supprimée");
-                    leaveRoom();
-                    return;
-                }
-                
-                // Mettre à jour la liste des joueurs
-                updatePlayersList(room.players);
-                
-                // Mettre à jour le bouton démarrer
-                const playerCount = room.players ? Object.keys(room.players).length : 0;
-                const startBtn = document.getElementById('startGameBtn');
-                
-                if (isHost && playerCount >= 2) {
-                    startBtn.style.display = 'block';
-                    startBtn.innerHTML = `<i class="fas fa-play"></i> Démarrer la Partie (${playerCount}/${room.maxPlayers})`;
-                } else {
-                    startBtn.style.display = 'none';
-                }
-                
-                // Si le jeu démarre
-                if (room.status === 'playing' && !gameActive) {
-                    gameActive = true;
-                    startGame();
-                }
-            });
+        // AFFICHAGE D'UNE ERREUR
+        function showError(message) {
+            const errorDiv = document.getElementById('joinError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
         }
 
-        function updatePlayersList(players = {}) {
-            const container = document.getElementById('playersContainer');
+        // MISE À JOUR DE LA LISTE DES JOUEURS
+        function updatePlayerList(players, listId) {
+            const container = document.getElementById(listId);
             if (!container) return;
             
             container.innerHTML = '';
             
-            let playerCount = 0;
-            
-            for (let id in players) {
-                const player = players[id];
-                playerCount++;
+            players.forEach((player, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player';
+                if (player.isHost) playerDiv.classList.add('host');
+                if (player.id === gameState.playerId) playerDiv.classList.add('current');
                 
-  const playerElement = document.createElement('div');
-                playerElement.className = 'player-item';
-                playerElement.innerHTML = `
-                    <div class="player-color" style="background-color: ${player.color};"></div>
-                    <div class="player-name">
-                        ${player.name} ${id === playerId ? '(Vous)' : ''}
-                        ${player.isHost ? ' 👑' : ''}
-                    </div>
-                    <div class="player-status status-online">
-                        ${player.score} pts
-                    </div>
+                playerDiv.innerHTML = `
+                    ${player.isHost ? '<i class="fas fa-crown"></i>' : '<i class="fas fa-user"></i>'}
+                    <span>${player.name}</span>
+                    ${listId.includes('Waiting') || listId.includes('Create') ? '' : `<span class="score">${player.score} pts</span>`}
                 `;
                 
-                container.appendChild(playerElement);
-            }
+                container.appendChild(playerDiv);
+            });
+        }
+
+        // DÉMARRER LA PARTIE
+        function startGame() {
+            if (!gameState.isHost) return;
             
-            // Mettre à jour le compteur
-            const waitingTitle = document.querySelector('#waitingPlayers h3');
-            if (waitingTitle) {
-                const roomRef = database.ref('rooms/' + currentRoomId);
-                roomRef.once('value').then((snapshot) => {
-                    const room = snapshot.val();
-                    if (room) {
-                        waitingTitle.innerHTML = `<i class="fas fa-users"></i> Joueurs en attente (${playerCount}/${room.maxPlayers})`;
-                    }
+            // Générer les questions
+            const questions = generateQuestions(gameState.selectedQuestions);
+            gameState.questions = questions;
+            
+            // Mettre à jour Firebase
+            if (database && gameState.roomCode) {
+                const roomRef = database.ref('rooms/' + gameState.roomCode);
+                roomRef.update({
+                    gameStarted: true,
+                    questions: questions,
+                    currentQuestion: 1,
+                    startTime: Date.now()
+                }).then(() => {
+                    // Initialiser le jeu pour l'hôte
+                    initializeGame({
+                        questions: questions,
+                        questionCount: gameState.selectedQuestions,
+                        currentQuestion: 1
+                    });
                 });
             }
         }
 
-        function startGame() {
-            if (!currentRoomId || !isHost) return;
+        // GÉNÉRATION DES QUESTIONS
+        function generateQuestions(count) {
+            const allQuestions = [];
             
-            // Changer le statut de la salle
-            database.ref('rooms/' + currentRoomId).update({
-                status: 'playing',
-                gameStartTime: Date.now()
-            }).then(() => {
-                showNotification("🎮 La partie commence !");
-                hideAllScreens();
-                document.getElementById('gameScreen').style.display = 'block';
-                
-                // Initialiser le jeu
-                initializeGame();
-                
-                // Démarrer le timer
-                startGameTimer();
-                
-                // Démarrer la boucle de jeu
-                gameLoop();
-            });
+            // Récupérer toutes les questions disponibles
+            for (const [prefix, questions] of Object.entries(questionsDatabase)) {
+                questions.forEach(q => {
+                    allQuestions.push({
+                        prefix: prefix,
+                        word: q.word,
+                        hint: q.hint
+                    });
+                });
+            }
+            
+            // Mélanger les questions
+            const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+            
+            // Sélectionner le nombre demandé
+            return shuffled.slice(0, count).map((q, index) => ({
+                ...q,
+                number: index + 1
+            }));
         }
 
-        // ================= JEU EN TEMPS RÉEL =================
-        function initializeGame() {
-            // Initialiser le canvas
-            canvas.width = 800;
-            canvas.height = 400;
+        // INITIALISATION DU JEU
+        function initializeGame(roomData) {
+            gameState.questions = roomData.questions || [];
+            gameState.selectedQuestions = roomData.questionCount || 10;
+            gameState.currentQuestion = roomData.currentQuestion || 1;
+            gameState.score = 0;
             
             // Mettre à jour l'affichage
-            document.getElementById('currentRoomCode').textContent = currentRoomId;
-            document.getElementById('gameStatus').textContent = "Partie en cours";
+            document.getElementById('totalQuestions').textContent = gameState.selectedQuestions;
+            document.getElementById('playerScore').textContent = '0';
             
-            // Écouter les positions des joueurs
-            database.ref('rooms/' + currentRoomId + '/players').on('value', (snapshot) => {
-                const players = snapshot.val();
-                if (players) {
-                    updateGamePlayersList(players);
-                    drawGamePlayers(players);
-                }
-            });
+            // Afficher l'écran de jeu
+            showScreen('gameScreen');
             
-            // Écouter les événements du jeu
-            database.ref('rooms/' + currentRoomId + '/gameEvents').on('child_added', (snapshot) => {
-                const event = snapshot.val();
-                handleGameEvent(event);
-            });
+            // Charger la première question
+            loadQuestion(gameState.currentQuestion, gameState.questions);
+            
+            // Mettre à jour le classement
+            updateScoreboard();
         }
 
-        function gameLoop() {
-            if (!gameActive) return;
+        // CHARGEMENT D'UNE QUESTION
+        function loadQuestion(questionNumber, questions) {
+            const question = questions[questionNumber - 1];
+            if (!question) return;
             
-            // Effacer le canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            gameState.currentQuestion = questionNumber;
+            gameState.timeLeft = 12;
             
-            // Dessiner l'arrière-plan
-            drawGameBackground();
+            // Mettre à jour l'affichage
+            document.getElementById('currentQuestion').textContent = questionNumber;
+            document.getElementById('lexicalPrefix').textContent = question.prefix;
+            document.getElementById('questionText').textContent = `Trouvez un mot qui commence par "${question.prefix}"`;
+            document.getElementById('questionHint').textContent = question.hint;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('timer').textContent = '12';
             
-            // Dessiner tous les joueurs (sera fait dans drawGamePlayers via l'écouteur)
-            
-            // Continuer la boucle
-            requestAnimationFrame(gameLoop);
-        }
-
-        function drawGameBackground() {
-            // Dégradé de fond
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#1a1a2e');
-            gradient.addColorStop(1, '#16213e');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Grille
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
-            
-            for (let x = 0; x < canvas.width; x += 50) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
+            // Réinitialiser le timer visuel
+            const timerCircle = document.querySelector('.timer-fg');
+            if (timerCircle) {
+                timerCircle.style.strokeDashoffset = '169.56';
+                timerCircle.style.animation = 'none';
+                setTimeout(() => {
+                    timerCircle.style.animation = 'timerProgress 12s linear forwards';
+                }, 10);
             }
             
-            for (let y = 0; y < canvas.height; y += 50) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
+            // Lancer le timer
+            startTimer();
             
-            // Centre du jeu
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        function drawGamePlayers(players) {
-            for (let id in players) {
-                const player = players[id];
-                if (!player.online) continue;
-                
-                // Corps du joueur
-                ctx.fillStyle = player.color;
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, 20, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Bordure
-                ctx.strokeStyle = id === playerId ? '#00ff00' : '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, 23, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Nom
-                ctx.fillStyle = 'white';
-                ctx.font = '14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(player.name, player.x, player.y - 30);
-                
-                // Score
-                ctx.fillStyle = 'yellow';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText(player.score.toString(), player.x, player.y + 5);
+            // Annoncer la question vocalement
+            if (gameState.voiceEnabled) {
+                announceQuestion(question.prefix);
             }
         }
 
-        function updateGamePlayersList(players) {
-            const container = document.getElementById('gamePlayersList');
-            if (!container) return;
-            
-            // Trier par score
-            const sortedPlayers = Object.entries(players)
-                .sort((a, b) => b[1].score - a[1].score);
-            
-            container.innerHTML = '<h4><i class="fas fa-trophy"></i> Classement en direct</h4>';
-            
-            sortedPlayers.forEach(([id, player], index) => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player-item';
-                playerElement.style.background = id === playerId ? 'rgba(0, 219, 222, 0.2)' : '';
+        // ANNONCE VOCALE DE LA QUESTION
+        function announceQuestion(prefix) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = `Champ lexical avec ${prefix}. Trouvez un mot qui commence par ${prefix}`;
+                utterance.lang = 'fr-FR';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
                 
-                playerElement.innerHTML = `
-                    <div style="font-size: 20px; font-weight: bold; width: 40px; text-align: center;">
-                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1)}
-                    </div>
-                    <div class="player-color" style="background-color: ${player.color};"></div>
-                    <div class="player-name">
-                        ${player.name} ${id === playerId ? '(Vous)' : ''}
-                    </div>
-                    <div style="font-size: 20px; font-weight: bold; color: #ffd700;">
-                        ${player.score}
-                    </div>
-                `;
-                
-                container.appendChild(playerElement);
-            });
-            
-            // Mettre à jour les stats
-            document.getElementById('totalPlayers').textContent = sortedPlayers.length;
-            document.getElementById('playerScore').textContent = players[playerId]?.score || 0;
-        }
-
-        function movePlayer(direction) {
-            if (!currentRoomId || !playerId || !gameActive) return;
-            
-            database.ref('rooms/' + currentRoomId + '/players/' + playerId).once('value').then((snapshot) => {
-                const player = snapshot.val();
-                if (!player) return;
-                
-                let newX = player.x;
-                let newY = player.y;
-                const moveAmount = 10;
-                
-                switch(direction) {
-                    case 'up': newY -= moveAmount; break;
-                    case 'down': newY += moveAmount; break;
-                    case 'left': newX -= moveAmount; break;
-                    case 'right': newX += moveAmount; break;
-                }
-                
-                // Limites du canvas
-                newX = Math.max(20, Math.min(canvas.width - 20, newX));
-                newY = Math.max(20, Math.min(canvas.height - 20, newY));
-                
-                // Mettre à jour la position
-                database.ref('rooms/' + currentRoomId + '/players/' + playerId).update({
-                    x: newX,
-                    y: newY,
-                    lastMove: Date.now()
-                });
-                
-                // Vérifier les collisions (exemple: gagner des points)
-                checkCollisions(newX, newY);
-            });
-        }
-
-        function checkCollisions(x, y) {
-            // Exemple simple: gagner des points en touchant le centre
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-            
-            if (distance < 70) {
-                // Ajouter un point
-                database.ref('rooms/' + currentRoomId + '/players/' + playerId).once('value').then((snapshot) => {
-                    const player = snapshot.val();
-                    const newScore = (player.score || 0) + 1;
-                    
-                    database.ref('rooms/' + currentRoomId + '/players/' + playerId).update({
-                        score: newScore
-                    });
-                    
-                    // Créer un événement de jeu
-                    database.ref('rooms/' + currentRoomId + '/gameEvents').push({
-                        type: 'score',
-                        playerId: playerId,
-                        playerName: playerName,
-                        points: 1,
-                        timestamp: Date.now()
-                    });
-                });
+                speechSynthesis.speak(utterance);
             }
         }
 
-        function handleGameEvent(event) {
-            switch(event.type) {
-                case 'score':
-                    showNotification(`🏆 ${event.playerName} a gagné 1 point!`);
-                    break;
-            }
-        }
-
-        function startGameTimer() {
-            clearInterval(gameTimerInterval);
-            gameStartTime = Date.now();
+        // LANCEMENT DU TIMER
+        function startTimer() {
+            clearInterval(gameState.timer);
             
-            gameTimerInterval = setInterval(() => {
-                const elapsed = Date.now() - gameStartTime;
-                const minutes = Math.floor(elapsed / 60000);
-                const seconds = Math.floor((elapsed % 60000) / 1000);
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
                 
-                document.getElementById('gameTime').textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                // Arrêter après 5 minutes (exemple)
-                if (elapsed > 5 * 60 * 1000) {
-                    endGame();
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    handleTimeUp();
                 }
             }, 1000);
         }
 
-        function endGame() {
-            if (!currentRoomId) return;
+        // GESTION DU TEMPS ÉCOULÉ
+        function handleTimeUp() {
+            // Passer à la question suivante
+            if (gameState.currentQuestion < gameState.selectedQuestions) {
+                nextQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        // SOUMISSION D'UNE RÉPONSE
+        function submitAnswer() {
+            const answerInput = document.getElementById('answerInput');
+            const answer = answerInput.value.trim();
             
-            gameActive = false;
-            clearInterval(gameTimerInterval);
+            if (!answer) return;
             
-            // Déterminer le gagnant
-            database.ref('rooms/' + currentRoomId + '/players').once('value').then((snapshot) => {
-                const players = snapshot.val();
-                let winner = null;
-                let maxScore = -1;
+            // Vérifier la réponse
+            const currentQuestion = gameState.questions[gameState.currentQuestion - 1];
+            const isCorrect = answer.toLowerCase().startsWith(currentQuestion.prefix.toLowerCase());
+            
+            if (isCorrect) {
+                // Le joueur gagne 10 points
+                gameState.score += 10;
                 
-                for (let id in players) {
-                    if (players[id].score > maxScore) {
-                        maxScore = players[id].score;
-                        winner = players[id];
+                // Mettre à jour le score
+                updateScoreInFirebase();
+                updateScoreboard();
+                
+                // Afficher une notification
+                showGameNotification('Bonne réponse ! +10 points', 'correct');
+                
+                // Passer à la question suivante
+                setTimeout(() => {
+                    if (gameState.currentQuestion < gameState.selectedQuestions) {
+                        nextQuestion();
+                    } else {
+                        endGame();
                     }
-                }
-                
-                if (winner) {
-                    showNotification(`🎉 ${winner.name} gagne la partie avec ${winner.score} points!`);
-                }
-                
-                // Mettre à jour le statut de la salle
-                database.ref('rooms/' + currentRoomId).update({
-                    status: 'finished',
-                    endedAt: Date.now(),
-                    winner: winner?.name
+                }, 1000);
+            } else {
+                // Mauvaise réponse
+                showGameNotification('Mauvaise réponse', 'wrong');
+                answerInput.value = '';
+                answerInput.focus();
+            }
+        }
+
+        // MISE À JOUR DU SCORE DANS FIREBASE
+        function updateScoreInFirebase() {
+            if (!database || !gameState.roomCode) return;
+            
+            const playerRef = database.ref(`rooms/${gameState.roomCode}/players/${gameState.playerId}/score`);
+            playerRef.set(gameState.score);
+        }
+
+        // MISE À JOUR DU CLASSEMENT
+        function updateScoreboard() {
+            if (!database || !gameState.roomCode) return;
+            
+            const roomRef = database.ref('rooms/' + gameState.roomCode);
+            roomRef.child('players').once('value').then((snapshot) => {
+                const players = [];
+                snapshot.forEach((childSnapshot) => {
+                    const player = childSnapshot.val();
+                    players.push({
+                        id: childSnapshot.key,
+                        name: player.name,
+                        score: player.score || 0,
+                        isHost: player.isHost || false
+                    });
                 });
+                
+                // Trier par score décroissant
+                players.sort((a, b) => b.score - a.score);
+                
+                // Mettre à jour l'affichage
+                const scoreboard = document.getElementById('scoreboard');
+                scoreboard.innerHTML = '';
+                
+                players.forEach((player, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'scoreboard-item';
+                    if (player.id === gameState.playerId) item.classList.add('current');
+                    if (index === 0) item.classList.add('leading');
+                    
+                    item.innerHTML = `
+                        <div class="player-rank">${index + 1}</div>
+                        <div class="player-name">${player.name} ${player.isHost ? '👑' : ''}</div>
+                        <div class="player-score">${player.score} pts</div>
+                    `;
+                    
+                    scoreboard.appendChild(item);
+                });
+                
+                // Mettre à jour le score du joueur
+                document.getElementById('playerScore').textContent = gameState.score;
             });
         }
 
-        // ================= FONCTIONS UTILITAIRES =================
-        function copyRoomCode() {
-            const code = document.getElementById('roomCode').textContent;
-            navigator.clipboard.writeText(code)
-                .then(() => showNotification("✅ Code copié dans le presse-papier!"))
-                .catch(() => {
-                    // Fallback pour anciens navigateurs
-                    const textArea = document.createElement('textarea');
-                    textArea.value = code;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showNotification("✅ Code copié!");
-                });
+        // QUESTION SUIVANTE
+        function nextQuestion() {
+            const nextQuestionNumber = gameState.currentQuestion + 1;
+            
+            // Mettre à jour dans Firebase
+            if (database && gameState.roomCode) {
+                database.ref('rooms/' + gameState.roomCode + '/currentQuestion').set(nextQuestionNumber);
+            }
         }
 
-        function shareRoomCode() {
-            const code = document.getElementById('roomCode').textContent;
-            const gameType = document.getElementById('gameType').options[document.getElementById('gameType').selectedIndex].text;
+        // FIN DE LA PARTIE
+        function endGame() {
+            clearInterval(gameState.timer);
             
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Rejoins ma partie multijoueur!',
-                    text: `Rejoins ma partie ${gameType}. Code: ${code}`,
-                    url: window.location.href
-                }).then(() => {
-                    showNotification("✅ Partage réussi!");
-                }).catch((error) => {
-                    console.log('Erreur de partage:', error);
+            // Récupérer les scores finaux
+            if (database && gameState.roomCode) {
+                const roomRef = database.ref('rooms/' + gameState.roomCode);
+                roomRef.child('players').once('value').then((snapshot) => {
+                    const players = [];
+                    snapshot.forEach((childSnapshot) => {
+                        const player = childSnapshot.val();
+                        players.push({
+                            name: player.name,
+                            score: player.score || 0,
+                            isHost: player.isHost || false
+                        });
+                    });
+                    
+                    // Trier par score
+                    players.sort((a, b) => b.score - a.score);
+                    
+                    // Afficher les résultats
+                    showResults(players);
                 });
             } else {
-                // Fallback: copier dans le presse-papier
-                const shareText = `Rejoins ma partie ${gameType}! Code: ${code}\nLien: ${window.location.href}`;
-                navigator.clipboard.writeText(shareText)
-                    .then(() => showNotification("✅ Lien copié! Partagez-le avec vos amis."));
+                // Mode hors ligne
+                showResults([{
+                    name: gameState.playerName,
+                    score: gameState.score,
+                    isHost: gameState.isHost
+                }]);
             }
         }
 
+        // AFFICHAGE DES RÉSULTATS
+        function showResults(players) {
+            // Mettre à jour les informations
+            document.getElementById('totalQuestionsPlayed').textContent = gameState.selectedQuestions;
+            document.getElementById('totalPlayers').textContent = players.length;
+            
+            // Déterminer le gagnant
+            const winner = players[0];
+            document.getElementById('winnerName').textContent = winner.name;
+            document.getElementById('winnerScore').textContent = winner.score + ' pts';
+            
+            // Mettre à jour le classement final
+            const finalScoreboard = document.getElementById('finalScoreboard');
+            finalScoreboard.innerHTML = '';
+            
+            players.forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = 'scoreboard-item';
+                if (player.name === winner.name) item.classList.add('leading');
+                
+                item.innerHTML = `
+                    <div class="player-rank">${index + 1}</div>
+                    <div class="player-name">${player.name} ${player.isHost ? '👑' : ''}</div>
+                    <div class="player-score">${player.score} pts</div>
+                `;
+                
+                finalScoreboard.appendChild(item);
+            });
+            
+            // Afficher l'écran de résultats
+            showScreen('resultsScreen');
+        }
+
+        // QUITTER UNE SALLE
         function leaveRoom() {
-            if (currentRoomId && playerId) {
-                // Retirer le joueur de la salle
-                database.ref('rooms/' + currentRoomId + '/players/' + playerId).remove().then(() => {
-                    // Vérifier si la salle est vide
-                    database.ref('rooms/' + currentRoomId + '/players').once('value').then((snapshot) => {
-                        if (!snapshot.exists() || snapshot.numChildren() === 0) {
-                            // Supprimer la salle si vide
-                            database.ref('rooms/' + currentRoomId).remove();
-                        }
-                    });
-                });
+            if (database && gameState.roomCode) {
+                if (gameState.isHost) {
+                    // L'hôte supprime la salle
+                    database.ref('rooms/' + gameState.roomCode).remove();
+                } else {
+                    // Un joueur se retire
+                    database.ref(`rooms/${gameState.roomCode}/players/${gameState.playerId}`).remove();
+                }
             }
             
-            resetGame();
-            showMainScreen();
-            showNotification("👋 Vous avez quitté la salle");
-        }
-
-        function quitGame() {
-            leaveRoom();
-        }
-
-        function resetGame() {
-            gameActive = false;
-            currentRoomId = null;
-            isHost = false;
-            clearInterval(gameTimerInterval);
+            // Réinitialiser l'état
+            gameState.roomCode = null;
+            gameState.isHost = false;
+            gameState.questions = [];
             
-            // Arrêter les écouteurs Firebase
-            if (currentRoomId) {
-                database.ref('rooms/' + currentRoomId).off();
-                database.ref('rooms/' + currentRoomId + '/players').off();
-                database.ref('rooms/' + currentRoomId + '/gameEvents').off();
+            // Retour à l'accueil
+            showScreen('homeScreen');
+        }
+
+        // REJOUER
+        function playAgain() {
+            if (gameState.isHost) {
+                // L'hôte peut relancer une partie
+                showScreen('createScreen');
+            } else {
+                // Les autres joueurs retournent à l'accueil
+                leaveRoom();
+                showScreen('homeScreen');
             }
         }
 
-        function updateOnlineStatus() {
-            if (!playerId) return;
+        // ACTIVATION/DÉSACTIVATION DE LA VOIX
+        function toggleVoice() {
+            gameState.voiceEnabled = !gameState.voiceEnabled;
+            const voiceToggle = document.getElementById('voiceToggle');
+            const icon = voiceToggle.querySelector('i');
             
-            // Mettre à jour le statut en ligne
-            database.ref('online/' + playerId).set({
-                name: playerName,
-                lastSeen: Date.now(),
-                color: playerColor
-            });
-            
-            // Nettoyer quand le joueur quitte
-            window.addEventListener('beforeunload', () => {
-                if (playerId) {
-                    database.ref('online/' + playerId).remove();
-                }
-                if (currentRoomId && playerId) {
-                    database.ref('rooms/' + currentRoomId + '/players/' + playerId).update({
-                        online: false
-                    });
-                }
-            });
+            if (gameState.voiceEnabled) {
+                voiceToggle.classList.remove('muted');
+                icon.className = 'fas fa-volume-up';
+            } else {
+                voiceToggle.classList.add('muted');
+                icon.className = 'fas fa-volume-mute';
+            }
         }
 
-        function updateStats() {
-            // Compter les joueurs en ligne
-            database.ref('online').once('value').then((snapshot) => {
-                const online = snapshot.val();
-                const count = online ? Object.keys(online).length : 0;
-                document.getElementById('onlineCount').textContent = count;
-            });
-            
-            // Compter les salles actives
-            database.ref('rooms').once('value').then((snapshot) => {
-                const rooms = snapshot.val();
-                let activeCount = 0;
-                
-                if (rooms) {
-                    for (let roomId in rooms) {
-                        if (rooms[roomId].status === 'waiting' || rooms[roomId].status === 'playing') {
-                            activeCount++;
-                        }
-                    }
-                }
-                
-                document.getElementById('activeRoomsCount').textContent = activeCount;
-            });
-        }
-
-        function showNotification(message) {
-            const notification = document.getElementById('notification');
+        // AFFICHER UNE NOTIFICATION DE JEU
+        function showGameNotification(message, type) {
+            const notifications = document.querySelector('.game-notifications');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
             notification.textContent = message;
-            notification.style.display = 'block';
+            
+            notifications.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.display = 'none';
+                notification.remove();
             }, 3000);
         }
 
-        // ================= CONTROLES CLAVIER =================
-        document.addEventListener('keydown', (e) => {
-            if (!gameActive) return;
-            
-            switch(e.key) {
-                case 'ArrowUp': case 'w': case 'W': 
-                    movePlayer('up'); 
-                    break;
-                case 'ArrowDown': case 's': case 'S': 
-                    movePlayer('down'); 
-                    break;
-                case 'ArrowLeft': case 'a': case 'A': 
-                    movePlayer('left'); 
-                    break;
-                case 'ArrowRight': case 'd': case 'D': 
-                    movePlayer('right'); 
-                    break;
-            }
-        });
+        // AFFICHER UNE NOTIFICATION MODALE
+        function showNotification(title, message) {
+            document.getElementById('notificationTitle').textContent = title;
+            document.getElementById('notificationMessage').textContent = message;
+            document.getElementById('notificationModal').classList.add('active');
+        }
 
-        // ================= INITIALISATION AUTO =================
-        // Vérifier si un code est présent dans l'URL
-        window.addEventListener('load', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const roomCodeFromUrl = urlParams.get('code');
+        // FERMER LA NOTIFICATION MODALE
+        function closeNotification() {
+            document.getElementById('notificationModal').classList.remove('active');
+        }
+
+        // AJOUTER UN JOUEUR
+        function addPlayerToRoom(roomCode, playerName, isHost = false) {
+            if (!database) return;
             
-            if (roomCodeFromUrl) {
-                document.getElementById('joinCode').value = roomCodeFromUrl.toUpperCase();
-                showJoinRoom();
-            }
+            const playerData = {
+                name: playerName,
+                score: 0,
+                isHost: isHost,
+                connected: true,
+                joinedAt: Date.now()
+            };
             
-            // Mettre à jour le nom du joueur avec un nom aléatoire si vide
-            if (!document.getElementById('playerName').value) {
-                const randomNames = ['GamerPro', 'Ninja', 'Champion', 'Warrior', 'Master', 'Hero', 'Legend', 'Star'];
-                const randomName = randomNames[Math.floor(Math.random() * randomNames.length)] + Math.floor(Math.random() * 100);
-                document.getElementById('playerName').value = randomName;
-                playerName = randomName;
-            }
-        });
+            database.ref(`rooms/${roomCode}/players/${gameState.playerId}`).set(playerData);
+        }
+
+        // SUPPRIMER UN JOUEUR
+        function removePlayerFromRoom(roomCode) {
+            if (!database || !roomCode) return;
+            
+            database.ref(`rooms/${roomCode}/players/${gameState.playerId}`).remove();
+        }
     </script>
 </body>
 </html>
