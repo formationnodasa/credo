@@ -76,6 +76,7 @@
         
         input[type="text"],
         input[type="email"],
+        input[type="tel"],
         select {
             width: 100%;
             padding: 12px 15px;
@@ -87,6 +88,7 @@
         
         input[type="text"]:focus,
         input[type="email"]:focus,
+        input[type="tel"]:focus,
         select:focus {
             border-color: #3498db;
             outline: none;
@@ -181,6 +183,13 @@
             border-radius: 3px;
             font-weight: 600;
         }
+        
+        .field-note {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -205,6 +214,12 @@
             <div class="form-group">
                 <label for="poste">Poste / Fonction <span class="required">*</span></label>
                 <input type="text" id="poste" name="poste" required placeholder="Ex: Étudiant en Master, Assistant administratif...">
+            </div>
+            
+            <div class="form-group">
+                <label for="telephone">Numéro de téléphone <span class="required">*</span></label>
+                <input type="tel" id="telephone" name="telephone" required placeholder="Ex: +33 1 23 45 67 89 ou 0123456789">
+                <div class="field-note">Ce numéro sera utilisé pour vous contacter concernant la formation</div>
             </div>
             
             <div class="form-group">
@@ -284,29 +299,41 @@
             const nom = document.getElementById('nom').value;
             const prenom = document.getElementById('prenom').value;
             const poste = document.getElementById('poste').value;
+            const telephone = document.getElementById('telephone').value;
             const faculte = document.getElementById('faculte').value;
             const universite = document.getElementById('universite').value;
-            const membre = document.querySelector('input[name="membre"]:checked').value;
-            const devenirMembre = document.querySelector('input[name="devenir_membre"]:checked').value;
+            const membre = document.querySelector('input[name="membre"]:checked');
+            const devenirMembre = document.querySelector('input[name="devenir_membre"]:checked');
             
-            // Validation supplémentaire
-            if (!nom || !prenom || !poste || !faculte || !universite) {
+            // Validation des champs obligatoires
+            if (!nom || !prenom || !poste || !telephone || !faculte || !universite || !membre || !devenirMembre) {
                 alert('Veuillez remplir tous les champs obligatoires.');
                 return;
             }
             
+            // Validation spécifique du téléphone (format simplifié)
+            const phoneRegex = /^[\d\s\+\-\(\)]{8,20}$/;
+            const cleanPhone = telephone.replace(/\s/g, '');
+            
+            if (!phoneRegex.test(cleanPhone)) {
+                alert('Veuillez entrer un numéro de téléphone valide (8 à 20 chiffres).');
+                return;
+            }
+            
             // Simulation d'envoi des données
-            console.log('Données du formulaire:');
+            console.log('=== DONNÉES DU FORMULAIRE ===');
             console.log('Nom:', nom);
             console.log('Prénom:', prenom);
             console.log('Poste/Fonction:', poste);
+            console.log('Téléphone:', telephone);
             console.log('Faculté:', faculte);
             console.log('Université:', universite);
-            console.log('Membre actuel:', membre);
-            console.log('Devenir membre:', devenirMembre);
+            console.log('Membre actuel:', membre.value);
+            console.log('Devenir membre:', devenirMembre.value);
+            console.log('=============================');
             
             // Affichage d'un message de confirmation
-            alert(`Merci ${prenom} ${nom} ! Votre inscription à la formation gratuite en art oratoire a été enregistrée avec succès. Vous recevrez un e-mail de confirmation sous peu.`);
+            alert(`Merci ${prenom} ${nom} !\n\nVotre inscription à la formation gratuite en art oratoire a été enregistrée avec succès.\n\nVous recevrez un SMS de confirmation au ${telephone} ainsi qu'un e-mail sous peu.`);
             
             // Réinitialisation du formulaire (optionnel)
             // document.getElementById('inscriptionForm').reset();
@@ -321,6 +348,28 @@
                     note.style.display = 'block';
                 }
             });
+        });
+        
+        // Formatage automatique du téléphone (optionnel)
+        document.getElementById('telephone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 0) {
+                // Format français simple : 01 23 45 67 89
+                if (value.length <= 2) {
+                    value = value;
+                } else if (value.length <= 4) {
+                    value = value.substring(0, 2) + ' ' + value.substring(2);
+                } else if (value.length <= 6) {
+                    value = value.substring(0, 2) + ' ' + value.substring(2, 4) + ' ' + value.substring(4);
+                } else if (value.length <= 8) {
+                    value = value.substring(0, 2) + ' ' + value.substring(2, 4) + ' ' + value.substring(4, 6) + ' ' + value.substring(6);
+                } else {
+                    value = value.substring(0, 2) + ' ' + value.substring(2, 4) + ' ' + value.substring(4, 6) + ' ' + value.substring(6, 8) + ' ' + value.substring(8, 10);
+                }
+            }
+            
+            e.target.value = value;
         });
     </script>
 </body>
