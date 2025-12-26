@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1081,7 +1083,8 @@
         #exportData:hover,
         #resetVotes:hover,
         #closeAdminPanel:hover,
-        #cancelAdmin:hover {
+        #cancelAdmin:hover,
+        #importCSVBtn:hover {
             transform: translateY(-3px);
         }
     </style>
@@ -1145,7 +1148,9 @@
                         <h1 style="font-size: 2em; margin-bottom: 5px; color: var(--secondary);">
                             SALLE DES RÉSULTATS
                         </h1>
-                        <p style="opacity: 0.8;">
+                       
+
+<p style="opacity: 0.8;">
                             Panel d'administration - Accès sécurisé
                         </p>
                     </div>
@@ -1221,6 +1226,84 @@
                         ACTUALISER LES DONNÉES
                     </button>
                 </div>
+            </div>
+            
+            <!-- GESTION DES CODES - NOUVELLE SECTION -->
+            <div style="background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%); padding: 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 3px solid var(--accent); margin-bottom: 40px;">
+                <h2 style="color: var(--primary); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; font-size: 1.8em;">
+                    <i class="fas fa-key"></i>
+                    GESTION DES CODES DE VOTE
+                </h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <!-- Import CSV -->
+                    <div style="background: white; padding: 25px; border-radius: 15px; border: 2px solid #e0e0e0;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-file-import"></i> IMPORT CSV
+                        </h3>
+                        <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                            Importez des codes depuis un fichier CSV (un code par ligne).
+                        </p>
+                        
+                        <textarea id="csvCodesTextarea" 
+                                  placeholder="Collez vos codes CSV ici (un code par ligne)&#10;Exemple:&#10;PBQJV6L6DFFJ&#10;M2CXHABC6LQ6&#10;3QBTKE7GUYVU"
+                                  style="width: 100%; height: 150px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: monospace; font-size: 0.9em;">
+                        </textarea>
+                        
+                        <button id="importCSVBtn" style="background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="fas fa-upload"></i>
+                            IMPORTER CSV
+                        </button>
+                    </div>
+                    
+                    <!-- Génération de codes -->
+                    <div style="background: white; padding: 25px; border-radius: 15px; border: 2px solid #e0e0e0;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-plus-circle"></i> GÉNÉRER DES CODES
+                        </h3>
+                        <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                            Générez automatiquement de nouveaux codes de vote.
+                        </p>
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="number" id="codeCount" placeholder="Nombre" min="1" max="1000" 
+                                   style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1;" value="10">
+                            
+                            <input type="text" id="codePrefix" placeholder="Préfixe" 
+                                   style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1;" value="VOTE">
+                        </div>
+                        
+                        <button id="generateCodesBtn" style="background: var(--secondary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="fas fa-cogs"></i>
+                            GÉNÉRER
+                        </button>
+                    </div>
+                    
+                    <!-- Statistiques des codes -->
+                    <div style="background: white; padding: 25px; border-radius: 15px; border: 2px solid #e0e0e0;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-chart-pie"></i> STATISTIQUES CODES
+                        </h3>
+                        <div id="codesStats" style="text-align: center;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 0.9em; color: #666;">Total Codes</div>
+                                    <div id="totalCodes" style="font-size: 1.8em; font-weight: bold; color: var(--primary);">0</div>
+                                </div>
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 0.9em; color: #666;">Utilisés</div>
+                                    <div id="usedCodes" style="font-size: 1.8em; font-weight: bold; color: var(--accent);">0</div>
+                                </div>
+                            </div>
+                            <button id="refreshCodesStats" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <i class="fas fa-sync-alt"></i>
+                                ACTUALISER
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="importResult" style="padding: 15px; border-radius: 10px; margin-top: 20px; display: none;"></div>
             </div>
             
             <!-- Admin Tools -->
@@ -2479,7 +2562,201 @@
             document.getElementById('loading').classList.toggle('hidden', !show);
         }
 
-        /* FONCTIONS ADMIN */
+        /* ============================================
+           NOUVELLES FONCTIONS POUR LA GESTION DES CODES
+           ============================================ */
+
+        // Fonction pour importer des codes CSV
+        async function importerCodesCSV(csvText) {
+            try {
+                // Convertir CSV en tableau
+                const codes = csvText.split('\n')
+                    .map(code => code.trim())
+                    .filter(code => code !== '' && !code.toLowerCase().includes('code'));
+                
+                if (codes.length === 0) {
+                    throw new Error('Aucun code valide trouvé dans le CSV');
+                }
+                
+                console.log(`📊 ${codes.length} codes à importer`);
+                
+                // Importer par lots de 500 (limite Firebase)
+                const batchSize = 500;
+                let importedCount = 0;
+                let errorCount = 0;
+                
+                for (let i = 0; i < codes.length; i += batchSize) {
+                    const batchCodes = codes.slice(i, i + batchSize);
+                    
+                    try {
+                        const batch = db.batch();
+                        
+                        batchCodes.forEach(code => {
+                            const codeRef = db.collection('codes').doc(code);
+                            batch.set(codeRef, {
+                                code: code,
+                                estValide: true,
+                                utilise: false,
+                                dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
+                                dateUtilisation: null,
+                                source: 'CSV_import',
+                                importedAt: new Date().toISOString()
+                            });
+                        });
+                        
+                        await batch.commit();
+                        importedCount += batchCodes.length;
+                        
+                    } catch (error) {
+                        console.error('Erreur batch:', error);
+                        errorCount += batchCodes.length;
+                    }
+                }
+                
+                return {
+                    success: true,
+                    importedCount: importedCount,
+                    errorCount: errorCount,
+                    totalCount: codes.length
+                };
+                
+            } catch (error) {
+                console.error('Erreur d\'import:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // Fonction pour générer des codes
+        async function genererCodes(nombre, prefix = 'VOTE') {
+            try {
+                const batch = db.batch();
+                const codes = [];
+                
+                for (let i = 1; i <= nombre; i++) {
+                    // Générer un code unique
+                    const timestamp = Date.now().toString(36).slice(-4);
+                    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const code = `${prefix}-${timestamp}-${random}`;
+                    
+                    codes.push(code);
+                    
+                    const codeRef = db.collection('codes').doc(code);
+                    batch.set(codeRef, {
+                        code: code,
+                        estValide: true,
+                        utilise: false,
+                        dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
+                        dateUtilisation: null,
+                        source: 'generated',
+                        prefix: prefix
+                    });
+                }
+                
+                await batch.commit();
+                
+                return {
+                    success: true,
+                    codes: codes,
+                    count: nombre
+                };
+                
+            } catch (error) {
+                console.error('Erreur de génération:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // Fonction pour obtenir les statistiques des codes
+        async function getCodesStats() {
+            try {
+                const codesRef = db.collection('codes');
+                const snapshot = await codesRef.get();
+                
+                let totalCodes = 0;
+                let usedCodes = 0;
+                let validCodes = 0;
+                
+                snapshot.forEach(doc => {
+                    const codeData = doc.data();
+                    totalCodes++;
+                    if (codeData.utilise) usedCodes++;
+                    if (codeData.estValide) validCodes++;
+                });
+                
+                return {
+                    totalCodes: totalCodes,
+                    usedCodes: usedCodes,
+                    validCodes: validCodes,
+                    unusedCodes: totalCodes - usedCodes
+                };
+                
+            } catch (error) {
+                console.error('Erreur statistiques:', error);
+                return null;
+            }
+        }
+
+        // Fonction pour afficher le résultat d'import
+        function showImportResult(type, message, details = null) {
+            const resultDiv = document.getElementById('importResult');
+            
+            let html = '';
+            if (type === 'success') {
+                html = `
+                    <div style="display: flex; align-items: center; gap: 10px; color: var(--accent);">
+                        <i class="fas fa-check-circle" style="font-size: 1.2em;"></i>
+                        <div style="font-weight: bold;">${message}</div>
+                    </div>
+                `;
+                resultDiv.style.background = '#d4edda';
+                resultDiv.style.color = '#155724';
+            } else if (type === 'error') {
+                html = `
+                    <div style="color: #721c24;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ${message}
+                    </div>
+                `;
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+            } else if (type === 'info') {
+                html = `
+                    <div style="color: #0c5460;">
+                        <i class="fas fa-info-circle"></i>
+                        ${message}
+                    </div>
+                `;
+                resultDiv.style.background = '#d1ecf1';
+                resultDiv.style.color = '#0c5460';
+            }
+            
+            if (details) {
+                html += `
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        ${details}
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            
+            // Masquer après 10 secondes
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 10000);
+        }
+
+        /* ============================================
+           FONCTIONS ADMIN EXISTANTES
+           ============================================ */
+
         const ADMIN_PASSWORD = "EXCELLENTIAACADEMIA05/05/UNIKIN";
         let isAdmin = false;
         let adminInterval = null;
@@ -2597,6 +2874,13 @@
                 });
                 
                 detailedContainer.innerHTML = detailedHTML;
+                
+                // Mettre à jour les statistiques des codes
+                const codesStats = await getCodesStats();
+                if (codesStats) {
+                    document.getElementById('totalCodes').textContent = codesStats.totalCodes;
+                    document.getElementById('usedCodes').textContent = codesStats.usedCodes;
+                }
                 
             } catch (error) {
                 console.error('Erreur lors du chargement des données admin:', error);
@@ -2718,9 +3002,6 @@
                     return;
                 }
                 
-
-
-                
                 const isValid = await verifierCode(code);
                 
                 if (isValid === true) {
@@ -2813,7 +3094,9 @@
                 this.value = this.value.toUpperCase();
             });
 
-            /* GESTIONNAIRES D'ÉVÉNEMENTS ADMIN */
+            /* ============================================
+               GESTIONNAIRES D'ÉVÉNEMENTS ADMIN
+               ============================================ */
 
             // Ouvrir le modal admin
             document.getElementById('adminBtn').addEventListener('click', () => {
@@ -2873,6 +3156,96 @@
             
             // Réinitialiser les votes
             document.getElementById('resetVotes').addEventListener('click', resetAllVotes);
+            
+            /* ============================================
+               NOUVEAUX GESTIONNAIRES POUR LA GESTION DES CODES
+               ============================================ */
+            
+            // Importer des codes CSV
+            document.getElementById('importCSVBtn').addEventListener('click', async () => {
+                const csvText = document.getElementById('csvCodesTextarea').value;
+                
+                if (!csvText.trim()) {
+                    showImportResult('error', 'Veuillez coller des codes CSV');
+                    return;
+                }
+                
+                // Désactiver le bouton
+                const importBtn = document.getElementById('importCSVBtn');
+                importBtn.disabled = true;
+                importBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> IMPORT EN COURS...';
+                
+                // Afficher le statut
+                showImportResult('info', 'Import des codes en cours...');
+                
+                // Importer les codes
+                const result = await importerCodesCSV(csvText);
+                
+                // Réactiver le bouton
+                importBtn.disabled = false;
+                importBtn.innerHTML = '<i class="fas fa-upload"></i> IMPORTER CSV';
+                
+                // Afficher le résultat
+                if (result.success) {
+                    showImportResult('success', 
+                        `${result.importedCount} codes importés avec succès !`,
+                        `Total: ${result.totalCount} | Importés: ${result.importedCount} | Erreurs: ${result.errorCount}`
+                    );
+                    
+                    // Vider le textarea
+                    document.getElementById('csvCodesTextarea').value = '';
+                    
+                    // Actualiser les statistiques
+                    loadAdminData();
+                } else {
+                    showImportResult('error', `Erreur: ${result.error}`);
+                }
+            });
+            
+            // Générer des codes
+            document.getElementById('generateCodesBtn').addEventListener('click', async () => {
+                const count = parseInt(document.getElementById('codeCount').value) || 10;
+                const prefix = document.getElementById('codePrefix').value.trim() || 'VOTE';
+                
+                if (count < 1 || count > 1000) {
+                    showImportResult('error', 'Le nombre de codes doit être entre 1 et 1000');
+                    return;
+                }
+                
+                // Désactiver le bouton
+                const generateBtn = document.getElementById('generateCodesBtn');
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GÉNÉRATION...';
+                
+                // Afficher le statut
+                showImportResult('info', `Génération de ${count} codes en cours...`);
+                
+                // Générer les codes
+                const result = await genererCodes(count, prefix);
+                
+                // Réactiver le bouton
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-cogs"></i> GÉNÉRER';
+                
+                // Afficher le résultat
+                if (result.success) {
+                    showImportResult('success', 
+                        `${result.count} codes générés avec succès !`,
+                        `Préfixe: ${prefix} | Exemple: ${result.codes[0]}`
+                    );
+                    
+                    // Actualiser les statistiques
+                    loadAdminData();
+                } else {
+                    showImportResult('error', `Erreur: ${result.error}`);
+                }
+            });
+            
+            // Actualiser les statistiques des codes
+            document.getElementById('refreshCodesStats').addEventListener('click', () => {
+                loadAdminData();
+                showImportResult('info', 'Statistiques actualisées');
+            });
         });
     </script>
 </body>
