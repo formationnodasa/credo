@@ -1373,6 +1373,26 @@
                             RÉINITIALISER
                         </button>
                     </div>
+
+                    <!-- NOUVEAU BOUTON : SUPPRIMER TOUS LES VOTES -->
+                    <div style="background: white; padding: 25px; border-radius: 15px; border: 2px solid #e0e0e0;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-bomb"></i> SUPPRIMER TOUS LES VOTES
+                        </h3>
+                        <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                            Supprime TOUS les votes de la base de données (mot de passe requis).
+                        </p>
+                        <div style="margin-bottom: 15px;">
+                            <input type="password" 
+                                   id="deletePassword" 
+                                   placeholder="Mot de passe: Supprimation" 
+                                   style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+                        </div>
+                        <button id="deleteAllVotes" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="fas fa-trash"></i>
+                            SUPPRIMER TOUS LES VOTES
+                        </button>
+                    </div>
                 </div>
                 
                 <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; border: 2px dashed var(--secondary);">
@@ -2710,6 +2730,90 @@
         }
 
         /* ============================================
+           NOUVELLE FONCTION : SUPPRIMER TOUS LES VOTES
+           ============================================ */
+
+        async function supprimerTousLesVotes() {
+            try {
+                showLoading(true);
+                
+                // Récupérer tous les votes
+                const votesRef = db.collection('votes');
+                const snapshot = await votesRef.get();
+                
+                if (snapshot.empty) {
+                    showAdminAlert('warning', 'Aucun vote à supprimer.');
+                    return;
+                }
+                
+                // Supprimer par lots de 500 (limite Firebase)
+                const batchSize = 500;
+                const batches = [];
+                let deletedCount = 0;
+                
+                const allVotes = [];
+                snapshot.forEach(doc => {
+                    allVotes.push(doc.ref);
+                });
+                
+                for (let i = 0; i < allVotes.length; i += batchSize) {
+                    const batchVotes = allVotes.slice(i, i + batchSize);
+                    const batch = db.batch();
+                    
+                    batchVotes.forEach(voteRef => {
+                        batch.delete(voteRef);
+                    });
+                    
+                    batches.push(batch.commit());
+                    deletedCount += batchVotes.length;
+                }
+                
+                // Exécuter tous les batches
+                await Promise.all(batches);
+                
+                // Réinitialiser également tous les codes
+                const codesRef = db.collection('codes');
+                const codesSnapshot = await codesRef.get();
+                
+                const codeBatches = [];
+                let codesUpdated = 0;
+                
+                const allCodes = [];
+                codesSnapshot.forEach(doc => {
+                    allCodes.push({ ref: doc.ref, data: doc.data() });
+                });
+                
+                for (let i = 0; i < allCodes.length; i += batchSize) {
+                    const batchCodes = allCodes.slice(i, i + batchSize);
+                    const batch = db.batch();
+                    
+                    batchCodes.forEach(code => {
+                        batch.update(code.ref, {
+                            utilise: false,
+                            dateUtilisation: null
+                        });
+                    });
+                    
+                    codeBatches.push(batch.commit());
+                    codesUpdated += batchCodes.length;
+                }
+                
+                await Promise.all(codeBatches);
+                
+                showAdminAlert('success', `✅ ${deletedCount} votes supprimés et ${codesUpdated} codes réinitialisés avec succès !`);
+                
+                // Actualiser les données
+                loadAdminData();
+                
+            } catch (error) {
+                console.error('Erreur lors de la suppression des votes:', error);
+                showAdminAlert('error', '❌ Erreur lors de la suppression des votes.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        /* ============================================
            FONCTIONS ADMIN EXISTANTES - MODIFIÉES POUR LE NOUVEAU SYSTÈME
            ============================================ */
 
@@ -3126,6 +3230,30 @@
             
             // Réinitialiser les votes
             document.getElementById('resetVotes').addEventListener('click', resetAllVotes);
+
+            /* ============================================
+               NOUVEAU GESTIONNAIRE : SUPPRIMER TOUS LES VOTES
+               ============================================ */
+            document.getElementById('deleteAllVotes').addEventListener('click', () => {
+                const password = document.getElementById('deletePassword').value;
+                
+                if (password !== 'Supprimation') {
+                    showAdminAlert('error', '❌ Mot de passe incorrect. Le mot de passe est "Supprimation"');
+                    return;
+                }
+                
+                if (confirm("⚠️ ATTENTION CRITIQUE :\n\nCette action va SUPPRIMER TOUS LES VOTES de la base de données.\n\n• Tous les votes seront définitivement effacés\n• Tous les codes seront réinitialisés (non utilisés)\n• Les statistiques seront remises à zéro\n\nÊtes-vous ABSOLUMENT sûr de vouloir continuer ?")) {
+                    if (confirm("DERNIER AVERTISSEMENT :\n\nCette action est IRREVERSIBLE.\n\nTapez 'JE CONFIRME LA SUPPRESSION' pour continuer.")) {
+                        const confirmation = prompt("Tapez 'JE CONFIRME LA SUPPRESSION' pour supprimer tous les votes :");
+                        if (confirmation === 'JE CONFIRME LA SUPPRESSION') {
+                            supprimerTousLesVotes();
+                            document.getElementById('deletePassword').value = '';
+                        } else {
+                            showAdminAlert('error', 'Suppression annulée.');
+                        }
+                    }
+                }
+            });
             
             /* ============================================
                NOUVEAUX GESTIONNAIRES POUR LA GESTION DES CODES
