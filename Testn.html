@@ -1237,7 +1237,7 @@
                 </div>
                 
                 <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
-                    <div style="background: linear-gradient(135deg, #666 0%, #333 100%); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <div style="background: linear-gradient(135deg, #666 0%, #333 100%); color: white; width = 60px; height = 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-clock" style="font-size: 25px;"></i>
                     </div>
                     <h3 style="color: var(--primary); margin-bottom: 10px;">DERNIÈRE MAJ</h3>
@@ -1374,13 +1374,13 @@
                         </button>
                     </div>
 
-                    <!-- NOUVEAU BOUTON : SUPPRIMER TOUS LES VOTES -->
+                    <!-- NOUVEAU BOUTON : SUPPRIMER TOUS LES VOTES (VERSION CORRIGÉE) -->
                     <div style="background: white; padding: 25px; border-radius: 15px; border: 2px solid #e0e0e0;">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">
                             <i class="fas fa-bomb"></i> SUPPRIMER TOUS LES VOTES
                         </h3>
                         <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
-                            Supprime TOUS les votes de la base de données (mot de passe requis).
+                            Supprime TOUS les votes de la base de données (mot de passe: Supprimation).
                         </p>
                         <div style="margin-bottom: 15px;">
                             <input type="password" 
@@ -2730,12 +2730,15 @@
         }
 
         /* ============================================
-           NOUVELLE FONCTION : SUPPRIMER TOUS LES VOTES
+           NOUVELLE FONCTION : SUPPRIMER TOUS LES VOTES (VERSION CORRIGÉE)
            ============================================ */
 
         async function supprimerTousLesVotes() {
             try {
                 showLoading(true);
+                
+                // Afficher un message de progression
+                showAdminAlert('info', '🗑️ Suppression des votes en cours...');
                 
                 // Récupérer tous les votes
                 const votesRef = db.collection('votes');
@@ -2746,59 +2749,38 @@
                     return;
                 }
                 
-                // Supprimer par lots de 500 (limite Firebase)
-                const batchSize = 500;
-                const batches = [];
                 let deletedCount = 0;
+                const batchSize = 500; // Taille maximale d'un batch Firebase
                 
-                const allVotes = [];
+                // Méthode 1: Suppression par lots (plus fiable)
+                const deletePromises = [];
+                
                 snapshot.forEach(doc => {
-                    allVotes.push(doc.ref);
+                    deletePromises.push(doc.ref.delete());
+                    deletedCount++;
                 });
                 
-                for (let i = 0; i < allVotes.length; i += batchSize) {
-                    const batchVotes = allVotes.slice(i, i + batchSize);
-                    const batch = db.batch();
-                    
-                    batchVotes.forEach(voteRef => {
-                        batch.delete(voteRef);
-                    });
-                    
-                    batches.push(batch.commit());
-                    deletedCount += batchVotes.length;
-                }
-                
-                // Exécuter tous les batches
-                await Promise.all(batches);
+                // Attendre que toutes les suppressions soient terminées
+                await Promise.all(deletePromises);
                 
                 // Réinitialiser également tous les codes
                 const codesRef = db.collection('codes');
                 const codesSnapshot = await codesRef.get();
                 
-                const codeBatches = [];
+                const codeUpdatePromises = [];
                 let codesUpdated = 0;
                 
-                const allCodes = [];
                 codesSnapshot.forEach(doc => {
-                    allCodes.push({ ref: doc.ref, data: doc.data() });
+                    const updatePromise = doc.ref.update({
+                        utilise: false,
+                        dateUtilisation: null
+                    });
+                    codeUpdatePromises.push(updatePromise);
+                    codesUpdated++;
                 });
                 
-                for (let i = 0; i < allCodes.length; i += batchSize) {
-                    const batchCodes = allCodes.slice(i, i + batchSize);
-                    const batch = db.batch();
-                    
-                    batchCodes.forEach(code => {
-                        batch.update(code.ref, {
-                            utilise: false,
-                            dateUtilisation: null
-                        });
-                    });
-                    
-                    codeBatches.push(batch.commit());
-                    codesUpdated += batchCodes.length;
-                }
-                
-                await Promise.all(codeBatches);
+                // Attendre que toutes les mises à jour soient terminées
+                await Promise.all(codeUpdatePromises);
                 
                 showAdminAlert('success', `✅ ${deletedCount} votes supprimés et ${codesUpdated} codes réinitialisés avec succès !`);
                 
@@ -2807,9 +2789,43 @@
                 
             } catch (error) {
                 console.error('Erreur lors de la suppression des votes:', error);
-                showAdminAlert('error', '❌ Erreur lors de la suppression des votes.');
+                showAdminAlert('error', '❌ Erreur lors de la suppression des votes: ' + error.message);
+                
+                // Essayer une méthode alternative si la première échoue
+                try {
+                    showAdminAlert('info', 'Essai d\'une méthode alternative...');
+                    await supprimerVotesAlternative();
+                } catch (altError) {
+                    console.error('Méthode alternative échouée:', altError);
+                    showAdminAlert('error', '❌ Les deux méthodes ont échoué. Essayez manuellement depuis la console Firebase.');
+                }
             } finally {
                 showLoading(false);
+            }
+        }
+
+        // Méthode alternative pour supprimer les votes
+        async function supprimerVotesAlternative() {
+            try {
+                const votesRef = db.collection('votes');
+                const snapshot = await votesRef.get();
+                
+                let deletedCount = 0;
+                
+                // Supprimer un par un (moins efficace mais plus fiable)
+                for (const doc of snapshot.docs) {
+                    await doc.ref.delete();
+                    deletedCount++;
+                    
+                    // Afficher la progression toutes les 50 suppressions
+                    if (deletedCount % 50 === 0) {
+                        showAdminAlert('info', `Suppression en cours... ${deletedCount} votes supprimés`);
+                    }
+                }
+                
+                return deletedCount;
+            } catch (error) {
+                throw error;
             }
         }
 
@@ -3232,7 +3248,7 @@
             document.getElementById('resetVotes').addEventListener('click', resetAllVotes);
 
             /* ============================================
-               NOUVEAU GESTIONNAIRE : SUPPRIMER TOUS LES VOTES
+               NOUVEAU GESTIONNAIRE : SUPPRIMER TOUS LES VOTES (VERSION CORRIGÉE)
                ============================================ */
             document.getElementById('deleteAllVotes').addEventListener('click', () => {
                 const password = document.getElementById('deletePassword').value;
