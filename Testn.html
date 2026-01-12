@@ -23,6 +23,7 @@
             --silver: #c0c0c0;
             --bronze: #cd7f32;
             --finalist-color: #4a148c;
+            --info-color: #0277bd;
         }
         
         body {
@@ -190,6 +191,16 @@
             margin-bottom: 1.2rem;
             padding-bottom: 1.2rem;
             border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .prize-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 6px;
         }
         
         .prize-item:last-child {
@@ -208,6 +219,132 @@
         
         .item-text {
             flex: 1;
+        }
+        
+        .info-icon {
+            color: var(--info-color);
+            font-size: 1rem;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .info-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Modal for detailed information */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transform: translateY(-30px);
+            transition: transform 0.4s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            background: linear-gradient(to right, var(--primary-color), #283593);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .modal-item-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-item-title i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .modal-item-content {
+            color: #555;
+            line-height: 1.7;
+        }
+        
+        .highlight {
+            background-color: #fff9c4;
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            border-left: 4px solid var(--secondary-color);
         }
         
         /* Finalists Section */
@@ -353,6 +490,11 @@
             .finalists-content {
                 flex-direction: column;
             }
+            
+            .modal {
+                width: 95%;
+                margin: 10px;
+            }
         }
     </style>
 </head>
@@ -396,33 +538,54 @@
                         <p>Grand Prix du Concours</p>
                     </div>
                     <div class="prize-body">
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="brevet-excellence">
                             <i class="fas fa-award item-icon"></i>
-                            <div class="item-text">Brevet d'excellence</div>
+                            <div class="item-text">
+                                Brevet d'excellence
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="medaille-or">
                             <i class="fas fa-medal item-icon"></i>
-                            <div class="item-text">Médaille d'or</div>
+                            <div class="item-text">
+                                Médaille d'or
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="echarpe">
                             <i class="fas fa-scroll item-icon"></i>
-                            <div class="item-text">Écharpe Excellentia Academia</div>
+                            <div class="item-text">
+                                Écharpe Excellentia Academia
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="trophee">
                             <i class="fas fa-trophy item-icon"></i>
-                            <div class="item-text">Trophée 🏆</div>
+                            <div class="item-text">
+                                Trophée 🏆
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="bourse-academique">
                             <i class="fas fa-graduation-cap item-icon"></i>
-                            <div class="item-text">Bourse académique Annuelle Excellentia Academia (1 ans UNIKIN)</div>
+                            <div class="item-text">
+                                Bourse académique Annuelle Excellentia Academia (1 ans UNIKIN)
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="trans-academia">
                             <i class="fas fa-bus item-icon"></i>
-                            <div class="item-text">Trans Academia annuelle (1 ans)</div>
+                            <div class="item-text">
+                                Trans Academia annuelle (1 ans)
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
-                        <div class="prize-item">
+                        <div class="prize-item" data-modal="bibliotheque">
                             <i class="fas fa-book item-icon"></i>
-                            <div class="item-text">Accès à la Bibliothèque Centrale (1 ans)</div>
+                            <div class="item-text">
+                                Accès à la Bibliothèque Centrale (1 ans)
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -524,6 +687,24 @@
         </div>
     </section>
 
+    <!-- Modal for detailed information -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="modalTitle">Détails de la Récompense</span>
+                </div>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -556,10 +737,310 @@
     </footer>
 
     <script>
+        // Detailed information for each prize
+        const prizeDetails = {
+            "brevet-excellence": {
+                title: "Brevet d'Excellence",
+                icon: "fas fa-award",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-certificate"></i>
+                            Description
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Le <strong>Brevet d'Excellence</strong> est un certificat officiel délivré par Excellentia Academia attestant de la performance exceptionnelle du lauréat au Concours Éloquence en Scène.</p>
+                            <div class="highlight">
+                                <p><strong>Caractéristiques :</strong></p>
+                                <ul>
+                                    <li>Document officiel numéroté et sécurisé</li>
+                                    <li>Signature du Président d'Excellentia Academia</li>
+                                    <li>Cachet officiel de l'institution</li>
+                                    <li>Reconnaissance académique permanente</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-check-circle"></i>
+                            Valeur
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Ce brevet constitue une <strong>preuve formelle d'excellence</strong> pouvant être présentée dans les dossiers académiques et professionnels futurs.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "medaille-or": {
+                title: "Médaille d'Or",
+                icon: "fas fa-medal",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-medal"></i>
+                            Description
+                        </div>
+                        <div class="modal-item-content">
+                            <p>La <strong>Médaille d'Or</strong> est la plus haute distinction matérielle décernée au vainqueur du Concours Éloquence en Scène.</p>
+                            <div class="highlight">
+                                <p><strong>Caractéristiques :</strong></p>
+                                <ul>
+                                    <li>Médaille en or 24 carats plaqué or</li>
+                                    <li>Diamètre : 70mm</li>
+                                    <li>Gravure personnalisée avec le nom du lauréat</li>
+                                    <li>Ruban aux couleurs d'Excellentia Academia</li>
+                                    <li>Écrin de présentation en velours</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-gem"></i>
+                            Symbole
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Cette médaille symbolise <strong>l'excellence suprême</strong> en art oratoire et devient un héritage personnel et familial du lauréat.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "echarpe": {
+                title: "Écharpe Excellentia Academia",
+                icon: "fas fa-scroll",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-tshirt"></i>
+                            Description
+                        </div>
+                        <div class="modal-item-content">
+                            <p>L'<strong>Écharpe Excellentia Academia</strong> est un attribut honorifique distinctif réservé exclusivement aux lauréats du premier prix.</p>
+                            <div class="highlight">
+                                <p><strong>Caractéristiques :</strong></p>
+                                <ul>
+                                    <li>Tissu premium en soie et laine</li>
+                                    <li>Aux couleurs officielles d'Excellentia Academia</li>
+                                    <li>Broderie du logo et de l'année du concours</li>
+                                    <li>Longueur standard : 2 mètres</li>
+                                    <li>Port officiel lors des cérémonies académiques</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-user-graduate"></i>
+                            Privilège
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Cette écharpe confère au lauréat le <strong>statut d'ambassadeur d'Excellentia Academia</strong> pour l'année académique suivante.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "trophee": {
+                title: "Trophée du Vainqueur",
+                icon: "fas fa-trophy",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-trophy"></i>
+                            Description
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Le <strong>Trophée du Vainqueur</strong> est une œuvre d'art symbolisant la victoire au Concours Éloquence en Scène.</p>
+                            <div class="highlight">
+                                <p><strong>Caractéristiques :</strong></p>
+                                <ul>
+                                    <li>Design exclusif créé par un artiste renommé</li>
+                                    <li>Hauteur : 45 cm</li>
+                                    <li>Matériaux : Cristal et métal plaqué or</li>
+                                    <li>Plaque gravée avec le nom du lauréat et l'année</li>
+                                    <li>Socle en bois d'ébène massif</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-history"></i>
+                            Héritage
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Ce trophée devient la <strong>propriété permanente du lauréat</strong> et sera inscrit au registre des vainqueurs d'Excellentia Academia.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "bourse-academique": {
+                title: "Bourse Académique Annuelle",
+                icon: "fas fa-graduation-cap",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-university"></i>
+                            Description de la Bourse
+                        </div>
+                        <div class="modal-item-content">
+                            <p>La <strong>Bourse Académique Annuelle Excellentia Academia</strong> couvre intégralement les frais académiques du lauréat à l'Université de Kinshasa (UNIKIN).</p>
+                            <div class="highlight">
+                                <p><strong>Couverture complète pour l'année académique 2026-2027 :</strong></p>
+                                <ul>
+                                    <li><strong>Frais d'inscription</strong> - Prise en charge à 100%</li>
+                                    <li><strong>Frais de scolarité</strong> - Intégralement couverts</li>
+                                    <li><strong>Frais administratifs</strong> - Complètement assumés</li>
+                                    <li><strong>Droits académiques</strong> - Totalement exonérés</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-file-contract"></i>
+                            Conditions et Modalités
+                        </div>
+                        <div class="modal-item-content">
+                            <p><strong>La bourse implique que le lauréat ne devra payer AUCUN frais académique pour l'année 2026-2027.</strong></p>
+                            <div class="highlight">
+                                <p><strong>Détails pratiques :</strong></p>
+                                <ul>
+                                    <li>Bourse valable pour une année académique complète</li>
+                                    <li>Couverture de tous les frais officiels de l'UNIKIN</li>
+                                    <li>Versement direct à l'université par Excellentia Academia</li>
+                                    <li>Renouvellement conditionnel à l'excellence académique</li>
+                                    <li>Accompagnement personnalisé par un mentor académique</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-handshake"></i>
+                            Engagement
+                        </div>
+                        <div class="modal-item-content">
+                            <p>En contrepartie, le lauréat s'engage à maintenir <strong>une excellence académique</strong> et à représenter dignement Excellentia Academia lors d'événements oratoires.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "trans-academia": {
+                title: "Carte Trans Academia",
+                icon: "fas fa-bus",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-id-card"></i>
+                            Description de la Carte
+                        </div>
+                        <div class="modal-item-content">
+                            <p>La <strong>Carte Trans Academia</strong> est une carte de transport annuelle offrant une mobilité complète au lauréat.</p>
+                            <div class="highlight">
+                                <p><strong>Avantages et couverture :</strong></p>
+                                <ul>
+                                    <li><strong>Transport illimité</strong> pendant 1 an</li>
+                                    <li><strong>Accès gratuit</strong> à tous les transports en commun affiliés</li>
+                                    <li>Valable sur l'ensemble du réseau urbain de Kinshasa</li>
+                                    <li>Carte personnalisée et nominative</li>
+                                    <li>Recharge automatique mensuelle</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-road"></i>
+                            Couverture des Trajets
+                        </div>
+                        <div class="modal-item-content">
+                            <p><strong>Le lauréat ne devra payer AUCUN frais de transport</strong> pour ses déplacements académiques et personnels pendant un an.</p>
+                            <div class="highlight">
+                                <p><strong>Trajets couverts :</strong></p>
+                                <ul>
+                                    <li>Domicile - Université (trajets quotidiens)</li>
+                                    <li>Déplacements vers les bibliothèques partenaires</li>
+                                    <li>Trajets vers les événements académiques officiels</li>
+                                    <li>Transport vers les installations sportives universitaires</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            Validité
+                        </div>
+                        <div class="modal-item-content">
+                            <p>La carte est valable <strong>du 1er septembre 2026 au 31 août 2027</strong> et est renouvelable sous conditions de performance académique.</p>
+                        </div>
+                    </div>
+                `
+            },
+            "bibliotheque": {
+                title: "Accès à la Bibliothèque Centrale",
+                icon: "fas fa-book",
+                content: `
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-library"></i>
+                            Description de l'Accès
+                        </div>
+                        <div class="modal-item-content">
+                            <p>L'<strong>Accès Premium à la Bibliothèque Centrale</strong> offre des privilèges étendus au lauréat pendant une année complète.</p>
+                            <div class="highlight">
+                                <p><strong>Avantages exclusifs :</strong></p>
+                                <ul>
+                                    <li><strong>Accès gratuit illimité</strong> pendant 1 an</li>
+                                    <li><strong>Exonération totale</strong> des frais d'inscription et d'abonnement</li>
+                                    <li>Accès à toutes les sections, y compris les fonds rares</li>
+                                    <li>Droit d'emprunt de 15 livres simultanément (contre 5 normalement)</li>
+                                    <li>Prolongation de prêt automatique jusqu'à 60 jours</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-user-tie"></i>
+                            Privilèges Spéciaux
+                        </div>
+                        <div class="modal-item-content">
+                            <p><strong>Le lauréat ne devra payer AUCUN frais d'accès ou d'abonnement</strong> à la bibliothèque centrale pendant un an.</p>
+                            <div class="highlight">
+                                <p><strong>Services inclus :</strong></p>
+                                <ul>
+                                    <li>Accès à la salle de recherche réservée aux chercheurs</li>
+                                    <li>Utilisation gratuite des salles de travail en groupe</li>
+                                    <li>Accès aux ressources numériques et bases de données payantes</li>
+                                    <li>Service de réservation prioritaire des ouvrages</li>
+                                    <li>Accompagnement par un bibliothécaire dédié</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-item-title">
+                            <i class="fas fa-clock"></i>
+                            Horaires Étendus
+                        </div>
+                        <div class="modal-item-content">
+                            <p>Le lauréat bénéficie d'<strong>horaires d'accès étendus</strong> (6h - 23h tous les jours) et d'un accès 24h/24 à la bibliothèque numérique.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
         // Animation for prize cards on scroll
         document.addEventListener('DOMContentLoaded', function() {
             const prizeCards = document.querySelectorAll('.prize-card');
             const finalistsSection = document.querySelector('.finalists-section');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const closeModal = document.getElementById('closeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -585,17 +1066,56 @@
                 observer.observe(finalistsSection);
             }
             
+            // Add click event to prize items with info icons
+            document.querySelectorAll('.prize-item[data-modal]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal');
+                    const modalData = prizeDetails[modalId];
+                    
+                    if (modalData) {
+                        modalTitle.innerHTML = `<i class="${modalData.icon}"></i> ${modalData.title}`;
+                        modalBody.innerHTML = modalData.content;
+                        modalOverlay.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+            
+            // Close modal when clicking close button
+            closeModal.addEventListener('click', function() {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Close modal when clicking outside
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
             // Add some interactive effects
             const prizeItems = document.querySelectorAll('.prize-item');
             prizeItems.forEach(item => {
                 item.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = '#f9f9f9';
+                    this.style.backgroundColor = '#f8f9fa';
                     this.style.paddingLeft = '10px';
-                    this.style.transition = 'background-color 0.3s, padding-left 0.3s';
+                    this.style.paddingRight = '10px';
+                    this.style.transition = 'background-color 0.3s, padding 0.3s';
                 });
                 item.addEventListener('mouseleave', function() {
                     this.style.backgroundColor = 'transparent';
                     this.style.paddingLeft = '0';
+                    this.style.paddingRight = '0';
                 });
             });
             
