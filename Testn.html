@@ -22,6 +22,7 @@
             --gold: #ffd700;
             --silver: #c0c0c0;
             --bronze: #cd7f32;
+            --finalist-color: #4a148c;
         }
         
         body {
@@ -155,6 +156,10 @@
             background: linear-gradient(135deg, var(--bronze), #b5651d);
         }
         
+        .finalists-card .prize-header {
+            background: linear-gradient(135deg, var(--finalist-color), #7b1fa2);
+        }
+        
         .place-badge {
             font-size: 1.8rem;
             font-weight: 700;
@@ -203,6 +208,59 @@
         
         .item-text {
             flex: 1;
+        }
+        
+        /* Finalists Section */
+        .finalists-section {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            margin: 3rem auto;
+            max-width: 1000px;
+            border-top: 5px solid var(--finalist-color);
+        }
+        
+        .finalists-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .finalists-icon {
+            font-size: 2.5rem;
+            color: var(--finalist-color);
+            margin-right: 20px;
+        }
+        
+        .finalists-header h3 {
+            color: var(--finalist-color);
+            font-size: 1.8rem;
+        }
+        
+        .finalists-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .finalists-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .finalists-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .certificate-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         /* Payment Info */
@@ -291,6 +349,10 @@
             .prize-card {
                 max-width: 100%;
             }
+            
+            .finalists-content {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -313,7 +375,7 @@
         <div class="container">
             <h2 class="section-title">Cérémonie de Remise des Prix</h2>
             <p>Le concours d'éloquence "Éloquence en Scène" a permis de mettre en lumière les talents oratoires exceptionnels de nos participants. Nous sommes fiers d'annoncer les lauréats et de récompenser leurs performances remarquables.</p>
-            <p>Découvrez les prestigieuses récompenses décernées aux trois premiers gagnants du concours.</p>
+            <p>Découvrez les prestigieuses récompenses décernées aux trois premiers gagnants du concours, ainsi que la reconnaissance spéciale pour tous les finalistes.</p>
         </div>
     </section>
 
@@ -418,6 +480,37 @@
                 </div>
             </div>
             
+            <!-- Finalists Recognition -->
+            <div class="finalists-section">
+                <div class="finalists-header">
+                    <i class="fas fa-users finalists-icon"></i>
+                    <h3>Reconnaissance des Finalistes</h3>
+                </div>
+                <div class="finalists-content">
+                    <div class="finalists-text">
+                        <p style="font-size: 1.2rem; margin-bottom: 1.5rem; color: #555;">
+                            <strong>Tous les participants ayant atteint la finale</strong> du Concours Éloquence en Scène recevront une reconnaissance spéciale pour leur parcours exceptionnel dans cette compétition.
+                        </p>
+                        <div class="prize-item" style="border-bottom: none; padding-bottom: 0;">
+                            <i class="fas fa-certificate item-icon" style="color: var(--finalist-color);"></i>
+                            <div class="item-text">
+                                <strong>Brevet de Mérite</strong> - Certificat officiel attestant de leur parcours remarquable et de leur qualification en finale du concours.
+                            </div>
+                        </div>
+                        <p style="margin-top: 1.5rem; font-style: italic; color: #666;">
+                            Ce brevet reconnaît l'engagement, le talent et la persévérance dont ont fait preuve ces orateurs exceptionnels tout au long de la compétition.
+                        </p>
+                    </div>
+                    <div class="finalists-image">
+                        <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); padding: 2rem; border-radius: 8px; border: 2px dashed var(--finalist-color);">
+                            <i class="fas fa-award" style="font-size: 8rem; color: var(--finalist-color); margin-bottom: 1rem;"></i>
+                            <h3 style="color: var(--finalist-color);">Brevet de Mérite</h3>
+                            <p style="color: #555; margin-top: 0.5rem;">Pour parcours exceptionnel<br>en finale du concours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Payment Information -->
             <div class="payment-info">
                 <h3><i class="fas fa-info-circle"></i> Information sur le Paiement</h3>
@@ -466,6 +559,7 @@
         // Animation for prize cards on scroll
         document.addEventListener('DOMContentLoaded', function() {
             const prizeCards = document.querySelectorAll('.prize-card');
+            const finalistsSection = document.querySelector('.finalists-section');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -483,16 +577,39 @@
                 observer.observe(card);
             });
             
+            // Animate finalists section
+            if (finalistsSection) {
+                finalistsSection.style.opacity = '0';
+                finalistsSection.style.transform = 'translateY(30px)';
+                finalistsSection.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(finalistsSection);
+            }
+            
             // Add some interactive effects
             const prizeItems = document.querySelectorAll('.prize-item');
             prizeItems.forEach(item => {
                 item.addEventListener('mouseenter', function() {
                     this.style.backgroundColor = '#f9f9f9';
+                    this.style.paddingLeft = '10px';
+                    this.style.transition = 'background-color 0.3s, padding-left 0.3s';
                 });
                 item.addEventListener('mouseleave', function() {
                     this.style.backgroundColor = 'transparent';
+                    this.style.paddingLeft = '0';
                 });
             });
+            
+            // Add certificate hover effect
+            const certificateIcon = document.querySelector('.finalists-image .fa-award');
+            if (certificateIcon) {
+                certificateIcon.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                certificateIcon.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            }
         });
     </script>
 </body>
