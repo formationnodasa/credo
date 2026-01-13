@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Import Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -539,7 +539,6 @@
             <h3><i class="fas fa-chart-line"></i> Tableau de bord des résultats</h3>
             
             <div class="stats-grid" id="admin-stats">
-                <!-- Statistics will be inserted here by JavaScript -->
                 <div class="stat-card">
                     <h4>Chargement des données...</h4>
                     <div class="stat-value">0</div>
@@ -660,7 +659,7 @@
     </div>
 
     <script>
-        // Firebase configuration
+        // Configuration Firebase (pour Firestore)
         const firebaseConfig = {
             apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
             authDomain: "match-a2ac6.firebaseapp.com",
@@ -673,7 +672,7 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.firestore(); // Firestore au lieu de Realtime Database
 
         // Questions data
         const questions = [
@@ -789,7 +788,7 @@
                 question: "Elle aurait ______ venir plus tôt.",
                 options: ["pu", "pue", "pouvoir", "pouvait"],
                 correct: 0,
-                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour former le conditionnel passé."
+                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour formar le conditionnel passé."
             },
             {
                 question: "Les films qu'ils ont ______ sont intéressants.",
@@ -907,8 +906,10 @@
                 
                 // Add coaching tip only for Credo
                 const coachingTip = member === 'credo' ? 
-                    `<div class="coaching-tip" style="margin-top: 15px; font-size:
-                    
+                    `<div class="coaching-tip" style="margin-top: 15px; font-size: 0.9rem;">
+                        <strong>Conseil :</strong> ${q.explanation}
+                    </div>` : '';
+                
                 questionDiv.innerHTML = `
                     <div class="question-text">
                         <span class="question-number">${index + 1}</span>
@@ -1023,7 +1024,7 @@
             // Calculate percentage
             const percentage = Math.round((score / totalQuestions) * 100);
             
-            // Prepare result data for Firebase
+            // Prepare result data for Firestore
             const resultData = {
                 member: member,
                 score: score,
@@ -1034,21 +1035,21 @@
                 answers: answers
             };
             
-            // Save to Firebase
-            saveResultToFirebase(resultData);
+            // Save to Firestore
+            saveResultToFirestore(resultData);
             
             // Display results
             displayResults(member, score, totalQuestions, percentage);
         }
         
-        function saveResultToFirebase(resultData) {
-            const resultRef = database.ref('results').push();
-            resultRef.set(resultData)
-                .then(() => {
-                    console.log('Result saved successfully to Firebase');
+        function saveResultToFirestore(resultData) {
+            // Utiliser Firestore
+            db.collection('results').add(resultData)
+                .then((docRef) => {
+                    console.log('Result saved successfully to Firestore with ID:', docRef.id);
                 })
                 .catch((error) => {
-                    console.error('Error saving result to Firebase:', error);
+                    console.error('Error saving result to Firestore:', error);
                     alert('Erreur lors de l\'enregistrement des résultats. Veuillez vérifier votre connexion Internet.');
                 });
         }
@@ -1099,8 +1100,6 @@
         }
         
         function loadAllResults() {
-            const resultsRef = database.ref('results');
-            
             // Show loading state
             document.getElementById('admin-stats').innerHTML = `
                 <div class="stat-card">
@@ -1115,24 +1114,22 @@
                 </tr>
             `;
             
-            resultsRef.once('value')
-                .then((snapshot) => {
+            // Utiliser Firestore pour récupérer les données
+            db.collection('results').orderBy('timestamp', 'desc').get()
+                .then((querySnapshot) => {
                     const results = [];
-                    snapshot.forEach((childSnapshot) => {
+                    querySnapshot.forEach((doc) => {
                         results.push({
-                            id: childSnapshot.key,
-                            ...childSnapshot.val()
+                            id: doc.id,
+                            ...doc.data()
                         });
                     });
-                    
-                    // Sort by timestamp (newest first)
-                    results.sort((a, b) => b.timestamp - a.timestamp);
                     
                     updateAdminStats(results);
                     updateResultsTable(results);
                 })
                 .catch((error) => {
-                    console.error('Error loading results:', error);
+                    console.error('Error loading results from Firestore:', error);
                     document.getElementById('admin-stats').innerHTML = `
                         <div class="stat-card">
                             <h4>Erreur de chargement</h4>
