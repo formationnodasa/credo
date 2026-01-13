@@ -59,166 +59,283 @@
             transform: scale(1.05);
         }
         
-        .admin-panel {
+        /* Styles pour le modal admin (inspiré du code partagé) */
+        .modal-overlay {
             display: none;
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            border: 3px solid #182848;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
         }
         
-        .admin-panel.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #d4af37;
+            position: relative;
+            color: white;
         }
         
-        .admin-header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #182848;
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
         }
         
-        .admin-header h2 {
-            font-size: 2rem;
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
+        .modal-content h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #f7ef8a;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0c8ff;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #1e90ff, #0d47a1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.4);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Styles pour les statistiques admin */
         .admin-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 15px;
             border-radius: 10px;
             text-align: center;
-            border-left: 5px solid #4b6cb7;
-        }
-        
-        .stat-card h3 {
-            color: #182848;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            border: 2px solid rgba(212, 175, 55, 0.3);
         }
         
         .stat-value {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
-            color: #4b6cb7;
+            color: #f7ef8a;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #a0c8ff;
+            font-size: 0.9rem;
+        }
+        
+        /* Styles pour le tableau des résultats */
+        .results-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
         
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
         
         .results-table th {
-            background-color: #182848;
-            color: white;
-            padding: 15px;
+            background: rgba(212, 175, 55, 0.2);
+            color: #f7ef8a;
+            padding: 12px 15px;
             text-align: left;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.4);
         }
         
         .results-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            color: #cccccc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .results-table tr:hover {
-            background-color: #f8f9fa;
+            background: rgba(212, 175, 55, 0.1);
         }
         
+        /* Bouton d'export */
         .export-btn {
-            background-color: #4b6cb7;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .export-btn:hover {
-            background-color: #3a56a4;
-            transform: scale(1.05);
-        }
-        
-        .auth-form {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 400px;
-            margin: 50px auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .auth-form h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #182848;
-        }
-        
-        .auth-form input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        
-        .auth-form button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4b6cb7;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        /* Bouton pour voir les erreurs */
+        .view-errors-btn {
+            padding: 8px 12px;
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
         
-        .auth-form button:hover {
-            background-color: #3a56a4;
+        .view-errors-btn:hover {
+            background: linear-gradient(90deg, #ffb74d, #ff9800);
+            transform: translateY(-1px);
         }
         
-        .auth-message {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
+        /* Section erreurs détaillées */
+        .error-details {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        .error-details h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error-list {
+            list-style: none;
+        }
+        
+        .error-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
         }
         
-        .auth-message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .error-question {
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 5px;
         }
         
-        .auth-message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .error-answer {
+            color: #cccccc;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .error-wrong {
+            color: #ff6b6b;
+        }
+        
+        .error-correct {
+            color: #4CAF50;
+        }
+        
+        /* Filtres pour les membres */
+        .member-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #cccccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            color: white;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(90deg, #d4af37, #f7ef8a);
+            color: #1a1a2e;
+            border-color: #d4af37;
         }
         
         .header h1 {
@@ -533,80 +650,15 @@
             font-size: 0.9rem;
         }
         
-        /* Styles pour les erreurs dans le panel admin */
-        .error-details {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-        
-        .error-details h4 {
-            color: #182848;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .error-list {
-            list-style-type: none;
-        }
-        
-        .error-item {
-            padding: 10px 15px;
-            margin-bottom: 10px;
+        /* Message initial */
+        #no-content {
+            display: block;
+            text-align: center;
+            padding: 50px;
             background-color: white;
-            border-left: 4px solid #dc3545;
-            border-radius: 5px;
-        }
-        
-        .error-question {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-        
-        .error-answer {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .error-correct {
-            color: #28a745;
-            font-weight: 500;
-        }
-        
-        .error-wrong {
-            color: #dc3545;
-            font-weight: 500;
-        }
-        
-        .member-selector {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .member-selector-btn {
-            padding: 8px 15px;
-            background-color: #e9ecef;
-            border: 2px solid #dee2e6;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .member-selector-btn:hover {
-            background-color: #dee2e6;
-        }
-        
-        .member-selector-btn.active {
-            background-color: #4b6cb7;
-            color: white;
-            border-color: #4b6cb7;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
         }
         
         @media (max-width: 768px) {
@@ -634,20 +686,17 @@
                 grid-template-columns: 1fr;
             }
             
-            .results-table {
-                font-size: 0.9rem;
+            .modal-content {
+                padding: 15px;
+                margin: 10px;
             }
             
-            .results-table th, .results-table td {
-                padding: 10px;
+            .member-filters {
+                flex-direction: column;
             }
             
             .questions-container {
                 max-height: 500px;
-            }
-            
-            .member-selector {
-                flex-direction: column;
             }
         }
     </style>
@@ -656,79 +705,96 @@
     <div class="header">
         <h1><i class="fas fa-book-open"></i> Devoirs de Français - Famille Singa</h1>
         <p>Thème : Accord du participe passé - 50 questions par personne<br>Chaque membre a son propre questionnaire unique</p>
-        <button class="admin-btn" id="admin-panel-btn">
+        <button class="admin-btn" id="adminButton">
             <i class="fas fa-lock"></i> Accès Admin
         </button>
     </div>
     
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="admin-panel">
-        <div class="admin-header">
-            <i class="fas fa-chart-bar fa-2x"></i>
-            <h2>Tableau de Bord Administrateur</h2>
-        </div>
-        
-        <div id="auth-form" class="auth-form">
-            <h2><i class="fas fa-user-shield"></i> Connexion Admin</h2>
-            <input type="password" id="admin-password" placeholder="Mot de passe admin" autocomplete="off">
-            <button id="admin-login-btn">Se connecter</button>
-            <div id="auth-message" class="auth-message"></div>
-        </div>
-        
-        <div id="admin-content" style="display: none;">
-            <div class="admin-stats">
-                <div class="stat-card">
-                    <h3>Total Participants</h3>
-                    <div class="stat-value" id="total-participants">0</div>
+    <!-- Modal Admin -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeAdminModal">&times;</button>
+            
+            <h2><i class="fas fa-lock"></i> PANEL ADMIN - FAMILLE SINGA</h2>
+            
+            <div id="passwordSection">
+                <p style="color: #a0c8ff; text-align: center; margin-bottom: 20px;">
+                    Accès réservé à la coordination
+                </p>
+                <div class="form-group">
+                    <input type="password" id="adminPassword" 
+                           placeholder="Mot de passe : legende360@"
+                           class="form-input">
                 </div>
-                <div class="stat-card">
-                    <h3>Moyenne Générale</h3>
-                    <div class="stat-value" id="average-score">0%</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Meilleur Score</h3>
-                    <div class="stat-value" id="best-score">0/50</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Dernière Activité</h3>
-                    <div class="stat-value" id="last-activity">--</div>
-                </div>
+                <button id="loginButton" class="submit-button">
+                    <i class="fas fa-sign-in-alt"></i> SE CONNECTER
+                </button>
             </div>
             
-            <h3><i class="fas fa-table"></i> Résultats Détailés</h3>
-            
-            <!-- Sélecteur de membre pour filtrer les résultats -->
-            <div class="member-selector" id="member-selector">
-                <button class="member-selector-btn active" data-member="all">Tous</button>
-                <button class="member-selector-btn" data-member="credo">Credo</button>
-                <button class="member-selector-btn" data-member="moise">Moïse</button>
-                <button class="member-selector-btn" data-member="aubaine">Aubaine</button>
+            <div id="adminPanel" class="hidden">
+                <h3 style="color: #f7ef8a; text-align: center; margin-bottom: 20px;">
+                    Résultats des Devoirs - Famille Singa
+                </h3>
+                
+                <!-- Statistiques -->
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalParticipants">0</div>
+                        <div class="stat-label">Total Tests</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="averageScore">0%</div>
+                        <div class="stat-label">Moyenne</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestScore">0/50</div>
+                        <div class="stat-label">Meilleur Score</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayTests">0</div>
+                        <div class="stat-label">Aujourd'hui</div>
+                    </div>
+                </div>
+                
+                <!-- Filtres par membre -->
+                <div class="member-filters">
+                    <button class="filter-btn active" data-member="all">Tous</button>
+                    <button class="filter-btn" data-member="credo">Credo</button>
+                    <button class="filter-btn" data-member="moise">Moïse</button>
+                    <button class="filter-btn" data-member="aubaine">Aubaine</button>
+                </div>
+                
+                <!-- Tableau des résultats -->
+                <div class="results-table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Score</th>
+                                <th>Pourcentage</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantsList">
+                            <!-- Les résultats seront insérés ici -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Section des erreurs détaillées -->
+                <div class="error-details" id="errorDetails" style="display: none;">
+                    <h3><i class="fas fa-exclamation-circle"></i> Erreurs détaillées</h3>
+                    <div id="errorsList"></div>
+                </div>
+                
+                <button id="exportButton" class="export-btn">
+                    <i class="fas fa-download"></i> EXPORTER LES RÉSULTATS
+                </button>
             </div>
-            
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Participant</th>
-                        <th>Score</th>
-                        <th>Pourcentage</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="results-table-body">
-                    <!-- Results will be populated here -->
-                </tbody>
-            </table>
-            
-            <!-- Zone d'affichage des erreurs détaillées -->
-            <div class="error-details" id="error-details" style="display: none;">
-                <h4><i class="fas fa-exclamation-circle"></i> Erreurs détaillées - <span id="selected-member-name"></span></h4>
-                <div id="errors-list"></div>
-            </div>
-            
-            <button class="export-btn" id="export-btn">
-                <i class="fas fa-download"></i> Exporter les Résultats
-            </button>
         </div>
     </div>
     
@@ -759,7 +825,7 @@
     </div>
     
     <!-- Message initial -->
-    <div id="no-content" style="display: block; text-align: center; padding: 50px; background-color: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); margin-top: 20px;">
+    <div id="no-content">
         <h2><i class="fas fa-hand-pointer fa-2x" style="color: #4b6cb7; margin-bottom: 20px;"></i></h2>
         <h2 style="color: #182848; margin-bottom: 15px;">Sélectionnez votre nom pour commencer</h2>
         <p style="color: #666; font-size: 1.1rem;">Cliquez sur votre nom dans les boutons ci-dessus pour afficher votre devoir.</p>
@@ -844,7 +910,7 @@
     </div>
 
     <script>
-        // NOUVELLE Configuration Firebase
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBPBq1uT7lbL9Xp_neAJh2lSe0MRErlYdo",
             authDomain: "evoir-1.firebaseapp.com",
@@ -858,11 +924,9 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
         // Admin credentials
         const ADMIN_PASSWORD = "legende360@";
-        const ADMIN_EMAIL = "admin@familiesinga.com";
 
         // Questions data - 50 UNIQUE questions for each family member
         const credoQuestions = [
@@ -1025,21 +1089,21 @@
             { question: "Les difficultés qu'il a ___ surmonter étaient réelles.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 }
         ];
 
-        // Variable pour stocker les résultats chargés
+        // Variables globales
         let allResults = [];
-        let selectedMemberFilter = 'all';
+        let currentFilter = 'all';
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Afficher le message "Sélectionnez votre nom" au départ
+            // Afficher le message initial
             document.getElementById('no-content').style.display = 'block';
             
-            // Cacher tous les contenus des membres au départ
+            // Cacher tous les contenus au départ
             document.getElementById('credo-content').style.display = 'none';
             document.getElementById('moise-content').style.display = 'none';
             document.getElementById('aubaine-content').style.display = 'none';
             
-            // Set up button click events - CORRECTION ICI
+            // Set up button click events
             document.getElementById('aubaine-btn').addEventListener('click', function() {
                 showContent('aubaine');
             });
@@ -1050,29 +1114,67 @@
                 showContent('credo');
             });
             
-            // Admin panel events
-            document.getElementById('admin-panel-btn').addEventListener('click', toggleAdminPanel);
-            document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
-            document.getElementById('export-btn').addEventListener('click', exportResults);
+            // Gestion du modal admin (inspiré du code partagé)
+            const adminModal = document.getElementById('adminModal');
+            const adminButton = document.getElementById('adminButton');
+            const closeAdminModal = document.getElementById('closeAdminModal');
+            const loginButton = document.getElementById('loginButton');
+            const exportButton = document.getElementById('exportButton');
             
-            // Set up member selector events
-            document.querySelectorAll('.member-selector-btn').forEach(btn => {
+            // Ouvrir modal admin
+            adminButton.addEventListener('click', () => {
+                adminModal.style.display = 'block';
+                document.getElementById('passwordSection').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('adminPassword').value = '';
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Fermer modal admin
+            closeAdminModal.addEventListener('click', () => {
+                adminModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Fermer modal en cliquant à l'extérieur
+            adminModal.addEventListener('click', (e) => {
+                if (e.target === adminModal) {
+                    adminModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Login admin
+            loginButton.addEventListener('click', () => {
+                const password = document.getElementById('adminPassword').value;
+                if (password === ADMIN_PASSWORD) {
+                    document.getElementById('passwordSection').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadResultsData();
+                } else {
+                    alert("Mot de passe incorrect. Le mot de passe est : legende360@");
+                }
+            });
+            
+            // Gestion des filtres
+            document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    document.querySelectorAll('.member-selector-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    selectedMemberFilter = this.getAttribute('data-member');
+                    currentFilter = this.getAttribute('data-member');
                     displayResultsTable();
                 });
             });
             
-            // Check if admin is already logged in
-            checkAdminAuth();
+            // Export des données
+            exportButton.addEventListener('click', exportResults);
+            
+            // Charger les données au démarrage
+            loadResultsData();
         });
         
         function showContent(member) {
-            console.log("Affichage du contenu pour:", member); // Debug
-            
-            // Cacher le message "Sélectionnez votre nom"
+            // Cacher le message initial
             document.getElementById('no-content').style.display = 'none';
             
             // Cacher tous les contenus
@@ -1083,19 +1185,11 @@
             // Créer les questions pour ce membre si elles n'existent pas encore
             const questionsContainer = document.getElementById(`${member}-questions`);
             if (questionsContainer.children.length === 0) {
-                console.log("Création des questions pour:", member); // Debug
-                
                 let questionsArray;
                 switch(member) {
-                    case 'credo': 
-                        questionsArray = credoQuestions; 
-                        break;
-                    case 'moise': 
-                        questionsArray = moiseQuestions; 
-                        break;
-                    case 'aubaine': 
-                        questionsArray = aubaineQuestions; 
-                        break;
+                    case 'credo': questionsArray = credoQuestions; break;
+                    case 'moise': questionsArray = moiseQuestions; break;
+                    case 'aubaine': questionsArray = aubaineQuestions; break;
                 }
                 
                 createQuestions(member, questionsArray);
@@ -1137,10 +1231,7 @@
         
         function createQuestions(member, questionsArray) {
             const container = document.getElementById(`${member}-questions`);
-            if (!container) {
-                console.error("Container non trouvé pour:", member);
-                return;
-            }
+            if (!container) return;
             
             container.innerHTML = '';
             
@@ -1262,19 +1353,6 @@
                 feedbackClass = 'poor';
             }
             
-            // Add additional feedback for Credo
-            if (member === 'credo') {
-                feedback += ` En tant que coach, tu peux maintenant expliquer ces règles à tes frères et sœurs.`;
-                
-                if (percentage >= 80) {
-                    feedback += ` Tu es prêt à les coacher efficacement !`;
-                } else if (percentage >= 60) {
-                    feedback += ` Revois les questions que tu as ratées pour mieux expliquer les règles.`;
-                } else {
-                    feedback += ` Étudie bien les explications avant de coacher les autres.`;
-                }
-            }
-            
             if (feedbackElement) {
                 feedbackElement.textContent = feedback;
                 feedbackElement.className = `feedback ${feedbackClass}`;
@@ -1301,7 +1379,11 @@
                 };
                 
                 await db.collection('resultats_devoirs').add(resultData);
-                console.log(`Résultats sauvegardés pour ${member} dans la nouvelle base de données`);
+                console.log(`Résultats sauvegardés pour ${member}`);
+                
+                // Mettre à jour les données admin
+                loadResultsData();
+                
             } catch (error) {
                 console.error("Erreur lors de la sauvegarde des résultats:", error);
                 alert("Erreur de connexion à la base de données. Veuillez réessayer.");
@@ -1317,69 +1399,7 @@
             }
         }
         
-        function toggleAdminPanel() {
-            const adminPanel = document.getElementById('admin-panel');
-            adminPanel.classList.toggle('active');
-        }
-        
-        function checkAdminAuth() {
-            auth.onAuthStateChanged((user) => {
-                if (user && user.email === ADMIN_EMAIL) {
-                    showAdminContent();
-                } else {
-                    hideAdminContent();
-                }
-            });
-        }
-        
-        async function adminLogin() {
-            const password = document.getElementById('admin-password').value;
-            const messageDiv = document.getElementById('auth-message');
-            
-            if (password === ADMIN_PASSWORD) {
-                try {
-                    // Create user with email and password
-                    await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-                    messageDiv.textContent = "Connexion réussie !";
-                    messageDiv.className = "auth-message success";
-                    showAdminContent();
-                    loadResults();
-                } catch (error) {
-                    if (error.code === 'auth/email-already-in-use') {
-                        // User already exists, try to sign in
-                        try {
-                            await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-                            messageDiv.textContent = "Connexion réussie !";
-                            messageDiv.className = "auth-message success";
-                            showAdminContent();
-                            loadResults();
-                        } catch (signInError) {
-                            messageDiv.textContent = "Erreur de connexion. Vérifiez le mot de passe.";
-                            messageDiv.className = "auth-message error";
-                        }
-                    } else {
-                        messageDiv.textContent = "Erreur de connexion.";
-                        messageDiv.className = "auth-message error";
-                    }
-                }
-            } else {
-                messageDiv.textContent = "Mot de passe incorrect.";
-                messageDiv.className = "auth-message error";
-            }
-        }
-        
-        function showAdminContent() {
-            document.getElementById('auth-form').style.display = 'none';
-            document.getElementById('admin-content').style.display = 'block';
-        }
-        
-        function hideAdminContent() {
-            document.getElementById('auth-form').style.display = 'block';
-            document.getElementById('admin-content').style.display = 'none';
-            document.getElementById('error-details').style.display = 'none';
-        }
-        
-        async function loadResults() {
+        async function loadResultsData() {
             try {
                 const snapshot = await db.collection('resultats_devoirs')
                     .orderBy('timestamp', 'desc')
@@ -1388,8 +1408,8 @@
                 allResults = [];
                 let totalScore = 0;
                 let bestScore = 0;
-                let lastActivity = null;
-                const members = new Set();
+                const today = new Date().toDateString();
+                let todayCount = 0;
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
@@ -1402,30 +1422,35 @@
                     if (data.score > bestScore) {
                         bestScore = data.score;
                     }
-                    members.add(data.member);
                     
-                    if (!lastActivity || data.timestamp > lastActivity) {
-                        lastActivity = data.timestamp;
+                    // Compter les tests d'aujourd'hui
+                    if (data.timestamp) {
+                        const testDate = data.timestamp.toDate ? 
+                            data.timestamp.toDate().toDateString() : 
+                            new Date(data.date).toDateString();
+                        if (testDate === today) {
+                            todayCount++;
+                        }
                     }
                 });
                 
                 // Update statistics
-                document.getElementById('total-participants').textContent = members.size;
-                document.getElementById('average-score').textContent = allResults.length > 0 ? 
+                document.getElementById('totalParticipants').textContent = allResults.length;
+                document.getElementById('averageScore').textContent = allResults.length > 0 ? 
                     Math.round(totalScore / allResults.length) + '%' : '0%';
-                document.getElementById('best-score').textContent = bestScore + '/50';
-                document.getElementById('last-activity').textContent = lastActivity ? 
-                    new Date(lastActivity.toDate()).toLocaleDateString('fr-FR') : '--';
+                document.getElementById('bestScore').textContent = bestScore + '/50';
+                document.getElementById('todayTests').textContent = todayCount;
                 
                 // Display results table
                 displayResultsTable();
                 
             } catch (error) {
                 console.error("Erreur lors du chargement des résultats:", error);
-                document.getElementById('results-table-body').innerHTML = `
+                const listElement = document.getElementById('participantsList');
+                listElement.innerHTML = `
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: #dc3545;">
-                            Erreur de connexion à la base de données. Veuillez réessayer.
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #ff6b6b;">
+                            Erreur de connexion à la base de données.
                         </td>
                     </tr>
                 `;
@@ -1433,13 +1458,13 @@
         }
         
         function displayResultsTable() {
-            const tableBody = document.getElementById('results-table-body');
+            const tableBody = document.getElementById('participantsList');
             tableBody.innerHTML = '';
             
-            // Filtrer les résultats selon le membre sélectionné
-            const filteredResults = selectedMemberFilter === 'all' 
+            // Filtrer les résultats selon le filtre actuel
+            const filteredResults = currentFilter === 'all' 
                 ? allResults 
-                : allResults.filter(result => result.member === selectedMemberFilter);
+                : allResults.filter(result => result.member === currentFilter);
             
             if (filteredResults.length === 0) {
                 tableBody.innerHTML = `
@@ -1449,7 +1474,7 @@
                         </td>
                     </tr>
                 `;
-                document.getElementById('error-details').style.display = 'none';
+                document.getElementById('errorDetails').style.display = 'none';
                 return;
             }
             
@@ -1459,23 +1484,33 @@
                     new Date(result.timestamp.toDate()).toLocaleString('fr-FR') : 
                     new Date(result.date).toLocaleString('fr-FR');
                 
-                let statusClass = '';
+                // Créer une couleur pour le score
+                let scoreColor = '#ff6b6b'; // rouge par défaut
                 if (result.percentage >= 80) {
-                    statusClass = 'Excellent';
+                    scoreColor = '#4CAF50'; // vert pour excellent
                 } else if (result.percentage >= 60) {
-                    statusClass = 'Bon';
-                } else {
-                    statusClass = 'À revoir';
+                    scoreColor = '#FF9800'; // orange pour bon
                 }
                 
                 row.innerHTML = `
-                    <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)} (${result.niveau})</td>
-                    <td>${result.score}/${result.totalQuestions}</td>
-                    <td>${result.percentage}%</td>
-                    <td>${date}</td>
+                    <td style="font-weight: bold; color: #f7ef8a;">
+                        ${result.member.charAt(0).toUpperCase() + result.member.slice(1)}
+                        <span style="font-size: 0.8rem; color: #a0c8ff; margin-left: 5px;">
+                            (${result.niveau})
+                        </span>
+                    </td>
+                    <td style="color: ${scoreColor}; font-weight: bold;">
+                        ${result.score}/${result.totalQuestions}
+                    </td>
+                    <td style="color: ${scoreColor}; font-weight: bold;">
+                        ${result.percentage}%
+                    </td>
+                    <td style="color: #cccccc; font-size: 0.9rem;">
+                        ${date}
+                    </td>
                     <td>
-                        <button class="member-selector-btn" onclick="showErrorDetails('${result.id}', '${result.member}')">
-                            <i class="fas fa-search"></i> Voir les erreurs
+                        <button class="view-errors-btn" onclick="showErrorDetails('${result.id}')">
+                            <i class="fas fa-search"></i> Voir erreurs
                         </button>
                     </td>
                 `;
@@ -1483,14 +1518,11 @@
             });
         }
         
-        function showErrorDetails(resultId, memberName) {
+        function showErrorDetails(resultId) {
             const result = allResults.find(r => r.id === resultId);
             if (!result) return;
             
-            document.getElementById('selected-member-name').textContent = 
-                memberName.charAt(0).toUpperCase() + memberName.slice(1);
-            
-            const errorsList = document.getElementById('errors-list');
+            const errorsList = document.getElementById('errorsList');
             errorsList.innerHTML = '';
             
             // Trouver les réponses incorrectes
@@ -1498,14 +1530,12 @@
             
             if (incorrectAnswers.length === 0) {
                 errorsList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #28a745;">
+                    <div style="text-align: center; padding: 20px; color: #4CAF50;">
                         <i class="fas fa-check-circle fa-2x"></i>
                         <p style="margin-top: 10px;">Aucune erreur ! Excellent travail !</p>
                     </div>
                 `;
             } else {
-                errorsList.innerHTML = `<p>${incorrectAnswers.length} erreur(s) trouvée(s) :</p>`;
-                
                 const errorList = document.createElement('ul');
                 errorList.className = 'error-list';
                 
@@ -1518,7 +1548,7 @@
                             <strong>Question ${answer.questionIndex + 1}:</strong> ${answer.question}
                         </div>
                         <div class="error-answer">
-                            <span class="error-wrong">Votre réponse: ${answer.selectedText}</span> | 
+                            <span class="error-wrong">Réponse donnée: ${answer.selectedText}</span>
                             <span class="error-correct">Réponse correcte: ${answer.correctText}</span>
                         </div>
                     `;
@@ -1528,16 +1558,23 @@
                 errorsList.appendChild(errorList);
             }
             
-            document.getElementById('error-details').style.display = 'block';
-            document.getElementById('error-details').scrollIntoView({ behavior: 'smooth' });
+            // Afficher la section des erreurs
+            const errorDetails = document.getElementById('errorDetails');
+            errorDetails.style.display = 'block';
+            errorDetails.scrollIntoView({ behavior: 'smooth' });
         }
         
         function exportResults() {
-            const filteredResults = selectedMemberFilter === 'all' 
+            const filteredResults = currentFilter === 'all' 
                 ? allResults 
-                : allResults.filter(result => result.member === selectedMemberFilter);
+                : allResults.filter(result => result.member === currentFilter);
             
-            let csv = "Participant,Niveau,Score,Pourcentage,Date,Nombre d'erreurs\n";
+            if (filteredResults.length === 0) {
+                alert("Aucune donnée à exporter pour ce filtre");
+                return;
+            }
+            
+            let csv = "Membre,Niveau,Score,Total Questions,Pourcentage,Nombre d'erreurs,Date\n";
             
             filteredResults.forEach(result => {
                 const date = result.timestamp ? 
@@ -1546,21 +1583,21 @@
                 
                 const errorCount = result.answers.filter(a => !a.isCorrect).length;
                 
-                csv += `"${result.member.charAt(0).toUpperCase() + result.member.slice(1)}","${result.niveau}",${result.score}/${result.totalQuestions},${result.percentage}%,"${date}",${errorCount}\n`;
+                csv += `"${result.member}","${result.niveau}","${result.score}","${result.totalQuestions}","${result.percentage}%","${errorCount}","${date}"\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'resultats_famille_singa_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.download = `resultats_famille_singa_${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }
         
-        // Exposer la fonction au scope global pour le bouton
+        // Exposer les fonctions au scope global
         window.showErrorDetails = showErrorDetails;
     </script>
 </body>
