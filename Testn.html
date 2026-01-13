@@ -3,1877 +3,1165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concours d'Éloquence Excellentia Academia</title>
+    <title>Système Éducatif - Admin & Exercice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Georgia', 'Times New Roman', serif;
-        }
-        
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff;
             padding: 20px;
-            position: relative;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        /* Logo professionnel en en-tête */
-        .header-logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            min-height: 90vh;
         }
-        
-        .logo-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #d4af37, #f7ef8a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .logo-circle i {
-            font-size: 2.5rem;
-            color: #1a1a2e;
-        }
-        
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            background: linear-gradient(90deg, #1e90ff, #f7ef8a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
-        }
-        
-        .logo-subtitle {
-            font-size: 0.9rem;
-            color: #a0c8ff;
-            font-style: italic;
-        }
-        
-        /* Animation d'entrée pour les éléments */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate {
-            animation: fadeInUp 0.8s ease-out forwards;
-            opacity: 0;
-        }
-        
-        .container {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            padding: 30px 25px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-            text-align: center;
-            max-width: 1100px;
-            width: 100%;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(220, 190, 130, 0.2);
-            position: relative;
-            overflow: hidden;
-            margin-top: 60px;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #d4af37, #f7ef8a, #d4af37);
-        }
-        
-        .event-title {
-            font-size: 1.6rem;
-            color: #f7ef8a;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        .deadline-info {
-            background-color: rgba(212, 175, 55, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        
-        .deadline-title {
-            font-size: 1.3rem;
-            color: #ffd700;
-            margin-bottom: 8px;
-        }
-        
-        .deadline-date {
-            font-size: 1.8rem;
-            color: #fff;
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-        }
-        
-        .countdown {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        .time-unit {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px 10px;
-            min-width: 75px;
-            flex: 1;
-            max-width: 120px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .time-unit::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #d4af37, #f7ef8a);
-        }
-        
-        .time-unit:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
-            border-color: rgba(212, 175, 55, 0.7);
-        }
-        
-        .time-value {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #f7ef8a;
-            text-shadow: 0 0 10px rgba(247, 239, 138, 0.7);
-            line-height: 1;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .time-label {
-            font-size: 0.9rem;
-            margin-top: 8px;
-            color: #a0c8ff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .urgent-message {
-            background-color: rgba(255, 50, 50, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0;
-            border: 2px solid rgba(255, 100, 100, 0.4);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { border-color: rgba(255, 100, 100, 0.4); }
-            50% { border-color: rgba(255, 100, 100, 0.8); }
-            100% { border-color: rgba(255, 100, 100, 0.4); }
-        }
-        
-        .urgent-title {
-            font-size: 1.2rem;
-            color: #ff6b6b;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .urgent-text {
-            font-size: 1rem;
-            color: #ffaaaa;
-            line-height: 1.4;
-        }
-        
-        /* Bouton Admin */
-        .admin-button-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
-        .admin-button {
-            background: linear-gradient(90deg, #d4af37, #8b7500);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-        }
-        
-        .admin-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(139, 117, 0, 0.4);
-        }
-        
-        .cta-button {
-            background: linear-gradient(90deg, #d4af37, #f7ef8a);
-            color: #1a1a2e;
-            border: none;
-            padding: 16px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 25px 0;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(212, 175, 55, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            max-width: 350px;
-        }
-        
-        .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 20px rgba(212, 175, 55, 0.6);
-        }
-        
-        /* Frais d'inscription */
-        .fees-section {
-            background: linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(212, 175, 55, 0.1));
-            border-radius: 15px;
-            padding: 25px;
-            margin: 30px 0;
-            border: 2px solid rgba(30, 144, 255, 0.3);
-        }
-        
-        .fees-title {
-            font-size: 1.8rem;
-            color: #1e90ff;
-            margin-bottom: 25px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .fees-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .fee-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 25px 20px;
-            border: 2px solid rgba(30, 144, 255, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .fee-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(30, 144, 255, 0.2);
-            border-color: #1e90ff;
-        }
-        
-        .fee-card.regular {
-            border-color: rgba(30, 144, 255, 0.4);
-        }
-        
-        .fee-card.member {
-            border-color: rgba(212, 175, 55, 0.4);
-        }
-        
-        .fee-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--color1), var(--color2));
-        }
-        
-        .fee-card.regular::before {
-            --color1: #1e90ff;
-            --color2: #63b4ff;
-        }
-        
-        .fee-card.member::before {
-            --color1: #d4af37;
-            --color2: #f7ef8a;
-        }
-        
-        .fee-type {
-            font-size: 1.4rem;
-            color: #1e90ff;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-align: center;
-        }
-        
-        .fee-card.member .fee-type {
-            color: #f7ef8a;
-        }
-        
-        .fee-amount {
-            font-size: 2.5rem;
-            color: #fff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 8px rgba(30, 144, 255, 0.7);
-            font-weight: bold;
-        }
-        
-        .fee-card.member .fee-amount {
-            text-shadow: 0 0 8px rgba(247, 239, 138, 0.7);
-        }
-        
-        .fee-description {
-            font-size: 0.9rem;
-            color: #a0c8ff;
-            font-style: italic;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .fee-details {
-            list-style: none;
-            padding: 0;
-            margin-top: 15px;
-            width: 100%;
-            text-align: left;
-        }
-        
-        .fee-details li {
-            margin-bottom: 10px;
-            color: #cccccc;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-        }
-        
-        .fee-details i {
-            color: #1e90ff;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .fee-card.member .fee-details i {
-            color: #f7ef8a;
-        }
-        
-        .fee-note {
-            background: rgba(212, 175, 55, 0.1);
+        .navbar-custom {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
             border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px dashed rgba(212, 175, 55, 0.5);
-            text-align: center;
-            font-size: 0.9rem;
-            color: #f7ef8a;
+            margin-bottom: 30px;
         }
-        
-        /* Section des Prix et Récompenses */
-        .prizes-section {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.1));
+        .card {
+            border: none;
             border-radius: 15px;
-            padding: 25px;
-            margin: 30px 0;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-        }
-        
-        .prizes-title {
-            font-size: 1.8rem;
-            color: #ffd700;
-            margin-bottom: 25px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .prizes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .prize-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 25px 20px;
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .prize-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
-            border-color: #d4af37;
-        }
-        
-        .prize-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--color1), var(--color2));
-        }
-        
-        .prize-card.first::before {
-            --color1: #ffd700;
-            --color2: #ffed4e;
-        }
-        
-        .prize-card.second::before {
-            --color1: #c0c0c0;
-            --color2: #e8e8e8;
-        }
-        
-        .prize-card.third::before {
-            --color1: #cd7f32;
-            --color2: #e49b5d;
-        }
-        
-        .prize-rank {
-            font-size: 1.6rem;
-            color: #ffd700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-align: center;
-        }
-        
-        .prize-amount {
-            font-size: 2.2rem;
-            color: #f7ef8a;
-            margin-bottom: 10px;
-            text-shadow: 0 0 8px rgba(247, 239, 138, 0.7);
-            font-weight: bold;
-        }
-        
-        .prize-label {
-            font-size: 1.1rem;
-            color: #a0c8ff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
             margin-bottom: 20px;
-            font-style: italic;
-            text-align: center;
-            background: rgba(212, 175, 55, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            width: 100%;
         }
-        
-        .prize-details {
-            list-style: none;
-            padding: 0;
-            margin-top: 15px;
-            width: 100%;
+        .card:hover {
+            transform: translateY(-5px);
         }
-        
-        .prize-details li {
-            margin-bottom: 12px;
-            color: #ffffff;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 10px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.07);
-            font-size: 0.95rem;
-            line-height: 1.4;
+        .btn-primary {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
         }
-        
-        .prize-details i {
-            color: #d4af37;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-            margin-top: 2px;
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
         }
-        
-        .prize-highlight {
-            color: #f7ef8a;
+        .timer-display {
+            font-size: 3em;
             font-weight: bold;
+            color: #7c3aed;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .question-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #4f46e5;
+            margin: 20px 0;
+        }
+        .answer-option {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .answer-option:hover {
+            background: #f1f5f9;
+            border-color: #c7d2fe;
+        }
+        .answer-option.selected {
+            background: #c7d2fe;
+            border-color: #4f46e5;
+            font-weight: bold;
+        }
+        .answer-option.correct {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .answer-option.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+        .result-item {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .result-item.correct {
+            background: #d1fae5;
+            border-left: 5px solid #10b981;
+        }
+        .result-item.wrong {
+            background: #fee2e2;
+            border-left: 5px solid #ef4444;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px;
+        }
+        .stat-card.success {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+        .stat-card.danger {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+        }
+        .stat-card.info {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .admin-badge {
+            background: #7c3aed;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .student-badge {
+            background: #10b981;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .tab-content {
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .nav-tabs {
+            border-bottom: 3px solid #e2e8f0;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            padding: 15px 30px;
+            border-radius: 10px 10px 0 0;
             margin-right: 5px;
         }
-        
-        /* Récompenses supplémentaires */
-        .additional-rewards {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 25px;
-            border: 2px solid rgba(212, 175, 55, 0.3);
+        .nav-tabs .nav-link.active {
+            background: #4f46e5;
+            color: white;
+            border: none;
         }
-        
-        .rewards-title {
-            font-size: 1.8rem;
-            color: #f7ef8a;
-            margin-bottom: 20px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .rewards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        
-        .reward-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 25px 20px;
-            border: 2px solid rgba(30, 144, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        .reward-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(30, 144, 255, 0.2);
-        }
-        
-        .reward-icon {
-            font-size: 2.5rem;
-            color: #1e90ff;
-            margin-bottom: 15px;
-        }
-        
-        .reward-subtitle {
-            font-size: 1.2rem;
-            color: #f7ef8a;
-            margin-bottom: 10px;
-        }
-        
-        .reward-description {
-            color: #cccccc;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        
-        .instructions {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: left;
-            border-left: 5px solid #d4af37;
-        }
-        
-        .instructions h3 {
-            color: #f7ef8a;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .instructions ul {
-            padding-left: 20px;
-            color: #cccccc;
-            line-height: 1.5;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-        
-        .whatsapp-section {
-            background-color: rgba(37, 211, 102, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 25px 0;
-            border: 2px solid rgba(37, 211, 102, 0.3);
-            text-align: center;
-        }
-        
-        .whatsapp-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        
-        .whatsapp-icon {
-            font-size: 2.2rem;
-            color: #25d366;
-        }
-        
-        .whatsapp-title {
-            font-size: 1.4rem;
-            color: #25d366;
-            font-weight: bold;
-        }
-        
-        .whatsapp-description {
-            font-size: 1rem;
-            color: #a0ffc0;
-            line-height: 1.5;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .whatsapp-benefits {
-            background-color: rgba(37, 211, 102, 0.08);
-            border-radius: 10px;
+        .question-preview {
+            background: white;
             padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .whatsapp-benefits li {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #ffffff;
-            line-height: 1.4;
-        }
-        
-        .whatsapp-button {
-            background: linear-gradient(90deg, #25d366, #128c7e);
-            color: white;
-            border: none;
-            padding: 18px 25px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(37, 211, 102, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            max-width: 350px;
-            margin: 0 auto;
-        }
-        
-        .whatsapp-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(37, 211, 102, 0.4);
-            background: linear-gradient(90deg, #2eff7c, #1ab394);
-        }
-        
-        .progress-container {
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin-top: 20px;
-            overflow: hidden;
-            height: 15px;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #0f3460, #d4af37, #f7ef8a);
-            width: 0%;
-            border-radius: 12px;
-            transition: width 1s ease;
-        }
-        
-        .progress-text {
-            margin-top: 12px;
-            font-size: 1rem;
-            color: #a0c8ff;
-            text-align: center;
-        }
-        
-        /* Modal styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            border-radius: 15px;
-            padding: 25px;
-            width: 100%;
-            max-width: 500px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-            position: relative;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #ff6b6b;
-            font-size: 1.8rem;
-            cursor: pointer;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-        
-        .close-modal:hover {
-            background-color: rgba(255, 107, 107, 0.1);
-            transform: rotate(90deg);
-        }
-        
-        .modal-title {
-            font-size: 1.6rem;
-            color: #f7ef8a;
-            margin-bottom: 25px;
-            text-align: center;
-            padding-right: 20px;
-        }
-        
-        .form-container {
-            margin-top: 15px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #a0c8ff;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus, .form-textarea:focus, .form-select:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-        }
-        
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .submit-button {
-            background: linear-gradient(90deg, #1e90ff, #0d47a1);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .submit-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(13, 71, 161, 0.4);
-        }
-        
-        .hidden-form {
-            display: none;
-        }
-        
-        .form-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .form-checkbox input {
-            margin-top: 3px;
-            flex-shrink: 0;
-        }
-        
-        .form-checkbox label {
-            font-size: 0.9rem;
-            color: #cccccc;
-            line-height: 1.4;
-        }
-        
-        /* Modal Admin */
-        .admin-modal-content {
-            max-width: 800px;
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .stat-card {
-            background: rgba(212, 175, 55, 0.1);
             border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin: 10px 0;
+            border: 1px solid #e2e8f0;
         }
-        
-        .stat-value {
-            font-size: 2rem;
-            color: #f7ef8a;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #a0c8ff;
-        }
-        
-        .participants-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin: 20px 0;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 10px;
-            padding: 10px;
-        }
-        
-        .participant-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border-left: 3px solid #d4af37;
-        }
-        
-        .participant-name {
-            font-weight: bold;
-            color: #f7ef8a;
-        }
-        
-        .participant-details {
-            font-size: 0.8rem;
-            color: #a0c8ff;
-            margin-top: 4px;
-        }
-        
-        .export-button {
-            background: linear-gradient(90deg, #4CAF50, #2E7D32);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .password-input-container {
-            margin: 20px 0;
-        }
-        
-        .password-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 2px solid #d4af37;
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 1rem;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-        
-        footer {
-            margin-top: 30px;
-            color: #88aabb;
-            font-size: 0.8rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-            text-align: center;
-        }
-        
-        @media (min-width: 768px) {
-            .container {
-                padding: 40px;
-            }
-            
-            .header-logo {
-                top: 30px;
-                left: 30px;
-            }
-            
-            .logo-circle {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .logo-circle i {
-                font-size: 3rem;
-            }
-            
-            .logo-title {
-                font-size: 2.2rem;
-            }
-            
-            .event-title {
-                font-size: 2.2rem;
-            }
-            
-            .deadline-date {
-                font-size: 2.5rem;
-            }
-            
-            .time-unit {
-                min-width: 160px;
-                padding: 30px 20px;
-            }
-            
-            .time-value {
-                font-size: 4rem;
-            }
-            
-            .time-label {
-                font-size: 1.3rem;
-            }
-            
-            .fees-title, .prizes-title, .rewards-title {
-                font-size: 2.2rem;
-            }
-            
-            .prize-card {
-                padding: 30px 25px;
-            }
-            
-            .prize-amount {
-                font-size: 2.5rem;
-            }
-            
-            .fee-amount {
-                font-size: 3rem;
-            }
-            
-            .cta-button {
-                width: auto;
-                max-width: none;
-            }
-            
-            .whatsapp-button {
-                width: auto;
-                max-width: none;
-            }
-            
-            .modal-content {
-                padding: 40px;
-                margin-top: 40px;
-            }
-            
-            .modal-title {
-                font-size: 2.2rem;
-            }
-            
-            .prizes-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .fees-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (min-width: 480px) and (max-width: 767px) {
-            .header-logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                justify-content: center;
-                margin-bottom: 20px;
-            }
-            
-            .logo-circle {
-                width: 70px;
-                height: 70px;
-            }
-            
-            .logo-circle i {
-                font-size: 2.5rem;
-            }
-            
-            .logo-title {
-                font-size: 2rem;
-            }
-            
-            .time-unit {
-                min-width: 100px;
-                padding: 25px 15px;
-            }
-            
-            .time-value {
-                font-size: 3rem;
-            }
-            
-            .prizes-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 479px) {
-            .header-logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-                margin-bottom: 20px;
-            }
-            
-            .logo-text {
-                align-items: center;
-            }
-            
-            .prizes-container, .fees-container, .rewards-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .admin-button {
-                font-size: 0.8rem;
-                padding: 8px 15px;
-            }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 5px;
+            border-radius: 3px;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Logo professionnel en en-tête -->
-    <div class="header-logo animate" style="animation-delay: 0.1s">
-        <div class="logo-circle">
-            <i class="fas fa-graduation-cap"></i>
-        </div>
-        <div class="logo-text">
-            <div class="logo-title">EXCELLENTIA ACADEMIA</div>
-            <div class="logo-subtitle">Concours d'Éloquence 2026</div>
-        </div>
-    </div>
-    
-    <!-- Bouton Admin -->
-    <div class="admin-button-container">
-        <button class="admin-button" id="adminButton">
-            <i class="fas fa-lock"></i> Admin
-        </button>
-    </div>
-    
-    <div class="container">
-        <h1 class="event-title animate" style="animation-delay: 0.2s">Éloquence en scène • 1ère édition</h1>
-        
-        <div class="deadline-info animate" style="animation-delay: 0.3s">
-            <div class="deadline-title">DERNIER JOUR D'INSCRIPTION</div>
-            <div class="deadline-date">20 Janvier 2026</div>
-        </div>
-        
-        <div class="urgent-message animate" style="animation-delay: 0.4s">
-            <div class="urgent-title"><i class="fas fa-exclamation-circle"></i> DERNIÈRE CHANCE !</div>
-            <div class="urgent-text">Le temps presse ! Inscrivez-vous avant la date limite pour participer à ce prestigieux concours.</div>
-        </div>
-        
-        <div class="countdown animate" style="animation-delay: 0.5s">
-            <div class="time-unit">
-                <div class="time-value" id="jours">00</div>
-                <div class="time-label">Jours</div>
+    <!-- Application Container -->
+    <div class="container main-container" id="app-container">
+        <!-- Login Screen (initial) -->
+        <div id="login-screen" class="login-container">
+            <h2 class="text-center mb-4" style="color: #4f46e5;">📚 Système Éducatif</h2>
+            <h4 class="text-center mb-4">Connexion</h4>
+            
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" id="login-email" class="form-control" placeholder="admin@match.com" value="admin@match.com">
             </div>
             
-            <div class="time-unit">
-                <div class="time-value" id="heures">00</div>
-                <div class="time-label">Heures</div>
+            <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin123">
             </div>
             
-            <div class="time-unit">
-                <div class="time-value" id="minutes">00</div>
-                <div class="time-label">Minutes</div>
+            <div class="mb-3">
+                <label class="form-label">Mode</label>
+                <select id="login-mode" class="form-select">
+                    <option value="admin">Administrateur</option>
+                    <option value="student">Élève (Credo Singa)</option>
+                </select>
             </div>
             
-            <div class="time-unit">
-                <div class="time-value" id="secondes">00</div>
-                <div class="time-label">Secondes</div>
-            </div>
-        </div>
-        
-        <button class="cta-button animate" id="openFormButton" style="animation-delay: 0.6s">
-            <i class="fas fa-pen-fancy"></i> S'INSCRIRE MAINTENANT
-        </button>
-        
-        <div class="progress-container animate" style="animation-delay: 0.7s">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="progress-text" id="progress-text">Temps restant avant la fermeture des inscriptions : 100%</div>
-        
-        <!-- Frais d'inscription -->
-        <div class="fees-section animate" style="animation-delay: 0.8s">
-            <h2 class="fees-title">
-                <i class="fas fa-ticket-alt"></i> FRAIS D'INSCRIPTION
-            </h2>
+            <button onclick="login()" class="btn btn-primary w-100">Se connecter</button>
             
-            <div class="fees-container">
-                <!-- Frais Réguliers -->
-                <div class="fee-card regular">
-                    <div class="fee-type">
-                        <i class="fas fa-user-graduate"></i> Participants Réguliers
-                    </div>
-                    <div class="fee-amount">5.000 Fc</div>
-                    <div class="fee-description">Montant standard pour tous les participants</div>
-                    <ul class="fee-details">
-                        <li><i class="fas fa-check-circle"></i> Accès à toutes les séances préparatoires</li>
-                        <li><i class="fas fa-check-circle"></i> Matériel du concours inclus</li>
-                        <li><i class="fas fa-check-circle"></i> Support pédagogique complet</li>
-                        <li><i class="fas fa-check-circle"></i> Accès aux ressources en ligne</li>
-                    </ul>
-                </div>
-                
-                <!-- Frais Membres -->
-                <div class="fee-card member">
-                    <div class="fee-type">
-                        <i class="fas fa-crown"></i> Membres Excellentia
-                    </div>
-                    <div class="fee-amount">3.000 Fc</div>
-                    <div class="fee-description">Tarif spécial pour les membres enregistrés</div>
-                    <ul class="fee-details">
-                        <li><i class="fas fa-check-circle"></i> Tous les avantages des participants réguliers</li>
-                        <li><i class="fas fa-check-circle"></i> Accès prioritaire aux formations</li>
-                        <li><i class="fas fa-check-circle"></i> Coaching personnalisé supplémentaire</li>
-                        <li><i class="fas fa-check-circle"></i> Certification de membre Excellentia</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="fee-note">
-                <i class="fas fa-info-circle"></i> Les frais couvrent l'accès à toutes les séances préparatoires et le matériel du concours.
+            <div class="mt-3 text-center">
+                <small class="text-muted">
+                    Admin: admin@match.com / admin123<br>
+                    Étudiant: credo@match.com / credo123
+                </small>
             </div>
         </div>
-        
-        <!-- Section des Prix et Récompenses -->
-        <div class="prizes-section animate" style="animation-delay: 0.9s">
-            <h2 class="prizes-title">
-                <i class="fas fa-trophy"></i> PRIX ET RÉCOMPENSES
-            </h2>
-            
-            <div class="prizes-container">
-                <!-- Premier Prix -->
-                <div class="prize-card first">
-                    <div class="prize-rank">
-                        <i class="fas fa-crown"></i> 1ère Place
-                    </div>
-                    <div class="prize-amount">1.000.000 Fc</div>
-                    <div class="prize-label">Grand Prix d'Excellence</div>
-                    <ul class="prize-details">
-                        <li><i class="fas fa-money-bill-wave"></i> <span class="prize-highlight">1.000.000 Fc</span> sur compte Equity BCDC</li>
-                        <li><i class="fas fa-graduation-cap"></i> <span class="prize-highlight">Bourse académique UNIKIN 2026-2027</span></li>
-                        <li><i class="fas fa-bus"></i> <span class="prize-highlight">Carte Trans Academia annuelle</span></li>
-                        <li><i class="fas fa-book"></i> <span class="prize-highlight">Accès Bibliothèque Centrale (1 an)</span></li>
-                        <li><i class="fas fa-medal"></i> <span class="prize-highlight">Médaille d'Or et Écharpe Officielle</span></li>
-                        <li><i class="fas fa-trophy"></i> Trophée d'Excellence</li>
-                        <li><i class="fas fa-award"></i> Brevet d'Excellence</li>
-                    </ul>
-                </div>
-                
-                <!-- Deuxième Prix -->
-                <div class="prize-card second">
-                    <div class="prize-rank">
-                        <i class="fas fa-medal"></i> 2ème Place
-                    </div>
-                    <div class="prize-amount">500.000 Fc</div>
-                    <div class="prize-label">Prix d'Honneur</div>
-                    <ul class="prize-details">
-                        <li><i class="fas fa-money-bill-wave"></i> <span class="prize-highlight">500.000 Fc</span> sur compte Equity BCDC</li>
-                        <li><i class="fas fa-medal"></i> Médaille d'Argent</li>
-                        <li><i class="fas fa-trophy"></i> Trophée d'Argent</li>
-                        <li><i class="fas fa-award"></i> Brevet d'Excellence</li>
-                    </ul>
-                </div>
-                
-                <!-- Troisième Prix -->
-                <div class="prize-card third">
-                    <div class="prize-rank">
-                        <i class="fas fa-award"></i> 3ème Place
-                    </div>
-                    <div class="prize-amount">250.000 Fc</div>
-                    <div class="prize-label">Prix Spécial du Jury</div>
-                    <ul class="prize-details">
-                        <li><i class="fas fa-money-bill-wave"></i> <span class="prize-highlight">250.000 Fc</span> sur compte Equity BCDC</li>
-                        <li><i class="fas fa-medal"></i> Médaille de Bronze</li>
-                        <li><i class="fas fa-trophy"></i> Trophée de Bronze</li>
-                        <li><i class="fas fa-award"></i> Brevet d'Excellence</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Récompenses supplémentaires -->
-            <div class="additional-rewards">
-                <h3 class="rewards-title">
-                    <i class="fas fa-star"></i> RÉCOMPENSES SUPPLÉMENTAIRES
-                </h3>
-                <div class="rewards-grid">
-                    <div class="reward-card">
-                        <div class="reward-icon">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <div class="reward-subtitle">Finalistes</div>
-                        <div class="reward-description">
-                            Tous les finalistes recevront un Brevet de Mérite pour leur parcours exceptionnel et un certificat de reconnaissance.
-                        </div>
-                    </div>
-                    <div class="reward-card">
-                        <div class="reward-icon">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <div class="reward-subtitle">Participants</div>
-                        <div class="reward-description">
-                            Certificats de participation officiels pour tous les concurrents, reconnaissant leur engagement et leur courage.
-                        </div>
-                    </div>
-                    <div class="reward-card">
-                        <div class="reward-icon">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="reward-subtitle">Formation</div>
-                        <div class="reward-description">
-                            Ateliers gratuits de techniques d'éloquence animés par des experts pour tous les inscrits au concours.
-                        </div>
+
+        <!-- Main Application (hidden initially) -->
+        <div id="main-app" style="display: none;">
+            <!-- Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-custom">
+                <div class="container-fluid">
+                    <span class="navbar-brand">
+                        📘 Système Éducatif
+                        <span id="user-badge" class="admin-badge">Admin</span>
+                    </span>
+                    <div class="d-flex">
+                        <span id="current-user" class="text-white me-3"></span>
+                        <button onclick="logout()" class="btn btn-light">Déconnexion</button>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Section Comment s'inscrire -->
-        <div class="instructions animate" style="animation-delay: 1s">
-            <h3><i class="fas fa-info-circle"></i> Comment s'inscrire :</h3>
-            <ul>
-                <li><strong>Remplissez le formulaire d'inscription</strong> en cliquant sur le bouton ci-dessus</li>
-                <li><strong>Payez les frais de participation</strong> selon votre catégorie (régulier ou membre)</li>
-                <li><strong>Préparez un discours de 3 minutes</strong> sur un des thèmes proposés</li>
-                <li><strong>Les participants sélectionnés</strong> seront contactés avant le 20 février 2026</li>
-                <li><strong>Bénéficiez de séances préparatoires</strong> gratuites pour perfectionner votre éloquence</li>
+            </nav>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="mainTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="showTab('admin')">Admin Panel</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="showTab('exercise')">Exercice Français</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="showTab('results')">Résultats</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="showTab('create')">Créer Exercice</button>
+                </li>
             </ul>
-        </div>
-        
-        <!-- Section WhatsApp -->
-        <div class="whatsapp-section animate" style="animation-delay: 1.1s">
-            <div class="whatsapp-header">
-                <i class="fab fa-whatsapp whatsapp-icon"></i>
-                <h3 class="whatsapp-title">Rejoignez notre groupe WhatsApp</h3>
-            </div>
-            
-            <p class="whatsapp-description">
-                Ne ratez aucune information importante ! Rejoignez la communauté officielle :
-            </p>
-            
-            <ul class="whatsapp-benefits">
-                <li><i class="fas fa-check-circle" style="color: #25d366;"></i> Annonces en temps réel</li>
-                <li><i class="fas fa-check-circle" style="color: #25d366;"></i> Rappels des dates importantes</li>
-                <li><i class="fas fa-check-circle" style="color: #25d366;"></i> Conseils des organisateurs</li>
-                <li><i class="fas fa-check-circle" style="color: #25d366;"></i> Échanges avec les participants</li>
-                <li><i class="fas fa-check-circle" style="color: #25d366;"></i> Questions/réponses en direct</li>
-            </ul>
-            
-            <button class="whatsapp-button" onclick="joinWhatsAppGroup()">
-                <i class="fab fa-whatsapp"></i> REJOINDRE LE GROUPE
-            </button>
-            
-            <p style="margin-top: 15px; color: #a0ffc0; font-size: 0.9rem; font-style: italic;">
-                <i class="fas fa-exclamation-circle"></i> Accès réservé aux participants et personnes intéressées
-            </p>
-        </div>
-        
-        <footer class="animate" style="animation-delay: 1.2s">
-            <p><i class="far fa-clock"></i> Compte à rebours en temps réel</p>
-            <p>Excellentia Academia © 2025-2026 | "L'excellence par l'éloquence"</p>
-            <p style="margin-top: 10px; font-size: 0.7rem; color: #66aaff;">
-                En partenariat avec l'Université de Kinshasa • Equity BCDC • Trans Academia
-            </p>
-        </footer>
-    </div>
-    
-    <!-- Modal pour le formulaire d'inscription -->
-    <div class="modal-overlay" id="formModal">
-        <div class="modal-content">
-            <button class="close-modal" id="closeModal">&times;</button>
-            
-            <div class="header-logo" style="position: relative; top: 0; left: 0; justify-content: center; margin-bottom: 20px;">
-                <div class="logo-circle">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="logo-text">
-                    <div class="logo-title" style="font-size: 1.8rem;">EXCELLENTIA ACADEMIA</div>
-                    <div class="logo-subtitle">Formulaire d'Inscription</div>
-                </div>
-            </div>
-            
-            <!-- Formulaire intégré via iframe -->
-            <iframe name="hiddenIframe" class="hidden-form"></iframe>
-            
-            <!-- Formulaire visible -->
-            <form id="inscriptionForm" class="form-container">
-                <div class="form-group">
-                    <label class="form-label" for="nom">Nom complet *</label>
-                    <input type="text" id="nom" name="nom" class="form-input" required placeholder="Votre nom, postnom et prénom">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="email">Adresse email *</label>
-                    <input type="email" id="email" name="email" class="form-input" required placeholder="exemple@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="telephone">Téléphone *</label>
-                    <input type="tel" id="telephone" name="telephone" class="form-input" required placeholder="+243 970 501 523">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="whatsapp">Avez-vous WhatsApp ? *</label>
-                    <select id="whatsapp" name="whatsapp" class="form-select" required>
-                        <option value="" disabled selected>Choisissez une option</option>
-                        <option value="oui">Oui, je l'utilise</option>
-                        <option value="non">Non</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="universite">Établissement *</label>
-                    <input type="text" id="universite" name="universite" class="form-input" required placeholder="Votre université/école">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="faculte">Faculté *</label>
-                    <select id="faculte" name="faculte" class="form-select" required>
-                        <option value="" disabled selected>Sélectionnez votre faculté</option>
-                        <option value="Faculté de sciences et technologies">Faculté de sciences et technologies</option>
-                        <option value="Faculté de Lettres et sciences humaines">Faculté de Lettres et sciences humaines</option>
-                        <option value="Faculté de Sciences économiques et de gestion">Faculté de Sciences économiques et de gestion</option>
-                        <option value="Faculté de Sciences sociales, administratives et politiques">Faculté de Sciences sociales, administratives et politiques</option>
-                        <option value="Faculté de Droit">Faculté de Droit</option>
-                        <option value="Faculté de Polytechnique">Faculté de Polytechnique</option>
-                        <option value="Faculté de sciences pharmaceutiques">Faculté de sciences pharmaceutiques</option>
-                        <option value="Faculté de médecine dentaire">Faculté de médecine dentaire</option>
-                        <option value="Faculté de médecine vétérinaire">Faculté de médecine vétérinaire</option>
-                        <option value="Faculté de Pétrole, gaz et énergies renouvelables">Faculté de Pétrole, gaz et énergies renouvelables</option>
-                        <option value="Faculté sciences agronomiques">Faculté sciences agronomiques</option>
-                        <option value="Faculté de Médecine">Faculté de Médecine</option>
-                        <option value="Faculté de psychologie et sciences de l'éducation">Faculté de psychologie et sciences de l'éducation</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="categorie">Catégorie d'inscription *</label>
-                    <select id="categorie" name="categorie" class="form-select" required>
-                        <option value="" disabled selected>Sélectionnez votre catégorie</option>
-                        <option value="participant_regulier">Participant Régulier (5.000 Fc)</option>
-                        <option value="membre_excellentia">Membre Excellentia (3.000 Fc)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="theme">Thème du discours *</label>
-                    <select id="theme" name="theme" class="form-select" required>
-                        <option value="" disabled selected>Sélectionnez un thème</option>
-                        <option value="liberte">La liberté d'expression numérique</option>
-                        <option value="education">Éducation et émancipation</option>
-                        <option value="environnement">Responsabilité envers les générations futures</option>
-                        <option value="autre">Autre (précisez ci-dessous)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="message">Votre motivation *</label>
-                    <textarea id="message" name="message" class="form-textarea" required 
-                              placeholder="Expliquez pourquoi vous souhaitez participer... (5-10 lignes)"></textarea>
-                </div>
-                
-                <div class="form-checkbox">
-                    <input type="checkbox" id="conditions" name="conditions" required>
-                    <label for="conditions">
-                        Je comprends et j'accepte les frais de participation selon ma catégorie *
-                    </label>
-                </div>
-                
-                <div class="form-checkbox">
-                    <input type="checkbox" id="whatsapp_group" name="whatsapp_group">
-                    <label for="whatsapp_group">
-                        Je souhaite rejoindre le groupe WhatsApp pour recevoir les dernières informations
-                    </label>
-                </div>
-                
-                <button type="submit" class="submit-button">
-                    <i class="fas fa-paper-plane"></i> ENVOYER MON INSCRIPTION
-                </button>
-            </form>
-            
-            <div id="confirmationMessage" class="hidden-form" style="text-align: center; padding: 20px;">
-                <div style="font-size: 3rem; color: #d4af37; margin-bottom: 15px;">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h3 style="color: #f7ef8a; font-size: 1.6rem; margin-bottom: 15px;">
-                    Inscription envoyée avec succès !
-                </h3>
-                <p style="color: #a0c8ff; font-size: 1rem; line-height: 1.5; margin-bottom: 15px;">
-                    Merci pour votre inscription au Concours d'Éloquence Excellentia Academia 2026.
-                    Vous recevrez un message WhatsApp avec les détails pour le paiement des frais de participation.
-                </p>
-                <p style="color: #25d366; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;">
-                    <i class="fab fa-whatsapp"></i> Rejoignez notre groupe WhatsApp pour ne rien manquer !
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button id="closeAfterSubmit" class="whatsapp-button" style="background: linear-gradient(90deg, #d4af37, #f7ef8a);">
-                        <i class="fas fa-home"></i> RETOUR À L'ACCUEIL
-                    </button>
-                    <button class="whatsapp-button" onclick="joinWhatsAppGroup()">
-                        <i class="fab fa-whatsapp"></i> REJOINDRE WHATSAPP
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Admin -->
-    <div class="modal-overlay" id="adminModal">
-        <div class="modal-content admin-modal-content">
-            <button class="close-modal" id="closeAdminModal">&times;</button>
-            
-            <h2 class="modal-title">
-                <i class="fas fa-lock"></i> PANEL ADMINISTRATEUR
-            </h2>
-            
-            <div id="passwordSection">
-                <h3 style="color: #f7ef8a; text-align: center; margin-bottom: 20px;">
-                    Accès réservé à la coordination Excellentia Academia
-                </h3>
-                <div class="password-input-container">
-                    <input type="password" id="adminPassword" class="password-input" 
-                           placeholder="Entrez le mot de passe">
-                    <p style="color: #a0c8ff; font-size: 0.9rem; margin-top: 10px; text-align: center;">
-                        Mot de passe : Excellence@acad_2K26
-                    </p>
-                </div>
-                <button id="loginButton" class="submit-button">
-                    <i class="fas fa-sign-in-alt"></i> CONNEXION
-                </button>
-            </div>
-            
-            <div id="adminPanel" class="hidden-form">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h3 style="color: #f7ef8a;">Excellentia Academia - Coordination</h3>
-                    <p style="color: #a0c8ff;">Gestion des inscriptions</p>
-                </div>
-                
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalParticipants">0</div>
-                        <div class="stat-label">Total Inscriptions</div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- ADMIN PANEL TAB -->
+                <div id="admin-tab">
+                    <h3 class="mb-4">📊 Tableau de Bord Administrateur</h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stat-card success">
+                                <h5>Exercices Complets</h5>
+                                <h2 id="completed-exercises">0</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card danger">
+                                <h5>Taux de Réussite</h5>
+                                <h2 id="success-rate">0%</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card info">
+                                <h5>Temps Moyen</h5>
+                                <h2 id="avg-time">0s</h2>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="todayParticipants">0</div>
-                        <div class="stat-label">Aujourd'hui</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="whatsappParticipants">0</div>
-                        <div class="stat-label">Sur WhatsApp</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="facultesCount">13</div>
-                        <div class="stat-label">Facultés représentées</div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Gestion des Utilisateurs</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ajouter un étudiant</label>
+                                        <input type="email" id="new-student-email" class="form-control mb-2" placeholder="email@exemple.com">
+                                        <input type="password" id="new-student-password" class="form-control mb-2" placeholder="Mot de passe">
+                                        <button onclick="addStudent()" class="btn btn-primary">Ajouter Étudiant</button>
+                                    </div>
+                                    <div id="students-list"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Exercices Créés</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="exercises-list"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <h4 style="color: #f7ef8a; margin: 20px 0 10px;">Liste des Participants</h4>
-                <div class="participants-list" id="participantsList">
-                    <!-- La liste des participants sera chargée ici -->
+
+                <!-- EXERCICE TAB -->
+                <div id="exercise-tab" style="display: none;">
+                    <h3 class="mb-4">📝 Exercice de Français - Credo Singa</h3>
+                    <div class="alert alert-info">
+                        <strong>Consigne :</strong> Pour chaque phrase, coche la bonne réponse parmi les propositions. 
+                        Tu as <span class="highlight">15 secondes par question</span>. 
+                        Aucune aide extérieure n'est autorisée.
+                    </div>
+
+                    <div class="timer-display" id="timer">
+                        15
+                    </div>
+
+                    <div id="exercise-container">
+                        <!-- Questions will be loaded here -->
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button id="submit-exercise" onclick="submitExercise()" class="btn btn-primary btn-lg" disabled>
+                            Soumettre les réponses
+                        </button>
+                        <button id="start-exercise" onclick="startExercise()" class="btn btn-success btn-lg">
+                            Démarrer l'exercice
+                        </button>
+                    </div>
                 </div>
-                
-                <button id="exportButton" class="export-button">
-                    <i class="fas fa-download"></i> EXPORTER EN EXCEL
-                </button>
-                
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(212, 175, 55, 0.3);">
-                    <p style="color: #a0c8ff; font-size: 0.8rem; text-align: center;">
-                        <i class="fas fa-info-circle"></i> Les données sont synchronisées en temps réel avec Firebase
-                    </p>
+
+                <!-- RESULTS TAB -->
+                <div id="results-tab" style="display: none;">
+                    <h3 class="mb-4">📈 Résultats de Credo Singa</h3>
+                    
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Statistiques Globales</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" id="global-stats"></div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">Détail des Exercices</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="results-detail"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE EXERCISE TAB -->
+                <div id="create-tab" style="display: none;">
+                    <h3 class="mb-4">✏️ Créer un Nouvel Exercice</h3>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Titre de l'exercice</label>
+                                <input type="text" id="exercise-title" class="form-control" placeholder="Ex: Participe passé - Niveau 1">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Thème</label>
+                                <input type="text" id="exercise-theme" class="form-control" placeholder="Ex: Conjugaison des verbes">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Temps par question (secondes)</label>
+                                <input type="number" id="exercise-time" class="form-control" value="15" min="5" max="60">
+                            </div>
+
+                            <div id="questions-container">
+                                <!-- Questions will be added here -->
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button onclick="addQuestion()" class="btn btn-primary me-2">
+                                    + Ajouter une question
+                                </button>
+                                <button onclick="saveExercise()" class="btn btn-success">
+                                    💾 Sauvegarder l'exercice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Aperçu de l'exercice</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="exercise-preview"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <script>
-        // Configuration Firebase
+        // ==================== FIREBASE CONFIGURATION ====================
         const firebaseConfig = {
-            apiKey: "AIzaSyB1ks7dKq69VZaSKV9j2imPUszA5o1HsrI",
-            authDomain: "eloquence-1-1a6a9.firebaseapp.com",
-            projectId: "eloquence-1-1a6a9",
-            storageBucket: "eloquence-1-1a6a9.firebasestorage.app",
-            messagingSenderId: "929069975420",
-            appId: "1:929069975420:web:5bc50e842a7a76f5c046f9",
-            measurementId: "G-RW9C3YRG1Q"
+            apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
+            authDomain: "match-a2ac6.firebaseapp.com",
+            projectId: "match-a2ac6",
+            storageBucket: "match-a2ac6.firebasestorage.app",
+            messagingSenderId: "376894292796",
+            appId: "1:376894292796:web:1eb138830c92aae8df5439",
+            measurementId: "G-2RSRSSFCDZ"
         };
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Date limite d'inscription : 20 janvier 2026 à 23h59
-        const targetDate = new Date('January 20, 2026 23:59:59').getTime();
-        const startDate = new Date('January 20, 2025 00:00:00').getTime();
-        const totalDuration = targetDate - startDate;
-        
-        // Mettre à jour le compte à rebours toutes les secondes
-        const countdownInterval = setInterval(updateCountdown, 1000);
-        
-        // Éléments du modal
-        const formModal = document.getElementById('formModal');
-        const adminModal = document.getElementById('adminModal');
-        const openFormButton = document.getElementById('openFormButton');
-        const adminButton = document.getElementById('adminButton');
-        const closeModal = document.getElementById('closeModal');
-        const closeAdminModal = document.getElementById('closeAdminModal');
-        const closeAfterSubmit = document.getElementById('closeAfterSubmit');
-        const inscriptionForm = document.getElementById('inscriptionForm');
-        const confirmationMessage = document.getElementById('confirmationMessage');
-        
-        // Variables admin
-        let participantsData = [];
-        const ADMIN_PASSWORD = "Excellence@acad_2K26";
-        
-        // Activer les animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const animateElements = document.querySelectorAll('.animate');
-            animateElements.forEach((el, index) => {
-                setTimeout(() => {
-                    el.style.opacity = 1;
-                    el.style.transform = 'translateY(0)';
-                }, index * 100);
+        // ==================== GLOBAL VARIABLES ====================
+        let currentUser = null;
+        let userMode = 'admin';
+        let currentExercise = null;
+        let timer = null;
+        let timeLeft = 15;
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let exerciseStarted = false;
+
+        // ==================== DEFAULT EXERCISE DATA ====================
+        const defaultExercise = {
+            title: "Devoir de Français - Participe passé",
+            theme: "Le participe passé et les terminaisons verbales",
+            timePerQuestion: 15,
+            questions: [
+                {
+                    id: 1,
+                    question: "Il a ______ son sac sur la table.",
+                    options: ["posé", "poser", "posait", "posera"],
+                    correctAnswer: 0,
+                    explanation: "Avec l'auxiliaire 'avoir', le participe passé ne s'accorde pas avec le sujet."
+                },
+                {
+                    id: 2,
+                    question: "Les lettres qu'elle a ______ étaient très touchantes.",
+                    options: ["écrire", "écrites", "écrite", "écrivait"],
+                    correctAnswer: 1,
+                    explanation: "Accord avec 'lettres' (féminin pluriel) placé avant le participe passé."
+                },
+                {
+                    id: 3,
+                    question: "Nous avons ______ toute la journée.",
+                    options: ["marcher", "marché", "marchait", "marchera"],
+                    correctAnswer: 1,
+                    explanation: "Participe passé avec 'avoir' - pas d'accord avec le sujet."
+                },
+                {
+                    id: 4,
+                    question: "La chanson que j'ai ______ hier était magnifique.",
+                    options: ["écouter", "écoutée", "écouté", "écoutait"],
+                    correctAnswer: 1,
+                    explanation: "Accord avec 'chanson' (féminin singulier) placé avant."
+                },
+                {
+                    id: 5,
+                    question: "Les enfants ont ______ trop tard.",
+                    options: ["arriver", "arrivés", "arrivé", "arrivaient"],
+                    correctAnswer: 1,
+                    explanation: "Accord avec 'enfants' (masculin pluriel) placé avant."
+                }
+            ]
+        };
+
+        // ==================== AUTHENTICATION ====================
+        function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const mode = document.getElementById('login-mode').value;
+            
+            userMode = mode;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    showMainApp();
+                    initializeApp();
+                })
+                .catch((error) => {
+                    alert("Erreur de connexion: " + error.message);
+                });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('main-app').style.display = 'none';
+            });
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        function showMainApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            
+            const userBadge = document.getElementById('user-badge');
+            if (userMode === 'admin') {
+                userBadge.className = 'admin-badge';
+                userBadge.textContent = 'Admin';
+            } else {
+                userBadge.className = 'student-badge';
+                userBadge.textContent = 'Élève';
+            }
+            
+            document.getElementById('current-user').textContent = currentUser.email;
+            showTab('admin');
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('admin-tab').style.display = 'none';
+            document.getElementById('exercise-tab').style.display = 'none';
+            document.getElementById('results-tab').style.display = 'none';
+            document.getElementById('create-tab').style.display = 'none';
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Update active tab button
+            const tabButtons = document.querySelectorAll('.nav-link');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Load content based on tab
+            switch(tabName) {
+                case 'admin':
+                    loadAdminDashboard();
+                    break;
+                case 'exercise':
+                    if (userMode === 'student') {
+                        loadExercise();
+                    }
+                    break;
+                case 'results':
+                    loadResults();
+                    break;
+                case 'create':
+                    if (userMode === 'admin') {
+                        loadCreateExercise();
+                    }
+                    break;
+            }
+        }
+
+        // ==================== ADMIN DASHBOARD ====================
+        function loadAdminDashboard() {
+            // Load statistics
+            db.collection('results').get().then(snapshot => {
+                let totalExercises = 0;
+                let totalCorrect = 0;
+                let totalQuestions = 0;
+                let totalTime = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    totalExercises++;
+                    totalCorrect += data.correctAnswers || 0;
+                    totalQuestions += data.totalQuestions || 0;
+                    totalTime += data.totalTime || 0;
+                });
+                
+                const successRate = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+                const avgTime = totalExercises > 0 ? Math.round(totalTime / totalExercises) : 0;
+                
+                document.getElementById('completed-exercises').textContent = totalExercises;
+                document.getElementById('success-rate').textContent = successRate + '%';
+                document.getElementById('avg-time').textContent = avgTime + 's';
+                
+                // Load students
+                loadStudentsList();
+                // Load exercises
+                loadExercisesList();
+            });
+        }
+
+        function loadStudentsList() {
+            db.collection('users').where('role', '==', 'student').get().then(snapshot => {
+                let html = '<h6>Étudiants inscrits:</h6>';
+                snapshot.forEach(doc => {
+                    const student = doc.data();
+                    html += `
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                            <span>${student.email}</span>
+                            <button onclick="deleteUser('${doc.id}')" class="btn btn-sm btn-danger">Supprimer</button>
+                        </div>
+                    `;
+                });
+                document.getElementById('students-list').innerHTML = html;
+            });
+        }
+
+        function loadExercisesList() {
+            db.collection('exercises').get().then(snapshot => {
+                let html = '<div class="list-group">';
+                snapshot.forEach(doc => {
+                    const exercise = doc.data();
+                    html += `
+                        <div class="list-group-item">
+                            <h6>${exercise.title}</h6>
+                            <small class="text-muted">${exercise.theme} • ${exercise.questions?.length || 0} questions</small>
+                            <div class="mt-2">
+                                <button onclick="deleteExercise('${doc.id}')" class="btn btn-sm btn-danger">Supprimer</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                document.getElementById('exercises-list').innerHTML = html;
+            });
+        }
+
+        function addStudent() {
+            const email = document.getElementById('new-student-email').value;
+            const password = document.getElementById('new-student-password').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    return db.collection('users').doc(userCredential.user.uid).set({
+                        email: email,
+                        role: 'student',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('Étudiant ajouté avec succès!');
+                    loadStudentsList();
+                    document.getElementById('new-student-email').value = '';
+                    document.getElementById('new-student-password').value = '';
+                })
+                .catch(error => alert('Erreur: ' + error.message));
+        }
+
+        // ==================== EXERCICE FUNCTIONS ====================
+        function loadExercise() {
+            // Load default exercise for demo
+            currentExercise = defaultExercise;
+            timeLeft = currentExercise.timePerQuestion;
+            
+            let html = '<h4 class="mb-4">' + currentExercise.title + '</h4>';
+            html += '<div class="alert alert-info mb-4">' + currentExercise.theme + '</div>';
+            
+            currentExercise.questions.forEach((q, index) => {
+                html += `
+                    <div class="question-box" id="question-${q.id}">
+                        <h5>Question ${index + 1}:</h5>
+                        <p class="lead">${q.question}</p>
+                        <div id="options-${q.id}">
+                `;
+                
+                q.options.forEach((option, optIndex) => {
+                    html += `
+                        <div class="answer-option" 
+                             onclick="selectAnswer(${q.id}, ${optIndex})"
+                             id="option-${q.id}-${optIndex}">
+                            ☐ ${option}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <div class="mt-3" id="explanation-${q.id}" style="display: none;">
+                            <div class="alert alert-success">
+                                <strong>Explication:</strong> ${q.explanation}
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
             
-            // Charger les données des participants
-            loadParticipantsData();
-        });
-        
-        // Fonction pour rejoindre le groupe WhatsApp
-        function joinWhatsAppGroup() {
-            const whatsappLink = "https://chat.whatsapp.com/EuFshU5EEZ7LpxQrC7OQuM";
-            window.open(whatsappLink, '_blank');
+            document.getElementById('exercise-container').innerHTML = html;
+            document.getElementById('submit-exercise').disabled = true;
+            document.getElementById('start-exercise').style.display = 'block';
         }
-        
-        // Ouvrir le modal d'inscription
-        openFormButton.addEventListener('click', () => {
-            formModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        });
-        
-        // Ouvrir le modal admin
-        adminButton.addEventListener('click', () => {
-            adminModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            document.getElementById('passwordSection').classList.remove('hidden-form');
-            document.getElementById('adminPanel').classList.add('hidden-form');
-            document.getElementById('adminPassword').value = '';
-        });
-        
-        // Fermer les modals
-        const closeModalFunc = (modal) => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        };
-        
-        closeModal.addEventListener('click', () => closeModalFunc(formModal));
-        closeAdminModal.addEventListener('click', () => closeModalFunc(adminModal));
-        
-        // Fermer le modal après soumission
-        closeAfterSubmit.addEventListener('click', () => {
-            closeModalFunc(formModal);
-            // Réinitialiser le formulaire
-            inscriptionForm.reset();
-            // Revenir au formulaire
-            inscriptionForm.classList.remove('hidden-form');
-            confirmationMessage.classList.add('hidden-form');
-        });
-        
-        // Fermer les modals en cliquant à l'extérieur
-        formModal.addEventListener('click', (e) => {
-            if (e.target === formModal) closeModalFunc(formModal);
-        });
-        
-        adminModal.addEventListener('click', (e) => {
-            if (e.target === adminModal) closeModalFunc(adminModal);
-        });
-        
-        // Fermer les modals avec la touche Échap
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (formModal.style.display === 'flex') closeModalFunc(formModal);
-                if (adminModal.style.display === 'flex') closeModalFunc(adminModal);
-            }
-        });
-        
-        // Gérer la connexion admin
-        document.getElementById('loginButton').addEventListener('click', () => {
-            const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('passwordSection').classList.add('hidden-form');
-                document.getElementById('adminPanel').classList.remove('hidden-form');
-                updateAdminStats();
-            } else {
-                alert("Mot de passe incorrect. Accès refusé.");
-            }
-        });
-        
-        // Gérer la soumission du formulaire d'inscription
-        inscriptionForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+
+        function startExercise() {
+            exerciseStarted = true;
+            currentQuestionIndex = 0;
+            answers = {};
+            document.getElementById('start-exercise').style.display = 'none';
+            document.getElementById('submit-exercise').disabled = false;
+            startTimer();
+            showQuestion(0);
+        }
+
+        function showQuestion(index) {
+            // Hide all questions
+            currentExercise.questions.forEach(q => {
+                document.getElementById(`question-${q.id}`).style.display = 'none';
+            });
             
-            // Validation rapide
-            const telephone = document.getElementById('telephone').value;
-            if (telephone.length < 8) {
-                alert("Veuillez entrer un numéro de téléphone valide.");
+            // Show current question
+            const currentQ = currentExercise.questions[index];
+            document.getElementById(`question-${currentQ.id}`).style.display = 'block';
+            
+            // Reset timer
+            timeLeft = currentExercise.timePerQuestion;
+            document.getElementById('timer').textContent = timeLeft;
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(questionId, optionIndex) {
+            answers[questionId] = optionIndex;
+            
+            // Update UI
+            const question = currentExercise.questions.find(q => q.id === questionId);
+            question.options.forEach((_, index) => {
+                const optionElement = document.getElementById(`option-${questionId}-${index}`);
+                optionElement.classList.remove('selected');
+                if (index === optionIndex) {
+                    optionElement.classList.add('selected');
+                }
+            });
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentExercise.questions.length) {
+                showQuestion(currentQuestionIndex);
+                timeLeft = currentExercise.timePerQuestion;
+            } else {
+                clearInterval(timer);
+                submitExercise();
+            }
+        }
+
+        function submitExercise() {
+            clearInterval(timer);
+            exerciseStarted = false;
+            
+            // Calculate results
+            let correctAnswers = 0;
+            const results = [];
+            
+            currentExercise.questions.forEach(q => {
+                const userAnswer = answers[q.id];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) correctAnswers++;
+                
+                results.push({
+                    questionId: q.id,
+                    question: q.question,
+                    userAnswer: q.options[userAnswer],
+                    correctAnswer: q.options[q.correctAnswer],
+                    isCorrect: isCorrect,
+                    explanation: q.explanation
+                });
+                
+                // Show explanations
+                document.getElementById(`explanation-${q.id}`).style.display = 'block';
+                
+                // Mark answers
+                q.options.forEach((_, index) => {
+                    const optionElement = document.getElementById(`option-${q.id}-${index}`);
+                    optionElement.classList.remove('selected');
+                    if (index === q.correctAnswer) {
+                        optionElement.classList.add('correct');
+                    } else if (index === userAnswer && !isCorrect) {
+                        optionElement.classList.add('wrong');
+                    }
+                    optionElement.style.cursor = 'default';
+                    optionElement.onclick = null;
+                });
+            });
+            
+            // Save results to Firebase
+            const resultData = {
+                studentId: currentUser.uid,
+                studentEmail: currentUser.email,
+                exerciseId: 'default-exercise',
+                exerciseTitle: currentExercise.title,
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                correctAnswers: correctAnswers,
+                totalQuestions: currentExercise.questions.length,
+                score: Math.round((correctAnswers / currentExercise.questions.length) * 100),
+                totalTime: (currentExercise.timePerQuestion * currentExercise.questions.length) - timeLeft,
+                details: results
+            };
+            
+            db.collection('results').add(resultData)
+                .then(() => {
+                    alert(`Exercice terminé! Score: ${resultData.score}% (${correctAnswers}/${currentExercise.questions.length} correctes)`);
+                    showTab('results');
+                    loadResults();
+                });
+            
+            document.getElementById('submit-exercise').disabled = true;
+        }
+
+        // ==================== RESULTS FUNCTIONS ====================
+        function loadResults() {
+            const userId = userMode === 'admin' ? null : currentUser.uid;
+            let query = db.collection('results').orderBy('date', 'desc');
+            
+            if (userId) {
+                query = query.where('studentId', '==', userId);
+            }
+            
+            query.get().then(snapshot => {
+                let globalStatsHtml = '';
+                let detailHtml = '';
+                let totalExercises = 0;
+                let totalScore = 0;
+                let totalTime = 0;
+                
+                snapshot.forEach(doc => {
+                    const result = doc.data();
+                    totalExercises++;
+                    totalScore += result.score;
+                    totalTime += result.totalTime;
+                    
+                    const date = result.date?.toDate?.() || new Date();
+                    const formattedDate = date.toLocaleDateString('fr-FR');
+                    
+                    globalStatsHtml += `
+                        <div class="col-md-4">
+                            <div class="stat-card ${result.score >= 70 ? 'success' : 'danger'}">
+                                <h6>${result.exerciseTitle}</h6>
+                                <h3>${result.score}%</h3>
+                                <small>${formattedDate}</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    detailHtml += `
+                        <div class="card mb-3">
+                            <div class="card-header ${result.score >= 70 ? 'bg-success' : 'bg-danger'} text-white">
+                                <h6 class="mb-0">${result.exerciseTitle} - ${formattedDate}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Score:</strong> ${result.score}%
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Réponses:</strong> ${result.correctAnswers}/${result.totalQuestions}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Temps:</strong> ${result.totalTime}s
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button onclick="viewResultDetails('${doc.id}')" class="btn btn-sm btn-info">
+                                            Voir détails
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                const avgScore = totalExercises > 0 ? Math.round(totalScore / totalExercises) : 0;
+                const avgTime = totalExercises > 0 ? Math.round(totalTime / totalExercises) : 0;
+                
+                document.getElementById('global-stats').innerHTML = globalStatsHtml;
+                document.getElementById('results-detail').innerHTML = detailHtml;
+            });
+        }
+
+        function viewResultDetails(resultId) {
+            db.collection('results').doc(resultId).get().then(doc => {
+                if (doc.exists) {
+                    const result = doc.data();
+                    let detailHtml = '<h5>Détail des réponses:</h5>';
+                    
+                    result.details.forEach((detail, index) => {
+                        detailHtml += `
+                            <div class="result-item ${detail.isCorrect ? 'correct' : 'wrong'}">
+                                <h6>Question ${index + 1}:</h6>
+                                <p><strong>${detail.question}</strong></p>
+                                <p><strong>Ta réponse:</strong> ${detail.userAnswer || 'Non répondue'}</p>
+                                <p><strong>Réponse correcte:</strong> ${detail.correctAnswer}</p>
+                                <p><strong>Explication:</strong> ${detail.explanation}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('results-detail').innerHTML = detailHtml;
+                }
+            });
+        }
+
+        // ==================== CREATE EXERCISE FUNCTIONS ====================
+        function loadCreateExercise() {
+            document.getElementById('questions-container').innerHTML = '';
+            document.getElementById('exercise-preview').innerHTML = '';
+            
+            // Add first question by default
+            addQuestion();
+        }
+
+        function addQuestion() {
+            const questionsContainer = document.getElementById('questions-container');
+            const questionCount = questionsContainer.children.length + 1;
+            
+            const questionHtml = `
+                <div class="question-preview mb-4" id="question-${questionCount}">
+                    <h5>Question ${questionCount}</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Phrase/Question</label>
+                        <input type="text" class="form-control question-text" 
+                               placeholder="Entrez la phrase avec le trou (______)">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Option 1 (correcte)</label>
+                            <input type="text" class="form-control option" placeholder="Réponse correcte">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Option 2</label>
+                            <input type="text" class="form-control option" placeholder="Autre option">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Option 3</label>
+                            <input type="text" class="form-control option" placeholder="Autre option">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Option 4</label>
+                            <input type="text" class="form-control option" placeholder="Autre option">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">Explication</label>
+                        <textarea class="form-control explanation" rows="2" 
+                                  placeholder="Explication de la règle de grammaire"></textarea>
+                    </div>
+                    <button onclick="removeQuestion(${questionCount})" class="btn btn-sm btn-danger mt-2">
+                        Supprimer cette question
+                    </button>
+                </div>
+            `;
+            
+            questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+            updateExercisePreview();
+        }
+
+        function removeQuestion(questionNumber) {
+            const questionElement = document.getElementById(`question-${questionNumber}`);
+            if (questionElement) {
+                questionElement.remove();
+                updateExercisePreview();
+            }
+        }
+
+        function updateExercisePreview() {
+            const title = document.getElementById('exercise-title').value || 'Nouvel exercice';
+            const theme = document.getElementById('exercise-theme').value || 'Grammaire française';
+            
+            let previewHtml = `
+                <h4>${title}</h4>
+                <p><strong>Thème:</strong> ${theme}</p>
+                <hr>
+            `;
+            
+            const questions = document.querySelectorAll('.question-preview');
+            questions.forEach((question, index) => {
+                const questionText = question.querySelector('.question-text').value || `Question ${index + 1}`;
+                const options = Array.from(question.querySelectorAll('.option')).map(input => input.value).filter(val => val);
+                const explanation = question.querySelector('.explanation').value || '';
+                
+                previewHtml += `
+                    <div class="mb-3">
+                        <h6>Question ${index + 1}: ${questionText}</h6>
+                        <ul>
+                            ${options.map(opt => `<li>${opt}</li>`).join('')}
+                        </ul>
+                        ${explanation ? `<small><strong>Explication:</strong> ${explanation}</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('exercise-preview').innerHTML = previewHtml;
+        }
+
+        function saveExercise() {
+            const title = document.getElementById('exercise-title').value;
+            const theme = document.getElementById('exercise-theme').value;
+            const timePerQuestion = parseInt(document.getElementById('exercise-time').value) || 15;
+            
+            if (!title || !theme) {
+                alert('Veuillez remplir le titre et le thème de l\'exercice');
                 return;
             }
             
-            // Récupérer les données du formulaire
-            const formData = {
-                nom: document.getElementById('nom').value,
-                email: document.getElementById('email').value,
-                telephone: document.getElementById('telephone').value,
-                whatsapp: document.getElementById('whatsapp').value,
-                universite: document.getElementById('universite').value,
-                faculte: document.getElementById('faculte').value,
-                categorie: document.getElementById('categorie').value,
-                theme: document.getElementById('theme').value,
-                message: document.getElementById('message').value,
-                whatsapp_group: document.getElementById('whatsapp_group').checked,
-                conditions: document.getElementById('conditions').checked,
-                date_inscription: new Date().toISOString(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            const questions = [];
+            const questionElements = document.querySelectorAll('.question-preview');
+            
+            questionElements.forEach((element, index) => {
+                const questionText = element.querySelector('.question-text').value;
+                const options = Array.from(element.querySelectorAll('.option')).map(input => input.value);
+                const explanation = element.querySelector('.explanation').value;
+                
+                if (questionText && options.filter(opt => opt).length >= 2) {
+                    questions.push({
+                        id: index + 1,
+                        question: questionText,
+                        options: options,
+                        correctAnswer: 0, // First option is correct
+                        explanation: explanation
+                    });
+                }
+            });
+            
+            if (questions.length === 0) {
+                alert('Veuillez ajouter au moins une question valide');
+                return;
+            }
+            
+            const exerciseData = {
+                title: title,
+                theme: theme,
+                timePerQuestion: timePerQuestion,
+                questions: questions,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: currentUser.email
             };
             
-            try {
-                // Envoyer à Firebase
-                await db.collection('participants').add(formData);
-                
-                // Envoyer également à Formspree pour garder la compatibilité
-                const formspreeForm = new FormData();
-                for (const key in formData) {
-                    formspreeForm.append(key, formData[key]);
-                }
-                
-                fetch('https://formspree.io/f/mldqkngp', {
-                    method: 'POST',
-                    body: formspreeForm,
-                    headers: { 'Accept': 'application/json' }
+            db.collection('exercises').add(exerciseData)
+                .then(() => {
+                    alert('Exercice sauvegardé avec succès!');
+                    document.getElementById('exercise-title').value = '';
+                    document.getElementById('exercise-theme').value = '';
+                    document.getElementById('questions-container').innerHTML = '';
+                    document.getElementById('exercise-preview').innerHTML = '';
+                    loadExercisesList();
+                    addQuestion();
+                })
+                .catch(error => alert('Erreur: ' + error.message));
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function deleteUser(userId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')) {
+                db.collection('users').doc(userId).delete()
+                    .then(() => {
+                        alert('Utilisateur supprimé');
+                        loadStudentsList();
+                    })
+                    .catch(error => alert('Erreur: ' + error.message));
+            }
+        }
+
+        function deleteExercise(exerciseId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet exercice?')) {
+                db.collection('exercises').doc(exerciseId).delete()
+                    .then(() => {
+                        alert('Exercice supprimé');
+                        loadExercisesList();
+                    })
+                    .catch(error => alert('Erreur: ' + error.message));
+            }
+        }
+
+        function initializeApp() {
+            // Check if default users exist, create them if not
+            const adminEmail = 'admin@match.com';
+            const adminPassword = 'admin123';
+            const studentEmail = 'credo@match.com';
+            const studentPassword = 'credo123';
+            
+            // Try to sign in as admin to check if exists
+            auth.signInWithEmailAndPassword(adminEmail, adminPassword)
+                .catch(() => {
+                    // Create admin user if doesn't exist
+                    auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
+                        .then(userCredential => {
+                            return db.collection('users').doc(userCredential.user.uid).set({
+                                email: adminEmail,
+                                role: 'admin',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        })
+                        .then(() => {
+                            // Create student user
+                            return auth.createUserWithEmailAndPassword(studentEmail, studentPassword);
+                        })
+                        .then(userCredential => {
+                            return db.collection('users').doc(userCredential.user.uid).set({
+                                email: studentEmail,
+                                role: 'student',
+                                name: 'Credo Singa',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        })
+                        .then(() => {
+                            console.log('Default users created');
+                            // Sign back in as original user
+                            return login();
+                        })
+                        .catch(error => console.log('Setup error:', error));
                 });
-                
-                // Afficher le message de confirmation
-                inscriptionForm.classList.add('hidden-form');
-                confirmationMessage.classList.remove('hidden-form');
-                
-                // Réinitialiser le formulaire
-                this.reset();
-                
-                // Mettre à jour les stats admin
-                loadParticipantsData();
-                
-            } catch (error) {
-                console.error("Erreur lors de l'enregistrement:", error);
-                alert("Erreur lors de l'enregistrement. Veuillez réessayer.");
+            
+            // Save default exercise if not exists
+            db.collection('exercises').where('title', '==', defaultExercise.title).get()
+                .then(snapshot => {
+                    if (snapshot.empty) {
+                        db.collection('exercises').add({
+                            ...defaultExercise,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            createdBy: 'system'
+                        });
+                    }
+                });
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for input changes in create exercise
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('question-text') || 
+                    e.target.classList.contains('option') ||
+                    e.target.classList.contains('explanation')) {
+                    updateExercisePreview();
+                }
+            });
+            
+            // Auto-update preview when title/theme changes
+            const titleInput = document.getElementById('exercise-title');
+            const themeInput = document.getElementById('exercise-theme');
+            if (titleInput && themeInput) {
+                titleInput.addEventListener('input', updateExercisePreview);
+                themeInput.addEventListener('input', updateExercisePreview);
             }
         });
-        
-        // Charger les données des participants
-        async function loadParticipantsData() {
-            try {
-                const snapshot = await db.collection('participants').get();
-                participantsData = [];
-                snapshot.forEach(doc => {
-                    participantsData.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Mettre à jour les stats si le panel admin est ouvert
-                if (!document.getElementById('adminPanel').classList.contains('hidden-form')) {
-                    updateAdminStats();
-                }
-            } catch (error) {
-                console.error("Erreur de chargement des données:", error);
-            }
+
+        // Initialize Firebase app
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.log('Firebase already initialized');
         }
-        
-        // Mettre à jour les statistiques admin
-        function updateAdminStats() {
-            // Nombre total de participants
-            document.getElementById('totalParticipants').textContent = participantsData.length;
-            
-            // Participants d'aujourd'hui
-            const today = new Date().toDateString();
-            const todayParticipants = participantsData.filter(p => {
-                const participantDate = new Date(p.date_inscription).toDateString();
-                return participantDate === today;
-            });
-            document.getElementById('todayParticipants').textContent = todayParticipants.length;
-            
-            // Participants avec WhatsApp
-            const whatsappParticipants = participantsData.filter(p => p.whatsapp === 'oui');
-            document.getElementById('whatsappParticipants').textContent = whatsappParticipants.length;
-            
-            // Nombre de facultés représentées
-            const facultes = [...new Set(participantsData.map(p => p.faculte).filter(Boolean))];
-            document.getElementById('facultesCount').textContent = facultes.length;
-            
-            // Mettre à jour la liste des participants
-            updateParticipantsList();
-        }
-        
-        // Mettre à jour la liste des participants
-        function updateParticipantsList() {
-            const listElement = document.getElementById('participantsList');
-            listElement.innerHTML = '';
-            
-            // Trier par date (plus récent d'abord)
-            const sortedParticipants = [...participantsData].sort((a, b) => {
-                return new Date(b.date_inscription) - new Date(a.date_inscription);
-            });
-            
-            sortedParticipants.forEach(participant => {
-                const div = document.createElement('div');
-                div.className = 'participant-item';
-                
-                const date = new Date(participant.date_inscription).toLocaleDateString('fr-FR');
-                const hasWhatsapp = participant.whatsapp === 'oui' ? '✓' : '✗';
-                const categorie = participant.categorie === 'participant_regulier' ? 'Régulier' : 'Membre Excellentia';
-                
-                div.innerHTML = `
-                    <div class="participant-name">${participant.nom}</div>
-                    <div class="participant-details">
-                        ${participant.faculte} | ${categorie} | ${participant.telephone} | ${date} 
-                        <span style="color: ${participant.whatsapp === 'oui' ? '#25d366' : '#ff6b6b'}">
-                            WhatsApp: ${hasWhatsapp}
-                        </span>
-                    </div>
-                `;
-                
-                listElement.appendChild(div);
-            });
-        }
-        
-        // Exporter en Excel
-        document.getElementById('exportButton').addEventListener('click',
+    </script>
+</body>
+</html>
