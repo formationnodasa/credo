@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devoirs de Français - Famille Singa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Import Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
     <style>
         * {
             margin: 0;
@@ -88,6 +91,11 @@
         
         #credo-btn {
             background-color: #9b59b6;
+            color: white;
+        }
+        
+        #admin-btn {
+            background-color: #e74c3c;
             color: white;
         }
         
@@ -330,6 +338,123 @@
             transform: none;
         }
         
+        /* Admin Panel Styles */
+        .admin-panel {
+            background-color: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-panel h3 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h4 {
+            margin-bottom: 10px;
+            color: #ecf0f1;
+            font-size: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .results-table th {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .results-table tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .date-cell {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .score-cell {
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .score-cell.high {
+            color: #27ae60;
+        }
+        
+        .score-cell.medium {
+            color: #f39c12;
+        }
+        
+        .score-cell.low {
+            color: #e74c3c;
+        }
+        
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+        
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -352,6 +477,19 @@
             .header h1 {
                 font-size: 2rem;
             }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-table {
+                font-size: 0.9rem;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -373,6 +511,10 @@
         <button class="member-btn" id="credo-btn">
             <i class="fas fa-user-graduate"></i> Credo
         </button>
+        
+        <button class="member-btn" id="admin-btn">
+            <i class="fas fa-user-shield"></i> Administration
+        </button>
     </div>
     
     <div class="instructions">
@@ -381,8 +523,52 @@
             <li>Chaque membre de la famille a accès à ses propres devoirs de français.</li>
             <li><strong>Aubaine et Moïse</strong> : Complétez les phrases en choisissant la bonne réponse.</li>
             <li><strong>Credo</strong> : En plus de compléter les phrases, vous devez aussi jouer le rôle de coach et valider les réponses. Vous aurez accès à des conseils pédagogiques et verrez les résultats finaux.</li>
+            <li><strong>Administration</strong> : Pour voir les résultats de tous les membres et suivre leur progression.</li>
             <li>Cliquez sur votre nom pour commencer votre devoir.</li>
         </ul>
+    </div>
+    
+    <!-- Admin Panel -->
+    <div id="admin-content" class="content-area">
+        <div class="content-header">
+            <h2>Panneau d'Administration</h2>
+            <p class="member-role">Suivi des résultats et progression des membres</p>
+        </div>
+        
+        <div class="admin-panel">
+            <h3><i class="fas fa-chart-line"></i> Tableau de bord des résultats</h3>
+            
+            <div class="stats-grid" id="admin-stats">
+                <!-- Statistics will be inserted here by JavaScript -->
+                <div class="stat-card">
+                    <h4>Chargement des données...</h4>
+                    <div class="stat-value">0</div>
+                </div>
+            </div>
+            
+            <button class="refresh-btn" id="refresh-results">
+                <i class="fas fa-sync-alt"></i> Actualiser les résultats
+            </button>
+            
+            <div style="overflow-x: auto; margin-top: 30px;">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Pourcentage</th>
+                            <th>Détails</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Chargement des données...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <!-- Aubaine's Content -->
@@ -402,6 +588,9 @@
             <h3>Résultats d'Aubaine</h3>
             <div class="score">Score: <span id="aubaine-score">0</span>/30</div>
             <div class="feedback" id="aubaine-feedback"></div>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
+                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
+            </p>
         </div>
     </div>
     
@@ -422,6 +611,9 @@
             <h3>Résultats de Moïse</h3>
             <div class="score">Score: <span id="moise-score">0</span>/30</div>
             <div class="feedback" id="moise-feedback"></div>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
+                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
+            </p>
         </div>
     </div>
     
@@ -452,6 +644,9 @@
             <h3>Résultats Finaux de Credo (Coach)</h3>
             <div class="score">Score: <span id="credo-score">0</span>/30</div>
             <div class="feedback" id="credo-feedback"></div>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
+                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
+            </p>
             
             <div class="coaching-tip" style="margin-top: 20px;">
                 <strong>Rappel pédagogique :</strong> Les terminaisons -é, -ée, -és, -ées correspondent au participe passé. La terminaison -er correspond à l'infinitif. Les terminaisons -ait, -aient correspondent à l'imparfait. Les terminaisons -era, -erait correspondent au futur et conditionnel.
@@ -465,6 +660,21 @@
     </div>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
+            authDomain: "match-a2ac6.firebaseapp.com",
+            projectId: "match-a2ac6",
+            storageBucket: "match-a2ac6.firebasestorage.app",
+            messagingSenderId: "376894292796",
+            appId: "1:376894292796:web:1eb138830c92aae8df5439",
+            measurementId: "G-2RSRSSFCDZ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // Questions data
         const questions = [
             {
@@ -660,11 +870,18 @@
             document.getElementById('aubaine-btn').addEventListener('click', () => showContent('aubaine'));
             document.getElementById('moise-btn').addEventListener('click', () => showContent('moise'));
             document.getElementById('credo-btn').addEventListener('click', () => showContent('credo'));
+            document.getElementById('admin-btn').addEventListener('click', () => showContent('admin'));
             
             // Set up submit button events
             document.getElementById('aubaine-submit').addEventListener('click', () => submitAnswers('aubaine'));
             document.getElementById('moise-submit').addEventListener('click', () => submitAnswers('moise'));
             document.getElementById('credo-submit').addEventListener('click', () => submitAnswers('credo'));
+            
+            // Set up refresh button for admin panel
+            document.getElementById('refresh-results').addEventListener('click', loadAllResults);
+            
+            // Load initial admin data
+            loadAllResults();
             
             // Show Aubaine's content by default
             showContent('aubaine');
@@ -690,10 +907,8 @@
                 
                 // Add coaching tip only for Credo
                 const coachingTip = member === 'credo' ? 
-                    `<div class="coaching-tip" style="margin-top: 15px; font-size: 0.9rem;">
-                        <strong>Conseil :</strong> ${q.explanation}
-                    </div>` : '';
-                
+                    `<div class="coaching-tip" style="margin-top: 15px; font-size:
+                    
                 questionDiv.innerHTML = `
                     <div class="question-text">
                         <span class="question-number">${index + 1}</span>
@@ -749,21 +964,31 @@
             selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
             
             // Hide results when switching members
-            document.querySelectorAll('.results-panel').forEach(panel => {
-                panel.style.display = 'none';
-            });
+            if (member !== 'admin') {
+                document.querySelectorAll('.results-panel').forEach(panel => {
+                    panel.style.display = 'none';
+                });
+            }
+            
+            // Load admin data if showing admin panel
+            if (member === 'admin') {
+                loadAllResults();
+            }
         }
         
         function submitAnswers(member) {
             let score = 0;
             const totalQuestions = questions.length;
+            const answers = [];
             
-            // Check each question
+            // Check each question and collect answers
             for (let i = 0; i < totalQuestions; i++) {
                 const selectedOption = document.querySelector(`input[name="${member}-q${i}"]:checked`);
+                let selectedValue = null;
                 
                 if (selectedOption) {
-                    const selectedValue = parseInt(selectedOption.value);
+                    selectedValue = parseInt(selectedOption.value);
+                    
                     const questionDiv = document.getElementById(`${member}-questions`).children[i];
                     const options = questionDiv.querySelectorAll('.option');
                     
@@ -785,17 +1010,55 @@
                         score++;
                     }
                 }
+                
+                // Store answer
+                answers.push({
+                    question: questions[i].question,
+                    selected: selectedValue,
+                    correct: questions[i].correct,
+                    isCorrect: selectedValue === questions[i].correct
+                });
             }
             
+            // Calculate percentage
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            // Prepare result data for Firebase
+            const resultData = {
+                member: member,
+                score: score,
+                total: totalQuestions,
+                percentage: percentage,
+                date: new Date().toISOString(),
+                timestamp: Date.now(),
+                answers: answers
+            };
+            
+            // Save to Firebase
+            saveResultToFirebase(resultData);
+            
             // Display results
+            displayResults(member, score, totalQuestions, percentage);
+        }
+        
+        function saveResultToFirebase(resultData) {
+            const resultRef = database.ref('results').push();
+            resultRef.set(resultData)
+                .then(() => {
+                    console.log('Result saved successfully to Firebase');
+                })
+                .catch((error) => {
+                    console.error('Error saving result to Firebase:', error);
+                    alert('Erreur lors de l\'enregistrement des résultats. Veuillez vérifier votre connexion Internet.');
+                });
+        }
+        
+        function displayResults(member, score, totalQuestions, percentage) {
             const resultsPanel = document.getElementById(`${member}-results`);
             const scoreElement = document.getElementById(`${member}-score`);
             const feedbackElement = document.getElementById(`${member}-feedback`);
             
             scoreElement.textContent = `${score}/${totalQuestions}`;
-            
-            // Calculate percentage
-            const percentage = (score / totalQuestions) * 100;
             
             // Provide feedback based on score
             let feedback = '';
@@ -833,6 +1096,351 @@
             
             // Scroll to results
             resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function loadAllResults() {
+            const resultsRef = database.ref('results');
+            
+            // Show loading state
+            document.getElementById('admin-stats').innerHTML = `
+                <div class="stat-card">
+                    <h4>Chargement des données...</h4>
+                    <div class="stat-value">0</div>
+                </div>
+            `;
+            
+            document.getElementById('results-table-body').innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center;">Chargement des données...</td>
+                </tr>
+            `;
+            
+            resultsRef.once('value')
+                .then((snapshot) => {
+                    const results = [];
+                    snapshot.forEach((childSnapshot) => {
+                        results.push({
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        });
+                    });
+                    
+                    // Sort by timestamp (newest first)
+                    results.sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    updateAdminStats(results);
+                    updateResultsTable(results);
+                })
+                .catch((error) => {
+                    console.error('Error loading results:', error);
+                    document.getElementById('admin-stats').innerHTML = `
+                        <div class="stat-card">
+                            <h4>Erreur de chargement</h4>
+                            <div class="stat-value">Erreur</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('results-table-body').innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #e74c3c;">
+                                Erreur lors du chargement des données. Vérifiez votre connexion Internet.
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        function updateAdminStats(results) {
+            if (results.length === 0) {
+                document.getElementById('admin-stats').innerHTML = `
+                    <div class="stat-card">
+                        <h4>Aucun résultat enregistré</h4>
+                        <div class="stat-value">0</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate statistics
+            const totalAttempts = results.length;
+            
+            // Count attempts per member
+            const memberAttempts = {
+                aubaine: 0,
+                moise: 0,
+                credo: 0
+            };
+            
+            // Calculate average scores
+            let totalScore = 0;
+            const memberScores = {
+                aubaine: { total: 0, count: 0 },
+                moise: { total: 0, count: 0 },
+                credo: { total: 0, count: 0 }
+            };
+            
+            results.forEach(result => {
+                memberAttempts[result.member]++;
+                totalScore += result.percentage;
+                
+                if (memberScores[result.member]) {
+                    memberScores[result.member].total += result.percentage;
+                    memberScores[result.member].count++;
+                }
+            });
+            
+            const averageScore = Math.round(totalScore / totalAttempts);
+            
+            // Create stats cards
+            const statsHtml = `
+                <div class="stat-card">
+                    <h4>Tentatives totales</h4>
+                    <div class="stat-value">${totalAttempts}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Score moyen</h4>
+                    <div class="stat-value">${averageScore}%</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Tentatives d'Aubaine</h4>
+                    <div class="stat-value">${memberAttempts.aubaine}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Tentatives de Moïse</h4>
+                    <div class="stat-value">${memberAttempts.moise}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Tentatives de Credo</h4>
+                    <div class="stat-value">${memberAttempts.credo}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Score moyen d'Aubaine</h4>
+                    <div class="stat-value">${memberScores.aubaine.count > 0 ? Math.round(memberScores.aubaine.total / memberScores.aubaine.count) : 0}%</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Score moyen de Moïse</h4>
+                    <div class="stat-value">${memberScores.moise.count > 0 ? Math.round(memberScores.moise.total / memberScores.moise.count) : 0}%</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h4>Score moyen de Credo</h4>
+                    <div class="stat-value">${memberScores.credo.count > 0 ? Math.round(memberScores.credo.total / memberScores.credo.count) : 0}%</div>
+                </div>
+            `;
+            
+            document.getElementById('admin-stats').innerHTML = statsHtml;
+        }
+        
+        function updateResultsTable(results) {
+            const tableBody = document.getElementById('results-table-body');
+            
+            if (results.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">
+                            Aucun résultat enregistré pour le moment.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let tableHtml = '';
+            
+            results.forEach((result, index) => {
+                // Format date
+                const date = new Date(result.date);
+                const formattedDate = date.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Determine score class
+                let scoreClass = '';
+                if (result.percentage >= 80) {
+                    scoreClass = 'high';
+                } else if (result.percentage >= 60) {
+                    scoreClass = 'medium';
+                } else {
+                    scoreClass = 'low';
+                }
+                
+                // Get member name with proper capitalization
+                let memberName = '';
+                switch(result.member) {
+                    case 'aubaine':
+                        memberName = 'Aubaine';
+                        break;
+                    case 'moise':
+                        memberName = 'Moïse';
+                        break;
+                    case 'credo':
+                        memberName = 'Credo';
+                        break;
+                    default:
+                        memberName = result.member;
+                }
+                
+                tableHtml += `
+                    <tr>
+                        <td>${memberName}</td>
+                        <td class="date-cell">${formattedDate}</td>
+                        <td class="score-cell ${scoreClass}">${result.score}/${result.total}</td>
+                        <td class="score-cell ${scoreClass}">${result.percentage}%</td>
+                        <td>
+                            <button class="view-details-btn" data-index="${index}" style="
+                                background-color: #3498db;
+                                color: white;
+                                border: none;
+                                padding: 5px 10px;
+                                border-radius: 3px;
+                                cursor: pointer;
+                                font-size: 0.85rem;
+                            ">
+                                <i class="fas fa-eye"></i> Détails
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = tableHtml;
+            
+            // Add event listeners to detail buttons
+            tableBody.querySelectorAll('.view-details-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    showResultDetails(results[index]);
+                });
+            });
+        }
+        
+        function showResultDetails(result) {
+            // Get member name with proper capitalization
+            let memberName = '';
+            switch(result.member) {
+                case 'aubaine':
+                    memberName = 'Aubaine';
+                    break;
+                case 'moise':
+                    memberName = 'Moïse';
+                    break;
+                case 'credo':
+                    memberName = 'Credo';
+                    break;
+                default:
+                    memberName = result.member;
+            }
+            
+            // Format date
+            const date = new Date(result.date);
+            const formattedDate = date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Create details HTML
+            let detailsHtml = `
+                <h3>Détails des résultats - ${memberName}</h3>
+                <p><strong>Date:</strong> ${formattedDate}</p>
+                <p><strong>Score:</strong> ${result.score}/${result.total} (${result.percentage}%)</p>
+                <hr style="margin: 20px 0;">
+                <h4>Réponses détaillées:</h4>
+            `;
+            
+            result.answers.forEach((answer, index) => {
+                const question = questions[index];
+                const isCorrect = answer.selected === question.correct;
+                const status = isCorrect ? '✅ Correct' : '❌ Incorrect';
+                const statusClass = isCorrect ? 'good' : 'poor';
+                
+                detailsHtml += `
+                    <div style="
+                        background-color: ${isCorrect ? '#d4edda' : '#f8d7da'};
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        border-left: 5px solid ${isCorrect ? '#28a745' : '#dc3545'};
+                    ">
+                        <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
+                        <p><strong>Réponse choisie:</strong> ${answer.selected !== null ? question.options[answer.selected] : 'Aucune réponse'}</p>
+                        <p><strong>Réponse correcte:</strong> ${question.options[question.correct]}</p>
+                        <p><strong>Statut:</strong> <span style="color: ${isCorrect ? '#155724' : '#721c24'}; font-weight: bold;">${status}</span></p>
+                        ${result.member === 'credo' ? `<p><em>${question.explanation}</em></p>` : ''}
+                    </div>
+                `;
+            });
+            
+            // Show in a modal dialog
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            `;
+            
+            modalContent.innerHTML = detailsHtml + `
+                <button id="close-modal" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background-color: #e74c3c;
+                    color: white;
+                    border: none;
+                    padding: 8px 12px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 1.2rem;
+                ">
+                    ×
+                </button>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking close button or outside
+            modalContent.querySelector('#close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
         }
     </script>
 </body>
