@@ -3,408 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système Éducatif - Admin & Exercice</title>
+    <title>Quiz Français - Participe Passé</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js"></script>
     <style>
-        body { 
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        
+        body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
         }
-        .main-container {
+        
+        .container-main {
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
             border-radius: 20px;
-            padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            min-height: 90vh;
+            overflow: hidden;
+            min-height: 95vh;
         }
-        .navbar-custom {
-            background: linear-gradient(90deg, #4f46e5, #7c3aed);
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-            margin-bottom: 20px;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .btn-primary {
-            background: linear-gradient(90deg, #4f46e5, #7c3aed);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
-        }
-        .timer-display {
-            font-size: 3em;
-            font-weight: bold;
-            color: #7c3aed;
+        
+        .header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
             text-align: center;
+            position: relative;
+        }
+        
+        .admin-access {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .admin-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .quiz-section, .admin-section {
+            padding: 30px;
+        }
+        
+        .timer-container {
+            background: var(--dark);
+            color: white;
             padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .timer {
+            font-size: 4em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #4cc9f0;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        
+        .question-card {
             background: #f8f9fa;
             border-radius: 15px;
-            margin: 20px 0;
-        }
-        .question-box {
-            background: #f8fafc;
             padding: 25px;
-            border-radius: 15px;
-            border-left: 5px solid #4f46e5;
-            margin: 20px 0;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
         }
-        .answer-option {
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #e2e8f0;
+        
+        .question-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .question-number {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #dee2e6;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
         }
-        .answer-option:hover {
-            background: #f1f5f9;
-            border-color: #c7d2fe;
+        
+        .option:hover {
+            background: #e9ecef;
+            border-color: var(--primary);
         }
-        .answer-option.selected {
-            background: #c7d2fe;
-            border-color: #4f46e5;
+        
+        .option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
             font-weight: bold;
         }
-        .answer-option.correct {
-            background: #d1fae5;
-            border-color: #10b981;
-            color: #065f46;
+        
+        .option.correct {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
         }
-        .answer-option.wrong {
-            background: #fee2e2;
-            border-color: #ef4444;
-            color: #7f1d1d;
+        
+        .option.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
         }
-        .result-item {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
+        
+        .option-mark {
+            margin-right: 15px;
+            font-size: 1.2em;
         }
-        .result-item.correct {
-            background: #d1fae5;
-            border-left: 5px solid #10b981;
-        }
-        .result-item.wrong {
-            background: #fee2e2;
-            border-left: 5px solid #ef4444;
-        }
-        .stat-card {
-            text-align: center;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 10px;
-        }
-        .stat-card.success {
-            background: linear-gradient(135deg, #10b981, #34d399);
+        
+        .btn-custom {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
-        }
-        .stat-card.danger {
-            background: linear-gradient(135deg, #ef4444, #f87171);
-            color: white;
-        }
-        .stat-card.info {
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
-            color: white;
-        }
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .admin-badge {
-            background: #7c3aed;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .student-badge {
-            background: #10b981;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .tab-content {
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 15px;
-            margin-top: 20px;
-        }
-        .nav-tabs {
-            border-bottom: 3px solid #e2e8f0;
-        }
-        .nav-tabs .nav-link {
             border: none;
-            color: #64748b;
+            padding: 15px 40px;
+            border-radius: 50px;
             font-weight: 600;
-            padding: 15px 30px;
-            border-radius: 10px 10px 0 0;
-            margin-right: 5px;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
         }
-        .nav-tabs .nav-link.active {
-            background: #4f46e5;
+        
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
             color: white;
-            border: none;
         }
-        .question-preview {
+        
+        .results-container {
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0% 75%, #e9ecef 75% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        
+        .score-inner {
+            width: 160px;
+            height: 160px;
             background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .admin-panel {
+            background: #1a1a2e;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .stats-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .student-result {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .modal-admin {
+            background: rgba(0,0,0,0.9);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .input-admin {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .explanation-box {
+            background: #e9ecef;
             padding: 15px;
             border-radius: 10px;
-            margin: 10px 0;
-            border: 1px solid #e2e8f0;
+            margin-top: 15px;
+            border-left: 4px solid var(--success);
+            display: none;
         }
-        .highlight {
-            background: #fef3c7;
-            padding: 2px 5px;
-            border-radius: 3px;
+        
+        @media (max-width: 768px) {
+            .container-main {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .timer {
+                font-size: 2.5em;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .option {
+                padding: 12px 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Application Container -->
-    <div class="container main-container" id="app-container">
-        <!-- Login Screen (initial) -->
-        <div id="login-screen" class="login-container">
-            <h2 class="text-center mb-4" style="color: #4f46e5;">📚 Système Éducatif</h2>
-            <h4 class="text-center mb-4">Connexion</h4>
+    <!-- Admin Access Modal -->
+    <div id="adminModal" class="modal-admin" style="display: none;">
+        <div class="modal-content">
+            <h3 class="mb-4"><i class="fas fa-lock"></i> Accès Administrateur</h3>
+            <input type="password" id="adminPassword" class="input-admin" placeholder="Mot de passe admin" autocomplete="off">
+            <button onclick="verifyAdmin()" class="btn-custom w-100">Accéder au Panel</button>
+            <p class="mt-3 text-muted">Mot de passe: <strong>Légende360@</strong></p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Quiz de Français</h1>
+            <h4>Participe passé et terminaisons verbales</h4>
+            <p>Testez vos connaissances en grammaire française</p>
             
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" id="login-email" class="form-control" placeholder="admin@match.com" value="admin@match.com">
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin123">
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Mode</label>
-                <select id="login-mode" class="form-select">
-                    <option value="admin">Administrateur</option>
-                    <option value="student">Élève (Credo Singa)</option>
-                </select>
-            </div>
-            
-            <button onclick="login()" class="btn btn-primary w-100">Se connecter</button>
-            
-            <div class="mt-3 text-center">
-                <small class="text-muted">
-                    Admin: admin@match.com / admin123<br>
-                    Étudiant: credo@match.com / credo123
-                </small>
+            <div class="admin-access">
+                <button class="admin-btn" onclick="showAdminModal()">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
             </div>
         </div>
 
-        <!-- Main Application (hidden initially) -->
-        <div id="main-app" style="display: none;">
-            <!-- Navigation -->
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <div class="container-fluid">
-                    <span class="navbar-brand">
-                        📘 Système Éducatif
-                        <span id="user-badge" class="admin-badge">Admin</span>
-                    </span>
-                    <div class="d-flex">
-                        <span id="current-user" class="text-white me-3"></span>
-                        <button onclick="logout()" class="btn btn-light">Déconnexion</button>
+        <!-- Quiz Section -->
+        <div id="quizSection" class="quiz-section">
+            <!-- Student Info -->
+            <div id="studentInfo" style="text-align: center; margin-bottom: 30px;">
+                <h3>Bonjour, <span id="studentName">Étudiant</span> !</h3>
+                <p class="text-muted">Prêt à tester vos connaissances ?</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="globalProgress"></div>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-container" id="timerContainer" style="display: none;">
+                <h4><i class="fas fa-clock"></i> Temps restant</h4>
+                <div class="timer" id="timerDisplay">15</div>
+                <p>Question <span id="currentQuestionNum">1</span> sur <span id="totalQuestions">30</span></p>
+            </div>
+
+            <!-- Instructions -->
+            <div id="instructions" class="question-card">
+                <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+                <p>Pour chaque phrase, cochez la bonne réponse parmi les propositions.</p>
+                <ul>
+                    <li><strong>Chronomètre :</strong> 15 secondes par question</li>
+                    <li><strong>Mode :</strong> Sans aide extérieure</li>
+                    <li><strong>Objectif :</strong> S'améliorer en grammaire</li>
+                    <li><strong>Pour :</strong> Credo Singa</li>
+                </ul>
+                <div class="text-center mt-4">
+                    <button onclick="startQuiz()" class="btn-custom btn-lg">
+                        <i class="fas fa-play"></i> Commencer le Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questionsContainer" style="display: none;"></div>
+
+            <!-- Navigation Buttons -->
+            <div id="navigationButtons" style="display: none; text-align: center; margin-top: 30px;">
+                <button onclick="previousQuestion()" class="btn-custom" id="prevBtn" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button onclick="nextQuestion()" class="btn-custom" id="nextBtn">
+                    Suivant <i class="fas fa-arrow-right"></i>
+                </button>
+                <button onclick="submitQuiz()" class="btn-custom" id="submitBtn" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Soumettre
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" style="display: none;"></div>
+        </div>
+
+        <!-- Admin Section (Hidden by default) -->
+        <div id="adminSection" class="admin-section" style="display: none;">
+            <h2 class="mb-4"><i class="fas fa-chart-line"></i> Panel Administrateur</h2>
+            
+            <!-- Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-users fa-2x"></i>
+                        <div class="stats-number" id="totalStudents">0</div>
+                        <p>Étudiants</p>
                     </div>
                 </div>
-            </nav>
-
-            <!-- Tabs Navigation -->
-            <ul class="nav nav-tabs" id="mainTabs">
-                <li class="nav-item">
-                    <button class="nav-link active" onclick="showTab('admin')">Admin Panel</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" onclick="showTab('exercise')">Exercice Français</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" onclick="showTab('results')">Résultats</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" onclick="showTab('create')">Créer Exercice</button>
-                </li>
-            </ul>
-
-            <!-- Tab Content -->
-            <div class="tab-content">
-                <!-- ADMIN PANEL TAB -->
-                <div id="admin-tab">
-                    <h3 class="mb-4">📊 Tableau de Bord Administrateur</h3>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="stat-card success">
-                                <h5>Exercices Complets</h5>
-                                <h2 id="completed-exercises">0</h2>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card danger">
-                                <h5>Taux de Réussite</h5>
-                                <h2 id="success-rate">0%</h2>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card info">
-                                <h5>Temps Moyen</h5>
-                                <h2 id="avg-time">0s</h2>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">Gestion des Utilisateurs</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Ajouter un étudiant</label>
-                                        <input type="email" id="new-student-email" class="form-control mb-2" placeholder="email@exemple.com">
-                                        <input type="password" id="new-student-password" class="form-control mb-2" placeholder="Mot de passe">
-                                        <button onclick="addStudent()" class="btn btn-primary">Ajouter Étudiant</button>
-                                    </div>
-                                    <div id="students-list"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0">Exercices Créés</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="exercises-list"></div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                        <div class="stats-number" id="totalQuizzes">0</div>
+                        <p>Quiz complétés</p>
                     </div>
                 </div>
-
-                <!-- EXERCICE TAB -->
-                <div id="exercise-tab" style="display: none;">
-                    <h3 class="mb-4">📝 Exercice de Français - Credo Singa</h3>
-                    <div class="alert alert-info">
-                        <strong>Consigne :</strong> Pour chaque phrase, coche la bonne réponse parmi les propositions. 
-                        Tu as <span class="highlight">15 secondes par question</span>. 
-                        Aucune aide extérieure n'est autorisée.
-                    </div>
-
-                    <div class="timer-display" id="timer">
-                        15
-                    </div>
-
-                    <div id="exercise-container">
-                        <!-- Questions will be loaded here -->
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <button id="submit-exercise" onclick="submitExercise()" class="btn btn-primary btn-lg" disabled>
-                            Soumettre les réponses
-                        </button>
-                        <button id="start-exercise" onclick="startExercise()" class="btn btn-success btn-lg">
-                            Démarrer l'exercice
-                        </button>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-percentage fa-2x"></i>
+                        <div class="stats-number" id="avgScore">0%</div>
+                        <p>Moyenne</p>
                     </div>
                 </div>
-
-                <!-- RESULTS TAB -->
-                <div id="results-tab" style="display: none;">
-                    <h3 class="mb-4">📈 Résultats de Credo Singa</h3>
-                    
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0">Statistiques Globales</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row" id="global-stats"></div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-4">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="mb-0">Détail des Exercices</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="results-detail"></div>
-                        </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-clock fa-2x"></i>
+                        <div class="stats-number" id="avgTime">0s</div>
+                        <p>Temps moyen</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- CREATE EXERCISE TAB -->
-                <div id="create-tab" style="display: none;">
-                    <h3 class="mb-4">✏️ Créer un Nouvel Exercice</h3>
-                    
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Titre de l'exercice</label>
-                                <input type="text" id="exercise-title" class="form-control" placeholder="Ex: Participe passé - Niveau 1">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Thème</label>
-                                <input type="text" id="exercise-theme" class="form-control" placeholder="Ex: Conjugaison des verbes">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Temps par question (secondes)</label>
-                                <input type="number" id="exercise-time" class="form-control" value="15" min="5" max="60">
-                            </div>
+            <!-- Results List -->
+            <div class="admin-panel">
+                <h4 class="mb-4"><i class="fas fa-list"></i> Résultats détaillés</h4>
+                <div id="resultsList"></div>
+            </div>
 
-                            <div id="questions-container">
-                                <!-- Questions will be added here -->
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button onclick="addQuestion()" class="btn btn-primary me-2">
-                                    + Ajouter une question
-                                </button>
-                                <button onclick="saveExercise()" class="btn btn-success">
-                                    💾 Sauvegarder l'exercice
-                                </button>
-                            </div>
-                        </div>
+            <!-- Create Exercise -->
+            <div class="mt-5">
+                <h4><i class="fas fa-plus-circle"></i> Créer un nouvel exercice</h4>
+                <div class="question-card">
+                    <div class="mb-3">
+                        <label class="form-label">Titre de l'exercice</label>
+                        <input type="text" id="newExerciseTitle" class="form-control" placeholder="Participe passé - Niveau avancé">
                     </div>
-
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Aperçu de l'exercice</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="exercise-preview"></div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Temps par question (secondes)</label>
+                        <input type="number" id="newExerciseTime" class="form-control" value="15" min="5" max="60">
                     </div>
+                    <button onclick="createNewExercise()" class="btn-custom">
+                        <i class="fas fa-save"></i> Créer l'exercice
+                    </button>
                 </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button onclick="backToQuiz()" class="btn-custom">
+                    <i class="fas fa-arrow-left"></i> Retour au Quiz
+                </button>
             </div>
         </div>
     </div>
@@ -425,315 +489,235 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const analytics = firebase.analytics();
 
-        // ==================== GLOBAL VARIABLES ====================
-        let currentUser = null;
-        let userMode = 'admin';
-        let currentExercise = null;
-        let timer = null;
-        let timeLeft = 15;
-        let currentQuestionIndex = 0;
-        let answers = {};
-        let exerciseStarted = false;
-
-        // ==================== DEFAULT EXERCISE DATA ====================
-        const defaultExercise = {
-            title: "Devoir de Français - Participe passé",
-            theme: "Le participe passé et les terminaisons verbales",
+        // ==================== QUIZ DATA ====================
+        const quizData = {
+            title: "Participe passé et terminaisons verbales",
             timePerQuestion: 15,
             questions: [
                 {
                     id: 1,
                     question: "Il a ______ son sac sur la table.",
                     options: ["posé", "poser", "posait", "posera"],
-                    correctAnswer: 0,
+                    correct: 0,
                     explanation: "Avec l'auxiliaire 'avoir', le participe passé ne s'accorde pas avec le sujet."
                 },
                 {
                     id: 2,
                     question: "Les lettres qu'elle a ______ étaient très touchantes.",
                     options: ["écrire", "écrites", "écrite", "écrivait"],
-                    correctAnswer: 1,
+                    correct: 1,
                     explanation: "Accord avec 'lettres' (féminin pluriel) placé avant le participe passé."
                 },
                 {
                     id: 3,
                     question: "Nous avons ______ toute la journée.",
                     options: ["marcher", "marché", "marchait", "marchera"],
-                    correctAnswer: 1,
+                    correct: 1,
                     explanation: "Participe passé avec 'avoir' - pas d'accord avec le sujet."
                 },
                 {
                     id: 4,
                     question: "La chanson que j'ai ______ hier était magnifique.",
                     options: ["écouter", "écoutée", "écouté", "écoutait"],
-                    correctAnswer: 1,
+                    correct: 1,
                     explanation: "Accord avec 'chanson' (féminin singulier) placé avant."
                 },
                 {
                     id: 5,
                     question: "Les enfants ont ______ trop tard.",
                     options: ["arriver", "arrivés", "arrivé", "arrivaient"],
-                    correctAnswer: 1,
+                    correct: 1,
                     explanation: "Accord avec 'enfants' (masculin pluriel) placé avant."
+                },
+                {
+                    id: 6,
+                    question: "Elle s'est ______ les mains avant de manger.",
+                    options: ["laver", "lavée", "lavées", "lavait"],
+                    correct: 2,
+                    explanation: "Avec l'auxiliaire 'être', le participe passé s'accorde avec le sujet."
+                },
+                {
+                    id: 7,
+                    question: "Ils avaient ______ le travail avant la nuit.",
+                    options: ["terminer", "terminé", "terminaient", "termina"],
+                    correct: 1,
+                    explanation: "Participe passé avec 'avoir' - pas d'accord."
+                },
+                {
+                    id: 8,
+                    question: "La robe qu'elle a ______ hier est très belle.",
+                    options: ["acheter", "achetée", "acheté", "achetait"],
+                    correct: 1,
+                    explanation: "Accord avec 'robe' (féminin singulier) placé avant."
+                },
+                {
+                    id: 9,
+                    question: "Il ______ partir plus tôt, mais il a oublié.",
+                    options: ["a", "est", "avait", "aurait"],
+                    correct: 3,
+                    explanation: "Conditionnel passé pour une action non réalisée."
+                },
+                {
+                    id: 10,
+                    question: "Les histoires que nous avons ______ sont vraies.",
+                    options: ["raconter", "raconté", "racontées", "racontait"],
+                    correct: 2,
+                    explanation: "Accord avec 'histoires' (féminin pluriel) placé avant."
+                },
+                {
+                    id: 11,
+                    question: "Elle a ______ ses erreurs.",
+                    options: ["corriger", "corrigé", "corrigée", "corrigeait"],
+                    correct: 1,
+                    explanation: "Participe passé avec 'avoir' - pas d'accord."
+                },
+                {
+                    id: 12,
+                    question: "Les fleurs qu'il a ______ sont fanées.",
+                    options: ["cueillir", "cueilli", "cueillies", "cueillait"],
+                    correct: 2,
+                    explanation: "Accord avec 'fleurs' (féminin pluriel) placé avant."
+                },
+                {
+                    id: 13,
+                    question: "Tu aurais ______ me prévenir.",
+                    options: ["dû", "du", "devoir", "dues"],
+                    correct: 0,
+                    explanation: "Participe passé du verbe 'devoir' au conditionnel passé."
+                },
+                {
+                    id: 14,
+                    question: "La leçon qu'ils ont ______ était difficile.",
+                    options: ["apprendre", "appris", "apprise", "apprenaient"],
+                    correct: 1,
+                    explanation: "Participe passé avec 'avoir' - pas d'accord."
+                },
+                {
+                    id: 15,
+                    question: "Elle s'est ______ tard cette nuit.",
+                    options: ["coucher", "couchée", "couché", "couchait"],
+                    correct: 1,
+                    explanation: "Accord avec le sujet 'elle' avec l'auxiliaire 'être'."
                 }
             ]
         };
 
-        // ==================== AUTHENTICATION ====================
-        function login() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const mode = document.getElementById('login-mode').value;
-            
-            userMode = mode;
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    currentUser = userCredential.user;
-                    showMainApp();
-                    initializeApp();
-                })
-                .catch((error) => {
-                    alert("Erreur de connexion: " + error.message);
-                });
-        }
+        // ==================== GLOBAL VARIABLES ====================
+        let currentStudent = {
+            id: null,
+            name: "Credo Singa",
+            email: "credo@quiz.fr"
+        };
+        
+        let currentAnswers = {};
+        let currentQuestionIndex = 0;
+        let timerInterval = null;
+        let timeLeft = quizData.timePerQuestion;
+        let quizStarted = false;
+        let quizCompleted = false;
 
-        function logout() {
-            auth.signOut().then(() => {
-                currentUser = null;
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('main-app').style.display = 'none';
-            });
-        }
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeStudent();
+            displayQuestions();
+            loadGlobalStats();
+        });
 
-        // ==================== UI FUNCTIONS ====================
-        function showMainApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            
-            const userBadge = document.getElementById('user-badge');
-            if (userMode === 'admin') {
-                userBadge.className = 'admin-badge';
-                userBadge.textContent = 'Admin';
-            } else {
-                userBadge.className = 'student-badge';
-                userBadge.textContent = 'Élève';
+        // ==================== STUDENT MANAGEMENT ====================
+        function initializeStudent() {
+            // Generate unique student ID
+            let studentId = localStorage.getItem('quiz_student_id');
+            if (!studentId) {
+                studentId = 'student_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('quiz_student_id', studentId);
             }
             
-            document.getElementById('current-user').textContent = currentUser.email;
-            showTab('admin');
+            currentStudent.id = studentId;
+            document.getElementById('studentName').textContent = currentStudent.name;
+            
+            // Load previous progress
+            loadStudentProgress();
         }
 
-        function showTab(tabName) {
-            // Hide all tabs
-            document.getElementById('admin-tab').style.display = 'none';
-            document.getElementById('exercise-tab').style.display = 'none';
-            document.getElementById('results-tab').style.display = 'none';
-            document.getElementById('create-tab').style.display = 'none';
-            
-            // Show selected tab
-            document.getElementById(tabName + '-tab').style.display = 'block';
-            
-            // Update active tab button
-            const tabButtons = document.querySelectorAll('.nav-link');
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Load content based on tab
-            switch(tabName) {
-                case 'admin':
-                    loadAdminDashboard();
-                    break;
-                case 'exercise':
-                    if (userMode === 'student') {
-                        loadExercise();
-                    }
-                    break;
-                case 'results':
-                    loadResults();
-                    break;
-                case 'create':
-                    if (userMode === 'admin') {
-                        loadCreateExercise();
-                    }
-                    break;
+        function loadStudentProgress() {
+            const progress = localStorage.getItem('quiz_progress');
+            if (progress) {
+                const progressData = JSON.parse(progress);
+                const progressPercent = (progressData.answered / quizData.questions.length) * 100;
+                document.getElementById('globalProgress').style.width = progressPercent + '%';
             }
         }
 
-        // ==================== ADMIN DASHBOARD ====================
-        function loadAdminDashboard() {
-            // Load statistics
-            db.collection('results').get().then(snapshot => {
-                let totalExercises = 0;
-                let totalCorrect = 0;
-                let totalQuestions = 0;
-                let totalTime = 0;
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    totalExercises++;
-                    totalCorrect += data.correctAnswers || 0;
-                    totalQuestions += data.totalQuestions || 0;
-                    totalTime += data.totalTime || 0;
-                });
-                
-                const successRate = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
-                const avgTime = totalExercises > 0 ? Math.round(totalTime / totalExercises) : 0;
-                
-                document.getElementById('completed-exercises').textContent = totalExercises;
-                document.getElementById('success-rate').textContent = successRate + '%';
-                document.getElementById('avg-time').textContent = avgTime + 's';
-                
-                // Load students
-                loadStudentsList();
-                // Load exercises
-                loadExercisesList();
-            });
-        }
-
-        function loadStudentsList() {
-            db.collection('users').where('role', '==', 'student').get().then(snapshot => {
-                let html = '<h6>Étudiants inscrits:</h6>';
-                snapshot.forEach(doc => {
-                    const student = doc.data();
-                    html += `
-                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-                            <span>${student.email}</span>
-                            <button onclick="deleteUser('${doc.id}')" class="btn btn-sm btn-danger">Supprimer</button>
-                        </div>
-                    `;
-                });
-                document.getElementById('students-list').innerHTML = html;
-            });
-        }
-
-        function loadExercisesList() {
-            db.collection('exercises').get().then(snapshot => {
-                let html = '<div class="list-group">';
-                snapshot.forEach(doc => {
-                    const exercise = doc.data();
-                    html += `
-                        <div class="list-group-item">
-                            <h6>${exercise.title}</h6>
-                            <small class="text-muted">${exercise.theme} • ${exercise.questions?.length || 0} questions</small>
-                            <div class="mt-2">
-                                <button onclick="deleteExercise('${doc.id}')" class="btn btn-sm btn-danger">Supprimer</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                document.getElementById('exercises-list').innerHTML = html;
-            });
-        }
-
-        function addStudent() {
-            const email = document.getElementById('new-student-email').value;
-            const password = document.getElementById('new-student-password').value;
+        // ==================== QUIZ FUNCTIONS ====================
+        function startQuiz() {
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('questionsContainer').style.display = 'block';
+            document.getElementById('timerContainer').style.display = 'block';
+            document.getElementById('navigationButtons').style.display = 'block';
             
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    return db.collection('users').doc(userCredential.user.uid).set({
-                        email: email,
-                        role: 'student',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-                .then(() => {
-                    alert('Étudiant ajouté avec succès!');
-                    loadStudentsList();
-                    document.getElementById('new-student-email').value = '';
-                    document.getElementById('new-student-password').value = '';
-                })
-                .catch(error => alert('Erreur: ' + error.message));
+            quizStarted = true;
+            currentQuestionIndex = 0;
+            currentAnswers = {};
+            
+            showQuestion(currentQuestionIndex);
+            startTimer();
+            updateNavigationButtons();
         }
 
-        // ==================== EXERCICE FUNCTIONS ====================
-        function loadExercise() {
-            // Load default exercise for demo
-            currentExercise = defaultExercise;
-            timeLeft = currentExercise.timePerQuestion;
+        function displayQuestions() {
+            const container = document.getElementById('questionsContainer');
+            document.getElementById('totalQuestions').textContent = quizData.questions.length;
             
-            let html = '<h4 class="mb-4">' + currentExercise.title + '</h4>';
-            html += '<div class="alert alert-info mb-4">' + currentExercise.theme + '</div>';
-            
-            currentExercise.questions.forEach((q, index) => {
-                html += `
-                    <div class="question-box" id="question-${q.id}">
-                        <h5>Question ${index + 1}:</h5>
-                        <p class="lead">${q.question}</p>
-                        <div id="options-${q.id}">
-                `;
-                
-                q.options.forEach((option, optIndex) => {
-                    html += `
-                        <div class="answer-option" 
-                             onclick="selectAnswer(${q.id}, ${optIndex})"
-                             id="option-${q.id}-${optIndex}">
-                            ☐ ${option}
+            quizData.questions.forEach((q, index) => {
+                const questionHTML = `
+                    <div class="question-card" id="question-${q.id}" style="display: ${index === 0 ? 'block' : 'none'};">
+                        <div class="question-number">${index + 1}</div>
+                        <h4>${q.question}</h4>
+                        <div class="options-container" id="options-${q.id}">
+                            ${q.options.map((option, optIndex) => `
+                                <div class="option" onclick="selectAnswer(${q.id}, ${optIndex})" id="option-${q.id}-${optIndex}">
+                                    <span class="option-mark">${String.fromCharCode(65 + optIndex)}.</span>
+                                    ${option}
+                                </div>
+                            `).join('')}
                         </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                        <div class="mt-3" id="explanation-${q.id}" style="display: none;">
-                            <div class="alert alert-success">
-                                <strong>Explication:</strong> ${q.explanation}
-                            </div>
+                        <div class="explanation-box" id="explanation-${q.id}">
+                            <strong><i class="fas fa-lightbulb"></i> Explication :</strong> ${q.explanation}
                         </div>
                     </div>
                 `;
+                container.innerHTML += questionHTML;
             });
-            
-            document.getElementById('exercise-container').innerHTML = html;
-            document.getElementById('submit-exercise').disabled = true;
-            document.getElementById('start-exercise').style.display = 'block';
-        }
-
-        function startExercise() {
-            exerciseStarted = true;
-            currentQuestionIndex = 0;
-            answers = {};
-            document.getElementById('start-exercise').style.display = 'none';
-            document.getElementById('submit-exercise').disabled = false;
-            startTimer();
-            showQuestion(0);
         }
 
         function showQuestion(index) {
             // Hide all questions
-            currentExercise.questions.forEach(q => {
+            quizData.questions.forEach(q => {
                 document.getElementById(`question-${q.id}`).style.display = 'none';
             });
             
             // Show current question
-            const currentQ = currentExercise.questions[index];
+            const currentQ = quizData.questions[index];
             document.getElementById(`question-${currentQ.id}`).style.display = 'block';
+            document.getElementById('currentQuestionNum').textContent = index + 1;
             
             // Reset timer
-            timeLeft = currentExercise.timePerQuestion;
-            document.getElementById('timer').textContent = timeLeft;
-        }
-
-        function startTimer() {
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    nextQuestion();
-                }
-            }, 1000);
+            timeLeft = quizData.timePerQuestion;
+            document.getElementById('timerDisplay').textContent = timeLeft;
+            
+            // Update selected answer if exists
+            if (currentAnswers[currentQ.id] !== undefined) {
+                selectAnswer(currentQ.id, currentAnswers[currentQ.id]);
+            }
         }
 
         function selectAnswer(questionId, optionIndex) {
-            answers[questionId] = optionIndex;
+            currentAnswers[questionId] = optionIndex;
             
             // Update UI
-            const question = currentExercise.questions.find(q => q.id === questionId);
+            const question = quizData.questions.find(q => q.id === questionId);
             question.options.forEach((_, index) => {
                 const optionElement = document.getElementById(`option-${questionId}-${index}`);
                 optionElement.classList.remove('selected');
@@ -741,427 +725,409 @@
                     optionElement.classList.add('selected');
                 }
             });
+            
+            // Save progress
+            saveProgress();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerDisplay').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    nextQuestion();
+                }
+            }, 1000);
         }
 
         function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < currentExercise.questions.length) {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
                 showQuestion(currentQuestionIndex);
-                timeLeft = currentExercise.timePerQuestion;
+                startTimer();
+                updateNavigationButtons();
             } else {
-                clearInterval(timer);
-                submitExercise();
+                submitQuiz();
             }
         }
 
-        function submitExercise() {
-            clearInterval(timer);
-            exerciseStarted = false;
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+                startTimer();
+                updateNavigationButtons();
+            }
+        }
+
+        function updateNavigationButtons() {
+            document.getElementById('prevBtn').style.display = currentQuestionIndex > 0 ? 'inline-block' : 'none';
+            document.getElementById('nextBtn').style.display = currentQuestionIndex < quizData.questions.length - 1 ? 'inline-block' : 'none';
+            document.getElementById('submitBtn').style.display = currentQuestionIndex === quizData.questions.length - 1 ? 'inline-block' : 'none';
+        }
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+            quizCompleted = true;
             
             // Calculate results
-            let correctAnswers = 0;
+            let correctCount = 0;
             const results = [];
             
-            currentExercise.questions.forEach(q => {
-                const userAnswer = answers[q.id];
-                const isCorrect = userAnswer === q.correctAnswer;
-                if (isCorrect) correctAnswers++;
+            quizData.questions.forEach(q => {
+                const userAnswer = currentAnswers[q.id];
+                const isCorrect = userAnswer === q.correct;
+                
+                if (isCorrect) correctCount++;
                 
                 results.push({
                     questionId: q.id,
                     question: q.question,
-                    userAnswer: q.options[userAnswer],
-                    correctAnswer: q.options[q.correctAnswer],
+                    userAnswer: userAnswer !== undefined ? q.options[userAnswer] : "Non répondue",
+                    correctAnswer: q.options[q.correct],
                     isCorrect: isCorrect,
                     explanation: q.explanation
                 });
                 
-                // Show explanations
-                document.getElementById(`explanation-${q.id}`).style.display = 'block';
-                
-                // Mark answers
+                // Show correct/wrong answers
+                if (userAnswer !== undefined) {
+                    const userOption = document.getElementById(`option-${q.id}-${userAnswer}`);
+                    const correctOption = document.getElementById(`option-${q.id}-${q.correct}`);
+                    
+                    userOption.classList.add(isCorrect ? 'correct' : 'wrong');
+                    if (!isCorrect) {
+                        correctOption.classList.add('correct');
+                    }
+                    
+                    // Show explanation
+                    document.getElementById(`explanation-${q.id}`).style.display = 'block';
+                }
+            });
+            
+            // Calculate score
+            const score = Math.round((correctCount / quizData.questions.length) * 100);
+            const totalTime = (quizData.timePerQuestion * quizData.questions.length) - timeLeft;
+            
+            // Display results
+            displayResults(score, correctCount, results, totalTime);
+            
+            // Save to Firebase
+            saveResultsToFirebase(score, correctCount, results, totalTime);
+            
+            // Disable further selection
+            quizData.questions.forEach(q => {
                 q.options.forEach((_, index) => {
                     const optionElement = document.getElementById(`option-${q.id}-${index}`);
-                    optionElement.classList.remove('selected');
-                    if (index === q.correctAnswer) {
-                        optionElement.classList.add('correct');
-                    } else if (index === userAnswer && !isCorrect) {
-                        optionElement.classList.add('wrong');
-                    }
                     optionElement.style.cursor = 'default';
                     optionElement.onclick = null;
                 });
             });
-            
-            // Save results to Firebase
-            const resultData = {
-                studentId: currentUser.uid,
-                studentEmail: currentUser.email,
-                exerciseId: 'default-exercise',
-                exerciseTitle: currentExercise.title,
-                date: firebase.firestore.FieldValue.serverTimestamp(),
-                correctAnswers: correctAnswers,
-                totalQuestions: currentExercise.questions.length,
-                score: Math.round((correctAnswers / currentExercise.questions.length) * 100),
-                totalTime: (currentExercise.timePerQuestion * currentExercise.questions.length) - timeLeft,
-                details: results
-            };
-            
-            db.collection('results').add(resultData)
-                .then(() => {
-                    alert(`Exercice terminé! Score: ${resultData.score}% (${correctAnswers}/${currentExercise.questions.length} correctes)`);
-                    showTab('results');
-                    loadResults();
-                });
-            
-            document.getElementById('submit-exercise').disabled = true;
         }
 
-        // ==================== RESULTS FUNCTIONS ====================
-        function loadResults() {
-            const userId = userMode === 'admin' ? null : currentUser.uid;
-            let query = db.collection('results').orderBy('date', 'desc');
+        function displayResults(score, correctCount, results, totalTime) {
+            const resultsHTML = `
+                <div class="results-container">
+                    <h2 class="text-center mb-4"><i class="fas fa-trophy"></i> Résultats du Quiz</h2>
+                    
+                    <div class="score-circle">
+                        <div class="score-inner">
+                            ${score}%
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <h3>${correctCount} sur ${quizData.questions.length} correctes</h3>
+                        <p class="text-muted">Temps total: ${totalTime} secondes</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stats-card" style="background: #d4edda; color: #155724;">
+                                <i class="fas fa-check fa-2x"></i>
+                                <div class="stats-number">${correctCount}</div>
+                                <p>Bonnes réponses</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card" style="background: #f8d7da; color: #721c24;">
+                                <i class="fas fa-times fa-2x"></i>
+                                <div class="stats-number">${quizData.questions.length - correctCount}</div>
+                                <p>Mauvaises réponses</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4">Détail des réponses:</h4>
+                    ${results.map((result, index) => `
+                        <div class="student-result ${result.isCorrect ? '' : 'border-left: 4px solid var(--danger);'}">
+                            <strong>Question ${index + 1}:</strong> ${result.question}<br>
+                            <strong>Ta réponse:</strong> ${result.userAnswer}<br>
+                            <strong>Réponse correcte:</strong> ${result.correctAnswer}<br>
+                            <strong>Explication:</strong> ${result.explanation}
+                        </div>
+                    `).join('')}
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="restartQuiz()" class="btn-custom">
+                            <i class="fas fa-redo"></i> Recommencer le Quiz
+                        </button>
+                    </div>
+                </div>
+            `;
             
-            if (userId) {
-                query = query.where('studentId', '==', userId);
-            }
+            document.getElementById('resultsSection').innerHTML = resultsHTML;
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('questionsContainer').style.display = 'none';
+            document.getElementById('timerContainer').style.display = 'none';
+            document.getElementById('navigationButtons').style.display = 'none';
+        }
+
+        function restartQuiz() {
+            currentAnswers = {};
+            currentQuestionIndex = 0;
+            quizCompleted = false;
             
-            query.get().then(snapshot => {
-                let globalStatsHtml = '';
-                let detailHtml = '';
-                let totalExercises = 0;
+            // Reset UI
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('instructions').style.display = 'block';
+            
+            // Reset questions
+            quizData.questions.forEach(q => {
+                q.options.forEach((_, index) => {
+                    const optionElement = document.getElementById(`option-${q.id}-${index}`);
+                    optionElement.classList.remove('selected', 'correct', 'wrong');
+                    optionElement.style.cursor = 'pointer';
+                    optionElement.onclick = function() { selectAnswer(q.id, index); };
+                });
+                document.getElementById(`explanation-${q.id}`).style.display = 'none';
+            });
+            
+            // Clear progress
+            localStorage.removeItem('quiz_progress');
+            document.getElementById('globalProgress').style.width = '0%';
+        }
+
+        function saveProgress() {
+            const answered = Object.keys(currentAnswers).length;
+            const progress = {
+                answered: answered,
+                total: quizData.questions.length,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('quiz_progress', JSON.stringify(progress));
+            
+            const progressPercent = (answered / quizData.questions.length) * 100;
+            document.getElementById('globalProgress').style.width = progressPercent + '%';
+        }
+
+        // ==================== FIREBASE FUNCTIONS ====================
+        function saveResultsToFirebase(score, correctCount, results, totalTime) {
+            const resultData = {
+                studentId: currentStudent.id,
+                studentName: currentStudent.name,
+                studentEmail: currentStudent.email,
+                quizTitle: quizData.title,
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                score: score,
+                correctAnswers: correctCount,
+                totalQuestions: quizData.questions.length,
+                totalTime: totalTime,
+                answers: results
+            };
+            
+            db.collection('quiz_results').add(resultData)
+                .then(docRef => {
+                    console.log('Résultats sauvegardés avec ID: ', docRef.id);
+                    
+                    // Update student record
+                    updateStudentRecord(score, totalTime);
+                    
+                    // Update admin stats
+                    loadGlobalStats();
+                })
+                .catch(error => {
+                    console.error('Erreur sauvegarde: ', error);
+                });
+        }
+
+        function updateStudentRecord(score, totalTime) {
+            const studentRef = db.collection('students').doc(currentStudent.id);
+            
+            studentRef.get().then(doc => {
+                if (doc.exists) {
+                    // Update existing student
+                    const data = doc.data();
+                    const totalQuizzes = (data.totalQuizzes || 0) + 1;
+                    const avgScore = ((data.avgScore || 0) * (totalQuizzes - 1) + score) / totalQuizzes;
+                    const avgTime = ((data.avgTime || 0) * (totalQuizzes - 1) + totalTime) / totalQuizzes;
+                    
+                    studentRef.update({
+                        totalQuizzes: totalQuizzes,
+                        avgScore: Math.round(avgScore),
+                        avgTime: Math.round(avgTime),
+                        lastAttempt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    // Create new student
+                    studentRef.set({
+                        id: currentStudent.id,
+                        name: currentStudent.name,
+                        email: currentStudent.email,
+                        totalQuizzes: 1,
+                        avgScore: score,
+                        avgTime: totalTime,
+                        firstAttempt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastAttempt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        function loadGlobalStats() {
+            // Load total students
+            db.collection('students').get().then(snapshot => {
+                document.getElementById('totalStudents').textContent = snapshot.size;
+            });
+            
+            // Load total quizzes and average score
+            db.collection('quiz_results').get().then(snapshot => {
+                let totalQuizzes = 0;
                 let totalScore = 0;
                 let totalTime = 0;
                 
                 snapshot.forEach(doc => {
-                    const result = doc.data();
-                    totalExercises++;
-                    totalScore += result.score;
-                    totalTime += result.totalTime;
-                    
-                    const date = result.date?.toDate?.() || new Date();
-                    const formattedDate = date.toLocaleDateString('fr-FR');
-                    
-                    globalStatsHtml += `
-                        <div class="col-md-4">
-                            <div class="stat-card ${result.score >= 70 ? 'success' : 'danger'}">
-                                <h6>${result.exerciseTitle}</h6>
-                                <h3>${result.score}%</h3>
-                                <small>${formattedDate}</small>
-                            </div>
-                        </div>
-                    `;
-                    
-                    detailHtml += `
-                        <div class="card mb-3">
-                            <div class="card-header ${result.score >= 70 ? 'bg-success' : 'bg-danger'} text-white">
-                                <h6 class="mb-0">${result.exerciseTitle} - ${formattedDate}</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <strong>Score:</strong> ${result.score}%
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>Réponses:</strong> ${result.correctAnswers}/${result.totalQuestions}
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>Temps:</strong> ${result.totalTime}s
-                                    </div>
-                                    <div class="col-md-3">
-                                        <button onclick="viewResultDetails('${doc.id}')" class="btn btn-sm btn-info">
-                                            Voir détails
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    const data = doc.data();
+                    totalQuizzes++;
+                    totalScore += data.score || 0;
+                    totalTime += data.totalTime || 0;
                 });
                 
-                const avgScore = totalExercises > 0 ? Math.round(totalScore / totalExercises) : 0;
-                const avgTime = totalExercises > 0 ? Math.round(totalTime / totalExercises) : 0;
+                const avgScore = totalQuizzes > 0 ? Math.round(totalScore / totalQuizzes) : 0;
+                const avgTime = totalQuizzes > 0 ? Math.round(totalTime / totalQuizzes) : 0;
                 
-                document.getElementById('global-stats').innerHTML = globalStatsHtml;
-                document.getElementById('results-detail').innerHTML = detailHtml;
+                document.getElementById('totalQuizzes').textContent = totalQuizzes;
+                document.getElementById('avgScore').textContent = avgScore + '%';
+                document.getElementById('avgTime').textContent = avgTime + 's';
+                
+                // Load detailed results
+                loadDetailedResults();
             });
         }
 
-        function viewResultDetails(resultId) {
-            db.collection('results').doc(resultId).get().then(doc => {
-                if (doc.exists) {
-                    const result = doc.data();
-                    let detailHtml = '<h5>Détail des réponses:</h5>';
+        function loadDetailedResults() {
+            db.collection('quiz_results')
+                .orderBy('date', 'desc')
+                .limit(10)
+                .get()
+                .then(snapshot => {
+                    let resultsHTML = '';
                     
-                    result.details.forEach((detail, index) => {
-                        detailHtml += `
-                            <div class="result-item ${detail.isCorrect ? 'correct' : 'wrong'}">
-                                <h6>Question ${index + 1}:</h6>
-                                <p><strong>${detail.question}</strong></p>
-                                <p><strong>Ta réponse:</strong> ${detail.userAnswer || 'Non répondue'}</p>
-                                <p><strong>Réponse correcte:</strong> ${detail.correctAnswer}</p>
-                                <p><strong>Explication:</strong> ${detail.explanation}</p>
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const date = data.date?.toDate?.() || new Date();
+                        const formattedDate = date.toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        resultsHTML += `
+                            <div class="student-result">
+                                <strong>${data.studentName}</strong><br>
+                                <small>${formattedDate}</small><br>
+                                Score: <strong>${data.score}%</strong> (${data.correctAnswers}/${data.totalQuestions})<br>
+                                Temps: ${data.totalTime}s
+                                <button onclick="viewStudentResult('${doc.id}')" class="btn btn-sm btn-primary mt-2">
+                                    Voir détails
+                                </button>
                             </div>
                         `;
                     });
                     
-                    document.getElementById('results-detail').innerHTML = detailHtml;
+                    document.getElementById('resultsList').innerHTML = resultsHTML;
+                });
+        }
+
+        function viewStudentResult(resultId) {
+            db.collection('quiz_results').doc(resultId).get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    alert(`Détails du résultat:\n\nÉtudiant: ${data.studentName}\nScore: ${data.score}%\nBonnes réponses: ${data.correctAnswers}/${data.totalQuestions}\nTemps: ${data.totalTime}s`);
                 }
             });
         }
 
-        // ==================== CREATE EXERCISE FUNCTIONS ====================
-        function loadCreateExercise() {
-            document.getElementById('questions-container').innerHTML = '';
-            document.getElementById('exercise-preview').innerHTML = '';
-            
-            // Add first question by default
-            addQuestion();
+        // ==================== ADMIN FUNCTIONS ====================
+        function showAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
         }
 
-        function addQuestion() {
-            const questionsContainer = document.getElementById('questions-container');
-            const questionCount = questionsContainer.children.length + 1;
+        function verifyAdmin() {
+            const password = document.getElementById('adminPassword').value;
             
-            const questionHtml = `
-                <div class="question-preview mb-4" id="question-${questionCount}">
-                    <h5>Question ${questionCount}</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Phrase/Question</label>
-                        <input type="text" class="form-control question-text" 
-                               placeholder="Entrez la phrase avec le trou (______)">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Option 1 (correcte)</label>
-                            <input type="text" class="form-control option" placeholder="Réponse correcte">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Option 2</label>
-                            <input type="text" class="form-control option" placeholder="Autre option">
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
-                            <label class="form-label">Option 3</label>
-                            <input type="text" class="form-control option" placeholder="Autre option">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Option 4</label>
-                            <input type="text" class="form-control option" placeholder="Autre option">
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <label class="form-label">Explication</label>
-                        <textarea class="form-control explanation" rows="2" 
-                                  placeholder="Explication de la règle de grammaire"></textarea>
-                    </div>
-                    <button onclick="removeQuestion(${questionCount})" class="btn btn-sm btn-danger mt-2">
-                        Supprimer cette question
-                    </button>
-                </div>
-            `;
-            
-            questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
-            updateExercisePreview();
-        }
-
-        function removeQuestion(questionNumber) {
-            const questionElement = document.getElementById(`question-${questionNumber}`);
-            if (questionElement) {
-                questionElement.remove();
-                updateExercisePreview();
+            if (password === 'Légende360@') {
+                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('quizSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                
+                // Load admin data
+                loadGlobalStats();
+            } else {
+                alert('Mot de passe incorrect!');
             }
         }
 
-        function updateExercisePreview() {
-            const title = document.getElementById('exercise-title').value || 'Nouvel exercice';
-            const theme = document.getElementById('exercise-theme').value || 'Grammaire française';
-            
-            let previewHtml = `
-                <h4>${title}</h4>
-                <p><strong>Thème:</strong> ${theme}</p>
-                <hr>
-            `;
-            
-            const questions = document.querySelectorAll('.question-preview');
-            questions.forEach((question, index) => {
-                const questionText = question.querySelector('.question-text').value || `Question ${index + 1}`;
-                const options = Array.from(question.querySelectorAll('.option')).map(input => input.value).filter(val => val);
-                const explanation = question.querySelector('.explanation').value || '';
-                
-                previewHtml += `
-                    <div class="mb-3">
-                        <h6>Question ${index + 1}: ${questionText}</h6>
-                        <ul>
-                            ${options.map(opt => `<li>${opt}</li>`).join('')}
-                        </ul>
-                        ${explanation ? `<small><strong>Explication:</strong> ${explanation}</small>` : ''}
-                    </div>
-                `;
-            });
-            
-            document.getElementById('exercise-preview').innerHTML = previewHtml;
+        function backToQuiz() {
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
         }
 
-        function saveExercise() {
-            const title = document.getElementById('exercise-title').value;
-            const theme = document.getElementById('exercise-theme').value;
-            const timePerQuestion = parseInt(document.getElementById('exercise-time').value) || 15;
+        function createNewExercise() {
+            const title = document.getElementById('newExerciseTitle').value;
+            const time = parseInt(document.getElementById('newExerciseTime').value);
             
-            if (!title || !theme) {
-                alert('Veuillez remplir le titre et le thème de l\'exercice');
-                return;
-            }
-            
-            const questions = [];
-            const questionElements = document.querySelectorAll('.question-preview');
-            
-            questionElements.forEach((element, index) => {
-                const questionText = element.querySelector('.question-text').value;
-                const options = Array.from(element.querySelectorAll('.option')).map(input => input.value);
-                const explanation = element.querySelector('.explanation').value;
-                
-                if (questionText && options.filter(opt => opt).length >= 2) {
-                    questions.push({
-                        id: index + 1,
-                        question: questionText,
-                        options: options,
-                        correctAnswer: 0, // First option is correct
-                        explanation: explanation
-                    });
-                }
-            });
-            
-            if (questions.length === 0) {
-                alert('Veuillez ajouter au moins une question valide');
+            if (!title) {
+                alert('Veuillez entrer un titre pour l\'exercice');
                 return;
             }
             
             const exerciseData = {
                 title: title,
-                theme: theme,
-                timePerQuestion: timePerQuestion,
-                questions: questions,
+                timePerQuestion: time,
+                questions: quizData.questions, // Using same questions for demo
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                createdBy: currentUser.email
+                createdBy: 'Admin'
             };
             
             db.collection('exercises').add(exerciseData)
                 .then(() => {
-                    alert('Exercice sauvegardé avec succès!');
-                    document.getElementById('exercise-title').value = '';
-                    document.getElementById('exercise-theme').value = '';
-                    document.getElementById('questions-container').innerHTML = '';
-                    document.getElementById('exercise-preview').innerHTML = '';
-                    loadExercisesList();
-                    addQuestion();
+                    alert('Exercice créé avec succès!');
+                    document.getElementById('newExerciseTitle').value = '';
                 })
-                .catch(error => alert('Erreur: ' + error.message));
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
-        function deleteUser(userId) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')) {
-                db.collection('users').doc(userId).delete()
-                    .then(() => {
-                        alert('Utilisateur supprimé');
-                        loadStudentsList();
-                    })
-                    .catch(error => alert('Erreur: ' + error.message));
-            }
-        }
-
-        function deleteExercise(exerciseId) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet exercice?')) {
-                db.collection('exercises').doc(exerciseId).delete()
-                    .then(() => {
-                        alert('Exercice supprimé');
-                        loadExercisesList();
-                    })
-                    .catch(error => alert('Erreur: ' + error.message));
-            }
-        }
-
-        function initializeApp() {
-            // Check if default users exist, create them if not
-            const adminEmail = 'admin@match.com';
-            const adminPassword = 'admin123';
-            const studentEmail = 'credo@match.com';
-            const studentPassword = 'credo123';
-            
-            // Try to sign in as admin to check if exists
-            auth.signInWithEmailAndPassword(adminEmail, adminPassword)
-                .catch(() => {
-                    // Create admin user if doesn't exist
-                    auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
-                        .then(userCredential => {
-                            return db.collection('users').doc(userCredential.user.uid).set({
-                                email: adminEmail,
-                                role: 'admin',
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        })
-                        .then(() => {
-                            // Create student user
-                            return auth.createUserWithEmailAndPassword(studentEmail, studentPassword);
-                        })
-                        .then(userCredential => {
-                            return db.collection('users').doc(userCredential.user.uid).set({
-                                email: studentEmail,
-                                role: 'student',
-                                name: 'Credo Singa',
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        })
-                        .then(() => {
-                            console.log('Default users created');
-                            // Sign back in as original user
-                            return login();
-                        })
-                        .catch(error => console.log('Setup error:', error));
-                });
-            
-            // Save default exercise if not exists
-            db.collection('exercises').where('title', '==', defaultExercise.title).get()
-                .then(snapshot => {
-                    if (snapshot.empty) {
-                        db.collection('exercises').add({
-                            ...defaultExercise,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            createdBy: 'system'
-                        });
-                    }
+                .catch(error => {
+                    alert('Erreur: ' + error.message);
                 });
         }
 
-        // Initialize event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Listen for input changes in create exercise
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('question-text') || 
-                    e.target.classList.contains('option') ||
-                    e.target.classList.contains('explanation')) {
-                    updateExercisePreview();
-                }
-            });
-            
-            // Auto-update preview when title/theme changes
-            const titleInput = document.getElementById('exercise-title');
-            const themeInput = document.getElementById('exercise-theme');
-            if (titleInput && themeInput) {
-                titleInput.addEventListener('input', updateExercisePreview);
-                themeInput.addEventListener('input', updateExercisePreview);
+        // ==================== ANALYTICS ====================
+        function trackEvent(eventName, eventData) {
+            if (analytics) {
+                analytics.logEvent(eventName, eventData);
             }
+        }
+
+        // Track page view
+        trackEvent('page_view', {
+            page_title: 'Quiz Français',
+            student_id: currentStudent.id
         });
-
-        // Initialize Firebase app
-        try {
-            firebase.initializeApp(firebaseConfig);
-            console.log('Firebase initialized successfully');
-        } catch (error) {
-            console.log('Firebase already initialized');
-        }
     </script>
 </body>
 </html>
