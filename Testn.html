@@ -742,15 +742,15 @@
     </div>
 
     <script>
-        // Configuration Firebase
+        // NOUVELLE Configuration Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
-            authDomain: "match-a2ac6.firebaseapp.com",
-            projectId: "match-a2ac6",
-            storageBucket: "match-a2ac6.firebasestorage.app",
-            messagingSenderId: "376894292796",
-            appId: "1:376894292796:web:1eb138830c92aae8df5439",
-            measurementId: "G-2RSRSSFCDZ"
+            apiKey: "AIzaSyBPBq1uT7lbL9Xp_neAJh2lSe0MRErlYdo",
+            authDomain: "evoir-1.firebaseapp.com",
+            projectId: "evoir-1",
+            storageBucket: "evoir-1.firebasestorage.app",
+            messagingSenderId: "504718469638",
+            appId: "1:504718469638:web:72707fd51d0ce6ff773187",
+            measurementId: "G-ZXPC2SKJHT"
         };
 
         // Initialize Firebase
@@ -1128,13 +1128,24 @@
                     percentage: Math.round((score / totalQuestions) * 100),
                     answers: answers,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    niveau: getNiveau(member)
                 };
                 
-                await db.collection('results').add(resultData);
-                console.log(`Résultats sauvegardés pour ${member}`);
+                await db.collection('resultats_devoirs').add(resultData);
+                console.log(`Résultats sauvegardés pour ${member} dans la nouvelle base de données`);
             } catch (error) {
                 console.error("Erreur lors de la sauvegarde des résultats:", error);
+                alert("Erreur de connexion à la base de données. Veuillez réessayer.");
+            }
+        }
+        
+        function getNiveau(member) {
+            switch(member) {
+                case 'credo': return 'intermédiaire';
+                case 'moise': return 'moyen';
+                case 'aubaine': return 'difficile';
+                default: return 'inconnu';
             }
         }
         
@@ -1201,7 +1212,7 @@
         
         async function loadResults() {
             try {
-                const snapshot = await db.collection('results')
+                const snapshot = await db.collection('resultats_devoirs')
                     .orderBy('timestamp', 'desc')
                     .get();
                 
@@ -1213,7 +1224,10 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    results.push(data);
+                    results.push({
+                        ...data,
+                        id: doc.id
+                    });
                     
                     totalScore += data.percentage;
                     if (data.score > bestScore) {
@@ -1254,7 +1268,7 @@
                     }
                     
                     row.innerHTML = `
-                        <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)}</td>
+                        <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)} (${result.niveau})</td>
                         <td>${result.score}/${result.totalQuestions}</td>
                         <td>${result.percentage}%</td>
                         <td>${date}</td>
@@ -1263,14 +1277,31 @@
                     tableBody.appendChild(row);
                 });
                 
+                if (results.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px;">
+                                Aucun résultat trouvé dans la base de données.
+                            </td>
+                        </tr>
+                    `;
+                }
+                
             } catch (error) {
                 console.error("Erreur lors du chargement des résultats:", error);
+                document.getElementById('results-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #dc3545;">
+                            Erreur de connexion à la base de données. Veuillez réessayer.
+                        </td>
+                    </tr>
+                `;
             }
         }
         
         function exportResults() {
             const table = document.getElementById('results-table-body');
-            let csv = "Participant,Score,Pourcentage,Date,Statut\n";
+            let csv = "Participant,Niveau,Score,Pourcentage,Date,Statut\n";
             
             Array.from(table.rows).forEach(row => {
                 const cells = row.cells;
@@ -1282,7 +1313,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'resultats_famille_singa.csv';
+            a.download = 'resultats_famille_singa_' + new Date().toISOString().split('T')[0] + '.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
