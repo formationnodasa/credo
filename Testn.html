@@ -345,56 +345,61 @@
         
         .questions-container {
             margin-bottom: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
         
         .question {
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px dashed #e0e0e0;
-        }
-        
-        .question:last-child {
-            border-bottom: none;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
         }
         
         .question-number {
             display: inline-block;
             background-color: #4b6cb7;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             text-align: center;
-            line-height: 32px;
+            line-height: 28px;
             margin-right: 10px;
             font-weight: bold;
+            font-size: 0.9rem;
         }
         
         .question-text {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 15px;
             font-weight: 500;
+            color: #333;
         }
         
         .options {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
+            gap: 8px;
         }
         
         .option {
-            padding: 12px 15px;
-            background-color: #f8f9fa;
+            padding: 10px 15px;
+            background-color: white;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
+            font-size: 0.95rem;
         }
         
         .option:hover {
-            background-color: #e9ecef;
+            background-color: #f8f9fa;
+            border-color: #3498db;
         }
         
         .option.selected {
@@ -560,13 +565,17 @@
             .results-table th, .results-table td {
                 padding: 10px;
             }
+            
+            .questions-container {
+                max-height: 500px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1><i class="fas fa-book-open"></i> Devoirs de Français - Famille Singa</h1>
-        <p>Thème : Le participe passé et les terminaisons verbales<br>Distinguer participe passé / infinitif / imparfait / conditionnel - Maîtriser les accords du participe passé</p>
+        <p>Thème : Accord du participe passé - 50 questions par personne<br>Chaque membre a son propre questionnaire unique</p>
         <button class="admin-btn" id="admin-panel-btn">
             <i class="fas fa-lock"></i> Accès Admin
         </button>
@@ -598,7 +607,7 @@
                 </div>
                 <div class="stat-card">
                     <h3>Meilleur Score</h3>
-                    <div class="stat-value" id="best-score">0/30</div>
+                    <div class="stat-value" id="best-score">0/50</div>
                 </div>
                 <div class="stat-card">
                     <h3>Dernière Activité</h3>
@@ -645,31 +654,42 @@
     <div class="instructions">
         <h3><i class="fas fa-info-circle"></i> Instructions</h3>
         <ul>
-            <li>Chaque membre de la famille a accès à ses propres devoirs de français.</li>
-            <li><strong>Aubaine et Moïse</strong> : Complétez les phrases en choisissant la bonne réponse.</li>
-            <li><strong>Credo</strong> : En plus de compléter les phrases, vous devez aussi jouer le rôle de coach et valider les réponses. Vous aurez accès à des conseils pédagogiques et verrez les résultats finaux.</li>
+            <li>Chaque membre de la famille a <strong>50 questions uniques et différentes</strong>.</li>
+            <li><strong>Credo (Niveau Intermédiaire)</strong> : 50 questions sur l'accord du participe passé</li>
+            <li><strong>Moïse (Niveau Moyen)</strong> : 50 questions plus exigeantes sur l'accord du participe passé</li>
+            <li><strong>Aubaine (Niveau Difficile)</strong> : 50 questions sur les verbes pronominaux et constructions complexes</li>
             <li>Cliquez sur votre nom pour commencer votre devoir.</li>
             <li><strong>Les résultats sont automatiquement sauvegardés dans la base de données.</strong></li>
         </ul>
     </div>
     
-    <!-- Aubaine's Content -->
-    <div id="aubaine-content" class="content-area">
+    <!-- Credo's Content -->
+    <div id="credo-content" class="content-area">
         <div class="content-header">
-            <h2>Devoir d'Aubaine</h2>
-            <p class="member-role">Complète les phrases avec la forme correcte du verbe</p>
+            <h2>Devoir de Credo - Niveau Intermédiaire</h2>
+            <p class="member-role">50 questions sur l'accord du participe passé</p>
         </div>
         
-        <div class="questions-container" id="aubaine-questions">
+        <div class="coaching-area">
+            <h4><i class="fas fa-chalkboard-teacher"></i> Rôle du Coach</h4>
+            <p>En tant que coach, vous devez non seulement répondre aux questions, mais aussi comprendre les règles derrière chaque réponse.</p>
+            <p>Pour chaque question, nous vous fournirons un conseil pédagogique pour vous aider à expliquer la bonne réponse.</p>
+            
+            <div class="coaching-tip">
+                <strong>Conseil du jour :</strong> Le participe passé s'accorde avec le complément d'objet direct (COD) quand il est placé avant le verbe.
+            </div>
+        </div>
+        
+        <div class="questions-container" id="credo-questions">
             <!-- Questions will be inserted here by JavaScript -->
         </div>
         
-        <button class="submit-btn" id="aubaine-submit">Soumettre mes réponses</button>
+        <button class="submit-btn" id="credo-submit">Soumettre mes réponses</button>
         
-        <div class="results-panel" id="aubaine-results" style="display: none;">
-            <h3>Résultats d'Aubaine</h3>
-            <div class="score">Score: <span id="aubaine-score">0</span>/30</div>
-            <div class="feedback" id="aubaine-feedback"></div>
+        <div class="results-panel" id="credo-results" style="display: none;">
+            <h3>Résultats de Credo</h3>
+            <div class="score">Score: <span id="credo-score">0</span>/50</div>
+            <div class="feedback" id="credo-feedback"></div>
             <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
         </div>
     </div>
@@ -677,8 +697,8 @@
     <!-- Moïse's Content -->
     <div id="moise-content" class="content-area">
         <div class="content-header">
-            <h2>Devoir de Moïse</h2>
-            <p class="member-role">Complète les phrases avec la forme correcte du verbe</p>
+            <h2>Devoir de Moïse - Niveau Moyen</h2>
+            <p class="member-role">50 questions plus exigeantes sur l'accord du participe passé</p>
         </div>
         
         <div class="questions-container" id="moise-questions">
@@ -689,51 +709,36 @@
         
         <div class="results-panel" id="moise-results" style="display: none;">
             <h3>Résultats de Moïse</h3>
-            <div class="score">Score: <span id="moise-score">0</span>/30</div>
+            <div class="score">Score: <span id="moise-score">0</span>/50</div>
             <div class="feedback" id="moise-feedback"></div>
             <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
         </div>
     </div>
     
-    <!-- Credo's Content -->
-    <div id="credo-content" class="content-area">
+    <!-- Aubaine's Content -->
+    <div id="aubaine-content" class="content-area">
         <div class="content-header">
-            <h2>Devoir de Credo</h2>
-            <p class="member-role">Complète les phrases et valide les réponses en tant que coach</p>
+            <h2>Devoir d'Aubaine - Niveau Difficile</h2>
+            <p class="member-role">50 questions sur les verbes pronominaux et constructions complexes</p>
         </div>
         
-        <div class="coaching-area">
-            <h4><i class="fas fa-chalkboard-teacher"></i> Rôle du Coach</h4>
-            <p>En tant que coach, vous devez non seulement répondre aux questions, mais aussi comprendre les règles derrière chaque réponse.</p>
-            <p>Pour chaque question, nous vous fournirons un conseil pédagogique pour vous aider à expliquer la bonne réponse.</p>
-            
-            <div class="coaching-tip">
-                <strong>Conseil du jour :</strong> Pour accorder le participe passé avec l'auxiliaire "avoir", regardez le complément d'objet direct (COD) s'il est placé avant le verbe. Si le COD est placé avant, le participe passé s'accorde en genre et en nombre avec ce COD.
-            </div>
-        </div>
-        
-        <div class="questions-container" id="credo-questions">
+        <div class="questions-container" id="aubaine-questions">
             <!-- Questions will be inserted here by JavaScript -->
         </div>
         
-        <button class="submit-btn" id="credo-submit">Soumettre et voir les résultats finaux</button>
+        <button class="submit-btn" id="aubaine-submit">Soumettre mes réponses</button>
         
-        <div class="results-panel" id="credo-results" style="display: none;">
-            <h3>Résultats Finaux de Credo (Coach)</h3>
-            <div class="score">Score: <span id="credo-score">0</span>/30</div>
-            <div class="feedback" id="credo-feedback"></div>
+        <div class="results-panel" id="aubaine-results" style="display: none;">
+            <h3>Résultats d'Aubaine</h3>
+            <div class="score">Score: <span id="aubaine-score">0</span>/50</div>
+            <div class="feedback" id="aubaine-feedback"></div>
             <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
-            
-            <div class="coaching-tip" style="margin-top: 20px;">
-                <strong>Rappel pédagogique :</strong> Les terminaisons -é, -ée, -és, -ées correspondent au participe passé. La terminaison -er correspond à l'infinitif. Les terminaisons -ait, -aient correspondent à l'imparfait. Les terminaisons -era, -erait correspondent au futur et conditionnel.
-            </div>
         </div>
     </div>
     
     <div class="footer">
-        <p>Devoirs de français - Famille Singa © 2023 | Thème : Participe passé et terminaisons verbales</p>
-        <p>Objectif : Distinguer -é / -er / -ait / -aient / -és / -ée / -ées / -era / -erait</p>
-        <p>Système de suivi administrateur activé - Tous les résultats sont sauvegardés</p>
+        <p>Devoirs de français - Famille Singa © 2023 | Thème : Accord du participe passé</p>
+        <p>Total : 150 questions uniques (50 par personne) | Système de suivi administrateur activé</p>
     </div>
 
     <script>
@@ -757,196 +762,173 @@
         const ADMIN_PASSWORD = "legende360@";
         const ADMIN_EMAIL = "admin@familiesinga.com";
 
-        // Questions data
-        const questions = [
-            {
-                question: "Il a ______ son sac sur la table.",
-                options: ["posé", "poser", "posait", "posera"],
-                correct: 0,
-                explanation: "On utilise le participe passé 'posé' avec l'auxiliaire 'a' pour former le passé composé."
-            },
-            {
-                question: "Les lettres qu'elle a ______ étaient très touchantes.",
-                options: ["écrire", "écrites", "écrite", "écrivait"],
-                correct: 1,
-                explanation: "'écrites' s'accorde avec 'lettres' (féminin pluriel) car le COD ('lettres') est placé avant le verbe."
-            },
-            {
-                question: "Nous avons ______ toute la journée.",
-                options: ["marcher", "marché", "marchait", "marchera"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'marché' avec l'auxiliaire 'avons' pour former le passé composé."
-            },
-            {
-                question: "La chanson que j'ai ______ hier était magnifique.",
-                options: ["écouter", "écoutée", "écouté", "écoutait"],
-                correct: 1,
-                explanation: "'écoutée' s'accorde avec 'chanson' (féminin singulier) car le COD ('chanson') est placé avant le verbe."
-            },
-            {
-                question: "Les enfants ont ______ trop tard.",
-                options: ["arriver", "arrivés", "arrivé", "arrivaient"],
-                correct: 1,
-                explanation: "'arrivés' s'accorde avec 'enfants' (masculin pluriel) car le sujet ('enfants') fait l'action avec l'auxiliaire 'avoir'."
-            },
-            {
-                question: "Elle s'est ______ les mains avant de manger.",
-                options: ["laver", "lavée", "lavées", "lavait"],
-                correct: 2,
-                explanation: "'lavées' s'accorde avec 'mains' (féminin pluriel) car le COD ('mains') est placé après le verbe dans ce cas avec 'se'."
-            },
-            {
-                question: "Ils avaient ______ le travail avant la nuit.",
-                options: ["terminer", "terminé", "terminaient", "termina"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'terminé' avec l'auxiliaire 'avaient' pour former le plus-que-parfait."
-            },
-            {
-                question: "La robe qu'elle a ______ hier est très belle.",
-                options: ["acheter", "achetée", "acheté", "achetait"],
-                correct: 1,
-                explanation: "'achetée' s'accorde avec 'robe' (féminin singulier) car le COD ('robe') est placé avant le verbe."
-            },
-            {
-                question: "Il ______ partir plus tôt, mais il a oublié.",
-                options: ["a", "est", "avait", "aurait"],
-                correct: 2,
-                explanation: "On utilise l'imparfait 'avait' pour exprimer une action dans le passé qui était en cours ou une habitude."
-            },
-            {
-                question: "Les histoires que nous avons ______ sont vraies.",
-                options: ["raconter", "raconté", "racontées", "racontait"],
-                correct: 2,
-                explanation: "'racontées' s'accorde avec 'histoires' (féminin pluriel) car le COD ('histoires') est placé avant le verbe."
-            },
-            {
-                question: "Elle a ______ ses erreurs.",
-                options: ["corriger", "corrigé", "corrigée", "corrigeait"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'corrigé' avec l'auxiliaire 'a' pour former le passé composé."
-            },
-            {
-                question: "Les fleurs qu'il a ______ sont fanées.",
-                options: ["cueillir", "cueilli", "cueillies", "cueillait"],
-                correct: 2,
-                explanation: "'cueillies' s'accorde avec 'fleurs' (féminin pluriel) car le COD ('fleurs') est placé avant le verbe."
-            },
-            {
-                question: "Tu aurais ______ me prévenir.",
-                options: ["dû", "du", "devoir", "dues"],
-                correct: 0,
-                explanation: "On utilise le participe passé 'dû' (de devoir) avec l'auxiliaire 'aurais' pour former le conditionnel passé."
-            },
-            {
-                question: "La leçon qu'ils ont ______ était difficile.",
-                options: ["apprendre", "appris", "apprise", "apprenaient"],
-                correct: 2,
-                explanation: "'apprise' s'accorde avec 'leçon' (féminin singulier) car le COD ('leçon') est placé avant le verbe."
-            },
-            {
-                question: "Elle s'est ______ tard cette nuit.",
-                options: ["coucher", "couchée", "couché", "couchait"],
-                correct: 1,
-                explanation: "'couchée' s'accorde avec 'elle' (féminin singulier) car le verbe est pronominal et le sujet fait l'action sur lui-même."
-            },
-            {
-                question: "Les efforts qu'elle a ______ ont porté leurs fruits.",
-                options: ["faire", "faits", "faites", "faisait"],
-                correct: 1,
-                explanation: "'faits' s'accorde avec 'efforts' (masculin pluriel) car le COD ('efforts') est placé avant le verbe."
-            },
-            {
-                question: "Il a ______ son erreur.",
-                options: ["reconnaître", "reconnu", "reconnue", "reconnaissait"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'reconnu' avec l'auxiliaire 'a' pour former le passé composé."
-            },
-            {
-                question: "Les décisions que nous avons ______ étaient justes.",
-                options: ["prendre", "pris", "prises", "prenaient"],
-                correct: 2,
-                explanation: "'prises' s'accorde avec 'décisions' (féminin pluriel) car le COD ('décisions') est placé avant le verbe."
-            },
-            {
-                question: "Elle aurait ______ venir plus tôt.",
-                options: ["pu", "pue", "pouvoir", "pouvait"],
-                correct: 0,
-                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour former le conditionnel passé."
-            },
-            {
-                question: "Les films qu'ils ont ______ sont intéressants.",
-                options: ["voir", "vus", "vue", "voyaient"],
-                correct: 1,
-                explanation: "'vus' s'accorde avec 'films' (masculin pluriel) car le COD ('films') est placé avant le verbe."
-            },
-            {
-                question: "Il est ______ trop tard.",
-                options: ["arriver", "arrivé", "arrivait", "arrivera"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'arrivé' avec l'auxiliaire 'est' pour former le passé composé des verbes de mouvement."
-            },
-            {
-                question: "Les promesses qu'elle a ______ n'ont pas été tenues.",
-                options: ["faire", "fait", "faites", "faisait"],
-                correct: 2,
-                explanation: "'faites' s'accorde avec 'promesses' (féminin pluriel) car le COD ('promesses') est placé avant le verbe."
-            },
-            {
-                question: "Elle a ______ une lettre à sa mère.",
-                options: ["écrit", "écrite", "écrire", "écrivait"],
-                correct: 0,
-                explanation: "On utilise le participe passé 'écrit' avec l'auxiliaire 'a' pour former le passé composé."
-            },
-            {
-                question: "Les valises qu'ils ont ______ étaient lourdes.",
-                options: ["porter", "porté", "portées", "portaient"],
-                correct: 2,
-                explanation: "'portées' s'accorde avec 'valises' (féminin pluriel) car le COD ('valises') est placé avant le verbe."
-            },
-            {
-                question: "Il aurait ______ gagner le match.",
-                options: ["pu", "peut", "pue", "pouvoir"],
-                correct: 0,
-                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour former le conditionnel passé."
-            },
-            {
-                question: "Les fautes que tu as ______ doivent être corrigées.",
-                options: ["faire", "fait", "faites", "faisait"],
-                correct: 2,
-                explanation: "'faites' s'accorde avec 'fautes' (féminin pluriel) car le COD ('fautes') est placé avant le verbe."
-            },
-            {
-                question: "Elle s'est ______ parler sévèrement.",
-                options: ["faire", "faite", "fait", "faisait"],
-                correct: 2,
-                explanation: "On utilise 'fait' car avec 'se faire + infinitif', le participe passé reste invariable."
-            },
-            {
-                question: "Les chansons que nous avons ______ hier plaisent beaucoup.",
-                options: ["chanter", "chanté", "chantées", "chantaient"],
-                correct: 2,
-                explanation: "'chantées' s'accorde avec 'chansons' (féminin pluriel) car le COD ('chansons') est placé avant le verbe."
-            },
-            {
-                question: "Il a ______ trop vite.",
-                options: ["répondre", "répondu", "répondait", "répondit"],
-                correct: 1,
-                explanation: "On utilise le participe passé 'répondu' avec l'auxiliaire 'a' pour former le passé composé."
-            },
-            {
-                question: "Les règles que vous avez ______ sont importantes.",
-                options: ["suivre", "suivi", "suivies", "suivaient"],
-                correct: 2,
-                explanation: "'suivies' s'accorde avec 'règles' (féminin pluriel) car le COD ('règles') est placé avant le verbe."
-            }
+        // Questions data - 50 UNIQUE questions for each family member
+        const credoQuestions = [
+            { question: "Les exercices que j'ai ___ sont faciles.", options: ["faire", "fait", "faits", "faite"], correct: 2 },
+            { question: "La lettre que j'ai ___ est partie.", options: ["écrire", "écrit", "écrite", "écrivait"], correct: 2 },
+            { question: "Les livres que tu as ___ sont intéressants.", options: ["lire", "lu", "lus", "lue"], correct: 2 },
+            { question: "La porte qu'il a ___ était fermée.", options: ["ouvrir", "ouvert", "ouverte", "ouvrait"], correct: 2 },
+            { question: "Les leçons que les élèves ont ___ sont longues.", options: ["apprendre", "appris", "apprises", "apprenait"], correct: 2 },
+            { question: "La faute qu'elle a ___ est grave.", options: ["faire", "fait", "faite", "faisait"], correct: 2 },
+            { question: "Les fleurs qu'ils ont ___ sont fanées.", options: ["cueillir", "cueilli", "cueillies", "cueillait"], correct: 2 },
+            { question: "Les réponses que vous avez ___ sont justes.", options: ["donner", "donné", "données", "donnait"], correct: 2 },
+            { question: "Le message que j'ai ___ était clair.", options: ["écrire", "écrit", "écrite", "écrivait"], correct: 2 },
+            { question: "Les films que nous avons ___ étaient longs.", options: ["voir", "vu", "vus", "voyait"], correct: 2 },
+            { question: "La maison qu'ils ont ___ est neuve.", options: ["construire", "construit", "construite", "construisait"], correct: 2 },
+            { question: "Les phrases que tu as ___ sont correctes.", options: ["écrire", "écrit", "écrites", "écrivait"], correct: 2 },
+            { question: "Le travail qu'elle a ___ est terminé.", options: ["finir", "fini", "finie", "finissait"], correct: 2 },
+            { question: "Les cadeaux qu'ils ont ___ ont plu.", options: ["offrir", "offert", "offerts", "offrait"], correct: 2 },
+            { question: "La réponse qu'il a ___ est exacte.", options: ["donner", "donné", "donnée", "donnait"], correct: 2 },
+            { question: "Les vêtements qu'elle a ___ sont propres.", options: ["laver", "lavé", "lavés", "lavait"], correct: 2 },
+            { question: "La leçon que le professeur a ___ est claire.", options: ["expliquer", "expliqué", "expliquée", "expliquait"], correct: 2 },
+            { question: "Les devoirs que vous avez ___ sont terminés.", options: ["faire", "fait", "faits", "faisait"], correct: 2 },
+            { question: "La chanson que nous avons ___ est connue.", options: ["chanter", "chanté", "chantée", "chantait"], correct: 2 },
+            { question: "Les fruits que nous avons ___ sont mûrs.", options: ["cueillir", "cueilli", "cueillis", "cueillait"], correct: 2 },
+            { question: "La robe qu'elle a ___ est belle.", options: ["acheter", "acheté", "achetée", "achetait"], correct: 2 },
+            { question: "Les règles que tu as ___ sont claires.", options: ["lire", "lu", "lues", "lisait"], correct: 2 },
+            { question: "Le film que j'ai ___ était émouvant.", options: ["voir", "vu", "vue", "voyait"], correct: 2 },
+            { question: "Les photos qu'ils ont ___ sont belles.", options: ["prendre", "pris", "prises", "prenait"], correct: 2 },
+            { question: "La décision qu'il a ___ est juste.", options: ["prendre", "pris", "prise", "prenait"], correct: 2 },
+            { question: "Les messages que tu as ___ sont clairs.", options: ["envoyer", "envoyé", "envoyés", "envoyait"], correct: 2 },
+            { question: "La faute qu'il a ___ est reconnue.", options: ["commettre", "commis", "commise", "commettait"], correct: 2 },
+            { question: "Les livres que nous avons ___ sont nouveaux.", options: ["acheter", "acheté", "achetés", "achetait"], correct: 2 },
+            { question: "La promesse qu'il a ___ est tenue.", options: ["faire", "fait", "faite", "faisait"], correct: 2 },
+            { question: "Les erreurs qu'ils ont ___ sont corrigées.", options: ["faire", "fait", "faites", "faisait"], correct: 2 },
+            { question: "Le texte que j'ai ___ est clair.", options: ["écrire", "écrit", "écrite", "écrivait"], correct: 2 },
+            { question: "Les films que vous avez ___ sont récents.", options: ["voir", "vu", "vus", "voyait"], correct: 2 },
+            { question: "La maison qu'elle a ___ est grande.", options: ["acheter", "acheté", "achetée", "achetait"], correct: 2 },
+            { question: "Les phrases qu'ils ont ___ sont justes.", options: ["écrire", "écrit", "écrites", "écrivait"], correct: 2 },
+            { question: "La réponse qu'elle a ___ est correcte.", options: ["donner", "donné", "donnée", "donnait"], correct: 2 },
+            { question: "Les devoirs qu'ils ont ___ sont faits.", options: ["faire", "fait", "faits", "faisait"], correct: 2 },
+            { question: "La chanson qu'elle a ___ est belle.", options: ["chanter", "chanté", "chantée", "chantait"], correct: 2 },
+            { question: "Les livres que tu as ___ sont lourds.", options: ["porter", "porté", "portés", "portait"], correct: 2 },
+            { question: "La robe qu'il a ___ est neuve.", options: ["choisir", "choisi", "choisie", "choisissait"], correct: 2 },
+            { question: "Les photos que nous avons ___ sont nettes.", options: ["prendre", "pris", "prises", "prenait"], correct: 2 },
+            { question: "Le message que tu as ___ est court.", options: ["envoyer", "envoyé", "envoyée", "envoyait"], correct: 2 },
+            { question: "Les réponses que j'ai ___ sont bonnes.", options: ["recevoir", "reçu", "reçues", "recevait"], correct: 2 },
+            { question: "La règle qu'il a ___ est importante.", options: ["expliquer", "expliqué", "expliquée", "expliquait"], correct: 2 },
+            { question: "Les cadeaux que nous avons ___ ont plu.", options: ["offrir", "offert", "offerts", "offrait"], correct: 2 },
+            { question: "La faute qu'elle a ___ est grave.", options: ["faire", "fait", "faite", "faisait"], correct: 2 },
+            { question: "Les films qu'il a ___ sont intéressants.", options: ["voir", "vu", "vus", "voyait"], correct: 2 },
+            { question: "La lettre qu'elle a ___ est longue.", options: ["écrire", "écrit", "écrite", "écrivait"], correct: 2 },
+            { question: "Les décisions qu'ils ont ___ sont justes.", options: ["prendre", "pris", "prises", "prenait"], correct: 2 },
+            { question: "Le travail qu'il a ___ est bien fait.", options: ["finir", "fini", "finie", "finissait"], correct: 2 },
+            { question: "Les réponses que vous avez ___ sont exactes.", options: ["donner", "donné", "données", "donnait"], correct: 2 }
+        ];
+
+        const moiseQuestions = [
+            { question: "Les lettres que j'ai ___ sont arrivées.", options: ["écrit", "écrite", "écrits", "écrites"], correct: 3 },
+            { question: "Les fautes qu'il a ___ doivent être corrigées.", options: ["fait", "faite", "faites", "faisait"], correct: 2 },
+            { question: "Les décisions qu'elle a ___ sont justes.", options: ["pris", "prise", "prises", "prenait"], correct: 2 },
+            { question: "Les réponses qu'on lui a ___ étaient fausses.", options: ["donné", "donnée", "donnés", "donnait"], correct: 1 },
+            { question: "Les erreurs qu'elle a ___ sont graves.", options: ["commis", "commise", "commises", "commettait"], correct: 2 },
+            { question: "Les livres qu'ils ont ___ sont anciens.", options: ["lire", "lu", "lus", "lisait"], correct: 2 },
+            { question: "Les promesses qu'il a ___ n'ont pas été tenues.", options: ["fait", "faite", "faites", "faisait"], correct: 2 },
+            { question: "Les fleurs qu'elle a ___ ont fané.", options: ["cueilli", "cueillie", "cueillies", "cueillir"], correct: 2 },
+            { question: "Les films que nous avons ___ sont intéressants.", options: ["vu", "vus", "vue", "voyait"], correct: 1 },
+            { question: "Les fautes qu'ils ont ___ sont nombreuses.", options: ["commis", "commise", "commises", "commettait"], correct: 2 },
+            { question: "Les lettres qu'elle a ___ sont longues.", options: ["écrit", "écrite", "écrites", "écrivait"], correct: 2 },
+            { question: "Les règles que tu as ___ sont claires.", options: ["suivi", "suivies", "suivre", "suivait"], correct: 1 },
+            { question: "Les réponses que j'ai ___ étaient exactes.", options: ["reçu", "reçus", "reçues", "recevoir"], correct: 2 },
+            { question: "Les maisons qu'ils ont ___ sont neuves.", options: ["construit", "construite", "construites", "construire"], correct: 2 },
+            { question: "Les fautes qu'elle a ___ sont pardonnées.", options: ["fait", "faite", "faites", "faisait"], correct: 2 },
+            { question: "Les paroles qu'il a ___ ont choqué.", options: ["dit", "dite", "dites", "dire"], correct: 2 },
+            { question: "Les photos qu'elle a ___ sont belles.", options: ["pris", "prise", "prises", "prendre"], correct: 2 },
+            { question: "Les textes que nous avons ___ sont clairs.", options: ["écrit", "écrite", "écrits", "écrire"], correct: 2 },
+            { question: "Les devoirs qu'ils ont ___ sont lourds.", options: ["fait", "faite", "faits", "faire"], correct: 2 },
+            { question: "Les décisions qu'il a ___ étaient justes.", options: ["pris", "prise", "prises", "prendre"], correct: 2 },
+            { question: "Les réponses qu'elle a ___ étaient bonnes.", options: ["donné", "donnée", "données", "donner"], correct: 2 },
+            { question: "Les livres que j'ai ___ sont intéressants.", options: ["lu", "lus", "lue", "lire"], correct: 1 },
+            { question: "Les lettres qu'ils ont ___ sont arrivées.", options: ["envoyé", "envoyée", "envoyées", "envoyer"], correct: 2 },
+            { question: "Les promesses qu'elle a ___ sont tenues.", options: ["fait", "faite", "faites", "faire"], correct: 2 },
+            { question: "Les films que tu as ___ sont longs.", options: ["vu", "vus", "vue", "voir"], correct: 1 },
+            { question: "Les fautes qu'il a ___ sont reconnues.", options: ["commis", "commise", "commises", "commettre"], correct: 2 },
+            { question: "Les réponses qu'ils ont ___ sont justes.", options: ["reçu", "reçus", "reçues", "recevoir"], correct: 2 },
+            { question: "Les décisions que nous avons ___ sont finales.", options: ["pris", "prise", "prises", "prendre"], correct: 2 },
+            { question: "Les lettres qu'elle a ___ sont courtes.", options: ["écrit", "écrite", "écrites", "écrire"], correct: 2 },
+            { question: "Les efforts qu'ils ont ___ sont visibles.", options: ["fait", "faite", "faits", "faire"], correct: 2 },
+            { question: "Les fautes qu'on a ___ sont graves.", options: ["commis", "commise", "commises", "commettre"], correct: 2 },
+            { question: "Les films que nous avons ___ hier étaient longs.", options: ["vu", "vus", "vue", "voir"], correct: 1 },
+            { question: "Les promesses qu'il a ___ étaient sincères.", options: ["fait", "faite", "faites", "faire"], correct: 2 },
+            { question: "Les réponses que tu as ___ sont correctes.", options: ["donné", "donnée", "données", "donner"], correct: 2 },
+            { question: "Les maisons qu'ils ont ___ sont solides.", options: ["bâti", "bâtie", "bâties", "bâtir"], correct: 2 },
+            { question: "Les lettres qu'elle a ___ sont belles.", options: ["écrit", "écrite", "écrites", "écrire"], correct: 2 },
+            { question: "Les fautes qu'ils ont ___ sont lourdes.", options: ["fait", "faite", "faites", "faire"], correct: 2 },
+            { question: "Les décisions qu'il a ___ sont respectées.", options: ["pris", "prise", "prises", "prendre"], correct: 2 },
+            { question: "Les réponses qu'on lui a ___ étaient claires.", options: ["donné", "donnée", "données", "donner"], correct: 1 },
+            { question: "Les erreurs qu'il a ___ sont minimes.", options: ["commis", "commise", "commises", "commettre"], correct: 2 },
+            { question: "Les maisons qu'ils ont ___ sont belles.", options: ["peint", "peinte", "peintes", "peindre"], correct: 2 },
+            { question: "Les chansons que nous avons ___ sont connues.", options: ["apprendre", "appris", "apprises", "apprenait"], correct: 2 },
+            { question: "Les fautes qu'elle s'est ___ sont graves.", options: ["permis", "permise", "permises", "permettre"], correct: 2 },
+            { question: "Les lettres que j'ai ___ sont courtes.", options: ["écrit", "écrite", "écrites", "écrivait"], correct: 2 },
+            { question: "Les décisions qu'ils ont ___ étaient difficiles.", options: ["prendre", "pris", "prises", "prenait"], correct: 2 },
+            { question: "Les réponses que vous avez ___ sont exactes.", options: ["donner", "donné", "données", "donnait"], correct: 2 },
+            { question: "Les livres qu'elle a ___ sont intéressants.", options: ["lire", "lu", "lus", "lisait"], correct: 2 },
+            { question: "Les promesses qu'il s'est ___ sont tenues.", options: ["faire", "fait", "faites", "faisait"], correct: 2 },
+            { question: "Les fautes qu'on a ___ sont nombreuses.", options: ["commettre", "commis", "commises", "commettait"], correct: 2 },
+            { question: "Les décisions que j'ai ___ étaient justes.", options: ["prendre", "pris", "prises", "prenait"], correct: 2 },
+            { question: "Les réponses qu'ils ont ___ sont bonnes.", options: ["recevoir", "reçu", "reçues", "recevait"], correct: 2 }
+        ];
+
+        const aubaineQuestions = [
+            { question: "Les fautes qu'elle s'est ___ sont graves.", options: ["permise", "permis", "permises", "permettre"], correct: 2 },
+            { question: "Les efforts qu'il a ___ faire ont payé.", options: ["dû", "dues", "dûs", "devoir"], correct: 2 },
+            { question: "Les blessures qu'ils se sont ___ sont profondes.", options: ["infligé", "infligée", "infligés", "infligées"], correct: 3 },
+            { question: "Les lettres qu'il s'est ___ écrire étaient longues.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les chansons qu'elle s'est ___ chanter ont plu.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les kilomètres qu'ils ont ___ à pied les ont épuisés.", options: ["parcouru", "parcourus", "parcourue", "parcourir"], correct: 1 },
+            { question: "Les fautes qu'elle a ___ commettre sont graves.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les décisions qu'il a ___ prendre étaient difficiles.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les promesses qu'elle s'est ___ faites étaient irréalistes.", options: ["fait", "faite", "faites", "faire"], correct: 0 },
+            { question: "Les sacrifices qu'ils ont ___ consentir étaient énormes.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les erreurs qu'il s'est ___ reprocher sont mineures.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les paroles qu'elle s'est ___ entendre ont choqué.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les critiques qu'elle a ___ essuyées l'ont blessée.", options: ["essuyé", "essuyés", "essuyées", "essuyer"], correct: 2 },
+            { question: "Les sommes qu'il a ___ payer étaient élevées.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les promesses qu'il a ___ tenir étaient nombreuses.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les réponses qu'elle a ___ reçues sont claires.", options: ["reçu", "reçus", "reçue", "recevoir"], correct: 2 },
+            { question: "Les vérités qu'elle a ___ dites ont choqué.", options: ["dit", "dite", "dites", "dire"], correct: 2 },
+            { question: "Les sanctions qu'ils se sont ___ infliger étaient sévères.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les difficultés qu'elle a ___ rencontrées sont nombreuses.", options: ["rencontré", "rencontrées", "rencontrer", "rencontrait"], correct: 1 },
+            { question: "Les efforts qu'ils ont ___ fournir ont payé.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les fautes qu'il s'est ___ permettre sont graves.", options: ["permis", "permise", "permises", "permettre"], correct: 0 },
+            { question: "Les tâches qu'elle a ___ accomplir étaient lourdes.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les reproches qu'il s'est ___ faits étaient injustes.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les paroles qu'elle a ___ voulu dire étaient dures.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les dépenses qu'ils ont ___ faire dépassent le budget.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les fautes qu'elle s'est ___ avouer étaient graves.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les efforts qu'il a ___ consentir ont payé.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les erreurs qu'elle a ___ pu éviter sont nombreuses.", options: ["pu", "pue", "pouvoir", "pouvait"], correct: 0 },
+            { question: "Les décisions qu'il a ___ voulu prendre étaient risquées.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les blessures qu'ils se sont ___ causées sont sérieuses.", options: ["causé", "causée", "causés", "causées"], correct: 3 },
+            { question: "Les promesses qu'elle s'est ___ données étaient irréalistes.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les difficultés qu'il a ___ surmonter étaient grandes.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les erreurs qu'ils se sont ___ avouer étaient graves.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les efforts qu'elle a ___ fournir ont été récompensés.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les fautes qu'il s'est ___ reprochées étaient légères.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les décisions qu'ils ont ___ prendre étaient difficiles.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les promesses qu'elle s'est ___ tenues étaient nombreuses.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les difficultés qu'il a ___ rencontrer étaient imprévues.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les erreurs qu'ils se sont ___ permettre étaient graves.", options: ["permis", "permise", "permises", "permettre"], correct: 0 },
+            { question: "Les efforts qu'elle a ___ consentir étaient énormes.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les fautes qu'il s'est ___ reprocher étaient sincères.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les décisions qu'ils ont ___ vouloir prendre étaient risquées.", options: ["cru", "crues", "crû", "croire"], correct: 0 },
+            { question: "Les promesses qu'elle s'est ___ faites étaient tenues.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les difficultés qu'il a ___ rencontrées étaient nombreuses.", options: ["rencontré", "rencontrées", "rencontrer", "rencontrait"], correct: 1 },
+            { question: "Les erreurs qu'ils se sont ___ avouées étaient graves.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les efforts qu'elle a ___ consentis étaient importants.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les fautes qu'il s'est ___ permises étaient graves.", options: ["permis", "permise", "permises", "permettre"], correct: 2 },
+            { question: "Les décisions qu'ils ont ___ prendre étaient courageuses.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 },
+            { question: "Les promesses qu'elle s'est ___ tenues étaient sincères.", options: ["fait", "faite", "faits", "faire"], correct: 0 },
+            { question: "Les difficultés qu'il a ___ surmonter étaient réelles.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 }
         ];
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             // Create questions for each family member
-            createQuestions('aubaine');
-            createQuestions('moise');
-            createQuestions('credo');
+            createQuestions('credo', credoQuestions);
+            createQuestions('moise', moiseQuestions);
+            createQuestions('aubaine', aubaineQuestions);
             
             // Set up button click events
             document.getElementById('aubaine-btn').addEventListener('click', () => showContent('aubaine'));
@@ -954,27 +936,27 @@
             document.getElementById('credo-btn').addEventListener('click', () => showContent('credo'));
             
             // Set up submit button events
-            document.getElementById('aubaine-submit').addEventListener('click', () => submitAnswers('aubaine'));
-            document.getElementById('moise-submit').addEventListener('click', () => submitAnswers('moise'));
-            document.getElementById('credo-submit').addEventListener('click', () => submitAnswers('credo'));
+            document.getElementById('aubaine-submit').addEventListener('click', () => submitAnswers('aubaine', aubaineQuestions));
+            document.getElementById('moise-submit').addEventListener('click', () => submitAnswers('moise', moiseQuestions));
+            document.getElementById('credo-submit').addEventListener('click', () => submitAnswers('credo', credoQuestions));
             
             // Admin panel events
             document.getElementById('admin-panel-btn').addEventListener('click', toggleAdminPanel);
             document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
             document.getElementById('export-btn').addEventListener('click', exportResults);
             
-            // Show Aubaine's content by default
-            showContent('aubaine');
+            // Show Credo's content by default
+            showContent('credo');
             
             // Check if admin is already logged in
             checkAdminAuth();
         });
         
-        function createQuestions(member) {
+        function createQuestions(member, questionsArray) {
             const container = document.getElementById(`${member}-questions`);
             container.innerHTML = '';
             
-            questions.forEach((q, index) => {
+            questionsArray.forEach((q, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
                 
@@ -988,12 +970,6 @@
                     `;
                 });
                 
-                // Add coaching tip only for Credo
-                const coachingTip = member === 'credo' ? 
-                    `<div class="coaching-tip" style="margin-top: 15px; font-size: 0.9rem;">
-                        <strong>Conseil :</strong> ${q.explanation}
-                    </div>` : '';
-                
                 questionDiv.innerHTML = `
                     <div class="question-text">
                         <span class="question-number">${index + 1}</span>
@@ -1002,7 +978,6 @@
                     <div class="options">
                         ${optionsHtml}
                     </div>
-                    ${coachingTip}
                 `;
                 
                 container.appendChild(questionDiv);
@@ -1054,25 +1029,25 @@
             });
         }
         
-        async function submitAnswers(member) {
+        async function submitAnswers(member, questionsArray) {
             let score = 0;
-            const totalQuestions = questions.length;
+            const totalQuestions = questionsArray.length;
             let answers = [];
             
             // Check each question
             for (let i = 0; i < totalQuestions; i++) {
                 const selectedOption = document.querySelector(`input[name="${member}-q${i}"]:checked`);
                 const selectedValue = selectedOption ? parseInt(selectedOption.value) : null;
-                const isCorrect = selectedValue === questions[i].correct;
+                const isCorrect = selectedValue === questionsArray[i].correct;
                 
                 if (isCorrect) {
                     score++;
                 }
                 
                 answers.push({
-                    question: questions[i].question,
+                    question: questionsArray[i].question,
                     selected: selectedValue,
-                    correct: questions[i].correct,
+                    correct: questionsArray[i].correct,
                     isCorrect: isCorrect
                 });
                 
@@ -1084,9 +1059,9 @@
                     options.forEach((option, index) => {
                         option.classList.remove('correct', 'incorrect');
                         
-                        if (index === questions[i].correct) {
+                        if (index === questionsArray[i].correct) {
                             option.classList.add('correct');
-                        } else if (index === selectedValue && selectedValue !== questions[i].correct) {
+                        } else if (index === selectedValue && selectedValue !== questionsArray[i].correct) {
                             option.classList.add('incorrect');
                         }
                     });
@@ -1094,7 +1069,7 @@
             }
             
             // Save results to Firebase
-            await saveResultsToFirebase(member, score, answers);
+            await saveResultsToFirebase(member, score, answers, totalQuestions);
             
             // Display results
             const resultsPanel = document.getElementById(`${member}-results`);
@@ -1111,7 +1086,7 @@
             let feedbackClass = '';
             
             if (percentage >= 80) {
-                feedback = `Excellent travail ! Tu as bien maîtrisé les accords du participe passé.`;
+                feedback = `Excellent travail ! Tu as bien maîtrisé l'accord du participe passé.`;
                 feedbackClass = 'good';
             } else if (percentage >= 60) {
                 feedback = `Bon travail ! Tu as compris la majorité des règles, mais il reste quelques points à revoir.`;
@@ -1144,13 +1119,13 @@
             resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
-        async function saveResultsToFirebase(member, score, answers) {
+        async function saveResultsToFirebase(member, score, answers, totalQuestions) {
             try {
                 const resultData = {
                     member: member,
                     score: score,
-                    totalQuestions: questions.length,
-                    percentage: Math.round((score / questions.length) * 100),
+                    totalQuestions: totalQuestions,
+                    percentage: Math.round((score / totalQuestions) * 100),
                     answers: answers,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     date: new Date().toISOString()
@@ -1241,7 +1216,9 @@
                     results.push(data);
                     
                     totalScore += data.percentage;
-                    bestScore = Math.max(bestScore, data.score);
+                    if (data.score > bestScore) {
+                        bestScore = data.score;
+                    }
                     members.add(data.member);
                     
                     if (!lastActivity || data.timestamp > lastActivity) {
@@ -1253,7 +1230,7 @@
                 document.getElementById('total-participants').textContent = members.size;
                 document.getElementById('average-score').textContent = results.length > 0 ? 
                     Math.round(totalScore / results.length) + '%' : '0%';
-                document.getElementById('best-score').textContent = bestScore + '/30';
+                document.getElementById('best-score').textContent = bestScore + '/50';
                 document.getElementById('last-activity').textContent = lastActivity ? 
                     new Date(lastActivity.toDate()).toLocaleDateString('fr-FR') : '--';
                 
