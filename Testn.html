@@ -758,10 +758,11 @@
         </ul>
     </div>
     
-    <!-- Aucun contenu affiché au départ -->
-    <div id="no-content" class="content-area" style="display: none; text-align: center; padding: 50px;">
-        <h2><i class="fas fa-hand-pointer"></i> Sélectionnez votre nom pour commencer</h2>
-        <p>Cliquez sur votre nom dans les boutons ci-dessus pour afficher votre devoir.</p>
+    <!-- Message initial -->
+    <div id="no-content" style="display: block; text-align: center; padding: 50px; background-color: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); margin-top: 20px;">
+        <h2><i class="fas fa-hand-pointer fa-2x" style="color: #4b6cb7; margin-bottom: 20px;"></i></h2>
+        <h2 style="color: #182848; margin-bottom: 15px;">Sélectionnez votre nom pour commencer</h2>
+        <p style="color: #666; font-size: 1.1rem;">Cliquez sur votre nom dans les boutons ci-dessus pour afficher votre devoir.</p>
     </div>
     
     <!-- Credo's Content -->
@@ -1038,10 +1039,16 @@
             document.getElementById('moise-content').style.display = 'none';
             document.getElementById('aubaine-content').style.display = 'none';
             
-            // Set up button click events
-            document.getElementById('aubaine-btn').addEventListener('click', () => showContent('aubaine'));
-            document.getElementById('moise-btn').addEventListener('click', () => showContent('moise'));
-            document.getElementById('credo-btn').addEventListener('click', () => showContent('credo'));
+            // Set up button click events - CORRECTION ICI
+            document.getElementById('aubaine-btn').addEventListener('click', function() {
+                showContent('aubaine');
+            });
+            document.getElementById('moise-btn').addEventListener('click', function() {
+                showContent('moise');
+            });
+            document.getElementById('credo-btn').addEventListener('click', function() {
+                showContent('credo');
+            });
             
             // Admin panel events
             document.getElementById('admin-panel-btn').addEventListener('click', toggleAdminPanel);
@@ -1063,30 +1070,50 @@
         });
         
         function showContent(member) {
+            console.log("Affichage du contenu pour:", member); // Debug
+            
             // Cacher le message "Sélectionnez votre nom"
             document.getElementById('no-content').style.display = 'none';
             
             // Cacher tous les contenus
-            document.querySelectorAll('.content-area').forEach(area => {
-                area.style.display = 'none';
-            });
+            document.getElementById('credo-content').style.display = 'none';
+            document.getElementById('moise-content').style.display = 'none';
+            document.getElementById('aubaine-content').style.display = 'none';
             
             // Créer les questions pour ce membre si elles n'existent pas encore
-            if (!document.getElementById(`${member}-questions`).hasChildNodes()) {
+            const questionsContainer = document.getElementById(`${member}-questions`);
+            if (questionsContainer.children.length === 0) {
+                console.log("Création des questions pour:", member); // Debug
+                
                 let questionsArray;
                 switch(member) {
-                    case 'credo': questionsArray = credoQuestions; break;
-                    case 'moise': questionsArray = moiseQuestions; break;
-                    case 'aubaine': questionsArray = aubaineQuestions; break;
+                    case 'credo': 
+                        questionsArray = credoQuestions; 
+                        break;
+                    case 'moise': 
+                        questionsArray = moiseQuestions; 
+                        break;
+                    case 'aubaine': 
+                        questionsArray = aubaineQuestions; 
+                        break;
                 }
+                
                 createQuestions(member, questionsArray);
                 
                 // Set up submit button event pour ce membre
-                document.getElementById(`${member}-submit`).addEventListener('click', () => submitAnswers(member, questionsArray));
+                const submitBtn = document.getElementById(`${member}-submit`);
+                if (submitBtn) {
+                    submitBtn.onclick = function() {
+                        submitAnswers(member, questionsArray);
+                    };
+                }
             }
             
             // Afficher le contenu du membre sélectionné
-            document.getElementById(`${member}-content`).style.display = 'block';
+            const memberContent = document.getElementById(`${member}-content`);
+            if (memberContent) {
+                memberContent.style.display = 'block';
+            }
             
             // Reset button styles
             document.querySelectorAll('.member-btn').forEach(btn => {
@@ -1096,15 +1123,25 @@
             
             // Highlight selected button
             const selectedBtn = document.getElementById(`${member}-btn`);
-            selectedBtn.style.transform = 'translateY(-5px)';
-            selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+            if (selectedBtn) {
+                selectedBtn.style.transform = 'translateY(-5px)';
+                selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+            }
             
             // Hide results when switching members
-            document.getElementById(`${member}-results`).style.display = 'none';
+            const resultsPanel = document.getElementById(`${member}-results`);
+            if (resultsPanel) {
+                resultsPanel.style.display = 'none';
+            }
         }
         
         function createQuestions(member, questionsArray) {
             const container = document.getElementById(`${member}-questions`);
+            if (!container) {
+                console.error("Container non trouvé pour:", member);
+                return;
+            }
+            
             container.innerHTML = '';
             
             questionsArray.forEach((q, index) => {
@@ -1144,12 +1181,13 @@
                     // Deselect all options in this question
                     options.forEach(opt => {
                         opt.classList.remove('selected');
-                        opt.querySelector('input').checked = false;
+                        const optInput = opt.querySelector('input');
+                        if (optInput) optInput.checked = false;
                     });
                     
                     // Select clicked option
                     this.classList.add('selected');
-                    input.checked = true;
+                    if (input) input.checked = true;
                 });
             });
         }
@@ -1181,17 +1219,19 @@
                 
                 // Show correct/incorrect
                 const questionDiv = document.getElementById(`${member}-questions`).children[i];
-                const options = questionDiv.querySelectorAll('.option');
-                
-                options.forEach((option, index) => {
-                    option.classList.remove('correct', 'incorrect');
+                if (questionDiv) {
+                    const options = questionDiv.querySelectorAll('.option');
                     
-                    if (index === questionsArray[i].correct) {
-                        option.classList.add('correct');
-                    } else if (index === selectedValue && selectedValue !== questionsArray[i].correct) {
-                        option.classList.add('incorrect');
-                    }
-                });
+                    options.forEach((option, index) => {
+                        option.classList.remove('correct', 'incorrect');
+                        
+                        if (index === questionsArray[i].correct) {
+                            option.classList.add('correct');
+                        } else if (index === selectedValue && selectedValue !== questionsArray[i].correct) {
+                            option.classList.add('incorrect');
+                        }
+                    });
+                }
             }
             
             // Save results to Firebase
@@ -1202,7 +1242,7 @@
             const scoreElement = document.getElementById(`${member}-score`);
             const feedbackElement = document.getElementById(`${member}-feedback`);
             
-            scoreElement.textContent = `${score}/${totalQuestions}`;
+            if (scoreElement) scoreElement.textContent = `${score}/${totalQuestions}`;
             
             // Calculate percentage
             const percentage = (score / totalQuestions) * 100;
@@ -1235,14 +1275,16 @@
                 }
             }
             
-            feedbackElement.textContent = feedback;
-            feedbackElement.className = `feedback ${feedbackClass}`;
+            if (feedbackElement) {
+                feedbackElement.textContent = feedback;
+                feedbackElement.className = `feedback ${feedbackClass}`;
+            }
             
             // Show results panel
-            resultsPanel.style.display = 'block';
-            
-            // Scroll to results
-            resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (resultsPanel) {
+                resultsPanel.style.display = 'block';
+                resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
         
         async function saveResultsToFirebase(member, score, answers, totalQuestions) {
