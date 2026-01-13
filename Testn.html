@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devoirs de Français - Famille Singa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Import Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -33,6 +34,191 @@
             color: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-btn:hover {
+            background-color: #ff5252;
+            transform: scale(1.05);
+        }
+        
+        .admin-panel {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 3px solid #182848;
+        }
+        
+        .admin-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #182848;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .admin-header h2 {
+            font-size: 2rem;
+        }
+        
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 5px solid #4b6cb7;
+        }
+        
+        .stat-card h3 {
+            color: #182848;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4b6cb7;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .results-table th {
+            background-color: #182848;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .results-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .export-btn {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background-color: #3a56a4;
+            transform: scale(1.05);
+        }
+        
+        .auth-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #182848;
+        }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-form button:hover {
+            background-color: #3a56a4;
+        }
+        
+        .auth-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .auth-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .auth-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
         
         .header h1 {
@@ -91,11 +277,6 @@
         
         #credo-btn {
             background-color: #9b59b6;
-            color: white;
-        }
-        
-        #admin-btn {
-            background-color: #e74c3c;
             color: white;
         }
         
@@ -338,123 +519,6 @@
             transform: none;
         }
         
-        /* Admin Panel Styles */
-        .admin-panel {
-            background-color: #2c3e50;
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .admin-panel h3 {
-            color: white;
-            margin-bottom: 20px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-card {
-            background-color: #34495e;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-card h4 {
-            margin-bottom: 10px;
-            color: #ecf0f1;
-            font-size: 1rem;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #3498db;
-        }
-        
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-            color: #333;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .results-table th {
-            background-color: #3498db;
-            color: white;
-            padding: 15px;
-            text-align: left;
-        }
-        
-        .results-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .results-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .results-table tr:hover {
-            background-color: #e8f4fc;
-        }
-        
-        .date-cell {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-        
-        .score-cell {
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .score-cell.high {
-            color: #27ae60;
-        }
-        
-        .score-cell.medium {
-            color: #f39c12;
-        }
-        
-        .score-cell.low {
-            color: #e74c3c;
-        }
-        
-        .refresh-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .refresh-btn:hover {
-            background-color: #2980b9;
-        }
-        
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -478,7 +542,14 @@
                 font-size: 2rem;
             }
             
-            .stats-grid {
+            .admin-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .admin-stats {
                 grid-template-columns: 1fr;
             }
             
@@ -486,9 +557,8 @@
                 font-size: 0.9rem;
             }
             
-            .results-table th,
-            .results-table td {
-                padding: 8px 10px;
+            .results-table th, .results-table td {
+                padding: 10px;
             }
         }
     </style>
@@ -497,6 +567,65 @@
     <div class="header">
         <h1><i class="fas fa-book-open"></i> Devoirs de Français - Famille Singa</h1>
         <p>Thème : Le participe passé et les terminaisons verbales<br>Distinguer participe passé / infinitif / imparfait / conditionnel - Maîtriser les accords du participe passé</p>
+        <button class="admin-btn" id="admin-panel-btn">
+            <i class="fas fa-lock"></i> Accès Admin
+        </button>
+    </div>
+    
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="admin-panel">
+        <div class="admin-header">
+            <i class="fas fa-chart-bar fa-2x"></i>
+            <h2>Tableau de Bord Administrateur</h2>
+        </div>
+        
+        <div id="auth-form" class="auth-form">
+            <h2><i class="fas fa-user-shield"></i> Connexion Admin</h2>
+            <input type="password" id="admin-password" placeholder="Mot de passe admin" autocomplete="off">
+            <button id="admin-login-btn">Se connecter</button>
+            <div id="auth-message" class="auth-message"></div>
+        </div>
+        
+        <div id="admin-content" style="display: none;">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h3>Total Participants</h3>
+                    <div class="stat-value" id="total-participants">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Moyenne Générale</h3>
+                    <div class="stat-value" id="average-score">0%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Meilleur Score</h3>
+                    <div class="stat-value" id="best-score">0/30</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Dernière Activité</h3>
+                    <div class="stat-value" id="last-activity">--</div>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-table"></i> Résultats Détailés</h3>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Score</th>
+                        <th>Pourcentage</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="results-table-body">
+                    <!-- Results will be populated here -->
+                </tbody>
+            </table>
+            
+            <button class="export-btn" id="export-btn">
+                <i class="fas fa-download"></i> Exporter les Résultats
+            </button>
+        </div>
     </div>
     
     <div class="family-members">
@@ -511,10 +640,6 @@
         <button class="member-btn" id="credo-btn">
             <i class="fas fa-user-graduate"></i> Credo
         </button>
-        
-        <button class="member-btn" id="admin-btn">
-            <i class="fas fa-user-shield"></i> Administration
-        </button>
     </div>
     
     <div class="instructions">
@@ -523,51 +648,9 @@
             <li>Chaque membre de la famille a accès à ses propres devoirs de français.</li>
             <li><strong>Aubaine et Moïse</strong> : Complétez les phrases en choisissant la bonne réponse.</li>
             <li><strong>Credo</strong> : En plus de compléter les phrases, vous devez aussi jouer le rôle de coach et valider les réponses. Vous aurez accès à des conseils pédagogiques et verrez les résultats finaux.</li>
-            <li><strong>Administration</strong> : Pour voir les résultats de tous les membres et suivre leur progression.</li>
             <li>Cliquez sur votre nom pour commencer votre devoir.</li>
+            <li><strong>Les résultats sont automatiquement sauvegardés dans la base de données.</strong></li>
         </ul>
-    </div>
-    
-    <!-- Admin Panel -->
-    <div id="admin-content" class="content-area">
-        <div class="content-header">
-            <h2>Panneau d'Administration</h2>
-            <p class="member-role">Suivi des résultats et progression des membres</p>
-        </div>
-        
-        <div class="admin-panel">
-            <h3><i class="fas fa-chart-line"></i> Tableau de bord des résultats</h3>
-            
-            <div class="stats-grid" id="admin-stats">
-                <div class="stat-card">
-                    <h4>Chargement des données...</h4>
-                    <div class="stat-value">0</div>
-                </div>
-            </div>
-            
-            <button class="refresh-btn" id="refresh-results">
-                <i class="fas fa-sync-alt"></i> Actualiser les résultats
-            </button>
-            
-            <div style="overflow-x: auto; margin-top: 30px;">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Date</th>
-                            <th>Score</th>
-                            <th>Pourcentage</th>
-                            <th>Détails</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-table-body">
-                        <tr>
-                            <td colspan="5" style="text-align: center;">Chargement des données...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
     
     <!-- Aubaine's Content -->
@@ -587,9 +670,7 @@
             <h3>Résultats d'Aubaine</h3>
             <div class="score">Score: <span id="aubaine-score">0</span>/30</div>
             <div class="feedback" id="aubaine-feedback"></div>
-            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
-                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
-            </p>
+            <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
         </div>
     </div>
     
@@ -610,9 +691,7 @@
             <h3>Résultats de Moïse</h3>
             <div class="score">Score: <span id="moise-score">0</span>/30</div>
             <div class="feedback" id="moise-feedback"></div>
-            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
-                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
-            </p>
+            <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
         </div>
     </div>
     
@@ -643,9 +722,7 @@
             <h3>Résultats Finaux de Credo (Coach)</h3>
             <div class="score">Score: <span id="credo-score">0</span>/30</div>
             <div class="feedback" id="credo-feedback"></div>
-            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
-                <i class="fas fa-database"></i> Vos résultats ont été enregistrés dans la base de données.
-            </p>
+            <p><i class="fas fa-database"></i> Résultats sauvegardés dans la base de données</p>
             
             <div class="coaching-tip" style="margin-top: 20px;">
                 <strong>Rappel pédagogique :</strong> Les terminaisons -é, -ée, -és, -ées correspondent au participe passé. La terminaison -er correspond à l'infinitif. Les terminaisons -ait, -aient correspondent à l'imparfait. Les terminaisons -era, -erait correspondent au futur et conditionnel.
@@ -656,10 +733,11 @@
     <div class="footer">
         <p>Devoirs de français - Famille Singa © 2023 | Thème : Participe passé et terminaisons verbales</p>
         <p>Objectif : Distinguer -é / -er / -ait / -aient / -és / -ée / -ées / -era / -erait</p>
+        <p>Système de suivi administrateur activé - Tous les résultats sont sauvegardés</p>
     </div>
 
     <script>
-        // Configuration Firebase (pour Firestore)
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAUYpCBlPUnnsCyvqrfMmY5uacjHLGVRh0",
             authDomain: "match-a2ac6.firebaseapp.com",
@@ -672,7 +750,12 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); // Firestore au lieu de Realtime Database
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Admin credentials
+        const ADMIN_PASSWORD = "legende360@";
+        const ADMIN_EMAIL = "admin@familiesinga.com";
 
         // Questions data
         const questions = [
@@ -788,7 +871,7 @@
                 question: "Elle aurait ______ venir plus tôt.",
                 options: ["pu", "pue", "pouvoir", "pouvait"],
                 correct: 0,
-                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour formar le conditionnel passé."
+                explanation: "On utilise le participe passé 'pu' (de pouvoir) avec l'auxiliaire 'aurait' pour former le conditionnel passé."
             },
             {
                 question: "Les films qu'ils ont ______ sont intéressants.",
@@ -869,21 +952,22 @@
             document.getElementById('aubaine-btn').addEventListener('click', () => showContent('aubaine'));
             document.getElementById('moise-btn').addEventListener('click', () => showContent('moise'));
             document.getElementById('credo-btn').addEventListener('click', () => showContent('credo'));
-            document.getElementById('admin-btn').addEventListener('click', () => showContent('admin'));
             
             // Set up submit button events
             document.getElementById('aubaine-submit').addEventListener('click', () => submitAnswers('aubaine'));
             document.getElementById('moise-submit').addEventListener('click', () => submitAnswers('moise'));
             document.getElementById('credo-submit').addEventListener('click', () => submitAnswers('credo'));
             
-            // Set up refresh button for admin panel
-            document.getElementById('refresh-results').addEventListener('click', loadAllResults);
-            
-            // Load initial admin data
-            loadAllResults();
+            // Admin panel events
+            document.getElementById('admin-panel-btn').addEventListener('click', toggleAdminPanel);
+            document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
+            document.getElementById('export-btn').addEventListener('click', exportResults);
             
             // Show Aubaine's content by default
             showContent('aubaine');
+            
+            // Check if admin is already logged in
+            checkAdminAuth();
         });
         
         function createQuestions(member) {
@@ -965,101 +1049,62 @@
             selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
             
             // Hide results when switching members
-            if (member !== 'admin') {
-                document.querySelectorAll('.results-panel').forEach(panel => {
-                    panel.style.display = 'none';
-                });
-            }
-            
-            // Load admin data if showing admin panel
-            if (member === 'admin') {
-                loadAllResults();
-            }
+            document.querySelectorAll('.results-panel').forEach(panel => {
+                panel.style.display = 'none';
+            });
         }
         
-        function submitAnswers(member) {
+        async function submitAnswers(member) {
             let score = 0;
             const totalQuestions = questions.length;
-            const answers = [];
+            let answers = [];
             
-            // Check each question and collect answers
+            // Check each question
             for (let i = 0; i < totalQuestions; i++) {
                 const selectedOption = document.querySelector(`input[name="${member}-q${i}"]:checked`);
-                let selectedValue = null;
+                const selectedValue = selectedOption ? parseInt(selectedOption.value) : null;
+                const isCorrect = selectedValue === questions[i].correct;
                 
-                if (selectedOption) {
-                    selectedValue = parseInt(selectedOption.value);
-                    
-                    const questionDiv = document.getElementById(`${member}-questions`).children[i];
-                    const options = questionDiv.querySelectorAll('.option');
-                    
-                    // Show correct/incorrect for Credo
-                    if (member === 'credo') {
-                        options.forEach((option, index) => {
-                            option.classList.remove('correct', 'incorrect');
-                            
-                            if (index === questions[i].correct) {
-                                option.classList.add('correct');
-                            } else if (index === selectedValue && selectedValue !== questions[i].correct) {
-                                option.classList.add('incorrect');
-                            }
-                        });
-                    }
-                    
-                    // Update score if correct
-                    if (selectedValue === questions[i].correct) {
-                        score++;
-                    }
+                if (isCorrect) {
+                    score++;
                 }
                 
-                // Store answer
                 answers.push({
                     question: questions[i].question,
                     selected: selectedValue,
                     correct: questions[i].correct,
-                    isCorrect: selectedValue === questions[i].correct
+                    isCorrect: isCorrect
                 });
+                
+                // Show correct/incorrect for Credo
+                if (member === 'credo') {
+                    const questionDiv = document.getElementById(`${member}-questions`).children[i];
+                    const options = questionDiv.querySelectorAll('.option');
+                    
+                    options.forEach((option, index) => {
+                        option.classList.remove('correct', 'incorrect');
+                        
+                        if (index === questions[i].correct) {
+                            option.classList.add('correct');
+                        } else if (index === selectedValue && selectedValue !== questions[i].correct) {
+                            option.classList.add('incorrect');
+                        }
+                    });
+                }
             }
             
-            // Calculate percentage
-            const percentage = Math.round((score / totalQuestions) * 100);
-            
-            // Prepare result data for Firestore
-            const resultData = {
-                member: member,
-                score: score,
-                total: totalQuestions,
-                percentage: percentage,
-                date: new Date().toISOString(),
-                timestamp: Date.now(),
-                answers: answers
-            };
-            
-            // Save to Firestore
-            saveResultToFirestore(resultData);
+            // Save results to Firebase
+            await saveResultsToFirebase(member, score, answers);
             
             // Display results
-            displayResults(member, score, totalQuestions, percentage);
-        }
-        
-        function saveResultToFirestore(resultData) {
-            // Utiliser Firestore
-            db.collection('results').add(resultData)
-                .then((docRef) => {
-                    console.log('Result saved successfully to Firestore with ID:', docRef.id);
-                })
-                .catch((error) => {
-                    console.error('Error saving result to Firestore:', error);
-                    alert('Erreur lors de l\'enregistrement des résultats. Veuillez vérifier votre connexion Internet.');
-                });
-        }
-        
-        function displayResults(member, score, totalQuestions, percentage) {
             const resultsPanel = document.getElementById(`${member}-results`);
             const scoreElement = document.getElementById(`${member}-score`);
             const feedbackElement = document.getElementById(`${member}-feedback`);
             
             scoreElement.textContent = `${score}/${totalQuestions}`;
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
             
             // Provide feedback based on score
             let feedback = '';
@@ -1099,345 +1144,172 @@
             resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
-        function loadAllResults() {
-            // Show loading state
-            document.getElementById('admin-stats').innerHTML = `
-                <div class="stat-card">
-                    <h4>Chargement des données...</h4>
-                    <div class="stat-value">0</div>
-                </div>
-            `;
-            
-            document.getElementById('results-table-body').innerHTML = `
-                <tr>
-                    <td colspan="5" style="text-align: center;">Chargement des données...</td>
-                </tr>
-            `;
-            
-            // Utiliser Firestore pour récupérer les données
-            db.collection('results').orderBy('timestamp', 'desc').get()
-                .then((querySnapshot) => {
-                    const results = [];
-                    querySnapshot.forEach((doc) => {
-                        results.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    
-                    updateAdminStats(results);
-                    updateResultsTable(results);
-                })
-                .catch((error) => {
-                    console.error('Error loading results from Firestore:', error);
-                    document.getElementById('admin-stats').innerHTML = `
-                        <div class="stat-card">
-                            <h4>Erreur de chargement</h4>
-                            <div class="stat-value">Erreur</div>
-                        </div>
-                    `;
-                    
-                    document.getElementById('results-table-body').innerHTML = `
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: #e74c3c;">
-                                Erreur lors du chargement des données. Vérifiez votre connexion Internet.
-                            </td>
-                        </tr>
-                    `;
-                });
+        async function saveResultsToFirebase(member, score, answers) {
+            try {
+                const resultData = {
+                    member: member,
+                    score: score,
+                    totalQuestions: questions.length,
+                    percentage: Math.round((score / questions.length) * 100),
+                    answers: answers,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    date: new Date().toISOString()
+                };
+                
+                await db.collection('results').add(resultData);
+                console.log(`Résultats sauvegardés pour ${member}`);
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde des résultats:", error);
+            }
         }
         
-        function updateAdminStats(results) {
-            if (results.length === 0) {
-                document.getElementById('admin-stats').innerHTML = `
-                    <div class="stat-card">
-                        <h4>Aucun résultat enregistré</h4>
-                        <div class="stat-value">0</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Calculate statistics
-            const totalAttempts = results.length;
-            
-            // Count attempts per member
-            const memberAttempts = {
-                aubaine: 0,
-                moise: 0,
-                credo: 0
-            };
-            
-            // Calculate average scores
-            let totalScore = 0;
-            const memberScores = {
-                aubaine: { total: 0, count: 0 },
-                moise: { total: 0, count: 0 },
-                credo: { total: 0, count: 0 }
-            };
-            
-            results.forEach(result => {
-                memberAttempts[result.member]++;
-                totalScore += result.percentage;
-                
-                if (memberScores[result.member]) {
-                    memberScores[result.member].total += result.percentage;
-                    memberScores[result.member].count++;
-                }
-            });
-            
-            const averageScore = Math.round(totalScore / totalAttempts);
-            
-            // Create stats cards
-            const statsHtml = `
-                <div class="stat-card">
-                    <h4>Tentatives totales</h4>
-                    <div class="stat-value">${totalAttempts}</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Score moyen</h4>
-                    <div class="stat-value">${averageScore}%</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Tentatives d'Aubaine</h4>
-                    <div class="stat-value">${memberAttempts.aubaine}</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Tentatives de Moïse</h4>
-                    <div class="stat-value">${memberAttempts.moise}</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Tentatives de Credo</h4>
-                    <div class="stat-value">${memberAttempts.credo}</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Score moyen d'Aubaine</h4>
-                    <div class="stat-value">${memberScores.aubaine.count > 0 ? Math.round(memberScores.aubaine.total / memberScores.aubaine.count) : 0}%</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Score moyen de Moïse</h4>
-                    <div class="stat-value">${memberScores.moise.count > 0 ? Math.round(memberScores.moise.total / memberScores.moise.count) : 0}%</div>
-                </div>
-                
-                <div class="stat-card">
-                    <h4>Score moyen de Credo</h4>
-                    <div class="stat-value">${memberScores.credo.count > 0 ? Math.round(memberScores.credo.total / memberScores.credo.count) : 0}%</div>
-                </div>
-            `;
-            
-            document.getElementById('admin-stats').innerHTML = statsHtml;
+        function toggleAdminPanel() {
+            const adminPanel = document.getElementById('admin-panel');
+            adminPanel.classList.toggle('active');
         }
         
-        function updateResultsTable(results) {
-            const tableBody = document.getElementById('results-table-body');
-            
-            if (results.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center;">
-                            Aucun résultat enregistré pour le moment.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let tableHtml = '';
-            
-            results.forEach((result, index) => {
-                // Format date
-                const date = new Date(result.date);
-                const formattedDate = date.toLocaleDateString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                // Determine score class
-                let scoreClass = '';
-                if (result.percentage >= 80) {
-                    scoreClass = 'high';
-                } else if (result.percentage >= 60) {
-                    scoreClass = 'medium';
+        function checkAdminAuth() {
+            auth.onAuthStateChanged((user) => {
+                if (user && user.email === ADMIN_EMAIL) {
+                    showAdminContent();
                 } else {
-                    scoreClass = 'low';
+                    hideAdminContent();
                 }
-                
-                // Get member name with proper capitalization
-                let memberName = '';
-                switch(result.member) {
-                    case 'aubaine':
-                        memberName = 'Aubaine';
-                        break;
-                    case 'moise':
-                        memberName = 'Moïse';
-                        break;
-                    case 'credo':
-                        memberName = 'Credo';
-                        break;
-                    default:
-                        memberName = result.member;
-                }
-                
-                tableHtml += `
-                    <tr>
-                        <td>${memberName}</td>
-                        <td class="date-cell">${formattedDate}</td>
-                        <td class="score-cell ${scoreClass}">${result.score}/${result.total}</td>
-                        <td class="score-cell ${scoreClass}">${result.percentage}%</td>
-                        <td>
-                            <button class="view-details-btn" data-index="${index}" style="
-                                background-color: #3498db;
-                                color: white;
-                                border: none;
-                                padding: 5px 10px;
-                                border-radius: 3px;
-                                cursor: pointer;
-                                font-size: 0.85rem;
-                            ">
-                                <i class="fas fa-eye"></i> Détails
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = tableHtml;
-            
-            // Add event listeners to detail buttons
-            tableBody.querySelectorAll('.view-details-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    showResultDetails(results[index]);
-                });
             });
         }
         
-        function showResultDetails(result) {
-            // Get member name with proper capitalization
-            let memberName = '';
-            switch(result.member) {
-                case 'aubaine':
-                    memberName = 'Aubaine';
-                    break;
-                case 'moise':
-                    memberName = 'Moïse';
-                    break;
-                case 'credo':
-                    memberName = 'Credo';
-                    break;
-                default:
-                    memberName = result.member;
-            }
+        async function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            const messageDiv = document.getElementById('auth-message');
             
-            // Format date
-            const date = new Date(result.date);
-            const formattedDate = date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            // Create details HTML
-            let detailsHtml = `
-                <h3>Détails des résultats - ${memberName}</h3>
-                <p><strong>Date:</strong> ${formattedDate}</p>
-                <p><strong>Score:</strong> ${result.score}/${result.total} (${result.percentage}%)</p>
-                <hr style="margin: 20px 0;">
-                <h4>Réponses détaillées:</h4>
-            `;
-            
-            result.answers.forEach((answer, index) => {
-                const question = questions[index];
-                const isCorrect = answer.selected === question.correct;
-                const status = isCorrect ? '✅ Correct' : '❌ Incorrect';
-                const statusClass = isCorrect ? 'good' : 'poor';
-                
-                detailsHtml += `
-                    <div style="
-                        background-color: ${isCorrect ? '#d4edda' : '#f8d7da'};
-                        padding: 15px;
-                        border-radius: 8px;
-                        margin-bottom: 15px;
-                        border-left: 5px solid ${isCorrect ? '#28a745' : '#dc3545'};
-                    ">
-                        <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
-                        <p><strong>Réponse choisie:</strong> ${answer.selected !== null ? question.options[answer.selected] : 'Aucune réponse'}</p>
-                        <p><strong>Réponse correcte:</strong> ${question.options[question.correct]}</p>
-                        <p><strong>Statut:</strong> <span style="color: ${isCorrect ? '#155724' : '#721c24'}; font-weight: bold;">${status}</span></p>
-                        ${result.member === 'credo' ? `<p><em>${question.explanation}</em></p>` : ''}
-                    </div>
-                `;
-            });
-            
-            // Show in a modal dialog
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                padding: 20px;
-            `;
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.cssText = `
-                background-color: white;
-                padding: 30px;
-                border-radius: 10px;
-                max-width: 800px;
-                max-height: 80vh;
-                overflow-y: auto;
-                position: relative;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            `;
-            
-            modalContent.innerHTML = detailsHtml + `
-                <button id="close-modal" style="
-                    position: absolute;
-                    top: 15px;
-                    right: 15px;
-                    background-color: #e74c3c;
-                    color: white;
-                    border: none;
-                    padding: 8px 12px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    font-size: 1.2rem;
-                ">
-                    ×
-                </button>
-            `;
-            
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-            
-            // Close modal when clicking close button or outside
-            modalContent.querySelector('#close-modal').addEventListener('click', () => {
-                document.body.removeChild(modal);
-            });
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
+            if (password === ADMIN_PASSWORD) {
+                try {
+                    // Create user with email and password
+                    await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+                    messageDiv.textContent = "Connexion réussie !";
+                    messageDiv.className = "auth-message success";
+                    showAdminContent();
+                    loadResults();
+                } catch (error) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        // User already exists, try to sign in
+                        try {
+                            await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+                            messageDiv.textContent = "Connexion réussie !";
+                            messageDiv.className = "auth-message success";
+                            showAdminContent();
+                            loadResults();
+                        } catch (signInError) {
+                            messageDiv.textContent = "Erreur de connexion. Vérifiez le mot de passe.";
+                            messageDiv.className = "auth-message error";
+                        }
+                    } else {
+                        messageDiv.textContent = "Erreur de connexion.";
+                        messageDiv.className = "auth-message error";
+                    }
                 }
+            } else {
+                messageDiv.textContent = "Mot de passe incorrect.";
+                messageDiv.className = "auth-message error";
+            }
+        }
+        
+        function showAdminContent() {
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+        }
+        
+        function hideAdminContent() {
+            document.getElementById('auth-form').style.display = 'block';
+            document.getElementById('admin-content').style.display = 'none';
+        }
+        
+        async function loadResults() {
+            try {
+                const snapshot = await db.collection('results')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                const results = [];
+                let totalScore = 0;
+                let bestScore = 0;
+                let lastActivity = null;
+                const members = new Set();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    results.push(data);
+                    
+                    totalScore += data.percentage;
+                    bestScore = Math.max(bestScore, data.score);
+                    members.add(data.member);
+                    
+                    if (!lastActivity || data.timestamp > lastActivity) {
+                        lastActivity = data.timestamp;
+                    }
+                });
+                
+                // Update statistics
+                document.getElementById('total-participants').textContent = members.size;
+                document.getElementById('average-score').textContent = results.length > 0 ? 
+                    Math.round(totalScore / results.length) + '%' : '0%';
+                document.getElementById('best-score').textContent = bestScore + '/30';
+                document.getElementById('last-activity').textContent = lastActivity ? 
+                    new Date(lastActivity.toDate()).toLocaleDateString('fr-FR') : '--';
+                
+                // Update results table
+                const tableBody = document.getElementById('results-table-body');
+                tableBody.innerHTML = '';
+                
+                results.forEach((result, index) => {
+                    const row = document.createElement('tr');
+                    const date = result.timestamp ? 
+                        new Date(result.timestamp.toDate()).toLocaleString('fr-FR') : 
+                        new Date(result.date).toLocaleString('fr-FR');
+                    
+                    let statusClass = '';
+                    if (result.percentage >= 80) {
+                        statusClass = 'Excellent';
+                    } else if (result.percentage >= 60) {
+                        statusClass = 'Bon';
+                    } else {
+                        statusClass = 'À revoir';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)}</td>
+                        <td>${result.score}/${result.totalQuestions}</td>
+                        <td>${result.percentage}%</td>
+                        <td>${date}</td>
+                        <td>${statusClass}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error("Erreur lors du chargement des résultats:", error);
+            }
+        }
+        
+        function exportResults() {
+            const table = document.getElementById('results-table-body');
+            let csv = "Participant,Score,Pourcentage,Date,Statut\n";
+            
+            Array.from(table.rows).forEach(row => {
+                const cells = row.cells;
+                const rowData = Array.from(cells).map(cell => cell.textContent);
+                csv += rowData.join(",") + "\n";
             });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resultats_famille_singa.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
