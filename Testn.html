@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -155,57 +154,6 @@
             font-weight: 600;
         }
         
-        .timer-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .timer {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #182848;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .timer-value {
-            background-color: #182848;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            min-width: 80px;
-            text-align: center;
-        }
-        
-        .timer.warning {
-            color: #e74c3c;
-        }
-        
-        .timer.warning .timer-value {
-            background-color: #e74c3c;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .timer.ended {
-            color: #7f8c8d;
-        }
-        
-        .timer.ended .timer-value {
-            background-color: #7f8c8d;
-        }
-        
         .questions-container {
             margin-bottom: 30px;
         }
@@ -278,18 +226,9 @@
             color: #721c24;
         }
         
-        .option.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
         .option input {
             margin-right: 10px;
             cursor: pointer;
-        }
-        
-        .option input:disabled {
-            cursor: not-allowed;
         }
         
         .results-panel {
@@ -391,25 +330,6 @@
             transform: none;
         }
         
-        .timer-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -431,10 +351,6 @@
             
             .header h1 {
                 font-size: 2rem;
-            }
-            
-            .timer {
-                font-size: 1.2rem;
             }
         }
     </style>
@@ -465,14 +381,8 @@
             <li>Chaque membre de la famille a accès à ses propres devoirs de français.</li>
             <li><strong>Aubaine et Moïse</strong> : Complétez les phrases en choisissant la bonne réponse.</li>
             <li><strong>Credo</strong> : En plus de compléter les phrases, vous devez aussi jouer le rôle de coach et valider les réponses. Vous aurez accès à des conseils pédagogiques et verrez les résultats finaux.</li>
-            <li><strong>Nouveau : Chronomètre de 20 secondes</strong> pour chaque question ! Répondez avant que le temps ne s'écoule.</li>
             <li>Cliquez sur votre nom pour commencer votre devoir.</li>
         </ul>
-    </div>
-    
-    <!-- Timer notification -->
-    <div class="timer-notification" id="timer-notification">
-        <i class="fas fa-clock"></i> Le temps est écoulé ! Passage à la question suivante...
     </div>
     
     <!-- Aubaine's Content -->
@@ -480,14 +390,6 @@
         <div class="content-header">
             <h2>Devoir d'Aubaine</h2>
             <p class="member-role">Complète les phrases avec la forme correcte du verbe</p>
-        </div>
-        
-        <div class="timer-container">
-            <div class="timer" id="aubaine-timer">
-                <i class="fas fa-hourglass-half"></i>
-                <span>Temps restant :</span>
-                <div class="timer-value" id="aubaine-timer-value">20s</div>
-            </div>
         </div>
         
         <div class="questions-container" id="aubaine-questions">
@@ -510,14 +412,6 @@
             <p class="member-role">Complète les phrases avec la forme correcte du verbe</p>
         </div>
         
-        <div class="timer-container">
-            <div class="timer" id="moise-timer">
-                <i class="fas fa-hourglass-half"></i>
-                <span>Temps restant :</span>
-                <div class="timer-value" id="moise-timer-value">20s</div>
-            </div>
-        </div>
-        
         <div class="questions-container" id="moise-questions">
             <!-- Questions will be inserted here by JavaScript -->
         </div>
@@ -536,14 +430,6 @@
         <div class="content-header">
             <h2>Devoir de Credo</h2>
             <p class="member-role">Complète les phrases et valide les réponses en tant que coach</p>
-        </div>
-        
-        <div class="timer-container">
-            <div class="timer" id="credo-timer">
-                <i class="fas fa-hourglass-half"></i>
-                <span>Temps restant :</span>
-                <div class="timer-value" id="credo-timer-value">20s</div>
-            </div>
         </div>
         
         <div class="coaching-area">
@@ -763,13 +649,6 @@
             }
         ];
 
-        // Timer variables
-        let currentTimer = null;
-        let currentTimerInterval = null;
-        let currentQuestionIndex = 0;
-        let currentMember = null;
-        const TIME_PER_QUESTION = 20; // 20 seconds per question
-
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             // Create questions for each family member
@@ -798,12 +677,11 @@
             questions.forEach((q, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
-                questionDiv.id = `${member}-q${index}`;
                 
                 let optionsHtml = '';
                 q.options.forEach((option, optIndex) => {
                     optionsHtml += `
-                        <div class="option" data-index="${optIndex}" data-question="${index}">
+                        <div class="option" data-index="${optIndex}">
                             <input type="radio" name="${member}-q${index}" id="${member}-q${index}-opt${optIndex}" value="${optIndex}">
                             <label for="${member}-q${index}-opt${optIndex}">${option}</label>
                         </div>
@@ -833,9 +711,6 @@
             // Add click events to options
             container.querySelectorAll('.option').forEach(option => {
                 option.addEventListener('click', function() {
-                    if (this.classList.contains('disabled')) return;
-                    
-                    const questionIndex = parseInt(this.getAttribute('data-question'));
                     const questionDiv = this.closest('.question');
                     const options = questionDiv.querySelectorAll('.option');
                     const input = this.querySelector('input');
@@ -849,17 +724,11 @@
                     // Select clicked option
                     this.classList.add('selected');
                     input.checked = true;
-                    
-                    // Automatically move to next question after selection (optional)
-                    // autoAdvanceQuestion(member, questionIndex);
                 });
             });
         }
         
         function showContent(member) {
-            // Stop any running timer
-            stopTimer();
-            
             // Hide all content areas
             document.querySelectorAll('.content-area').forEach(area => {
                 area.classList.remove('active-content');
@@ -883,166 +752,11 @@
             document.querySelectorAll('.results-panel').forEach(panel => {
                 panel.style.display = 'none';
             });
-            
-            // Reset current question index and enable all options
-            currentQuestionIndex = 0;
-            currentMember = member;
-            
-            // Enable all options
-            document.querySelectorAll(`#${member}-questions .option`).forEach(option => {
-                option.classList.remove('disabled');
-                option.querySelector('input').disabled = false;
-            });
-            
-            // Show first question and hide others
-            document.querySelectorAll(`#${member}-questions .question`).forEach((q, index) => {
-                q.style.display = index === 0 ? 'block' : 'none';
-            });
-            
-            // Start timer for first question
-            startTimer(member);
-        }
-        
-        function startTimer(member) {
-            // Clear any existing timer
-            stopTimer();
-            
-            let timeLeft = TIME_PER_QUESTION;
-            currentMember = member;
-            currentTimer = document.getElementById(`${member}-timer`);
-            currentTimerValue = document.getElementById(`${member}-timer-value`);
-            
-            // Reset timer display
-            updateTimerDisplay(timeLeft);
-            currentTimer.classList.remove('warning', 'ended');
-            
-            // Start countdown
-            currentTimerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay(timeLeft);
-                
-                // Change style when time is running low
-                if (timeLeft <= 5) {
-                    currentTimer.classList.add('warning');
-                }
-                
-                // When time is up
-                if (timeLeft <= 0) {
-                    clearInterval(currentTimerInterval);
-                    currentTimer.classList.remove('warning');
-                    currentTimer.classList.add('ended');
-                    currentTimerValue.textContent = "0s";
-                    
-                    // Show notification
-                    showTimerNotification();
-                    
-                    // Disable options for current question
-                    disableCurrentQuestionOptions(member);
-                    
-                    // Automatically move to next question after 1 second
-                    setTimeout(() => {
-                        goToNextQuestion(member);
-                    }, 1000);
-                }
-            }, 1000);
-        }
-        
-        function stopTimer() {
-            if (currentTimerInterval) {
-                clearInterval(currentTimerInterval);
-                currentTimerInterval = null;
-            }
-        }
-        
-        function updateTimerDisplay(timeLeft) {
-            if (currentTimerValue) {
-                currentTimerValue.textContent = `${timeLeft}s`;
-            }
-        }
-        
-        function showTimerNotification() {
-            const notification = document.getElementById('timer-notification');
-            notification.style.display = 'block';
-            
-            // Hide notification after 2 seconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 2000);
-        }
-        
-        function disableCurrentQuestionOptions(member) {
-            const currentQuestion = document.querySelector(`#${member}-q${currentQuestionIndex}`);
-            if (currentQuestion) {
-                const options = currentQuestion.querySelectorAll('.option');
-                options.forEach(option => {
-                    option.classList.add('disabled');
-                    option.querySelector('input').disabled = true;
-                });
-            }
-        }
-        
-        function goToNextQuestion(member) {
-            // Hide current question
-            const currentQuestion = document.querySelector(`#${member}-q${currentQuestionIndex}`);
-            if (currentQuestion) {
-                currentQuestion.style.display = 'none';
-            }
-            
-            // Move to next question
-            currentQuestionIndex++;
-            
-            // If there are more questions, show next one and start timer
-            if (currentQuestionIndex < questions.length) {
-                const nextQuestion = document.querySelector(`#${member}-q${currentQuestionIndex}`);
-                if (nextQuestion) {
-                    nextQuestion.style.display = 'block';
-                    
-                    // Scroll to the question
-                    nextQuestion.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    
-                    // Start timer for next question
-                    startTimer(member);
-                }
-            } else {
-                // If no more questions, show submit button and stop timer
-                stopTimer();
-                currentTimer.classList.add('ended');
-                
-                // Show message that all questions are answered
-                const timerContainer = document.querySelector(`#${member}-timer`);
-                timerContainer.innerHTML = `
-                    <div class="timer ended">
-                        <i class="fas fa-flag-checkered"></i>
-                        <span>Toutes les questions ont été traitées !</span>
-                    </div>
-                `;
-                
-                // Scroll to submit button
-                document.getElementById(`${member}-submit`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }
-        
-        function autoAdvanceQuestion(member, questionIndex) {
-            // Automatically advance to next question after answering (optional feature)
-            // You can enable this by uncommenting the call in the option click event
-            if (questionIndex === currentQuestionIndex) {
-                setTimeout(() => {
-                    goToNextQuestion(member);
-                }, 500); // Wait 0.5 seconds before advancing
-            }
         }
         
         function submitAnswers(member) {
             let score = 0;
             const totalQuestions = questions.length;
-            
-            // Stop timer if running
-            stopTimer();
-            
-            // Show all questions for review
-            document.querySelectorAll(`#${member}-questions .question`).forEach(q => {
-                q.style.display = 'block';
-            });
             
             // Check each question
             for (let i = 0; i < totalQuestions; i++) {
@@ -1098,17 +812,9 @@
                 feedbackClass = 'poor';
             }
             
-            // Add timer feedback
-            const answeredQuestions = document.querySelectorAll(`input[name^="${member}-q"]:checked`).length;
-            const unansweredQuestions = totalQuestions - answeredQuestions;
-            
-            if (unansweredQuestions > 0) {
-                feedback += `\n\nTu as répondu à ${answeredQuestions} questions sur ${totalQuestions}. ${unansweredQuestions} question(s) n'ont pas reçu de réponse à temps.`;
-            }
-            
             // Add additional feedback for Credo
             if (member === 'credo') {
-                feedback += `\n\nEn tant que coach, tu peux maintenant expliquer ces règles à tes frères et sœurs.`;
+                feedback += ` En tant que coach, tu peux maintenant expliquer ces règles à tes frères et sœurs.`;
                 
                 if (percentage >= 80) {
                     feedback += ` Tu es prêt à les coacher efficacement !`;
