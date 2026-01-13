@@ -533,6 +533,82 @@
             font-size: 0.9rem;
         }
         
+        /* Styles pour les erreurs dans le panel admin */
+        .error-details {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .error-details h4 {
+            color: #182848;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error-list {
+            list-style-type: none;
+        }
+        
+        .error-item {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-left: 4px solid #dc3545;
+            border-radius: 5px;
+        }
+        
+        .error-question {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .error-answer {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .error-correct {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .error-wrong {
+            color: #dc3545;
+            font-weight: 500;
+        }
+        
+        .member-selector {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .member-selector-btn {
+            padding: 8px 15px;
+            background-color: #e9ecef;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .member-selector-btn:hover {
+            background-color: #dee2e6;
+        }
+        
+        .member-selector-btn.active {
+            background-color: #4b6cb7;
+            color: white;
+            border-color: #4b6cb7;
+        }
+        
         @media (max-width: 768px) {
             .member-btn {
                 width: 100%;
@@ -568,6 +644,10 @@
             
             .questions-container {
                 max-height: 500px;
+            }
+            
+            .member-selector {
+                flex-direction: column;
             }
         }
     </style>
@@ -616,6 +696,15 @@
             </div>
             
             <h3><i class="fas fa-table"></i> Résultats Détailés</h3>
+            
+            <!-- Sélecteur de membre pour filtrer les résultats -->
+            <div class="member-selector" id="member-selector">
+                <button class="member-selector-btn active" data-member="all">Tous</button>
+                <button class="member-selector-btn" data-member="credo">Credo</button>
+                <button class="member-selector-btn" data-member="moise">Moïse</button>
+                <button class="member-selector-btn" data-member="aubaine">Aubaine</button>
+            </div>
+            
             <table class="results-table">
                 <thead>
                     <tr>
@@ -623,13 +712,19 @@
                         <th>Score</th>
                         <th>Pourcentage</th>
                         <th>Date</th>
-                        <th>Statut</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="results-table-body">
                     <!-- Results will be populated here -->
                 </tbody>
             </table>
+            
+            <!-- Zone d'affichage des erreurs détaillées -->
+            <div class="error-details" id="error-details" style="display: none;">
+                <h4><i class="fas fa-exclamation-circle"></i> Erreurs détaillées - <span id="selected-member-name"></span></h4>
+                <div id="errors-list"></div>
+            </div>
             
             <button class="export-btn" id="export-btn">
                 <i class="fas fa-download"></i> Exporter les Résultats
@@ -655,12 +750,18 @@
         <h3><i class="fas fa-info-circle"></i> Instructions</h3>
         <ul>
             <li>Chaque membre de la famille a <strong>50 questions uniques et différentes</strong>.</li>
+            <li><strong>Cliquez sur votre nom pour commencer votre devoir.</strong> Aucun exercice ne s'affiche avant que vous ne cliquiez.</li>
             <li><strong>Credo (Niveau Intermédiaire)</strong> : 50 questions sur l'accord du participe passé</li>
             <li><strong>Moïse (Niveau Moyen)</strong> : 50 questions plus exigeantes sur l'accord du participe passé</li>
             <li><strong>Aubaine (Niveau Difficile)</strong> : 50 questions sur les verbes pronominaux et constructions complexes</li>
-            <li>Cliquez sur votre nom pour commencer votre devoir.</li>
             <li><strong>Les résultats sont automatiquement sauvegardés dans la base de données.</strong></li>
         </ul>
+    </div>
+    
+    <!-- Aucun contenu affiché au départ -->
+    <div id="no-content" class="content-area" style="display: none; text-align: center; padding: 50px;">
+        <h2><i class="fas fa-hand-pointer"></i> Sélectionnez votre nom pour commencer</h2>
+        <p>Cliquez sur votre nom dans les boutons ci-dessus pour afficher votre devoir.</p>
     </div>
     
     <!-- Credo's Content -->
@@ -923,34 +1024,84 @@
             { question: "Les difficultés qu'il a ___ surmonter étaient réelles.", options: ["dû", "dues", "dûes", "devoir"], correct: 2 }
         ];
 
+        // Variable pour stocker les résultats chargés
+        let allResults = [];
+        let selectedMemberFilter = 'all';
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Create questions for each family member
-            createQuestions('credo', credoQuestions);
-            createQuestions('moise', moiseQuestions);
-            createQuestions('aubaine', aubaineQuestions);
+            // Afficher le message "Sélectionnez votre nom" au départ
+            document.getElementById('no-content').style.display = 'block';
+            
+            // Cacher tous les contenus des membres au départ
+            document.getElementById('credo-content').style.display = 'none';
+            document.getElementById('moise-content').style.display = 'none';
+            document.getElementById('aubaine-content').style.display = 'none';
             
             // Set up button click events
             document.getElementById('aubaine-btn').addEventListener('click', () => showContent('aubaine'));
             document.getElementById('moise-btn').addEventListener('click', () => showContent('moise'));
             document.getElementById('credo-btn').addEventListener('click', () => showContent('credo'));
             
-            // Set up submit button events
-            document.getElementById('aubaine-submit').addEventListener('click', () => submitAnswers('aubaine', aubaineQuestions));
-            document.getElementById('moise-submit').addEventListener('click', () => submitAnswers('moise', moiseQuestions));
-            document.getElementById('credo-submit').addEventListener('click', () => submitAnswers('credo', credoQuestions));
-            
             // Admin panel events
             document.getElementById('admin-panel-btn').addEventListener('click', toggleAdminPanel);
             document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
             document.getElementById('export-btn').addEventListener('click', exportResults);
             
-            // Show Credo's content by default
-            showContent('credo');
+            // Set up member selector events
+            document.querySelectorAll('.member-selector-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.member-selector-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedMemberFilter = this.getAttribute('data-member');
+                    displayResultsTable();
+                });
+            });
             
             // Check if admin is already logged in
             checkAdminAuth();
         });
+        
+        function showContent(member) {
+            // Cacher le message "Sélectionnez votre nom"
+            document.getElementById('no-content').style.display = 'none';
+            
+            // Cacher tous les contenus
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.style.display = 'none';
+            });
+            
+            // Créer les questions pour ce membre si elles n'existent pas encore
+            if (!document.getElementById(`${member}-questions`).hasChildNodes()) {
+                let questionsArray;
+                switch(member) {
+                    case 'credo': questionsArray = credoQuestions; break;
+                    case 'moise': questionsArray = moiseQuestions; break;
+                    case 'aubaine': questionsArray = aubaineQuestions; break;
+                }
+                createQuestions(member, questionsArray);
+                
+                // Set up submit button event pour ce membre
+                document.getElementById(`${member}-submit`).addEventListener('click', () => submitAnswers(member, questionsArray));
+            }
+            
+            // Afficher le contenu du membre sélectionné
+            document.getElementById(`${member}-content`).style.display = 'block';
+            
+            // Reset button styles
+            document.querySelectorAll('.member-btn').forEach(btn => {
+                btn.style.transform = 'translateY(0)';
+                btn.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+            });
+            
+            // Highlight selected button
+            const selectedBtn = document.getElementById(`${member}-btn`);
+            selectedBtn.style.transform = 'translateY(-5px)';
+            selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+            
+            // Hide results when switching members
+            document.getElementById(`${member}-results`).style.display = 'none';
+        }
         
         function createQuestions(member, questionsArray) {
             const container = document.getElementById(`${member}-questions`);
@@ -1003,32 +1154,6 @@
             });
         }
         
-        function showContent(member) {
-            // Hide all content areas
-            document.querySelectorAll('.content-area').forEach(area => {
-                area.classList.remove('active-content');
-            });
-            
-            // Show selected member's content
-            document.getElementById(`${member}-content`).classList.add('active-content');
-            
-            // Reset button styles
-            document.querySelectorAll('.member-btn').forEach(btn => {
-                btn.style.transform = 'translateY(0)';
-                btn.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
-            });
-            
-            // Highlight selected button
-            const selectedBtn = document.getElementById(`${member}-btn`);
-            selectedBtn.style.transform = 'translateY(-5px)';
-            selectedBtn.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
-            
-            // Hide results when switching members
-            document.querySelectorAll('.results-panel').forEach(panel => {
-                panel.style.display = 'none';
-            });
-        }
-        
         async function submitAnswers(member, questionsArray) {
             let score = 0;
             const totalQuestions = questionsArray.length;
@@ -1045,27 +1170,28 @@
                 }
                 
                 answers.push({
+                    questionIndex: i,
                     question: questionsArray[i].question,
                     selected: selectedValue,
                     correct: questionsArray[i].correct,
-                    isCorrect: isCorrect
+                    isCorrect: isCorrect,
+                    selectedText: selectedValue !== null ? questionsArray[i].options[selectedValue] : 'Non répondu',
+                    correctText: questionsArray[i].options[questionsArray[i].correct]
                 });
                 
-                // Show correct/incorrect for Credo
-                if (member === 'credo') {
-                    const questionDiv = document.getElementById(`${member}-questions`).children[i];
-                    const options = questionDiv.querySelectorAll('.option');
+                // Show correct/incorrect
+                const questionDiv = document.getElementById(`${member}-questions`).children[i];
+                const options = questionDiv.querySelectorAll('.option');
+                
+                options.forEach((option, index) => {
+                    option.classList.remove('correct', 'incorrect');
                     
-                    options.forEach((option, index) => {
-                        option.classList.remove('correct', 'incorrect');
-                        
-                        if (index === questionsArray[i].correct) {
-                            option.classList.add('correct');
-                        } else if (index === selectedValue && selectedValue !== questionsArray[i].correct) {
-                            option.classList.add('incorrect');
-                        }
-                    });
-                }
+                    if (index === questionsArray[i].correct) {
+                        option.classList.add('correct');
+                    } else if (index === selectedValue && selectedValue !== questionsArray[i].correct) {
+                        option.classList.add('incorrect');
+                    }
+                });
             }
             
             // Save results to Firebase
@@ -1208,6 +1334,7 @@
         function hideAdminContent() {
             document.getElementById('auth-form').style.display = 'block';
             document.getElementById('admin-content').style.display = 'none';
+            document.getElementById('error-details').style.display = 'none';
         }
         
         async function loadResults() {
@@ -1216,7 +1343,7 @@
                     .orderBy('timestamp', 'desc')
                     .get();
                 
-                const results = [];
+                allResults = [];
                 let totalScore = 0;
                 let bestScore = 0;
                 let lastActivity = null;
@@ -1224,7 +1351,7 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    results.push({
+                    allResults.push({
                         ...data,
                         id: doc.id
                     });
@@ -1242,50 +1369,14 @@
                 
                 // Update statistics
                 document.getElementById('total-participants').textContent = members.size;
-                document.getElementById('average-score').textContent = results.length > 0 ? 
-                    Math.round(totalScore / results.length) + '%' : '0%';
+                document.getElementById('average-score').textContent = allResults.length > 0 ? 
+                    Math.round(totalScore / allResults.length) + '%' : '0%';
                 document.getElementById('best-score').textContent = bestScore + '/50';
                 document.getElementById('last-activity').textContent = lastActivity ? 
                     new Date(lastActivity.toDate()).toLocaleDateString('fr-FR') : '--';
                 
-                // Update results table
-                const tableBody = document.getElementById('results-table-body');
-                tableBody.innerHTML = '';
-                
-                results.forEach((result, index) => {
-                    const row = document.createElement('tr');
-                    const date = result.timestamp ? 
-                        new Date(result.timestamp.toDate()).toLocaleString('fr-FR') : 
-                        new Date(result.date).toLocaleString('fr-FR');
-                    
-                    let statusClass = '';
-                    if (result.percentage >= 80) {
-                        statusClass = 'Excellent';
-                    } else if (result.percentage >= 60) {
-                        statusClass = 'Bon';
-                    } else {
-                        statusClass = 'À revoir';
-                    }
-                    
-                    row.innerHTML = `
-                        <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)} (${result.niveau})</td>
-                        <td>${result.score}/${result.totalQuestions}</td>
-                        <td>${result.percentage}%</td>
-                        <td>${date}</td>
-                        <td>${statusClass}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-                
-                if (results.length === 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px;">
-                                Aucun résultat trouvé dans la base de données.
-                            </td>
-                        </tr>
-                    `;
-                }
+                // Display results table
+                displayResultsTable();
                 
             } catch (error) {
                 console.error("Erreur lors du chargement des résultats:", error);
@@ -1299,14 +1390,121 @@
             }
         }
         
-        function exportResults() {
-            const table = document.getElementById('results-table-body');
-            let csv = "Participant,Niveau,Score,Pourcentage,Date,Statut\n";
+        function displayResultsTable() {
+            const tableBody = document.getElementById('results-table-body');
+            tableBody.innerHTML = '';
             
-            Array.from(table.rows).forEach(row => {
-                const cells = row.cells;
-                const rowData = Array.from(cells).map(cell => cell.textContent);
-                csv += rowData.join(",") + "\n";
+            // Filtrer les résultats selon le membre sélectionné
+            const filteredResults = selectedMemberFilter === 'all' 
+                ? allResults 
+                : allResults.filter(result => result.member === selectedMemberFilter);
+            
+            if (filteredResults.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px;">
+                            Aucun résultat trouvé pour ce filtre.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('error-details').style.display = 'none';
+                return;
+            }
+            
+            filteredResults.forEach((result, index) => {
+                const row = document.createElement('tr');
+                const date = result.timestamp ? 
+                    new Date(result.timestamp.toDate()).toLocaleString('fr-FR') : 
+                    new Date(result.date).toLocaleString('fr-FR');
+                
+                let statusClass = '';
+                if (result.percentage >= 80) {
+                    statusClass = 'Excellent';
+                } else if (result.percentage >= 60) {
+                    statusClass = 'Bon';
+                } else {
+                    statusClass = 'À revoir';
+                }
+                
+                row.innerHTML = `
+                    <td>${result.member.charAt(0).toUpperCase() + result.member.slice(1)} (${result.niveau})</td>
+                    <td>${result.score}/${result.totalQuestions}</td>
+                    <td>${result.percentage}%</td>
+                    <td>${date}</td>
+                    <td>
+                        <button class="member-selector-btn" onclick="showErrorDetails('${result.id}', '${result.member}')">
+                            <i class="fas fa-search"></i> Voir les erreurs
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function showErrorDetails(resultId, memberName) {
+            const result = allResults.find(r => r.id === resultId);
+            if (!result) return;
+            
+            document.getElementById('selected-member-name').textContent = 
+                memberName.charAt(0).toUpperCase() + memberName.slice(1);
+            
+            const errorsList = document.getElementById('errors-list');
+            errorsList.innerHTML = '';
+            
+            // Trouver les réponses incorrectes
+            const incorrectAnswers = result.answers.filter(answer => !answer.isCorrect);
+            
+            if (incorrectAnswers.length === 0) {
+                errorsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #28a745;">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                        <p style="margin-top: 10px;">Aucune erreur ! Excellent travail !</p>
+                    </div>
+                `;
+            } else {
+                errorsList.innerHTML = `<p>${incorrectAnswers.length} erreur(s) trouvée(s) :</p>`;
+                
+                const errorList = document.createElement('ul');
+                errorList.className = 'error-list';
+                
+                incorrectAnswers.forEach(answer => {
+                    const errorItem = document.createElement('li');
+                    errorItem.className = 'error-item';
+                    
+                    errorItem.innerHTML = `
+                        <div class="error-question">
+                            <strong>Question ${answer.questionIndex + 1}:</strong> ${answer.question}
+                        </div>
+                        <div class="error-answer">
+                            <span class="error-wrong">Votre réponse: ${answer.selectedText}</span> | 
+                            <span class="error-correct">Réponse correcte: ${answer.correctText}</span>
+                        </div>
+                    `;
+                    errorList.appendChild(errorItem);
+                });
+                
+                errorsList.appendChild(errorList);
+            }
+            
+            document.getElementById('error-details').style.display = 'block';
+            document.getElementById('error-details').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function exportResults() {
+            const filteredResults = selectedMemberFilter === 'all' 
+                ? allResults 
+                : allResults.filter(result => result.member === selectedMemberFilter);
+            
+            let csv = "Participant,Niveau,Score,Pourcentage,Date,Nombre d'erreurs\n";
+            
+            filteredResults.forEach(result => {
+                const date = result.timestamp ? 
+                    new Date(result.timestamp.toDate()).toLocaleString('fr-FR') : 
+                    new Date(result.date).toLocaleString('fr-FR');
+                
+                const errorCount = result.answers.filter(a => !a.isCorrect).length;
+                
+                csv += `"${result.member.charAt(0).toUpperCase() + result.member.slice(1)}","${result.niveau}",${result.score}/${result.totalQuestions},${result.percentage}%,"${date}",${errorCount}\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1319,6 +1517,9 @@
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }
+        
+        // Exposer la fonction au scope global pour le bouton
+        window.showErrorDetails = showErrorDetails;
     </script>
 </body>
 </html>
