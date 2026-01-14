@@ -813,6 +813,36 @@
       animation: correctAnswer 0.5s ease;
     }
     
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px var(--ok); }
+      50% { box-shadow: 0 0 20px var(--ok); }
+      100% { box-shadow: 0 0 5px var(--ok); }
+    }
+    
+    .pulse-glow {
+      animation: pulseGlow 1s infinite;
+    }
+    
+    /* Nouveau : Indicateur de qui peut répondre */
+    .answer-indicator {
+      text-align: center;
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .answer-indicator.creator-only {
+      background: rgba(156, 39, 176, 0.3);
+      border-left: 4px solid var(--room-color);
+    }
+    
+    .answer-indicator.everyone {
+      background: rgba(76, 175, 80, 0.3);
+      border-left: 4px solid var(--player-color);
+    }
+    
     /* Modal Admin */
     .admin-modal {
       position: fixed;
@@ -1251,6 +1281,11 @@
       <!-- Messages multijoueur -->
     </div>
     
+    <!-- Nouveau : Indicateur de qui peut répondre -->
+    <div id="answerIndicator" class="answer-indicator hidden">
+      <i class="fas fa-info-circle"></i> <span id="answerIndicatorText">Seul le créateur peut passer à la question suivante</span>
+    </div>
+    
     <!-- Affichage des manches -->
     <div id="roundsDisplay" class="rounds-display hidden">
       <!-- Les bulles des manches seront ajoutées ici -->
@@ -1277,7 +1312,7 @@
     <div class="answer-section">
       <input type="text" id="answer" placeholder="Écris le mot correct (mêmes initiales) et appuie sur Entrée…" autocomplete="off" />
       <div style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:8px; text-align:center;">
-        <i class="fas fa-info-circle"></i> Seul le joueur avec la bonne réponse gagne des points
+        <i class="fas fa-info-circle"></i> <span id="pointsInfo">Chaque bonne réponse rapporte 10 points !</span>
       </div>
     </div>
 
@@ -1383,7 +1418,7 @@
       "Ca": [
         {mot:"Caractère", def:"Ensemble de traits distinctifs d'une personne ou d'une chose."},
         {mot:"Carte", def:"Document représentant une région ou un territoire."},
-        {mot:"Cascade", def:"Chute d'eau sur une piste."},
+        {mot:"Cascade", def:"Chute d'eau sur une pente."},
         {mot:"Cadeau", def:"Objet offert pour une occasion ou par affection."},
         {mot:"Caisse", def:"Contenant destiné au transport d'objets."},
         {mot:"Caméra", def:"Appareil pour prendre des photos ou filmer."},
@@ -1424,6 +1459,9 @@
     const roundsDisplay = document.getElementById("roundsDisplay");
     const questionCounter = document.getElementById("questionCounter");
     const scoreValue = document.getElementById("scoreValue");
+    const answerIndicator = document.getElementById("answerIndicator");
+    const answerIndicatorText = document.getElementById("answerIndicatorText");
+    const pointsInfo = document.getElementById("pointsInfo");
 
     // Éléments Multijoueur
     const multiplayerModal = document.getElementById("multiplayerModal");
@@ -1492,14 +1530,15 @@
     let gameStateListenerActive = false;
     let lastSyncTime = 0;
     const SYNC_INTERVAL = 100;
+    let autoAdvanceTimer = null;
 
     // Variables Admin
     const ADMIN_PASSWORD = "admin123";
     let adminAuthenticated = false;
     let adminData = [];
 
-    // 🔥 AMÉLIORATION : Points seulement pour la bonne réponse
-    // Pas de points pour les mauvaises réponses, on passe simplement à la question suivante
+    // 🔥 NOUVEAU : Système de passage automatique pour TOUS les joueurs
+    // Points fixés à 10 par bonne réponse
 
     // Générer un ID de joueur unique
     function generatePlayerId() {
@@ -1516,13 +1555,15 @@
       return code;
     }
 
-    // 🔥 FONCTION CRITIQUE : Mettre à jour les contrôles selon le rôle
+    // 🔥 FONCTION AMÉLIORÉE : Mettre à jour les contrôles selon le rôle
     function updatePlayerControls() {
-      const canControl = isRoomCreator && multiplayerGameActive && gameActive;
+      // TOUS les joueurs peuvent répondre
+      answerInput.disabled = !multiplayerGameActive || !gameActive || answeredThisQuestion;
       
-      btnPlay.disabled = !canControl;
-      btnSkip.disabled = !canControl;
-      btnBack.disabled = !canControl;
+      // Seul le créateur peut démarrer/arrêter le jeu
+      btnPlay.disabled = !isRoomCreator || multiplayerGameActive;
+      btnSkip.disabled = !isRoomCreator;
+      btnBack.disabled = !isRoomCreator;
       
       // Les boutons de vitesse et répétition sont toujours actifs
       btnSlow.disabled = !multiplayerGameActive || !gameActive;
@@ -1534,7 +1575,26 @@
         btn.disabled = multiplayerGameActive;
       });
       
-      answerInput.disabled = !multiplayerGameActive || !gameActive;
+      // Mettre à jour l'indicateur
+      updateAnswerIndicator();
+    }
+
+    // 🔥 NOUVEAU : Mettre à jour l'indicateur de qui peut répondre
+    function updateAnswerIndicator() {
+      if (!multiplayerGameActive || !gameActive) {
+        answerIndicator.classList.add('hidden');
+        return;
+      }
+      
+      answerIndicator.classList.remove('hidden');
+      
+      if (answeredThisQuestion) {
+        answerIndicatorText.textContent = "Vous avez déjà répondu à cette question";
+        answerIndicator.className = "answer-indicator";
+      } else {
+        answerIndicatorText.textContent = "Tous les joueurs peuvent répondre !";
+        answerIndicator.className = "answer-indicator everyone";
+      }
     }
 
     // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE
@@ -1569,8 +1629,9 @@
       
       answerInput.value = "";
       answerInput.placeholder = `Écris un mot qui commence par « ${currentPrefix} »…`;
-      answerInput.disabled = !gameActive;
+      answerInput.disabled = !gameActive || answeredThisQuestion;
       updatePills();
+      updateAnswerIndicator();
       answerInput.focus();
     }
 
@@ -1609,7 +1670,9 @@
             renderCard();
             updatePlayerControls();
             
+            // Réinitialiser le statut de réponse pour la nouvelle question
             answeredThisQuestion = false;
+            updateAnswerIndicator();
             
             if (gameActive === false && gameState.currentPrefix) {
               gameActive = true;
@@ -1677,7 +1740,7 @@
     }
 
     // Gestion du temps écoulé
-    function timeUp() {
+    async function timeUp() {
       if (!gameActive) return;
       
       const item = FIELDS[currentPrefix][currentIndex];
@@ -1685,16 +1748,16 @@
       message.style.color = "#ff5252";
       message.classList.add('shake');
       
-      // Pas de points pour le temps écoulé
+      // Passer automatiquement à la question suivante
       if (multiplayerGameActive && isRoomCreator) {
-        setTimeout(() => {
-          updateGameStateForNextWord();
+        setTimeout(async () => {
+          await advanceToNextQuestion();
         }, 2000);
       }
     }
 
-    // Mettre à jour l'état du jeu pour le mot suivant
-    async function updateGameStateForNextWord() {
+    // 🔥 NOUVEAU : Fonction pour avancer à la question suivante
+    async function advanceToNextQuestion() {
       if (!currentRoomId || !isRoomCreator) return;
       
       const list = FIELDS[currentPrefix];
@@ -1709,6 +1772,13 @@
           lastUpdate: Date.now()
         });
       }
+    }
+
+    // Mettre à jour l'état du jeu pour le mot suivant
+    async function updateGameStateForNextWord() {
+      // Cette fonction est maintenant appelée par advanceToNextQuestion
+      // Gardée pour compatibilité
+      await advanceToNextQuestion();
     }
 
     // Terminer une manche
@@ -1805,7 +1875,7 @@
       }
     }
 
-    // 🔥 AMÉLIORATION : Vérification des réponses avec logique améliorée
+    // 🔥 AMÉLIORATION : Vérification des réponses avec LOGIQUE ÉQUITABLE
     async function check(){
       if(!currentPrefix || !gameActive || answeredThisQuestion) return;
       
@@ -1815,48 +1885,45 @@
       const timeUsed = 20 - timeLeft;
 
       if(user && user.startsWith(normalize(currentPrefix)) && user === target){
-        // 🔥 CORRECT : Le joueur gagne 1 point
+        // 🔥 CORRECT : Le joueur gagne 10 POINTS
         stopChrono();
-        const newScore = score + 1;
+        const newScore = score + 10; // 10 points par bonne réponse
         
         // Animation visuelle pour la bonne réponse
         prefixDisplay.classList.add('correct-animation');
         setTimeout(() => prefixDisplay.classList.remove('correct-animation'), 500);
         
-        message.innerHTML = `✅ <strong>Correct !</strong> +1 point ! Temps: ${timeUsed}s - Score: ${newScore}`;
+        message.innerHTML = `✅ <strong>Correct !</strong> +10 points ! Temps: ${timeUsed}s - Score: ${newScore}`;
         message.style.color = "#00e676";
         
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
           await updatePlayerScore(newScore);
           
-          if (isRoomCreator) {
-            setTimeout(() => {
-              updateGameStateForNextWord();
-            }, 1500);
-          }
+          // TOUS les joueurs peuvent faire passer la question après avoir répondu
+          // Attendre 1.5 secondes puis passer automatiquement
+          setTimeout(async () => {
+            if (isRoomCreator) {
+              await advanceToNextQuestion();
+            }
+          }, 1500);
         } else {
           score = newScore;
           setTimeout(next, 1500);
         }
       } else {
-        // 🔥 INCORRECT : Pas de point, on passe à la question suivante
-        message.innerHTML = `❌ <strong>Incorrect.</strong> La réponse était : ${item.mot}`;
+        // 🔥 INCORRECT : Pas de point, mais on peut réessayer
+        message.innerHTML = `❌ <strong>Incorrect.</strong> Essaie encore !`;
         message.style.color = "#ff5252";
         message.classList.add('shake');
         setTimeout(() => message.classList.remove('shake'), 500);
         
-        if (multiplayerGameActive) {
-          answeredThisQuestion = true;
-          
-          if (isRoomCreator) {
-            setTimeout(() => {
-              updateGameStateForNextWord();
-            }, 2000);
-          }
-        } else {
-          setTimeout(next, 2000);
-        }
+        // L'utilisateur peut réessayer immédiatement
+        answerInput.value = "";
+        answerInput.focus();
+        
+        // En mode multijoueur, on ne passe PAS à la question suivante
+        // Le joueur peut continuer à essayer jusqu'à ce qu'il trouve la bonne réponse
       }
     }
 
@@ -2076,6 +2143,7 @@
       multiplayerMessage.classList.remove('hidden');
       multiplayerMessage.innerHTML = `
         <i class="fas fa-gamepad"></i> La partie a commencé ! Manche 1/3 - Champ lexical: <strong>${randomPrefix}</strong>
+        <br><small>Tous les joueurs peuvent répondre - 10 points par bonne réponse !</small>
       `;
       
       updatePlayerControls();
@@ -2228,12 +2296,12 @@
       const list = FIELDS[currentPrefix];
       if(currentIndex >= list.length){
         currentIndex = list.length-1;
-        message.innerHTML = `🎉 <strong>${playerName.toUpperCase()}</strong> a terminé le champ lexical ${currentPrefix} avec un score de ${score}/${list.length}.`;
+        message.innerHTML = `🎉 <strong>${playerName.toUpperCase()}</strong> a terminé le champ lexical ${currentPrefix} avec un score de ${score}/${list.length*10}.`;
         message.style.color = "#00e676";
         answerInput.disabled = true;
         gameActive = false;
         stopChrono();
-        speak(`Bravo ${playerName} ! Tu as terminé le champ lexical ${currentPrefix} avec un score de ${score} sur ${list.length}.`);
+        speak(`Bravo ${playerName} ! Tu as terminé le champ lexical ${currentPrefix} avec un score de ${score} sur ${list.length*10}.`);
         return;
       }
       renderCard();
@@ -2496,7 +2564,11 @@
         setTimeout(() => message.classList.remove('shake'), 500);
         return;
       }
-      next();
+      if (multiplayerGameActive && isRoomCreator) {
+        advanceToNextQuestion();
+      } else {
+        next();
+      }
     });
     
     btnBack.addEventListener("click", () => {
@@ -2608,6 +2680,11 @@
         gameStateUnsubscribe = null;
       }
       
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+      }
+      
       currentRoomId = null;
       isRoomCreator = false;
       multiplayerGameActive = false;
@@ -2621,6 +2698,7 @@
       multiplayerStatus.classList.add('hidden');
       multiplayerMessage.classList.add('hidden');
       roundsDisplay.classList.add('hidden');
+      answerIndicator.classList.add('hidden');
       
       gameActive = false;
       stopChrono();
@@ -2686,9 +2764,12 @@
       playerNameInput.value = randomName;
       playerName = randomName;
       
+      // Indiquer que c'est 10 points par bonne réponse
+      pointsInfo.textContent = "Chaque bonne réponse rapporte 10 points !";
+      
       // Prévenir l'utilisateur des règles
       setTimeout(() => {
-        message.innerHTML = '<i class="fas fa-info-circle"></i> Seul le joueur avec la bonne réponse gagne des points !';
+        message.innerHTML = '<i class="fas fa-info-circle"></i> En mode multijoueur : Tous les joueurs peuvent répondre !';
         message.style.color = "#ff9800";
       }, 1000);
     });
