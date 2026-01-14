@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Champs Lexicaux - Jeu Chronométré MULTIJOUEUR</title>
+  <title>Champs Lexicaux - MULTIJOUEUR SIMPLIFIÉ</title>
   <style>
     :root{
       --bg1:#6a11cb; --bg2:#2575fc;
@@ -89,7 +90,7 @@
     
     .multiplayer-buttons {
       display: flex;
-        flex-direction: column;
+      flex-direction: column;
       gap: 15px;
       margin-bottom: 25px;
     }
@@ -328,77 +329,6 @@
       font-weight: bold;
     }
     
-    /* Statut des réponses */
-    .answers-status {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin: 10px 0;
-    }
-    
-    .answer-indicator {
-      padding: 8px 15px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255,255,255,0.1);
-    }
-    
-    .answer-indicator.correct {
-      background: rgba(0, 230, 118, 0.2);
-      color: #00e676;
-      border: 1px solid #00e676;
-    }
-    
-    .answer-indicator.incorrect {
-      background: rgba(255, 82, 82, 0.2);
-      color: #ff5252;
-      border: 1px solid #ff5252;
-    }
-    
-    .answer-indicator.waiting {
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffc107;
-      border: 1px solid #ffc107;
-    }
-    
-    /* Affichage des manches */
-    .rounds-display {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin: 15px 0;
-      flex-wrap: wrap;
-    }
-    
-    .round-bubble {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2rem;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      flex-shrink: 0;
-    }
-    
-    .round-bubble.active {
-      background: var(--room-color);
-      border-color: #fff;
-      box-shadow: 0 0 15px var(--room-color);
-    }
-    
-    .round-bubble.completed {
-      background: var(--ok);
-      border-color: #fff;
-    }
-    
     /* Container principal */
     .container{
       background: var(--card);
@@ -583,10 +513,6 @@
       box-shadow:0 0 15px var(--brand);
       caret-color:var(--brand);
     }
-    #answer:disabled {
-      background: #e0e0e0;
-      color: #666;
-    }
     
     /* Contrôles */
     .controls-section {
@@ -618,13 +544,6 @@
     button:disabled{
       opacity: .55;
       cursor: not-allowed;
-      background: #666;
-      color: #999;
-    }
-    button:disabled:hover{
-      background: #666;
-      color: #999;
-      box-shadow: none;
     }
     
     /* Message */
@@ -667,11 +586,6 @@
       background: #fff;
       color: var(--brand);
       border-color: var(--brand);
-    }
-    .bank button:disabled{
-      background: rgba(255,255,255,.05);
-      color: #666;
-      border-color: #666;
     }
     
     /* Responsive */
@@ -728,6 +642,19 @@
     .hidden {
       display: none !important;
     }
+    
+    .debug-info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      max-width: 300px;
+      z-index: 9999;
+    }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -736,6 +663,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <!-- Debug info -->
+  <div id="debugInfo" class="debug-info hidden">
+    <div><strong>Debug Info</strong></div>
+    <div id="debugStatus">Non connecté</div>
+  </div>
+
   <!-- Modal Multijoueur -->
   <div class="multiplayer-modal hidden" id="multiplayerModal">
     <div class="multiplayer-content">
@@ -757,20 +690,20 @@
       <div id="createRoomSection" class="room-section hidden">
         <h3>Créer une nouvelle salle</h3>
         <input type="text" id="roomNameInput" class="room-input" 
-               placeholder="Nom de la salle (ex: Champions du lexique)" maxlength="30">
-        <input type="number" id="maxPlayersInput" class="room-input" 
-               placeholder="Nombre maximum de joueurs (2-8)" min="2" max="8" value="4">
+               placeholder="Ton pseudo (ex: Moise)" maxlength="20">
         <button id="createRoomConfirm" class="multiplayer-btn">
-          <i class="fas fa-gamepad"></i> Créer et démarrer
+          <i class="fas fa-gamepad"></i> Créer une salle
         </button>
       </div>
       
       <div id="joinRoomSection" class="room-section hidden">
         <h3>Rejoindre une salle</h3>
         <input type="text" id="roomCodeInput" class="room-input" 
-               placeholder="Code de la salle (ex: ABCD)" maxlength="6" style="text-transform:uppercase">
+               placeholder="Code de la salle (ex: ABCD)" maxlength="4" style="text-transform:uppercase">
+        <input type="text" id="playerNameInput" class="room-input" 
+               placeholder="Ton pseudo (ex: Joueur2)" maxlength="20">
         <button id="joinRoomConfirm" class="multiplayer-btn join">
-          <i class="fas fa-sign-in-alt"></i> Rejoindre la salle
+          <i class="fas fa-sign-in-alt"></i> Rejoindre
         </button>
       </div>
       
@@ -784,7 +717,7 @@
         </button>
         
         <div class="room-info">
-          <h4>Joueurs dans la salle (<span id="playerCount">0</span>/<span id="maxPlayers">4</span>)</h4>
+          <h4>Joueurs dans la salle (<span id="playerCount">0</span>/8)</h4>
           <ul class="players-list" id="playersList">
             <!-- Les joueurs seront ajoutés ici -->
           </ul>
@@ -850,16 +783,6 @@
     <div id="multiplayerMessage" class="multiplayer-message hidden">
       <!-- Messages multijoueur -->
     </div>
-    
-    <!-- Statut des réponses -->
-    <div id="answersStatus" class="answers-status hidden">
-      <!-- Indicateurs de réponses -->
-    </div>
-    
-    <!-- Affichage des manches -->
-    <div id="roundsDisplay" class="rounds-display hidden">
-      <!-- Les bulles des manches seront ajoutées ici -->
-    </div>
 
     <!-- Zone d'affichage -->
     <div class="display">
@@ -917,20 +840,28 @@
   </div>
 
   <script>
-    // 🔥 CONFIGURATION FIREBASE
+    // 🔥 CONFIGURATION FIREBASE SIMPLIFIÉE
     const firebaseConfig = {
       apiKey: "AIzaSyBPBq1uT7lbL9Xp_neAJh2lSe0MRErlYdo",
       authDomain: "evoir-1.firebaseapp.com",
       projectId: "evoir-1",
       storageBucket: "evoir-1.firebasestorage.app",
       messagingSenderId: "504718469638",
-      appId: "1:504718469638:web:72707fd51d0ce6ff773187",
-      measurementId: "G-ZXPC2SKJHT"
+      appId: "1:504718469638:web:72707fd51d0ce6ff773187"
     };
 
     // Initialiser Firebase
-    firebase.initializeApp(firebaseConfig);
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase initialisé");
+    } catch (error) {
+      console.error("❌ Erreur Firebase:", error);
+    }
+    
     const db = firebase.firestore();
+    
+    // Activer le debug
+    document.getElementById('debugInfo').classList.remove('hidden');
 
     // Données : champs lexicaux (COMPLETS)
     const FIELDS = {
@@ -1019,1024 +950,735 @@
     const btnRepeat = document.getElementById("btnRepeat");
     const btnSkip = document.getElementById("btnSkip");
     const btnBack = document.getElementById("btnBack");
-    const initialBank = document.getElementById("initialBank");
-    const progressPill = document.getElementById("progressPill");
-    const scorePill = document.getElementById("scorePill");
-    const chronoDisplay = document.getElementById("chrono");
-    const roundsDisplay = document.getElementById("roundsDisplay");
-    const questionCounter = document.getElementById("questionCounter");
-    const scoreValue = document.getElementById("scoreValue");
-    const answersStatus = document.getElementById("answersStatus");
+const initialBank = document.getElementById("initialBank");
+const progressPill = document.getElementById("progressPill");
+const scorePill = document.getElementById("scorePill");
+const chronoDisplay = document.getElementById("chrono");
+const questionCounter = document.getElementById("questionCounter");
+const scoreValue = document.getElementById("scoreValue");
+const debugStatus = document.getElementById("debugStatus");
+// Éléments Multijoueur
+const multiplayerModal = document.getElementById("multiplayerModal");
+const multiplayerButton = document.getElementById("multiplayerButton");
+const closeMultiplayerModal = document.getElementById("closeMultiplayerModal");
+const createRoomBtn = document.getElementById("createRoomBtn");
+const joinRoomBtn = document.getElementById("joinRoomBtn");
+const createRoomSection = document.getElementById("createRoomSection");
+const joinRoomSection = document.getElementById("joinRoomSection");
+const roomInfoSection = document.getElementById("roomInfoSection");
+const waitingSection = document.getElementById("waitingSection");
+const createRoomConfirm = document.getElementById("createRoomConfirm");
+const joinRoomConfirm = document.getElementById("joinRoomConfirm");
+const roomIdDisplay = document.getElementById("roomIdDisplay");
+const copyRoomCodeBtn = document.getElementById("copyRoomCodeBtn");
+const playersList = document.getElementById("playersList");
+const startGameBtn = document.getElementById("startGameBtn");
+const leaveRoomBtn = document.getElementById("leaveRoomBtn");
+const multiplayerStatus = document.getElementById("multiplayerStatus");
+const playersInRoom = document.getElementById("playersInRoom");
+const currentRoomCode = document.getElementById("currentRoomCode");
+const roomCreator = document.getElementById("roomCreator");
+const leaveRoomBtnInGame = document.getElementById("leaveRoomBtnInGame");
+const multiplayerMessage = document.getElementById("multiplayerMessage");
 
-    // Éléments Multijoueur
-    const multiplayerModal = document.getElementById("multiplayerModal");
-    const multiplayerButton = document.getElementById("multiplayerButton");
-    const closeMultiplayerModal = document.getElementById("closeMultiplayerModal");
-    const createRoomBtn = document.getElementById("createRoomBtn");
-    const joinRoomBtn = document.getElementById("joinRoomBtn");
-    const createRoomSection = document.getElementById("createRoomSection");
-    const joinRoomSection = document.getElementById("joinRoomSection");
-    const roomInfoSection = document.getElementById("roomInfoSection");
-    const waitingSection = document.getElementById("waitingSection");
-    const createRoomConfirm = document.getElementById("createRoomConfirm");
-    const joinRoomConfirm = document.getElementById("joinRoomConfirm");
-    const roomIdDisplay = document.getElementById("roomIdDisplay");
-    const copyRoomCodeBtn = document.getElementById("copyRoomCodeBtn");
-    const playersList = document.getElementById("playersList");
-    const startGameBtn = document.getElementById("startGameBtn");
-    const leaveRoomBtn = document.getElementById("leaveRoomBtn");
-    const multiplayerStatus = document.getElementById("multiplayerStatus");
-    const playersInRoom = document.getElementById("playersInRoom");
-    const currentRoomCode = document.getElementById("currentRoomCode");
-    const roomCreator = document.getElementById("roomCreator");
-    const leaveRoomBtnInGame = document.getElementById("leaveRoomBtnInGame");
-    const multiplayerMessage = document.getElementById("multiplayerMessage");
+// État du jeu
+let currentPrefix = null;
+let currentIndex = 0;
+let speechRate = 1;
+let score = 0;
+let chronoTimer = null;
+let timeLeft = 20;
+let gameActive = false;
+let playerName = "Joueur";
 
-    // État du jeu
-    let currentPrefix = null;
-    let currentIndex = 0;
-    let speechRate = 1;
-    let score = 0;
-    let chronoTimer = null;
-    let timeLeft = 20;
-    let gameActive = false;
-    let playerName = "Joueur";
+// Variables Multijoueur
+let currentRoomId = null;
+let isRoomCreator = false;
+let players = [];
+let playerId = null;
+let roomUnsubscribe = null;
+let gameStateUnsubscribe = null;
+let multiplayerGameActive = false;
 
-    // Variables Multijoueur
-    let currentRoomId = null;
-    let isRoomCreator = false;
-    let players = [];
-    let playerId = null;
-    let roomUnsubscribe = null;
-    let gameStateUnsubscribe = null;
-    let multiplayerGameActive = false;
-    let currentRound = 1;
-    let totalRounds = 3;
-    let answeredThisQuestion = false;
-    let gameStateListenerActive = false;
-    let lastSyncTime = 0;
-    const SYNC_INTERVAL = 100;
+// 🔥 SUPPRIMER TOUTE LA COMPLEXITÉ - GARDER L'ESSENTIEL
+function updateDebugInfo(text) {
+  debugStatus.textContent = text;
+  console.log("DEBUG:", text);
+}
+
+// Générer un ID de joueur unique
+function generatePlayerId() {
+  return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Générer un code de salle simple
+function generateRoomCode() {
+  return Math.random().toString(36).substr(2, 4).toUpperCase();
+}
+
+// 🔥 SIMPLIFIER : Créer une salle
+createRoomConfirm.addEventListener('click', async () => {
+  const name = document.getElementById('roomNameInput').value || "Créateur";
+  playerName = name;
+  
+  try {
+    const roomCode = generateRoomCode();
+    playerId = generatePlayerId();
     
-    // 🔥 NOUVEAU : Suivi des réponses
-    let playerAnswers = {}; // {playerId: {correct: boolean, time: number}}
-
-    // Générer un ID de joueur unique
-    function generatePlayerId() {
-      return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    // Générer un code de salle unique
-    function generateRoomCode() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let code = '';
-      for (let i = 0; i < 4; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return code;
-    }
-
-    // 🔥 NOUVEAU : Afficher le statut des réponses
-    function updateAnswersStatus() {
-      answersStatus.classList.remove('hidden');
-      answersStatus.innerHTML = '';
-      
-      const allPlayersAnswered = Object.keys(playerAnswers).length === players.length;
-      
-      players.forEach(player => {
-        const answerStatus = document.createElement('div');
-        answerStatus.className = 'answer-indicator';
-        
-        if (playerAnswers[player.id]) {
-          answerStatus.classList.add(playerAnswers[player.id].correct ? 'correct' : 'incorrect');
-          answerStatus.innerHTML = `
-            <i class="fas fa-${playerAnswers[player.id].correct ? 'check' : 'times'}"></i>
-            ${player.name}: ${playerAnswers[player.id].correct ? 'Correct' : 'Incorrect'} (${playerAnswers[player.id].time}s)
-          `;
-        } else {
-          answerStatus.classList.add('waiting');
-          answerStatus.innerHTML = `
-            <i class="fas fa-clock"></i>
-            ${player.name}: En attente...
-          `;
-        }
-        
-        answersStatus.appendChild(answerStatus);
-      });
-      
-      // 🔥 NOUVEAU LOGIQUE : Vérifier si tout le monde a répondu
-      if (allPlayersAnswered && isRoomCreator) {
-        // Attendre 2 secondes puis passer à la question suivante
-        setTimeout(() => {
-          updateGameStateForNextWord();
-        }, 2000);
-      }
-    }
-
-    // 🔥 FONCTION CRITIQUE : Mettre à jour les contrôles selon le rôle
-    function updatePlayerControls() {
-      const canControl = isRoomCreator && multiplayerGameActive && gameActive;
-      
-      // Seul le créateur peut passer/retourner
-      btnSkip.disabled = !canControl;
-      btnBack.disabled = !canControl;
-      btnPlay.disabled = !canControl;
-      
-      // Tout le monde peut contrôler la vitesse et répéter
-      btnSlow.disabled = !multiplayerGameActive || !gameActive;
-      btnFast.disabled = !multiplayerGameActive || !gameActive;
-      btnRepeat.disabled = !multiplayerGameActive || !gameActive;
-      
-      // Désactiver la banque d'initiales en mode multijoueur
-      document.querySelectorAll('#initialBank button').forEach(btn => {
-        btn.disabled = multiplayerGameActive;
-      });
-      
-      answerInput.disabled = !multiplayerGameActive || !gameActive || answeredThisQuestion;
-    }
-
-    // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE
-    function renderCard(){
-      if(!currentPrefix){
-        prefixDisplay.textContent = "– –";
-        definitionDisplay.innerHTML = `
-          ${multiplayerGameActive ? 
-            'En attente du créateur pour démarrer...' : 
-            'Sélectionne un champ lexical ci-dessous et clique sur "Jouer".<br>Tu as <strong>20 secondes</strong> pour trouver le mot correspondant !'}
-        `;
-        updatePills();
-        return;
-      }
-      
-      const item = FIELDS[currentPrefix]?.[currentIndex];
-      if (!item) {
-        console.error("Item non trouvé:", currentPrefix, currentIndex);
-        return;
-      }
-      
-      prefixDisplay.textContent = currentPrefix.toUpperCase();
-      definitionDisplay.textContent = item.def;
-      
-      if (multiplayerGameActive) {
-        message.textContent = `Manche ${currentRound}/${totalRounds} - Question ${currentIndex + 1}/10 - Mot doit commencer par ${currentPrefix}`;
-        message.style.color = "#fff";
-      } else {
-        message.textContent = `Temps restant: ${timeLeft}s - Mot doit commencer par ${currentPrefix}`;
-        message.style.color = "#fff";
-      }
-      
-      answerInput.value = "";
-      answerInput.placeholder = `Écris un mot qui commence par « ${currentPrefix} »…`;
-      answerInput.disabled = !gameActive || answeredThisQuestion;
-      updatePills();
-      answerInput.focus();
-    }
-
-    // 🔥 SYNCHRONISATION AVEC FIRESTORE
-    function subscribeToGameState(roomCode) {
-      if (gameStateUnsubscribe) gameStateUnsubscribe();
-      
-      gameStateListenerActive = true;
-      let lastGameState = null;
-      
-      gameStateUnsubscribe = db.collection('multiplayer_rooms').doc(roomCode)
-        .onSnapshot((doc) => {
-          if (!doc.exists) return;
-          
-          const roomData = doc.data();
-          const gameState = roomData.gameState;
-          const now = Date.now();
-          
-          // Éviter les mises à jour trop fréquentes
-          if (lastGameState && 
-              lastGameState.currentPrefix === gameState.currentPrefix &&
-              lastGameState.currentIndex === gameState.currentIndex &&
-              now - lastSyncTime < SYNC_INTERVAL) {
-            return;
-          }
-          
-          lastGameState = { ...gameState };
-          lastSyncTime = now;
-          
-          if (gameState.active) {
-            // 🔥 TOUTE LA LOGIQUE VIENT DE FIRESTORE
-            currentPrefix = gameState.currentPrefix;
-            currentIndex = gameState.currentIndex;
-            currentRound = gameState.currentRound || 1;
-            totalRounds = gameState.totalRounds || 3;
-            
-            // 🔥 NOUVEAU : Réinitialiser les réponses quand nouvelle question
-            if (lastGameState && (
-                lastGameState.currentPrefix !== currentPrefix ||
-                lastGameState.currentIndex !== currentIndex)) {
-              playerAnswers = {};
-              answeredThisQuestion = false;
-            }
-            
-            // Mettre à jour l'affichage
-            renderCard();
-            updatePlayerControls();
-            
-            // Gérer le chrono
-            if (gameActive === false && gameState.currentPrefix) {
-              gameActive = true;
-              multiplayerGameActive = true;
-              if (gameState.questionStartTime) {
-                startChronoFromTime(gameState.questionStartTime);
-              } else {
-                startChrono();
-              }
-            }
-            
-            // Mettre à jour l'affichage des manches
-            updateRoundsDisplay(currentRound, totalRounds);
-            
-            // Afficher le message multijoueur
-            multiplayerMessage.classList.remove('hidden');
-            multiplayerMessage.innerHTML = `
-              <i class="fas fa-gamepad"></i> Partie multijoueur - 
-              Manche ${currentRound}/${totalRounds} - 
-              Question ${currentIndex + 1}/10 - Champ lexical: <strong>${currentPrefix}</strong>
-            `;
-          } else {
-            // Jeu inactif
-            gameActive = false;
-            multiplayerGameActive = false;
-            stopChrono();
-            updatePlayerControls();
-            multiplayerMessage.innerHTML = `<i class="fas fa-gamepad"></i> Partie en pause...`;
-          }
-        }, (error) => {
-          console.error("Erreur d'écoute de l'état du jeu:", error);
-          gameStateListenerActive = false;
-        });
-    }
-
-    // Démarrer le chrono depuis un temps donné
-    function startChronoFromTime(startTime) {
-      if (!startTime) {
-        startChrono();
-        return;
-      }
-      
-      const elapsed = Date.now() - startTime;
-      const timeElapsed = Math.floor(elapsed / 1000);
-      timeLeft = Math.max(0, 20 - timeElapsed);
-      
-      if (chronoTimer) clearInterval(chronoTimer);
-      
-      if (timeLeft <= 0) {
-        chronoDisplay.textContent = "0";
-        chronoDisplay.className = "danger";
-        if (isRoomCreator) {
-          // 🔥 NOUVEAU : Quand le temps est écoulé, on passe à la question suivante
-          setTimeout(() => {
-            updateGameStateForNextWord();
-          }, 1000);
-        }
-        return;
-      }
-      
-      chronoDisplay.textContent = timeLeft;
-      updateChronoStyle();
-      
-      chronoTimer = setInterval(() => {
-        timeLeft--;
-        chronoDisplay.textContent = timeLeft;
-        updateChronoStyle();
-        
-        if (timeLeft <= 0) {
-          clearInterval(chronoTimer);
-          timeUp();
-        }
-      }, 1000);
-    }
-
-    // Gestion du temps écoulé
-    function timeUp() {
-      if (!gameActive) return;
-      
-      const item = FIELDS[currentPrefix][currentIndex];
-      message.textContent = `⏰ Temps écoulé ! La réponse était : ${item.mot}`;
-      message.style.color = "#ff5252";
-      
-      // En mode multijoueur, seul le créateur passe au mot suivant
-      if (multiplayerGameActive && isRoomCreator) {
-        setTimeout(() => {
-          updateGameStateForNextWord();
-        }, 2000);
-      }
-    }
-
-    // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
-    function checkAllPlayersAnswered() {
-      if (!multiplayerGameActive || !isRoomCreator) return;
-      
-      const roomDoc = db.collection('multiplayer_rooms').doc(currentRoomId);
-      roomDoc.get().then(doc => {
-        if (!doc.exists) return;
-        
-        const roomData = doc.data();
-        const allPlayers = roomData.players;
-        const allAnswered = allPlayers.every(player => 
-          playerAnswers[player.id] !== undefined
-        );
-        
-        if (allAnswered) {
-          // Attendre 2 secondes pour voir les résultats
-          setTimeout(() => {
-            updateGameStateForNextWord();
-          }, 2000);
-        }
-      });
-    }
-
-    // Mettre à jour l'état du jeu pour le mot suivant
-    async function updateGameStateForNextWord() {
-      if (!currentRoomId || !isRoomCreator) return;
-      
-      const list = FIELDS[currentPrefix];
-      const nextIndex = currentIndex + 1;
-      
-      if (nextIndex >= list.length) {
-        // Fin de la manche
-        await endRound();
-      } else {
-        // Passer au mot suivant
-        await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-          'gameState.currentIndex': nextIndex,
-          'gameState.questionStartTime': Date.now(),
-          lastUpdate: Date.now()
-        });
-      }
-    }
-
-    // Vérifier la réponse
-    async function check(){
-      if(!currentPrefix || !gameActive || answeredThisQuestion) return;
-      
-      const item = FIELDS[currentPrefix][currentIndex];
-      const user = normalize(answerInput.value);
-      const target = normalize(item.mot);
-      const timeUsed = 20 - timeLeft;
-      const isCorrect = user && user.startsWith(normalize(currentPrefix)) && user === target;
-
-      // 🔥 TOUT LE MONDE PEUT RÉPONDRE
-      if(isCorrect){
-        const newScore = score + 1;
-        message.innerHTML = `✅ <strong>Correct !</strong> Temps: ${timeUsed}s - Score: ${newScore}`;
-        message.style.color = "#00e676";
-        
-        // Mettre à jour le score en multijoueur
-        if (multiplayerGameActive) {
-          answeredThisQuestion = true;
-          playerAnswers[playerId] = { correct: true, time: timeUsed };
-          
-          await updatePlayerScore(newScore);
-          updateAnswersStatus();
-          
-          // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
-          checkAllPlayersAnswered();
-        } else {
-          score = newScore;
-          setTimeout(next, 1500);
-        }
-      } else {
-        message.innerHTML = `❌ <strong>Incorrect.</strong> La réponse était : ${item.mot}`;
-        message.style.color = "#ff5252";
-        
-        // En mode multijoueur
-        if (multiplayerGameActive) {
-          answeredThisQuestion = true;
-          playerAnswers[playerId] = { correct: false, time: timeUsed };
-          
-          updateAnswersStatus();
-          
-          // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
-          checkAllPlayersAnswered();
-        } else {
-          setTimeout(next, 2000);
-        }
-      }
-    }
-
-    // 🔥 INTERFACE MULTIJOUEUR - Gestion complète
-    function showMainMenu() {
-      createRoomSection.classList.add('hidden');
-      joinRoomSection.classList.add('hidden');
-      roomInfoSection.classList.add('hidden');
-      waitingSection.classList.add('hidden');
-    }
-
-    // Créer une salle
-    createRoomConfirm.addEventListener('click', async () => {
-      const roomName = document.getElementById('roomNameInput').value || "Salle de Jeu";
-      const maxPlayers = parseInt(document.getElementById('maxPlayersInput').value) || 4;
-      
-      if (maxPlayers < 2 || maxPlayers > 8) {
-        alert("Le nombre de joueurs doit être entre 2 et 8");
-        return;
-      }
-      
-      const roomCode = generateRoomCode();
-      playerId = generatePlayerId();
-      playerName = roomName.substring(0, 15) || "Créateur";
-      
-      const roomData = {
-        code: roomCode,
-        name: roomName,
-        creatorId: playerId,
-        creatorName: playerName,
-        maxPlayers: maxPlayers,
-        players: [{
-          id: playerId,
-          name: playerName,
-          score: 0,
-          isReady: false,
-          isCreator: true,
-          lastAnswerTime: 0
-        }],
-        gameState: {
-          active: false,
-          currentPrefix: null,
-          currentIndex: 0,
-          currentRound: 1,
-          totalRounds: 3,
-          startedAt: null,
-          questionStartTime: null
-        },
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastUpdate: Date.now()
-      };
-      
-      try {
-        await db.collection('multiplayer_rooms').doc(roomCode).set(roomData);
-        currentRoomId = roomCode;
-        isRoomCreator = true;
-        joinRoom(roomCode);
-      } catch (error) {
-        console.error("Erreur lors de la création de la salle:", error);
-        alert("Erreur lors de la création de la salle");
-      }
-    });
-
-    // Rejoindre une salle
-    joinRoomConfirm.addEventListener('click', async () => {
-      const roomCode = document.getElementById('roomCodeInput').value.toUpperCase();
-      
-      if (!roomCode || roomCode.length !== 4) {
-        alert("Veuillez entrer un code de salle valide (4 caractères)");
-        return;
-      }
-      
-      try {
-        const roomDoc = await db.collection('multiplayer_rooms').doc(roomCode).get();
-        
-        if (!roomDoc.exists) {
-          alert("Cette salle n'existe pas");
-          return;
-        }
-        
-        const roomData = roomDoc.data();
-        
-        if (roomData.players.length >= roomData.maxPlayers) {
-          alert("Cette salle est pleine");
-          return;
-        }
-        
-        playerId = generatePlayerId();
-        playerName = "Joueur_" + Math.floor(Math.random() * 1000);
-        currentRoomId = roomCode;
-        isRoomCreator = false;
-        joinRoom(roomCode);
-      } catch (error) {
-        console.error("Erreur lors de la jointure de la salle:", error);
-        alert("Erreur lors de la jointure de la salle");
-      }
-    });
-
-    // Rejoindre une salle
-    async function joinRoom(roomCode) {
-      try {
-        // Ajouter le joueur à la salle
-        await db.collection('multiplayer_rooms').doc(roomCode).update({
-          players: firebase.firestore.FieldValue.arrayUnion({
-            id: playerId,
-            name: playerName,
-            score: 0,
-            isReady: false,
-            isCreator: isRoomCreator,
-            lastAnswerTime: 0
-          }),
-          lastUpdate: Date.now()
-        });
-        
-        // Afficher les infos de la salle
-        showRoomInfo(roomCode);
-        
-        // S'abonner aux mises à jour de la salle
-        subscribeToRoomUpdates(roomCode);
-        
-        // Mettre à jour l'interface
-        multiplayerStatus.classList.remove('hidden');
-        currentRoomCode.textContent = roomCode;
-        updatePlayerControls();
-        
-      } catch (error) {
-        console.error("Erreur lors de la jointure:", error);
-        alert("Erreur lors de la jointure à la salle");
-      }
-    }
-
-    // S'abonner aux mises à jour de la salle
-    function subscribeToRoomUpdates(roomCode) {
-      if (roomUnsubscribe) roomUnsubscribe();
-      
-      roomUnsubscribe = db.collection('multiplayer_rooms').doc(roomCode)
-        .onSnapshot((doc) => {
-          if (!doc.exists) return;
-          
-          const roomData = doc.data();
-          updatePlayersList(roomData.players);
-          updatePlayersInGame(roomData.players);
-          
-          // Mettre à jour les joueurs
-          players = roomData.players;
-          
-          // Mettre à jour l'affichage
-          document.getElementById('playerCount').textContent = roomData.players.length;
-          document.getElementById('maxPlayers').textContent = roomData.maxPlayers;
-          roomCreator.textContent = roomData.creatorName;
-          
-          // Gérer l'état du jeu
-          if (roomData.gameState.active) {
-            multiplayerGameActive = true;
-            waitingSection.classList.remove('hidden');
-            roomInfoSection.classList.add('hidden');
-            
-            // Si le jeu est actif, s'abonner aux mises à jour de l'état du jeu
-            if (!gameStateListenerActive) {
-              subscribeToGameState(roomCode);
-            }
-          } else {
-            multiplayerGameActive = false;
-            gameActive = false;
-            stopChrono();
-            updatePlayerControls();
-          }
-        }, (error) => {
-          console.error("Erreur d'écoute de la salle:", error);
-        });
-    }
-
-    // Démarrer le jeu (créateur seulement)
-    startGameBtn.addEventListener('click', async () => {
-      if (!currentRoomId || !isRoomCreator) return;
-      
-      // Choisir un champ lexical aléatoire pour la première manche
-      const prefixes = Object.keys(FIELDS);
-      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-      
-      // Mettre à jour l'état du jeu
-      await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-        'gameState.active': true,
-        'gameState.currentPrefix': randomPrefix,
-        'gameState.currentIndex': 0,
-        'gameState.currentRound': 1,
-        'gameState.totalRounds': 3,
-        'gameState.startedAt': firebase.firestore.FieldValue.serverTimestamp(),
-        'gameState.questionStartTime': Date.now(),
-        lastUpdate: Date.now()
-      });
-      
-      // Réinitialiser les scores
-      const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
-      const roomData = roomDoc.data();
-      
-      const resetPlayers = roomData.players.map(p => ({
-        ...p,
+    updateDebugInfo(`Création salle ${roomCode}...`);
+    
+    // Structure SIMPLIFIÉE
+    const roomData = {
+      code: roomCode,
+      name: name + " - Salle",
+      creatorId: playerId,
+      creatorName: playerName,
+      players: [{
+        id: playerId,
+        name: playerName,
         score: 0,
-        lastAnswerTime: 0
-      }));
-      
-      await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-        players: resetPlayers,
-        lastUpdate: Date.now()
-      });
-      
-      // Afficher un message
-      multiplayerMessage.classList.remove('hidden');
-      multiplayerMessage.innerHTML = `
-        <i class="fas fa-gamepad"></i> La partie a commencé ! Manche 1/3 - Champ lexical: <strong>${randomPrefix}</strong>
-      `;
-      
-      updatePlayerControls();
+        isCreator: true,
+        joinedAt: Date.now()
+      }],
+      gameState: {
+        active: false,
+        currentPrefix: null,
+        currentIndex: 0
+      },
+      createdAt: Date.now(),
+      lastUpdate: Date.now()
+    };
+    
+    await db.collection('rooms').doc(roomCode).set(roomData);
+    updateDebugInfo(`✅ Salle ${roomCode} créée`);
+    
+    currentRoomId = roomCode;
+    isRoomCreator = true;
+    joinRoom(roomCode);
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur création: ${error.message}`);
+    alert("Erreur création salle. Vérifie ta connexion.");
+  }
+});
+
+// 🔥 SIMPLIFIER : Rejoindre une salle
+joinRoomConfirm.addEventListener('click', async () => {
+  const roomCode = document.getElementById('roomCodeInput').value.toUpperCase();
+  const name = document.getElementById('playerNameInput').value || "Joueur";
+  
+  if (!roomCode || roomCode.length !== 4) {
+    alert("Code salle: 4 lettres/chiffres");
+    return;
+  }
+  
+  updateDebugInfo(`Connexion salle ${roomCode}...`);
+  
+  try {
+    const roomDoc = await db.collection('rooms').doc(roomCode).get();
+    
+    if (!roomDoc.exists) {
+      alert("Salle non trouvée");
+      updateDebugInfo("❌ Salle inexistante");
+      return;
+    }
+    
+    playerId = generatePlayerId();
+    playerName = name;
+    currentRoomId = roomCode;
+    isRoomCreator = false;
+    
+    updateDebugInfo(`✅ Salle trouvée, connexion...`);
+    joinRoom(roomCode);
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur connexion: ${error.message}`);
+    alert("Erreur connexion. Vérifie le code et ta connexion.");
+  }
+});
+
+// 🔥 ULTRA-SIMPLIFIÉ : Joindre une salle
+async function joinRoom(roomCode) {
+  try {
+    const roomRef = db.collection('rooms').doc(roomCode);
+    const roomDoc = await roomRef.get();
+    
+    if (!roomDoc.exists) {
+      alert("Salle supprimée");
+      return;
+    }
+    
+    const roomData = roomDoc.data();
+    
+    // Ajouter le joueur
+    await roomRef.update({
+      players: firebase.firestore.FieldValue.arrayUnion({
+        id: playerId,
+        name: playerName,
+        score: 0,
+        isCreator: isRoomCreator,
+        joinedAt: Date.now()
+      }),
+      lastUpdate: Date.now()
     });
+    
+    // Afficher infos
+    showRoomInfo(roomCode);
+    subscribeToRoom(roomCode);
+    
+    multiplayerStatus.classList.remove('hidden');
+    currentRoomCode.textContent = roomCode;
+    updateDebugInfo(`✅ Connecté à ${roomCode} comme ${playerName}`);
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur joinRoom: ${error.message}`);
+  }
+}
 
-    // 🔥 FONCTIONS RESTANTES (inchangées sauf ajustements)
-    function startChrono() {
-      if (chronoTimer) clearInterval(chronoTimer);
-      timeLeft = 20;
-      chronoDisplay.textContent = timeLeft;
-      chronoDisplay.className = "";
-      
-      chronoTimer = setInterval(() => {
-        timeLeft--;
-        chronoDisplay.textContent = timeLeft;
-        updateChronoStyle();
-        
-        if (timeLeft <= 0) {
-          clearInterval(chronoTimer);
-          timeUp();
-        }
-      }, 1000);
-    }
-
-    function stopChrono() {
-      if (chronoTimer) {
-        clearInterval(chronoTimer);
-        chronoTimer = null;
+// 🔥 SUIVRE LES CHANGEMENTS DE LA SALLE
+function subscribeToRoom(roomCode) {
+  if (roomUnsubscribe) roomUnsubscribe();
+  
+  roomUnsubscribe = db.collection('rooms').doc(roomCode)
+    .onSnapshot((doc) => {
+      if (!doc.exists) {
+        updateDebugInfo("❌ Salle supprimée");
+        return;
       }
-    }
+      
+      const roomData = doc.data();
+      updateRoomDisplay(roomData);
+      
+    }, (error) => {
+      updateDebugInfo(`❌ Erreur écoute: ${error.message}`);
+    });
+}
 
-    function updateChronoStyle() {
-      if (timeLeft <= 5) {
-        chronoDisplay.className = "danger";
-      } else if (timeLeft <= 10) {
-        chronoDisplay.className = "warning";
-      } else {
-        chronoDisplay.className = "";
+// 🔥 METTRE À JOUR L'AFFICHAGE
+function updateRoomDisplay(roomData) {
+  // Mettre à jour les joueurs
+  updatePlayersList(roomData.players);
+  updatePlayersInGame(roomData.players);
+  
+  document.getElementById('playerCount').textContent = roomData.players.length;
+  roomCreator.textContent = roomData.creatorName;
+  
+  // Gérer l'état du jeu
+  if (roomData.gameState.active) {
+    multiplayerGameActive = true;
+    waitingSection.classList.remove('hidden');
+    roomInfoSection.classList.add('hidden');
+    
+    // Synchroniser le jeu
+    syncGameState(roomData.gameState);
+  } else {
+    multiplayerGameActive = false;
+    gameActive = false;
+    stopChrono();
+  }
+}
+
+// 🔥 SYNCHRONISER L'ÉTAT DU JEU
+function syncGameState(gameState) {
+  if (gameState.currentPrefix) {
+    currentPrefix = gameState.currentPrefix;
+    currentIndex = gameState.currentIndex;
+    renderCard();
+    
+    if (!gameActive) {
+      gameActive = true;
+      startChrono();
+    }
+    
+    multiplayerMessage.classList.remove('hidden');
+    multiplayerMessage.innerHTML = `
+      <i class="fas fa-gamepad"></i> Partie en cours - 
+      Question ${currentIndex + 1}/10 - 
+      Champ: <strong>${currentPrefix}</strong>
+    `;
+  }
+}
+
+// 🔥 DÉMARRER LE JEU
+startGameBtn.addEventListener('click', async () => {
+  if (!currentRoomId || !isRoomCreator) return;
+  
+  const prefixes = Object.keys(FIELDS);
+  const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  
+  try {
+    await db.collection('rooms').doc(currentRoomId).update({
+      'gameState.active': true,
+      'gameState.currentPrefix': randomPrefix,
+      'gameState.currentIndex': 0,
+      'gameState.startedAt': Date.now(),
+      lastUpdate: Date.now()
+    });
+    
+    multiplayerMessage.classList.remove('hidden');
+    multiplayerMessage.innerHTML = `
+      <i class="fas fa-gamepad"></i> Partie démarrée ! 
+      Champ lexical: <strong>${randomPrefix}</strong>
+    `;
+    
+    updateDebugInfo("✅ Jeu démarré");
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur démarrage: ${error.message}`);
+  }
+});
+
+// 🔥 PASSER À LA QUESTION SUIVANTE
+async function nextQuestion() {
+  if (!currentRoomId || !isRoomCreator) return;
+  
+  const list = FIELDS[currentPrefix];
+  const nextIndex = currentIndex + 1;
+  
+  if (nextIndex >= list.length) {
+    // Fin du champ
+    await db.collection('rooms').doc(currentRoomId).update({
+      'gameState.active': false,
+      lastUpdate: Date.now()
+    });
+    
+    multiplayerMessage.innerHTML = `
+      <i class="fas fa-flag-checkered"></i> Champ lexical terminé !
+    `;
+    return;
+  }
+  
+  await db.collection('rooms').doc(currentRoomId).update({
+    'gameState.currentIndex': nextIndex,
+    lastUpdate: Date.now()
+  });
+}
+
+// 🔥 METTRE À JOUR LES JOUEURS
+function updatePlayersList(playersArray) {
+  playersList.innerHTML = '';
+  players = playersArray;
+  
+  playersArray.forEach(player => {
+    const li = document.createElement('li');
+    if (player.id === playerId) {
+      li.classList.add('you');
+    }
+    
+    li.innerHTML = `
+      <span class="player-badge">${player.name.charAt(0).toUpperCase()}</span>
+      <span>${player.name} ${player.isCreator ? '(Créateur)' : ''}</span>
+      <span style="margin-left:auto; font-weight:bold;">${player.score} pts</span>
+    `;
+    
+    playersList.appendChild(li);
+  });
+}
+
+function updatePlayersInGame(playersArray) {
+  playersInRoom.innerHTML = '';
+  
+  playersArray.forEach(player => {
+    const bubble = document.createElement('div');
+    bubble.className = `player-bubble ${player.id === playerId ? 'you' : ''}`;
+    bubble.innerHTML = `
+      ${player.name.charAt(0).toUpperCase()}
+      <div class="score">${player.score}</div>
+    `;
+    playersInRoom.appendChild(bubble);
+  });
+}
+
+// 🔥 METTRE À JOUR LE SCORE
+async function updatePlayerScore(newScore) {
+  if (!currentRoomId) return;
+  
+  try {
+    const roomRef = db.collection('rooms').doc(currentRoomId);
+    const roomDoc = await roomRef.get();
+    
+    if (!roomDoc.exists) return;
+    
+    const roomData = roomDoc.data();
+    const updatedPlayers = roomData.players.map(p => {
+      if (p.id === playerId) {
+        return { ...p, score: newScore };
       }
-    }
+      return p;
+    });
+    
+    await roomRef.update({
+      players: updatedPlayers,
+      lastUpdate: Date.now()
+    });
+    
+    score = newScore;
+    updatePills();
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur score: ${error.message}`);
+  }
+}
 
-    function updateRoundsDisplay(currentRound, totalRounds) {
-      roundsDisplay.classList.remove('hidden');
-      roundsDisplay.innerHTML = '';
-      
-      for (let i = 1; i <= totalRounds; i++) {
-        const roundBubble = document.createElement('div');
-        roundBubble.className = 'round-bubble';
-        
-        if (i < currentRound) {
-          roundBubble.classList.add('completed');
-          roundBubble.innerHTML = `<i class="fas fa-check"></i>`;
-        } else if (i === currentRound) {
-          roundBubble.classList.add('active');
-          roundBubble.textContent = i;
-        } else {
-          roundBubble.textContent = i;
-        }
-        
-        roundsDisplay.appendChild(roundBubble);
-      }
-    }
+// Afficher infos salle
+function showRoomInfo(roomCode) {
+  createRoomSection.classList.add('hidden');
+  joinRoomSection.classList.add('hidden');
+  roomInfoSection.classList.remove('hidden');
+  roomIdDisplay.textContent = `SALLE: ${roomCode}`;
+  startGameBtn.classList.toggle('hidden', !isRoomCreator);
+}
 
-    function updatePlayersList(playersArray) {
-      playersList.innerHTML = '';
-      players = playersArray;
-      
-      playersArray.forEach(player => {
-        const li = document.createElement('li');
-        if (player.id === playerId) {
-          li.classList.add('you');
-        }
-        
-        li.innerHTML = `
-          <span class="player-badge">${player.name.charAt(0).toUpperCase()}</span>
-          <span>${player.name} ${player.isCreator ? '(Créateur)' : ''}</span>
-          <span style="margin-left:auto; font-weight:bold;">Score: ${player.score}</span>
-        `;
-        
-        playersList.appendChild(li);
-      });
-    }
+// Copier code
+copyRoomCodeBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(currentRoomId)
+    .then(() => {
+      copyRoomCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+      setTimeout(() => {
+        copyRoomCodeBtn.innerHTML = '<i class="fas fa-copy"></i> Copier le code';
+      }, 2000);
+    });
+});
 
-    function updatePlayersInGame(playersArray) {
-      playersInRoom.innerHTML = '';
-      
-      playersArray.forEach(player => {
-        const bubble = document.createElement('div');
-        bubble.className = `player-bubble ${player.id === playerId ? 'you' : ''}`;
-        
-        bubble.innerHTML = `
-          ${player.name.charAt(0).toUpperCase()}
-          <div class="score">${player.score}</div>
-        `;
-        
-        playersInRoom.appendChild(bubble);
-      });
-    }
+// Quitter salle
+leaveRoomBtn.addEventListener('click', leaveRoom);
+leaveRoomBtnInGame.addEventListener('click', leaveRoom);
 
-    // Mettre à jour le score du joueur
-    async function updatePlayerScore(newScore) {
-      if (!currentRoomId) return;
+async function leaveRoom() {
+  if (!currentRoomId) return;
+  
+  try {
+    const roomRef = db.collection('rooms').doc(currentRoomId);
+    const roomDoc = await roomRef.get();
+    
+    if (roomDoc.exists) {
+      const roomData = roomDoc.data();
+      const player = roomData.players.find(p => p.id === playerId);
       
-      try {
-        const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
-        const roomData = roomDoc.data();
-        
-        // Trouver et mettre à jour le joueur
-        const updatedPlayers = roomData.players.map(p => {
-          if (p.id === playerId) {
-            return { 
-              ...p, 
-              score: newScore,
-              lastAnswerTime: Date.now()
-            };
-          }
-          return p;
-        });
-        
-        await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-          players: updatedPlayers,
+      if (player) {
+        await roomRef.update({
+          players: firebase.firestore.FieldValue.arrayRemove(player),
           lastUpdate: Date.now()
         });
         
-        // Mettre à jour le score local
-        score = newScore;
-        updatePills();
-        
-      } catch (error) {
-        console.error("Erreur lors de la mise à jour du score:", error);
-      }
-    }
-
-    // Utilitaires
-    const normalize = s => s
-      .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/[^a-z\-' ]/g,'')
-      .trim();
-
-    function updatePills(){
-      const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
-      questionCounter.textContent = `${currentIndex+1}/${total}`;
-      scoreValue.textContent = score;
-    }
-
-    function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
-    function speak(text, rate=speechRate){
-      if(!('speechSynthesis' in window)) { return; }
-      ttsCancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'fr-FR';
-      u.rate = rate;
-      speechSynthesis.speak(u);
-    }
-
-    function announce(){
-      if(!currentPrefix) return;
-      const item = FIELDS[currentPrefix][currentIndex];
-      const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
-      const def  = item.def;
-      speak(`${intro} Définition : ${def}`);
-      if (!multiplayerGameActive) {
-        startChrono();
-      }
-      gameActive = true;
-    }
-
-    function setPrefix(prefix){
-      if(!FIELDS[prefix]) return;
-      currentPrefix = prefix;
-      currentIndex = 0;
-      score = 0;
-      highlightBank(prefix);
-      renderCard();
-      gameActive = false;
-      stopChrono();
-      answerInput.focus();
-    }
-
-    function next(){
-      if(!currentPrefix) return;
-      currentIndex++;
-      const list = FIELDS[currentPrefix];
-      if(currentIndex >= list.length){
-        currentIndex = list.length-1;
-        message.innerHTML = `🎉 <strong>${playerName.toUpperCase()}</strong> a terminé le champ lexical ${currentPrefix} avec un score de ${score}/${list.length}.`;
-        message.style.color = "#00e676";
-        answerInput.disabled = true;
-        gameActive = false;
-        stopChrono();
-        speak(`Bravo ${playerName} ! Tu as terminé le champ lexical ${currentPrefix} avec un score de ${score} sur ${list.length}.`);
-        return;
-      }
-      renderCard();
-      announce();
-    }
-
-    function back(){
-      if(!currentPrefix) return;
-      if(currentIndex > 0){
-        currentIndex--;
-        gameActive = false;
-        stopChrono();
-        renderCard();
-        answerInput.focus();
-      }
-    }
-
-    function repeat(){ 
-      if (gameActive) {
-        announce(); 
-      }
-    }
-
-    function slower(){
-      speechRate = Math.max(0.5, speechRate - 0.25);
-      if (gameActive) announce();
-    }
-    
-    function faster(){
-      speechRate = Math.min(2, speechRate + 0.25);
-      if (gameActive) announce();
-    }
-
-    // Banque d'initiales
-    function buildBank(){
-      const keys = Object.keys(FIELDS);
-      keys.sort((a,b)=>a.localeCompare(b,'fr'));
-      initialBank.innerHTML = "";
-      for(const k of keys){
-        const btn = document.createElement("button");
-        btn.textContent = k.toUpperCase();
-        btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
-        btn.addEventListener("click", ()=> setPrefix(k));
-        initialBank.appendChild(btn);
-      }
-    }
-    
-    function highlightBank(k){
-      [...initialBank.children].forEach(b=>{
-        b.classList.toggle('active', b.textContent === k.toUpperCase());
-      });
-    }
-
-    // Écouteurs d'événements
-    btnPlay.addEventListener("click", ()=>{
-      if (multiplayerGameActive && !isRoomCreator) {
-        message.textContent = "❌ Seul le créateur peut démarrer le jeu en mode multijoueur";
-        return;
-      }
-      
-      if(!currentPrefix){
-        const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
-        setPrefix(first);
-        announce();
-      }else{
-        announce();
-      }
-    });
-    
-    btnSlow.addEventListener("click", slower);
-    btnFast.addEventListener("click", faster);
-    btnRepeat.addEventListener("click", repeat);
-    
-    btnSkip.addEventListener("click", () => {
-      if (multiplayerGameActive && !isRoomCreator) {
-        message.textContent = "❌ Seul le créateur peut passer à la question suivante";
-        return;
-      }
-      next();
-    });
-    
-    btnBack.addEventListener("click", () => {
-      if (multiplayerGameActive && !isRoomCreator) {
-        message.textContent = "❌ Seul le créateur peut revenir à la question précédente";
-        return;
-      }
-      back();
-    });
-
-    answerInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" && gameActive && !answeredThisQuestion) check();
-    });
-
-    // Gestion de l'interface multijoueur
-    multiplayerButton.addEventListener('click', () => {
-      multiplayerModal.classList.remove('hidden');
-      showMainMenu();
-      document.body.style.overflow = 'hidden';
-    });
-
-    closeMultiplayerModal.addEventListener('click', () => {
-      multiplayerModal.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    });
-
-    multiplayerModal.addEventListener('click', (e) => {
-      if (e.target === multiplayerModal) {
-        multiplayerModal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-      }
-    });
-
-    createRoomBtn.addEventListener('click', () => {
-      showMainMenu();
-      createRoomSection.classList.remove('hidden');
-    });
-
-    joinRoomBtn.addEventListener('click', () => {
-      showMainMenu();
-      joinRoomSection.classList.remove('hidden');
-    });
-
-    // Copier le code de la salle
-    copyRoomCodeBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(currentRoomId)
-        .then(() => {
-          const originalText = copyRoomCodeBtn.innerHTML;
-          copyRoomCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
-          setTimeout(() => {
-            copyRoomCodeBtn.innerHTML = originalText;
-          }, 2000);
-        })
-        .catch(err => {
-          console.error('Erreur lors de la copie:', err);
-        });
-    });
-
-    // Quitter la salle
-    leaveRoomBtn.addEventListener('click', leaveRoom);
-    leaveRoomBtnInGame.addEventListener('click', leaveRoom);
-
-    async function leaveRoom() {
-      if (!currentRoomId) return;
-      
-      try {
-        // Retirer le joueur de la salle
-        const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
-        if (roomDoc.exists) {
-          const roomData = roomDoc.data();
-          const player = roomData.players.find(p => p.id === playerId);
-          
-          if (player) {
-            await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-              players: firebase.firestore.FieldValue.arrayRemove(player),
-              lastUpdate: Date.now()
-            });
-          }
+        // Si salle vide, supprimer
+        const newData = await roomRef.get();
+        if (newData.exists && newData.data().players.length === 0) {
+          await roomRef.delete();
         }
-        
-        // Réinitialiser l'état multijoueur
-        resetMultiplayerState();
-        
-      } catch (error) {
-        console.error("Erreur lors de la sortie de la salle:", error);
       }
     }
+    
+    resetMultiplayerState();
+    
+  } catch (error) {
+    updateDebugInfo(`❌ Erreur sortie: ${error.message}`);
+  }
+}
 
-    // Réinitialiser l'état multijoueur
-    function resetMultiplayerState() {
-      if (roomUnsubscribe) {
-        roomUnsubscribe();
-        roomUnsubscribe = null;
-      }
-      
-      if (gameStateUnsubscribe) {
-        gameStateUnsubscribe();
-        gameStateUnsubscribe = null;
-      }
-      
-      currentRoomId = null;
-      isRoomCreator = false;
-      multiplayerGameActive = false;
-      gameStateListenerActive = false;
-      players = [];
-      currentRound = 1;
-      answeredThisQuestion = false;
-      lastSyncTime = 0;
-      playerAnswers = {};
-      
-      // Masquer les éléments multijoueur
-      multiplayerModal.classList.add('hidden');
-      multiplayerStatus.classList.add('hidden');
-      multiplayerMessage.classList.add('hidden');
-      roundsDisplay.classList.add('hidden');
-      answersStatus.classList.add('hidden');
-      
-      // Réinitialiser le jeu
-      gameActive = false;
-      stopChrono();
-      updatePlayerControls();
-      document.body.style.overflow = 'auto';
+// Réinitialiser
+function resetMultiplayerState() {
+  if (roomUnsubscribe) roomUnsubscribe();
+  
+  currentRoomId = null;
+  isRoomCreator = false;
+  multiplayerGameActive = false;
+  players = [];
+  
+  multiplayerModal.classList.add('hidden');
+  multiplayerStatus.classList.add('hidden');
+  multiplayerMessage.classList.add('hidden');
+  
+  gameActive = false;
+  stopChrono();
+  updateDebugInfo("Déconnecté");
+}
+
+// 🔥 FONCTIONS DE BASE DU JEU (inchangées)
+function startChrono() {
+  if (chronoTimer) clearInterval(chronoTimer);
+  timeLeft = 20;
+  chronoDisplay.textContent = timeLeft;
+  chronoDisplay.className = "";
+  
+  chronoTimer = setInterval(() => {
+    timeLeft--;
+    chronoDisplay.textContent = timeLeft;
+    
+    if (timeLeft <= 5) {
+      chronoDisplay.className = "danger";
+    } else if (timeLeft <= 10) {
+      chronoDisplay.className = "warning";
     }
+    
+    if (timeLeft <= 0) {
+      clearInterval(chronoTimer);
+      timeUp();
+    }
+  }, 1000);
+}
 
-    // Initialisation
-    window.addEventListener("load", ()=>{
-      buildBank();
-      renderCard();
-      if(!('speechSynthesis' in window)){
-        message.innerHTML = "⚠️ La synthèse vocale n'est pas disponible sur ce navigateur.";
-      }
-    });
+function stopChrono() {
+  if (chronoTimer) {
+    clearInterval(chronoTimer);
+    chronoTimer = null;
+  }
+}
 
-    // Nettoyage
-    window.addEventListener('beforeunload', () => {
-      if (currentRoomId) {
-        leaveRoom();
+function timeUp() {
+  if (!gameActive) return;
+  
+  const item = FIELDS[currentPrefix][currentIndex];
+  message.textContent = `⏰ Temps écoulé ! Réponse : ${item.mot}`;
+  message.style.color = "#ff5252";
+  
+  if (multiplayerGameActive && isRoomCreator) {
+    setTimeout(() => {
+      nextQuestion();
+    }, 2000);
+  } else if (!multiplayerGameActive) {
+    setTimeout(next, 2000);
+  }
+}
+
+const normalize = s => s
+  .toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z\-' ]/g,'')
+  .trim();
+
+function updatePills(){
+  const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
+  questionCounter.textContent = `${currentIndex+1}/${total}`;
+  scoreValue.textContent = score;
+}
+
+function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+function speak(text, rate=speechRate){
+  if(!('speechSynthesis' in window)) { return; }
+  ttsCancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'fr-FR';
+  u.rate = rate;
+  speechSynthesis.speak(u);
+}
+
+function announce(){
+  if(!currentPrefix) return;
+  const item = FIELDS[currentPrefix][currentIndex];
+  const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
+  const def  = item.def;
+  speak(`${intro} Définition : ${def}`);
+  if (!multiplayerGameActive) {
+    startChrono();
+  }
+  gameActive = true;
+}
+
+function renderCard(){
+  if(!currentPrefix){
+    prefixDisplay.textContent = "– –";
+    definitionDisplay.innerHTML = `
+      Sélectionne un champ lexical ci-dessous et clique sur "Jouer".<br>
+      Tu as <strong>20 secondes</strong> pour trouver le mot correspondant !
+    `;
+    updatePills();
+    return;
+  }
+  const item = FIELDS[currentPrefix][currentIndex];
+  prefixDisplay.textContent = currentPrefix;
+  definitionDisplay.textContent = item.def;
+  message.textContent = `Joueur: ${playerName} - Temps: ${timeLeft}s - Mot commence par ${currentPrefix}`;
+  message.style.color = "#fff";
+  answerInput.value = "";
+  answerInput.placeholder = `Écris un mot qui commence par « ${currentPrefix} »…`;
+  updatePills();
+  answerInput.focus();
+}
+
+function setPrefix(prefix){
+  if(!FIELDS[prefix]) return;
+  currentPrefix = prefix;
+  currentIndex = 0;
+  score = 0;
+  highlightBank(prefix);
+  renderCard();
+  gameActive = false;
+  stopChrono();
+  answerInput.focus();
+}
+
+function next(){
+  if(!currentPrefix) return;
+  currentIndex++;
+  const list = FIELDS[currentPrefix];
+  if(currentIndex >= list.length){
+    currentIndex = list.length-1;
+    message.innerHTML = `🎉 ${playerName} a terminé ! Score: ${score}/${list.length}`;
+    message.style.color = "#00e676";
+    gameActive = false;
+    stopChrono();
+    return;
+  }
+  renderCard();
+  announce();
+}
+
+function back(){
+  if(!currentPrefix) return;
+  if(currentIndex > 0){
+    currentIndex--;
+    gameActive = false;
+    stopChrono();
+    renderCard();
+    answerInput.focus();
+  }
+}
+
+function repeat(){ 
+  if (gameActive) {
+    announce(); 
+  }
+}
+
+function slower(){
+  speechRate = Math.max(0.5, speechRate - 0.25);
+  if (gameActive) announce();
+}
+
+function faster(){
+  speechRate = Math.min(2, speechRate + 0.25);
+  if (gameActive) announce();
+}
+
+async function check(){
+  if(!currentPrefix || !gameActive) return;
+  
+  const item = FIELDS[currentPrefix][currentIndex];
+  const user = normalize(answerInput.value);
+  const target = normalize(item.mot);
+  const timeUsed = 20 - timeLeft;
+
+  if(user && user.startsWith(normalize(currentPrefix)) && user === target){
+    stopChrono();
+    const newScore = score + 1;
+    message.innerHTML = `✅ Correct ! Temps: ${timeUsed}s - Score: ${newScore}`;
+    message.style.color = "#00e676";
+    
+    if (multiplayerGameActive) {
+      await updatePlayerScore(newScore);
+      if (isRoomCreator) {
+        setTimeout(() => {
+          nextQuestion();
+        }, 1500);
       }
-    });
-  </script>
+    } else {
+      score = newScore;
+      setTimeout(next, 1500);
+    }
+  } else {
+    message.innerHTML = `❌ Incorrect. Réponse: ${item.mot}`;
+    message.style.color = "#ff5252";
+    
+    if (multiplayerGameActive && isRoomCreator) {
+      setTimeout(() => {
+        nextQuestion();
+      }, 2000);
+    } else if (!multiplayerGameActive) {
+      setTimeout(next, 2000);
+    }
+  }
+}
+
+// Banque d'initiales
+function buildBank(){
+  const keys = Object.keys(FIELDS);
+  keys.sort((a,b)=>a.localeCompare(b,'fr'));
+  initialBank.innerHTML = "";
+  for(const k of keys){
+    const btn = document.createElement("button");
+    btn.textContent = k.toUpperCase();
+    btn.setAttribute("aria-label", `Choisir le champ lexical ${k}`);
+    btn.addEventListener("click", ()=> setPrefix(k));
+    initialBank.appendChild(btn);
+  }
+}
+
+function highlightBank(k){
+  [...initialBank.children].forEach(b=>{
+    b.classList.toggle('active', b.textContent === k.toUpperCase());
+  });
+}
+
+// Écouteurs
+btnPlay.addEventListener("click", ()=>{
+  if(!currentPrefix){
+    const first = Object.keys(FIELDS).sort((a,b)=>a.localeCompare(b,'fr'))[0];
+    setPrefix(first);
+    announce();
+  }else{
+    announce();
+  }
+});
+
+btnSlow.addEventListener("click", slower);
+btnFast.addEventListener("click", faster);
+btnRepeat.addEventListener("click", repeat);
+btnSkip.addEventListener("click", next);
+btnBack.addEventListener("click", back);
+
+answerInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter" && gameActive) check();
+});
+
+// Interface multijoueur
+multiplayerButton.addEventListener('click', () => {
+  multiplayerModal.classList.remove('hidden');
+  showMainMenu();
+  document.body.style.overflow = 'hidden';
+  updateDebugInfo("Modal ouvert");
+});
+
+closeMultiplayerModal.addEventListener('click', () => {
+  multiplayerModal.classList.add('hidden');
+  document.body.style.overflow = 'auto';
+});
+
+multiplayerModal.addEventListener('click', (e) => {
+  if (e.target === multiplayerModal) {
+    multiplayerModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }
+});
+
+createRoomBtn.addEventListener('click', () => {
+  showMainMenu();
+  createRoomSection.classList.remove('hidden');
+});
+
+joinRoomBtn.addEventListener('click', () => {
+  showMainMenu();
+  joinRoomSection.classList.remove('hidden');
+});
+
+// Initialisation
+window.addEventListener("load", ()=>{
+  buildBank();
+  renderCard();
+  updateDebugInfo("Prêt");
+  if(!('speechSynthesis' in window)){
+    message.innerHTML = "⚠️ Synthèse vocale non disponible";
+  }
+});
+
+// Nettoyage
+window.addEventListener('beforeunload', () => {
+  if (currentRoomId) {
+    leaveRoom();
+  }
+});
+
+</script>
 </body>
 </html>
+
