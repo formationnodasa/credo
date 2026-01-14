@@ -864,7 +864,12 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (error) {
+      console.log("Firebase déjà initialisé");
+    }
+    
     const db = firebase.firestore();
 
     // Admin credentials
@@ -907,6 +912,18 @@
         {mot:"Triomphe", def:"Victoire éclatante à l'issue d'une lutte."},
         {mot:"Transparence", def:"Clarté d'une substance ou d'une situation."},
         {mot:"Trésor", def:"Richesse ou bien précieux à valeur sentimentale ou matérielle."}
+      ],
+      "Ac": [
+        {mot:"Accompagnement", def:"Soutien ou aide fournie à quelqu'un."},
+        {mot:"Accès", def:"Possibilité d'entrer dans un lieu ou d'obtenir quelque chose."},
+        {mot:"Action", def:"Acte de faire quelque chose."},
+        {mot:"Activité", def:"Occupation ou exercice d'une action."},
+        {mot:"Achat", def:"Acquisition d'un bien."},
+        {mot:"Accident", def:"Événement imprévu, souvent tragique."},
+        {mot:"Accord", def:"Entente ou consensus entre plusieurs personnes."},
+        {mot:"Acquisition", def:"Obtention d'une chose."},
+        {mot:"Acteur", def:"Personne qui joue un rôle au théâtre ou au cinéma."},
+        {mot:"Acclamation", def:"Applaudissements ou éloges enthousiastes."}
       ]
     };
 
@@ -914,7 +931,8 @@
     let currentUser = {
       id: null,
       name: "moise",
-      isHost: false
+      isHost: false,
+      playerColor: "#FF6B6B"
     };
     
     let currentGame = {
@@ -925,11 +943,13 @@
       currentWordIndex: 0,
       currentPrefix: null,
       scores: {},
-      timeLeft: 20
+      timeLeft: 20,
+      gameStarted: false,
+      chronoInterval: null
     };
     
     let gameListener = null;
-    let chronoTimer = null;
+    let localChronoTimer = null;
     let speechRate = 1;
 
     // Générer un code de jeu
@@ -943,22 +963,31 @@
     }
 
     // Normaliser le texte
-    const normalize = s => s
-      .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/[^a-z\-' ]/g,'')
-      .trim();
+    function normalize(s) {
+      if (!s) return '';
+      return s
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z\-' ]/g,'')
+        .trim();
+    }
 
     // Gestion des écrans
     function showScreen(screenId) {
+      console.log("Changement d'écran:", screenId);
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
       });
-      document.getElementById(screenId).classList.add('active');
+      const screenElement = document.getElementById(screenId);
+      if (screenElement) {
+        screenElement.classList.add('active');
+      }
     }
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', function() {
+      console.log("Page chargée");
+      
       // Sélection du joueur
       document.querySelectorAll('.player-card').forEach(card => {
         card.addEventListener('click', function() {
@@ -967,6 +996,7 @@
           });
           this.classList.add('selected');
           currentUser.name = this.getAttribute('data-player');
+          console.log("Joueur sélectionné:", currentUser.name);
         });
       });
 
@@ -1013,9 +1043,11 @@
     // Créer une nouvelle partie
     async function createGame() {
       try {
+        console.log("Création d'une partie...");
         const gameCode = generateGameCode();
-        currentUser.id = Date.now().toString(); // ID simple
+        currentUser.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
         currentUser.isHost = true;
+        currentUser.playerColor = "#FF6B6B";
         
         currentGame = {
           id: gameCode,
@@ -1025,6 +1057,7 @@
             name: currentUser.name,
             isHost: true,
             score: 0,
+            playerColor: "#FF6B6B",
             joinedAt: new Date().toISOString()
           }],
           status: "waiting",
@@ -1035,9 +1068,13 @@
           },
           hostId: currentUser.id,
           timeLeft: 20,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          gameStarted: false,
+          currentWord: null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         };
         
+        console.log("Sauvegarde dans Firebase...");
         // Sauvegarder dans Firebase
         await db.collection('multiplayer_games').doc(gameCode).set(currentGame);
         
@@ -1050,9 +1087,11 @@
         // Écouter les changements
         listenToGameChanges();
         
+        console.log("Partie créée avec code:", gameCode);
+        
       } catch (error) {
         console.error("Erreur création partie:", error);
-        alert("Erreur lors de la création de la partie");
+        alert("Erreur lors de la création de la partie: " + error.message);
       }
     }
 
@@ -1061,11 +1100,12 @@
       const gameCode = document.getElementById('gameCodeInput').value.trim().toUpperCase();
       
       if (!gameCode || gameCode.length !== 6) {
-        alert("Code invalide. Le code doit faire 6 caractères.");
+        alert("Code invalide. Le code doit faire 6 caractères (ex: ABC123).");
         return;
       }
       
       try {
+        console.log("Tentative de rejoindre partie:", gameCode);
         const gameDoc = await db.collection('multiplayer_games').doc(gameCode).get();
         
         if (!gameDoc.exists) {
@@ -1074,30 +1114,38 @@
         }
         
         const gameData = gameDoc.data();
+        console.log("Données de la partie:", gameData);
         
         if (gameData.status !== "waiting") {
           alert("Cette partie a déjà commencé.");
           return;
         }
         
-        currentUser.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        if (gameData.players && gameData.players.length >= 4) {
+          alert("Cette partie est complète (4 joueurs maximum).");
+          return;
+        }
+        
+        currentUser.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
         currentUser.isHost = false;
+        currentUser.playerColor = "#4ECDC4";
         currentGame.id = gameCode;
         currentGame.code = gameCode;
         
         // Ajouter le joueur à la partie
+        const newPlayer = {
+          id: currentUser.id,
+          name: currentUser.name,
+          isHost: false,
+          score: 0,
+          playerColor: "#4ECDC4",
+          joinedAt: new Date().toISOString()
+        };
+        
         await db.collection('multiplayer_games').doc(gameCode).update({
-          players: firebase.firestore.FieldValue.arrayUnion({
-            id: currentUser.id,
-            name: currentUser.name,
-            isHost: false,
-            score: 0,
-            joinedAt: new Date().toISOString()
-          }),
-          scores: {
-            ...gameData.scores,
-            [currentUser.id]: 0
-          }
+          players: firebase.firestore.FieldValue.arrayUnion(newPlayer),
+          [`scores.${currentUser.id}`]: 0,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         });
         
         // Afficher le salon
@@ -1108,54 +1156,73 @@
         // Écouter les changements
         listenToGameChanges();
         
+        console.log("Joueur rejoint avec succès");
+        
       } catch (error) {
         console.error("Erreur rejoindre partie:", error);
-        alert("Erreur lors de la connexion à la partie");
+        alert("Erreur lors de la connexion à la partie: " + error.message);
       }
     }
 
     // Écouter les changements de la partie
     function listenToGameChanges() {
-      if (gameListener) gameListener(); // Désabonner l'ancien listener
+      if (gameListener) {
+        console.log("Désabonnement ancien listener");
+        gameListener();
+      }
       
+      console.log("Écoute des changements pour la partie:", currentGame.code);
       gameListener = db.collection('multiplayer_games').doc(currentGame.code)
         .onSnapshot((doc) => {
           if (doc.exists) {
             const gameData = doc.data();
-            currentGame = gameData;
+            console.log("Mise à jour reçue:", gameData);
+            
+            // Mettre à jour l'état local
+            currentGame = { ...currentGame, ...gameData };
             
             // Mettre à jour l'affichage
             updatePlayersList();
             updateScoresDisplay();
             
             // Gérer les changements d'état
-            if (gameData.status === "playing" && currentGame.status === "waiting") {
-              // La partie vient de commencer
+            if (gameData.status === "playing" && !currentGame.gameStarted) {
+              console.log("La partie commence !");
+              currentGame.gameStarted = true;
               showScreen('gameScreen');
               startGameRound();
             } else if (gameData.status === "finished") {
-              // La partie est terminée
+              console.log("La partie est terminée");
               showResults();
             } else if (gameData.status === "playing") {
-              // Mettre à jour le chrono si nécessaire
-              updateChronoDisplay();
+              // Mettre à jour l'affichage du jeu en cours
+              updateGameDisplay();
             }
+          } else {
+            console.log("La partie n'existe plus");
+            alert("La partie a été supprimée par l'hôte.");
+            resetGame();
+            showScreen('loginScreen');
           }
+        }, (error) => {
+          console.error("Erreur écoute Firebase:", error);
         });
     }
 
     // Mettre à jour la liste des joueurs
     function updatePlayersList() {
       const playersList = document.getElementById('playersList');
+      if (!playersList) return;
+      
       playersList.innerHTML = '';
       
-      if (currentGame.players) {
+      if (currentGame.players && Array.isArray(currentGame.players)) {
         currentGame.players.forEach(player => {
           const playerDiv = document.createElement('div');
           playerDiv.className = `player-item ${player.isHost ? 'host' : 'guest'} ${player.id === currentUser.id ? 'joined' : ''}`;
           
           const firstLetter = player.name.charAt(0).toUpperCase();
-          const playerColor = player.isHost ? 'var(--player1)' : 'var(--player2)';
+          const playerColor = player.playerColor || (player.isHost ? '#FF6B6B' : '#4ECDC4');
           
           playerDiv.innerHTML = `
             <div class="player-avatar" style="background: ${playerColor}">
@@ -1165,6 +1232,7 @@
               <div class="player-name-lobby">${player.name}</div>
               <div class="player-status">
                 ${player.id === currentUser.id ? '✓ Vous' : 'En attente...'}
+                ${player.isHost ? ' (Hôte)' : ''}
               </div>
             </div>
           `;
@@ -1187,47 +1255,27 @@
       
       scoresDiv.innerHTML = '';
       
-      if (currentGame.players) {
+      if (currentGame.players && Array.isArray(currentGame.players)) {
         currentGame.players.forEach(player => {
           const scoreDiv = document.createElement('div');
           scoreDiv.className = `player-score ${player.isHost ? 'host' : 'guest'}`;
           const score = currentGame.scores ? (currentGame.scores[player.id] || 0) : 0;
+          const playerColor = player.playerColor || (player.isHost ? '#FF6B6B' : '#4ECDC4');
           
           scoreDiv.innerHTML = `
             <div class="score-name">${player.name}</div>
             <div class="score-value">${score}</div>
           `;
+          scoreDiv.style.borderLeftColor = playerColor;
           
           scoresDiv.appendChild(scoreDiv);
         });
       }
     }
 
-    // Démarrer la partie (seulement l'hôte)
-    async function startGame() {
-      if (!currentUser.isHost) return;
-      
-      try {
-        // Sélectionner un champ lexical aléatoire
-        const prefixes = Object.keys(FIELDS);
-        const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-        
-        await db.collection('multiplayer_games').doc(currentGame.code).update({
-          status: "playing",
-          currentPrefix: randomPrefix,
-          currentWordIndex: 0,
-          timeLeft: 20,
-          startedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-      } catch (error) {
-        console.error("Erreur démarrage partie:", error);
-      }
-    }
-
-    // Démarrer un tour de jeu
-    async function startGameRound() {
-      if (!currentGame.currentPrefix) return;
+    // Mettre à jour l'affichage du jeu
+    function updateGameDisplay() {
+      if (!currentGame.currentPrefix || currentGame.status !== "playing") return;
       
       const prefix = currentGame.currentPrefix;
       const wordIndex = currentGame.currentWordIndex || 0;
@@ -1235,10 +1283,80 @@
       
       if (wordIndex >= words.length) {
         // Fin du jeu
+        endGame();
+        return;
+      }
+      
+      const currentWord = words[wordIndex];
+      
+      // Mettre à jour l'affichage
+      document.getElementById('prefixDisplay').textContent = prefix;
+      document.getElementById('definitionDisplay').textContent = currentWord.def;
+      
+      // Réinitialiser le champ de réponse
+      document.getElementById('answer').value = '';
+      document.getElementById('answer').disabled = false;
+      
+      // Mettre à jour le chrono
+      if (currentGame.timeLeft !== undefined) {
+        updateChronoDisplay(currentGame.timeLeft);
+      }
+    }
+
+    // Démarrer la partie (seulement l'hôte)
+    async function startGame() {
+      if (!currentUser.isHost) {
+        alert("Seul l'hôte peut démarrer la partie.");
+        return;
+      }
+      
+      if (!currentGame.players || currentGame.players.length < 2) {
+        alert("Attendez qu'au moins un autre joueur rejoigne la partie.");
+        return;
+      }
+      
+      try {
+        // Sélectionner un champ lexical aléatoire
+        const prefixes = Object.keys(FIELDS);
+        const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const words = FIELDS[randomPrefix];
+        const firstWord = words[0];
+        
         await db.collection('multiplayer_games').doc(currentGame.code).update({
-          status: "finished",
-          finishedAt: firebase.firestore.FieldValue.serverTimestamp()
+          status: "playing",
+          currentPrefix: randomPrefix,
+          currentWordIndex: 0,
+          currentWord: firstWord,
+          timeLeft: 20,
+          gameStarted: true,
+          startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         });
+        
+        console.log("Partie démarrée avec préfixe:", randomPrefix);
+        
+      } catch (error) {
+        console.error("Erreur démarrage partie:", error);
+        alert("Erreur lors du démarrage de la partie: " + error.message);
+      }
+    }
+
+    // Démarrer un tour de jeu
+    function startGameRound() {
+      console.log("Début d'un tour de jeu");
+      
+      if (!currentGame.currentPrefix) {
+        console.error("Pas de préfixe défini");
+        return;
+      }
+      
+      const prefix = currentGame.currentPrefix;
+      const wordIndex = currentGame.currentWordIndex || 0;
+      const words = FIELDS[prefix];
+      
+      if (wordIndex >= words.length) {
+        // Fin du jeu
+        endGame();
         return;
       }
       
@@ -1250,26 +1368,34 @@
       document.getElementById('answer').value = '';
       document.getElementById('answer').disabled = false;
       document.getElementById('answer').focus();
+      document.getElementById('message').innerHTML = '';
+      document.getElementById('message').style.color = '';
       
       // Lire la définition
       speak(`Toutes les bonnes réponses commencent par les lettres : ${prefix}. Définition : ${currentWord.def}`);
       
-      // Démarrer le chrono
-      startChrono();
+      // Démarrer le chrono local
+      startLocalChrono();
     }
 
-    // Gestion du chronomètre
-    function startChrono() {
-      if (chronoTimer) clearInterval(chronoTimer);
+    // Gestion du chronomètre local
+    function startLocalChrono() {
+      if (localChronoTimer) clearInterval(localChronoTimer);
+      
       let timeLeft = 20;
       updateChronoDisplay(timeLeft);
       
-      chronoTimer = setInterval(async () => {
+      localChronoTimer = setInterval(async () => {
         timeLeft--;
         updateChronoDisplay(timeLeft);
         
+        // Mettre à jour Firebase périodiquement
+        if (currentUser.isHost && timeLeft % 5 === 0) {
+          await updateGameTime(timeLeft);
+        }
+        
         if (timeLeft <= 0) {
-          clearInterval(chronoTimer);
+          clearInterval(localChronoTimer);
           await handleTimeUp();
         }
       }, 1000);
@@ -1290,6 +1416,17 @@
       }
     }
 
+    async function updateGameTime(timeLeft) {
+      try {
+        await db.collection('multiplayer_games').doc(currentGame.code).update({
+          timeLeft: timeLeft,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Erreur mise à jour temps:", error);
+      }
+    }
+
     async function handleTimeUp() {
       const wordIndex = currentGame.currentWordIndex || 0;
       const prefix = currentGame.currentPrefix;
@@ -1299,14 +1436,25 @@
       // Afficher le message temps écoulé
       document.getElementById('message').innerHTML = `⏰ Temps écoulé ! Le mot était : <strong>${currentWord.mot}</strong>`;
       document.getElementById('message').style.color = "#ff5252";
+      speak(`Temps écoulé ! Le mot était : ${currentWord.mot}`);
       
-      // Passer au mot suivant
+      // Désactiver l'entrée
+      document.getElementById('answer').disabled = true;
+      
+      // Passer au mot suivant après un délai
       setTimeout(async () => {
-        await db.collection('multiplayer_games').doc(currentGame.code).update({
-          currentWordIndex: wordIndex + 1,
-          timeLeft: 20
-        });
-      }, 2000);
+        if (currentUser.isHost) {
+          const nextWordIndex = wordIndex + 1;
+          const nextWord = words[nextWordIndex];
+          
+          await db.collection('multiplayer_games').doc(currentGame.code).update({
+            currentWordIndex: nextWordIndex,
+            timeLeft: 20,
+            currentWord: nextWord,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }, 3000);
     }
 
     // Soumettre une réponse
@@ -1314,11 +1462,25 @@
       const answerInput = document.getElementById('answer');
       const userAnswer = normalize(answerInput.value);
       
-      if (!userAnswer) return;
+      if (!userAnswer) {
+        alert("Veuillez entrer une réponse.");
+        return;
+      }
+      
+      if (answerInput.disabled) {
+        alert("Temps écoulé ! Attendez le prochain mot.");
+        return;
+      }
       
       const wordIndex = currentGame.currentWordIndex || 0;
       const prefix = currentGame.currentPrefix;
       const words = FIELDS[prefix];
+      
+      if (wordIndex >= words.length) {
+        alert("La partie est terminée !");
+        return;
+      }
+      
       const currentWord = words[wordIndex];
       const correctAnswer = normalize(currentWord.mot);
       
@@ -1333,13 +1495,14 @@
       
       try {
         await db.collection('multiplayer_games').doc(currentGame.code).update({
-          [`scores.${currentUser.id}`]: newScore
+          [`scores.${currentUser.id}`]: newScore,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         });
         
         // Afficher le résultat
         const message = document.getElementById('message');
         if (isCorrect) {
-          message.innerHTML = `✅ <strong>Correct !</strong> +1 point`;
+          message.innerHTML = `✅ <strong>Correct !</strong> +1 point pour ${currentUser.name}`;
           message.style.color = "#00e676";
           speak("Correct !");
         } else {
@@ -1351,24 +1514,59 @@
         // Désactiver l'entrée
         answerInput.disabled = true;
         
-        // Passer au mot suivant après un délai
-        setTimeout(async () => {
-          await db.collection('multiplayer_games').doc(currentGame.code).update({
-            currentWordIndex: wordIndex + 1,
-            timeLeft: 20
-          });
-        }, 2000);
+        // Arrêter le chrono local
+        if (localChronoTimer) {
+          clearInterval(localChronoTimer);
+          localChronoTimer = null;
+        }
+        
+        // Si c'est l'hôte, passer au mot suivant après un délai
+        if (currentUser.isHost) {
+          setTimeout(async () => {
+            const nextWordIndex = wordIndex + 1;
+            const nextWord = words[nextWordIndex];
+            
+            if (nextWordIndex < words.length) {
+              await db.collection('multiplayer_games').doc(currentGame.code).update({
+                currentWordIndex: nextWordIndex,
+                timeLeft: 20,
+                currentWord: nextWord,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            } else {
+              // Fin du jeu
+              await endGame();
+            }
+          }, 2000);
+        }
         
       } catch (error) {
         console.error("Erreur soumission réponse:", error);
+        alert("Erreur lors de l'envoi de la réponse: " + error.message);
+      }
+    }
+
+    // Terminer la partie
+    async function endGame() {
+      try {
+        await db.collection('multiplayer_games').doc(currentGame.code).update({
+          status: "finished",
+          finishedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Erreur fin de partie:", error);
       }
     }
 
     // Afficher les résultats finaux
     function showResults() {
+      console.log("Affichage des résultats");
       showScreen('resultsScreen');
       
       const finalScores = document.getElementById('finalScores');
+      if (!finalScores) return;
+      
       finalScores.innerHTML = '';
       
       if (currentGame.players && currentGame.scores) {
@@ -1388,20 +1586,19 @@
         currentGame.players.forEach(player => {
           const score = currentGame.scores[player.id] || 0;
           const isWinner = player.id === winner.id;
+          const playerColor = player.playerColor || (player.isHost ? '#FF6B6B' : '#4ECDC4');
+          const totalWords = currentGame.currentPrefix ? FIELDS[currentGame.currentPrefix].length : 10;
+          const accuracy = Math.round((score / totalWords) * 100);
           
           const scoreDiv = document.createElement('div');
           scoreDiv.className = `final-score ${isWinner ? 'winner' : ''}`;
           
-          const playerColor = player.isHost ? 'var(--player1)' : 'var(--player2)';
-          const totalWords = currentGame.currentPrefix ? FIELDS[currentGame.currentPrefix].length : 10;
-          const accuracy = Math.round((score / totalWords) * 100);
-          
           scoreDiv.innerHTML = `
             ${isWinner ? '<div class="winner-badge">🏆 GAGNANT</div>' : ''}
             <div class="final-player-name" style="color: ${playerColor}">
-              ${player.name}
+              ${player.name} ${player.isHost ? ' (Hôte)' : ''}
             </div>
-            <div class="final-score-value">${score}</div>
+            <div class="final-score-value">${score}/${totalWords}</div>
             <div class="final-accuracy">
               ${accuracy}% de précision
             </div>
@@ -1410,24 +1607,47 @@
           finalScores.appendChild(scoreDiv);
         });
       }
+      
+      // Arrêter tous les timers
+      if (localChronoTimer) {
+        clearInterval(localChronoTimer);
+        localChronoTimer = null;
+      }
     }
 
     // Quitter le salon
     async function leaveLobby() {
-      if (gameListener) gameListener();
+      console.log("Quitter le salon");
       
-      if (currentUser.isHost) {
+      if (gameListener) {
+        gameListener();
+        gameListener = null;
+      }
+      
+      if (currentUser.isHost && currentGame.code) {
         // Si c'est l'hôte, supprimer la partie
-        await db.collection('multiplayer_games').doc(currentGame.code).delete();
-      } else {
+        try {
+          await db.collection('multiplayer_games').doc(currentGame.code).delete();
+          console.log("Partie supprimée par l'hôte");
+        } catch (error) {
+          console.error("Erreur suppression partie:", error);
+        }
+      } else if (currentGame.code) {
         // Sinon, retirer le joueur
-        await db.collection('multiplayer_games').doc(currentGame.code).update({
-          players: firebase.firestore.FieldValue.arrayRemove({
+        try {
+          const playerToRemove = {
             id: currentUser.id,
             name: currentUser.name,
             isHost: false
-          })
-        });
+          };
+          
+          await db.collection('multiplayer_games').doc(currentGame.code).update({
+            players: firebase.firestore.FieldValue.arrayRemove(playerToRemove)
+          });
+          console.log("Joueur retiré du salon");
+        } catch (error) {
+          console.error("Erreur retrait joueur:", error);
+        }
       }
       
       resetGame();
@@ -1436,13 +1656,22 @@
 
     // Quitter la partie en cours
     async function leaveGame() {
-      if (gameListener) gameListener();
+      console.log("Quitter la partie");
       
-      if (currentUser.isHost) {
+      if (gameListener) {
+        gameListener();
+        gameListener = null;
+      }
+      
+      if (currentUser.isHost && currentGame.code) {
         // L'hôte met fin à la partie
-        await db.collection('multiplayer_games').doc(currentGame.code).update({
-          status: "finished"
-        });
+        try {
+          await db.collection('multiplayer_games').doc(currentGame.code).update({
+            status: "finished"
+          });
+        } catch (error) {
+          console.error("Erreur fin de partie:", error);
+        }
       }
       
       resetGame();
@@ -1451,16 +1680,20 @@
 
     // Nouvelle partie
     function newGame() {
+      console.log("Nouvelle partie");
       resetGame();
       showScreen('loginScreen');
     }
 
     // Réinitialiser le jeu
     function resetGame() {
+      console.log("Réinitialisation du jeu");
+      
       currentUser = {
         id: null,
         name: "moise",
-        isHost: false
+        isHost: false,
+        playerColor: "#FF6B6B"
       };
       
       currentGame = {
@@ -1471,18 +1704,27 @@
         currentWordIndex: 0,
         currentPrefix: null,
         scores: {},
-        timeLeft: 20
+        timeLeft: 20,
+        gameStarted: false
       };
       
-      if (chronoTimer) {
-        clearInterval(chronoTimer);
-        chronoTimer = null;
+      if (localChronoTimer) {
+        clearInterval(localChronoTimer);
+        localChronoTimer = null;
       }
       
       if (gameListener) {
         gameListener();
         gameListener = null;
       }
+      
+      // Réinitialiser l'affichage
+      document.getElementById('answer').value = '';
+      document.getElementById('answer').disabled = false;
+      document.getElementById('message').innerHTML = '';
+      document.getElementById('prefixDisplay').textContent = '– –';
+      document.getElementById('definitionDisplay').textContent = 'Sélectionne un personnage pour commencer';
+      updateChronoDisplay(20);
     }
 
     // Copier le code de la partie
@@ -1495,12 +1737,18 @@
         setTimeout(() => {
           btn.innerHTML = originalText;
         }, 2000);
+      }).catch(err => {
+        console.error("Erreur copie:", err);
+        alert("Impossible de copier le code. Copiez-le manuellement: " + code);
       });
     }
 
     // Synthèse vocale
     function speak(text, rate = speechRate) {
-      if (!('speechSynthesis' in window)) return;
+      if (!('speechSynthesis' in window)) {
+        console.log("Synthèse vocale non supportée");
+        return;
+      }
       
       if (speechSynthesis.speaking) {
         speechSynthesis.cancel();
@@ -1513,7 +1761,10 @@
     }
 
     function repeatWord() {
-      if (!currentGame.currentPrefix) return;
+      if (!currentGame.currentPrefix || currentGame.status !== "playing") {
+        alert("Aucun mot en cours.");
+        return;
+      }
       
       const wordIndex = currentGame.currentWordIndex || 0;
       const prefix = currentGame.currentPrefix;
@@ -1562,6 +1813,22 @@
         }
       });
     }
+
+    // Vérifier la connexion Firebase
+    function checkFirebaseConnection() {
+      db.collection('test').limit(1).get()
+        .then(() => {
+          console.log("✅ Firebase connecté");
+          document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-wifi"></i> Connecté';
+        })
+        .catch(error => {
+          console.error("❌ Erreur Firebase:", error);
+          document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-wifi-slash"></i> Hors ligne';
+        });
+    }
+
+    // Vérifier la connexion au chargement
+    setTimeout(checkFirebaseConnection, 1000);
   </script>
 </body>
 </html>
