@@ -13,6 +13,7 @@
       --ok:#00e676; --ko:#ff5252;
       --room-color:#9c27b0;
       --player-color:#4caf50;
+      --warning:#ff9800;
     }
     *{box-sizing:border-box; margin:0; padding:0;}
     body{
@@ -451,8 +452,8 @@
     }
     
     .admin-btn {
-      background-color: #ff6b6b;
-      color: white;
+      background-color: #d4af37;
+      color: #1a1a2e;
       border: none;
       padding: 12px 24px;
       border-radius: 10px;
@@ -467,8 +468,9 @@
     }
     
     .admin-btn:hover {
-      background-color: #ff5252;
+      background-color: #f7ef8a;
       transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
     }
     
     .status{
@@ -571,6 +573,7 @@
     /* Zone de réponse */
     .answer-section {
       margin: 20px 0;
+      position: relative;
     }
     
     #answer{
@@ -799,6 +802,234 @@
     .shake {
       animation: shake 0.5s ease;
     }
+    
+    @keyframes correctAnswer {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .correct-animation {
+      animation: correctAnswer 0.5s ease;
+    }
+    
+    /* Modal Admin */
+    .admin-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .admin-content {
+      background: #1a1a2e;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 800px;
+      width: 100%;
+      border: 2px solid #d4af37;
+      position: relative;
+      color: white;
+      box-shadow: 0 10px 40px rgba(212, 175, 55, 0.4);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .close-admin {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      font-size: 1.8rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background-color 0.3s;
+    }
+    
+    .close-admin:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .admin-title {
+      text-align: center;
+      color: #f7ef8a;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+    }
+    
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: rgba(212, 175, 55, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #f7ef8a;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #a0c8ff;
+      font-size: 0.9rem;
+    }
+    
+    .admin-password-input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    
+    .admin-login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #d4af37, #f7ef8a);
+      color: #1a1a2e;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .admin-login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    }
+    
+    .results-table-container {
+      max-height: 400px;
+      overflow-y: auto;
+      margin: 20px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .results-table th {
+      background: rgba(212, 175, 55, 0.2);
+      color: #f7ef8a;
+      padding: 12px 15px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+    }
+    
+    .results-table td {
+      padding: 12px 15px;
+      color: #cccccc;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .results-table tr:hover {
+      background: rgba(212, 175, 55, 0.1);
+    }
+    
+    .export-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #4CAF50, #2E7D32);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    }
+    
+    .view-results-btn {
+      padding: 8px 12px;
+      background: linear-gradient(90deg, #1e90ff, #0d47a1);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .view-results-btn:hover {
+      background: linear-gradient(90deg, #4fc3f7, #0288d1);
+      transform: translateY(-1px);
+    }
+    
+    .admin-section {
+      margin-top: 25px;
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+    
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .admin-action-btn {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .admin-action-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+    }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -885,6 +1116,99 @@
     </div>
   </div>
 
+  <!-- Modal Admin -->
+  <div class="admin-modal hidden" id="adminModal">
+    <div class="admin-content">
+      <button class="close-admin" id="closeAdminModal" aria-label="Fermer">&times;</button>
+      
+      <h2 class="admin-title">
+        <i class="fas fa-lock"></i> PANEL ADMINISTRATEUR
+      </h2>
+      
+      <div id="adminLoginSection">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <i class="fas fa-key fa-3x" style="color:#d4af37; margin-bottom:10px;"></i>
+          <p style="color:#a0c8ff;">Accès réservé à l'administrateur</p>
+        </div>
+        
+        <input type="password" id="adminPassword" class="admin-password-input" 
+               placeholder="Entrez le mot de passe administrateur">
+        
+        <button id="adminLoginBtn" class="admin-login-btn">
+          <i class="fas fa-sign-in-alt"></i> SE CONNECTER
+        </button>
+        
+        <div style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
+          <i class="fas fa-info-circle"></i> Mot de passe par défaut: <code>admin123</code>
+        </div>
+      </div>
+      
+      <div id="adminDashboard" class="hidden">
+        <div class="admin-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="totalRooms">0</div>
+            <div class="stat-label">Salles Actives</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-value" id="totalPlayers">0</div>
+            <div class="stat-label">Joueurs Connectés</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-value" id="totalGames">0</div>
+            <div class="stat-label">Parties Jouées</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-value" id="avgScore">0</div>
+            <div class="stat-label">Score Moyen</div>
+          </div>
+        </div>
+        
+        <div class="admin-section">
+          <h3 style="color:#f7ef8a; margin-bottom:15px;">
+            <i class="fas fa-list-ol"></i> Résultats Détailés
+          </h3>
+          
+          <div class="results-table-container">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Salle</th>
+                  <th>Créateur</th>
+                  <th>Joueurs</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminResultsList">
+                <!-- Les résultats seront ajoutés ici -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="admin-actions">
+          <button id="refreshAdminBtn" class="admin-action-btn">
+            <i class="fas fa-sync-alt"></i> Actualiser
+          </button>
+          <button id="exportAdminBtn" class="admin-action-btn">
+            <i class="fas fa-download"></i> Exporter
+          </button>
+          <button id="clearOldBtn" class="admin-action-btn" style="background:rgba(255,107,107,0.1); border-color:#ff6b6b;">
+            <i class="fas fa-trash"></i> Nettoyer
+          </button>
+        </div>
+        
+        <button id="adminLogoutBtn" class="export-btn" style="background:linear-gradient(90deg, #ff9800, #f57c00); margin-top:15px;">
+          <i class="fas fa-sign-out-alt"></i> DÉCONNEXION
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <header>
       <h1><i class="fas fa-brain"></i> Champs Lexicaux – MULTIJOUEUR</h1>
@@ -952,6 +1276,9 @@
     <!-- Zone de réponse -->
     <div class="answer-section">
       <input type="text" id="answer" placeholder="Écris le mot correct (mêmes initiales) et appuie sur Entrée…" autocomplete="off" />
+      <div style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:8px; text-align:center;">
+        <i class="fas fa-info-circle"></i> Seul le joueur avec la bonne réponse gagne des points
+      </div>
     </div>
 
     <!-- Contrôles -->
@@ -1056,7 +1383,7 @@
       "Ca": [
         {mot:"Caractère", def:"Ensemble de traits distinctifs d'une personne ou d'une chose."},
         {mot:"Carte", def:"Document représentant une région ou un territoire."},
-        {mot:"Cascade", def:"Chute d'eau sur une pente."},
+        {mot:"Cascade", def:"Chute d'eau sur une piste."},
         {mot:"Cadeau", def:"Objet offert pour une occasion ou par affection."},
         {mot:"Caisse", def:"Contenant destiné au transport d'objets."},
         {mot:"Caméra", def:"Appareil pour prendre des photos ou filmer."},
@@ -1123,6 +1450,24 @@
     const multiplayerMessage = document.getElementById("multiplayerMessage");
     const playerNameInput = document.getElementById("playerNameInput");
 
+    // Éléments Admin
+    const adminModal = document.getElementById("adminModal");
+    const adminButton = document.getElementById("adminButton");
+    const closeAdminModal = document.getElementById("closeAdminModal");
+    const adminPassword = document.getElementById("adminPassword");
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    const adminLoginSection = document.getElementById("adminLoginSection");
+    const adminDashboard = document.getElementById("adminDashboard");
+    const adminResultsList = document.getElementById("adminResultsList");
+    const refreshAdminBtn = document.getElementById("refreshAdminBtn");
+    const exportAdminBtn = document.getElementById("exportAdminBtn");
+    const clearOldBtn = document.getElementById("clearOldBtn");
+    const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+    const totalRooms = document.getElementById("totalRooms");
+    const totalPlayers = document.getElementById("totalPlayers");
+    const totalGames = document.getElementById("totalGames");
+    const avgScore = document.getElementById("avgScore");
+
     // État du jeu
     let currentPrefix = null;
     let currentIndex = 0;
@@ -1147,6 +1492,14 @@
     let gameStateListenerActive = false;
     let lastSyncTime = 0;
     const SYNC_INTERVAL = 100;
+
+    // Variables Admin
+    const ADMIN_PASSWORD = "admin123";
+    let adminAuthenticated = false;
+    let adminData = [];
+
+    // 🔥 AMÉLIORATION : Points seulement pour la bonne réponse
+    // Pas de points pour les mauvaises réponses, on passe simplement à la question suivante
 
     // Générer un ID de joueur unique
     function generatePlayerId() {
@@ -1328,9 +1681,11 @@
       if (!gameActive) return;
       
       const item = FIELDS[currentPrefix][currentIndex];
-      message.textContent = `⏰ Temps écoulé ! La réponse était : ${item.mot}`;
+      message.innerHTML = `⏰ <strong>Temps écoulé !</strong> La réponse était : ${item.mot}`;
       message.style.color = "#ff5252";
+      message.classList.add('shake');
       
+      // Pas de points pour le temps écoulé
       if (multiplayerGameActive && isRoomCreator) {
         setTimeout(() => {
           updateGameStateForNextWord();
@@ -1402,8 +1757,8 @@
       }
       
       multiplayerMessage.innerHTML = `
-        <i class="fas fa-flag-checkered"></i> PARTIE TERMINÉE ! 
-        <br>🎉 GAGNANT: ${winner.name} avec ${winner.score} points !
+        <i class="fas fa-flag-checkered"></i> <strong>PARTIE TERMINÉE !</strong> 
+        <br>🎉 <strong>GAGNANT: ${winner.name}</strong> avec ${winner.score} points !
         <br>Merci d'avoir joué !
       `;
       
@@ -1450,7 +1805,7 @@
       }
     }
 
-    // Vérifier la réponse
+    // 🔥 AMÉLIORATION : Vérification des réponses avec logique améliorée
     async function check(){
       if(!currentPrefix || !gameActive || answeredThisQuestion) return;
       
@@ -1460,9 +1815,15 @@
       const timeUsed = 20 - timeLeft;
 
       if(user && user.startsWith(normalize(currentPrefix)) && user === target){
+        // 🔥 CORRECT : Le joueur gagne 1 point
         stopChrono();
         const newScore = score + 1;
-        message.innerHTML = `✅ <strong>Correct !</strong> Temps: ${timeUsed}s - Score: ${newScore}`;
+        
+        // Animation visuelle pour la bonne réponse
+        prefixDisplay.classList.add('correct-animation');
+        setTimeout(() => prefixDisplay.classList.remove('correct-animation'), 500);
+        
+        message.innerHTML = `✅ <strong>Correct !</strong> +1 point ! Temps: ${timeUsed}s - Score: ${newScore}`;
         message.style.color = "#00e676";
         
         if (multiplayerGameActive) {
@@ -1479,8 +1840,11 @@
           setTimeout(next, 1500);
         }
       } else {
+        // 🔥 INCORRECT : Pas de point, on passe à la question suivante
         message.innerHTML = `❌ <strong>Incorrect.</strong> La réponse était : ${item.mot}`;
         message.style.color = "#ff5252";
+        message.classList.add('shake');
+        setTimeout(() => message.classList.remove('shake'), 500);
         
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
@@ -1923,7 +2287,187 @@
       });
     }
 
-    // Écouteurs d'événements
+    // 🔥 FONCTIONS ADMIN
+    function showAdminModal() {
+      adminModal.classList.remove('hidden');
+      if (!adminAuthenticated) {
+        adminLoginSection.classList.remove('hidden');
+        adminDashboard.classList.add('hidden');
+      } else {
+        adminLoginSection.classList.add('hidden');
+        adminDashboard.classList.remove('hidden');
+        loadAdminData();
+      }
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideAdminModal() {
+      adminModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    async function loadAdminData() {
+      try {
+        // Charger toutes les salles
+        const roomsSnapshot = await db.collection('multiplayer_rooms').get();
+        adminData = [];
+        let totalPlayersCount = 0;
+        let totalScore = 0;
+        let totalGamesCount = 0;
+        
+        roomsSnapshot.forEach(doc => {
+          const roomData = doc.data();
+          adminData.push({
+            id: doc.id,
+            ...roomData,
+            createdAt: roomData.createdAt ? roomData.createdAt.toDate() : new Date()
+          });
+          
+          totalPlayersCount += roomData.players.length;
+          totalScore += roomData.players.reduce((sum, player) => sum + player.score, 0);
+          if (roomData.gameState && roomData.gameState.startedAt) {
+            totalGamesCount++;
+          }
+        });
+        
+        // Mettre à jour les statistiques
+        totalRooms.textContent = adminData.length;
+        totalPlayers.textContent = totalPlayersCount;
+        totalGames.textContent = totalGamesCount;
+        avgScore.textContent = totalPlayersCount > 0 ? 
+          Math.round(totalScore / totalPlayersCount) : '0';
+        
+        // Mettre à jour le tableau
+        updateAdminResultsTable();
+        
+      } catch (error) {
+        console.error("Erreur lors du chargement des données admin:", error);
+      }
+    }
+
+    function updateAdminResultsTable() {
+      adminResultsList.innerHTML = '';
+      
+      if (adminData.length === 0) {
+        adminResultsList.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 30px;">
+              Aucune donnée disponible
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Trier par date (plus récent d'abord)
+      adminData.sort((a, b) => b.createdAt - a.createdAt);
+      
+      adminData.forEach(room => {
+        const row = document.createElement('tr');
+        const date = room.createdAt.toLocaleString('fr-FR');
+        const avgPlayerScore = room.players.length > 0 ? 
+          Math.round(room.players.reduce((sum, p) => sum + p.score, 0) / room.players.length) : 0;
+        
+        row.innerHTML = `
+          <td>
+            <strong style="color:#f7ef8a;">${room.code}</strong><br>
+            <small style="color:#cccccc;">${room.name}</small>
+          </td>
+          <td style="color:#e1bee7;">${room.creatorName}</td>
+          <td>
+            ${room.players.map(p => 
+              `<span style="display:inline-block; margin:2px; padding:4px 8px; background:rgba(76,175,80,0.2); border-radius:4px; font-size:0.9rem;">
+                ${p.name} (${p.score})
+              </span>`
+            ).join('')}
+          </td>
+          <td style="font-weight:bold; color:#4CAF50;">${avgPlayerScore}</td>
+          <td style="font-size:0.9rem; color:#cccccc;">${date}</td>
+          <td>
+            <button class="view-results-btn" onclick="viewRoomDetails('${room.code}')">
+              <i class="fas fa-search"></i> Détails
+            </button>
+          </td>
+        `;
+        adminResultsList.appendChild(row);
+      });
+    }
+
+    function viewRoomDetails(roomCode) {
+      const room = adminData.find(r => r.code === roomCode);
+      if (!room) return;
+      
+      let details = `📊 **Détails de la salle: ${room.code}**\n\n`;
+      details += `**Nom:** ${room.name}\n`;
+      details += `**Créateur:** ${room.creatorName}\n`;
+      details += `**Date:** ${room.createdAt.toLocaleString('fr-FR')}\n`;
+      details += `**Statut:** ${room.gameState?.active ? 'En cours' : 'Terminé'}\n\n`;
+      details += `**Joueurs:**\n`;
+      
+      room.players.forEach((player, index) => {
+        details += `${index + 1}. ${player.name} - Score: ${player.score} ${player.isCreator ? '(Créateur)' : ''}\n`;
+      });
+      
+      alert(details);
+    }
+
+    function exportAdminData() {
+      if (adminData.length === 0) {
+        alert("Aucune donnée à exporter");
+        return;
+      }
+      
+      let csv = "Code,Nom,Créateur,Nombre de Joueurs,Score Moyen,Date Création\n";
+      
+      adminData.forEach(room => {
+        const avgPlayerScore = room.players.length > 0 ? 
+          Math.round(room.players.reduce((sum, p) => sum + p.score, 0) / room.players.length) : 0;
+        const date = room.createdAt.toLocaleString('fr-FR');
+        
+        csv += `"${room.code}","${room.name}","${room.creatorName}","${room.players.length}","${avgPlayerScore}","${date}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `champs_lexicaux_stats_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      alert(`Données exportées: ${adminData.length} salles`);
+    }
+
+    async function clearOldRooms() {
+      if (!confirm("Voulez-vous supprimer les salles inactives (plus de 7 jours) ?")) {
+        return;
+      }
+      
+      try {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - 7);
+        
+        let deletedCount = 0;
+        
+        for (const room of adminData) {
+          if (room.createdAt < cutoffDate) {
+            await db.collection('multiplayer_rooms').doc(room.code).delete();
+            deletedCount++;
+          }
+        }
+        
+        alert(`${deletedCount} salles inactives ont été supprimées`);
+        loadAdminData();
+        
+      } catch (error) {
+        console.error("Erreur lors de la suppression:", error);
+        alert("Erreur lors de la suppression des salles");
+      }
+    }
+
+    // 🔥 ÉCOUTEURS D'ÉVÉNEMENTS PRINCIPAUX
     btnPlay.addEventListener("click", ()=>{
       if (multiplayerGameActive && !isRoomCreator) {
         message.textContent = "❌ Seul le créateur peut démarrer le jeu en mode multijoueur";
@@ -2087,6 +2631,47 @@
       setPrefix(Object.keys(FIELDS)[0]);
     }
 
+    // 🔥 GESTION ADMIN
+    adminButton.addEventListener('click', showAdminModal);
+    
+    closeAdminModal.addEventListener('click', hideAdminModal);
+    
+    adminModal.addEventListener('click', (e) => {
+      if (e.target === adminModal) {
+        hideAdminModal();
+      }
+    });
+
+    adminLoginBtn.addEventListener('click', () => {
+      if (adminPassword.value === ADMIN_PASSWORD) {
+        adminAuthenticated = true;
+        adminLoginSection.classList.add('hidden');
+        adminDashboard.classList.remove('hidden');
+        loadAdminData();
+        adminPassword.value = '';
+      } else {
+        alert("Mot de passe incorrect. Essayez: admin123");
+      }
+    });
+
+    adminPassword.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        adminLoginBtn.click();
+      }
+    });
+
+    refreshAdminBtn.addEventListener('click', loadAdminData);
+    
+    exportAdminBtn.addEventListener('click', exportAdminData);
+    
+    clearOldBtn.addEventListener('click', clearOldRooms);
+    
+    adminLogoutBtn.addEventListener('click', () => {
+      adminAuthenticated = false;
+      hideAdminModal();
+      alert("Déconnecté du panel admin");
+    });
+
     // Initialisation
     window.addEventListener("load", ()=>{
       buildBank();
@@ -2100,7 +2685,16 @@
       const randomName = defaultNames[Math.floor(Math.random() * defaultNames.length)];
       playerNameInput.value = randomName;
       playerName = randomName;
+      
+      // Prévenir l'utilisateur des règles
+      setTimeout(() => {
+        message.innerHTML = '<i class="fas fa-info-circle"></i> Seul le joueur avec la bonne réponse gagne des points !';
+        message.style.color = "#ff9800";
+      }, 1000);
     });
+
+    // Exposer les fonctions globales
+    window.viewRoomDetails = viewRoomDetails;
 
     // Nettoyage
     window.addEventListener('beforeunload', () => {
