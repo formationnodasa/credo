@@ -23,6 +23,8 @@
       color: var(--txt);
       min-height: 100vh;
       padding: 12px;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
     @keyframes gradientAnimation{
       0%{background-position:0% 50%}
@@ -43,6 +45,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      overflow-y: auto;
     }
     
     .multiplayer-content {
@@ -55,6 +58,8 @@
       position: relative;
       color: white;
       box-shadow: 0 10px 40px rgba(156, 39, 176, 0.4);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     
     .close-multiplayer {
@@ -72,6 +77,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 10;
     }
     
     .multiplayer-title {
@@ -102,6 +108,7 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
+      width: 100%;
     }
     
     .multiplayer-btn:hover {
@@ -144,12 +151,19 @@
       padding: 20px;
       margin-top: 20px;
       border: 2px solid rgba(156, 39, 176, 0.3);
+      max-height: 300px;
+      overflow-y: auto;
     }
     
     .room-info h4 {
       color: #e1bee7;
       margin-bottom: 15px;
       font-size: 1.3rem;
+      position: sticky;
+      top: 0;
+      background: rgba(26, 26, 46, 0.9);
+      padding: 5px;
+      z-index: 1;
     }
     
     .players-list {
@@ -176,6 +190,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
+      flex-shrink: 0;
     }
     
     .players-list li.you {
@@ -208,6 +223,8 @@
       gap: 8px;
       margin: 10px auto 0;
       transition: background 0.3s;
+      width: 100%;
+      justify-content: center;
     }
     
     .copy-btn:hover {
@@ -224,6 +241,8 @@
       padding: 15px;
       border-radius: 15px;
       border: 2px solid var(--room-color);
+      flex-wrap: wrap;
+      gap: 15px;
     }
     
     .room-indicator {
@@ -234,12 +253,17 @@
       background: rgba(156, 39, 176, 0.2);
       border-radius: 10px;
       border: 2px solid var(--room-color);
+      flex: 1;
+      min-width: 200px;
     }
     
     .players-in-room {
       display: flex;
       gap: 10px;
       align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      flex: 2;
     }
     
     .player-bubble {
@@ -253,6 +277,7 @@
       font-weight: bold;
       position: relative;
       border: 3px solid white;
+      flex-shrink: 0;
     }
     
     .player-bubble.you {
@@ -285,6 +310,7 @@
       align-items: center;
       gap: 8px;
       transition: all 0.3s ease;
+      flex-shrink: 0;
     }
     
     .leave-room-btn:hover {
@@ -308,6 +334,7 @@
       justify-content: center;
       gap: 15px;
       margin: 15px 0;
+      flex-wrap: wrap;
     }
     
     .round-bubble {
@@ -321,6 +348,7 @@
       font-weight: bold;
       font-size: 1.2rem;
       border: 2px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
     }
     
     .round-bubble.active {
@@ -357,6 +385,8 @@
       border: 2px solid #d4af37;
       position: relative;
       color: white;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     
     .close-modal {
@@ -374,6 +404,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 10;
     }
     
     /* Container principal */
@@ -386,6 +417,8 @@
       box-shadow: 0 8px 32px rgba(0,0,0,.25);
       animation: fadeIn .9s ease;
       margin: 20px auto;
+      min-height: auto;
+      overflow: visible;
     }
     @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
     
@@ -828,89 +861,15 @@
     </div>
   </div>
 
-  <!-- Modal Admin -->
-  <div class="modal-overlay" id="adminModal">
-    <div class="modal-content">
-      <button class="close-modal" id="closeAdminModal">&times;</button>
-      
-      <h2><i class="fas fa-lock"></i> PANEL ADMIN - JEU DES CHAMPS LEXICAUX</h2>
-      
-      <div id="passwordSection">
-        <p style="color: #a0c8ff; text-align: center; margin-bottom: 20px;">
-          Accès réservé à l'administrateur
-        </p>
-        <div class="form-group">
-          <input type="password" id="adminPassword" 
-                 placeholder="Entrez le mot de passe administrateur"
-                 class="form-input">
-        </div>
-        <button id="loginButton" class="submit-button">
-          <i class="fas fa-sign-in-alt"></i> SE CONNECTER
-        </button>
-      </div>
-      
-      <div id="adminPanel" class="hidden">
-        <h3 style="color: #f7ef8a; text-align: center; margin-bottom: 20px;">
-          Statistiques du Jeu - Famille Singa
-        </h3>
-        
-        <!-- Statistiques -->
-        <div class="admin-stats">
-          <div class="stat-card">
-            <div class="stat-value" id="totalGames">0</div>
-            <div class="stat-label">Parties Jouées</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-value" id="averageScore">0%</div>
-            <div class="stat-label">Moyenne Score</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-value" id="bestScore">0</div>
-            <div class="stat-label">Meilleur Score</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-value" id="todayGames">0</div>
-            <div class="stat-label">Aujourd'hui</div>
-          </div>
-        </div>
-        
-        <!-- Tableau des résultats -->
-        <div class="results-table-container">
-          <table class="results-table">
-            <thead>
-              <tr>
-                <th>Joueur</th>
-                <th>Score</th>
-                <th>Temps</th>
-                <th>Date</th>
-                <th>Champ</th>
-              </tr>
-            </thead>
-            <tbody id="gamesList">
-              <!-- Les résultats seront insérés ici -->
-            </tbody>
-          </table>
-        </div>
-        
-        <button id="exportButton" class="export-btn">
-          <i class="fas fa-download"></i> EXPORTER LES RÉSULTATS
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div class="container">
     <header>
       <h1><i class="fas fa-brain"></i> Champs Lexicaux – MULTIJOUEUR</h1>
       <div class="status">
         <span class="pill" id="progressPill">
-          <i class="fas fa-list-ol"></i> 0 / 0
+          <i class="fas fa-list-ol"></i> <span id="questionCounter">0/0</span>
         </span>
         <span class="pill" id="scorePill">
-          <i class="fas fa-star"></i> Score: 0
+          <i class="fas fa-star"></i> Score: <span id="scoreValue">0</span>
         </span>
         <button class="multiplayer-btn-header" id="multiplayerButton">
           <i class="fas fa-users"></i> Multijoueur
@@ -947,36 +906,6 @@
     <!-- Affichage des manches -->
     <div id="roundsDisplay" class="rounds-display hidden">
       <!-- Les bulles des manches seront ajoutées ici -->
-    </div>
-
-    <!-- Section Sélection Joueur -->
-    <div class="player-section">
-      <h3><i class="fas fa-user-circle"></i> Sélection du Joueur</h3>
-      <div class="player-cards">
-        <div class="player-card active" data-player="moise">
-          <div class="player-icon">
-            <i class="fas fa-user-graduate"></i>
-          </div>
-          <div class="player-name">Moïse</div>
-          <div class="player-role">Niveau Avancé</div>
-        </div>
-        
-        <div class="player-card" data-player="credo">
-          <div class="player-icon">
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <div class="player-name">Credo</div>
-          <div class="player-role">Niveau Expert</div>
-        </div>
-        
-        <div class="player-card" data-player="visiteur">
-          <div class="player-icon">
-            <i class="fas fa-user"></i>
-          </div>
-          <div class="player-name">Visiteur</div>
-          <div class="player-role">Niveau Découverte</div>
-        </div>
-      </div>
     </div>
 
     <!-- Zone d'affichage -->
@@ -1145,6 +1074,8 @@
     const scorePill = document.getElementById("scorePill");
     const chronoDisplay = document.getElementById("chrono");
     const roundsDisplay = document.getElementById("roundsDisplay");
+    const questionCounter = document.getElementById("questionCounter");
+    const scoreValue = document.getElementById("scoreValue");
 
     // Éléments Multijoueur
     const multiplayerModal = document.getElementById("multiplayerModal");
@@ -1190,15 +1121,17 @@
     let multiplayerGameActive = false;
     let currentRound = 1;
     let totalRounds = 3;
-    let roundScores = [];
-    let answeredInRound = false;
+    let answeredThisQuestion = false;
+    let gameStateListenerActive = false;
+    let lastSyncTime = 0;
+    const SYNC_INTERVAL = 100; // 100ms pour une synchronisation très rapide
 
     // Variables admin
     let allGames = [];
 
     // Générer un ID de joueur unique
     function generatePlayerId() {
-      return 'player_' + Math.random().toString(36).substr(2, 9);
+      return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // Générer un code de salle unique
@@ -1291,7 +1224,8 @@
           name: playerName,
           score: 0,
           isReady: false,
-          isCreator: true
+          isCreator: true,
+          lastAnswerTime: 0
         }],
         gameState: {
           active: false,
@@ -1299,11 +1233,12 @@
           currentIndex: 0,
           currentRound: 1,
           totalRounds: 3,
-          roundScores: {},
           startedAt: null,
-          questionStartTime: null
+          questionStartTime: null,
+          syncTime: Date.now()
         },
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdate: Date.now()
       };
       
       try {
@@ -1360,8 +1295,10 @@
             name: playerName,
             score: 0,
             isReady: false,
-            isCreator: isRoomCreator
-          })
+            isCreator: isRoomCreator,
+            lastAnswerTime: 0
+          }),
+          lastUpdate: Date.now()
         });
         
         // Afficher les infos de la salle
@@ -1405,7 +1342,8 @@
         const oldPlayer = roomData.players.find(p => p.id === playerId);
         if (oldPlayer) {
           await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-            players: firebase.firestore.FieldValue.arrayRemove(oldPlayer)
+            players: firebase.firestore.FieldValue.arrayRemove(oldPlayer),
+            lastUpdate: Date.now()
           });
         }
         
@@ -1414,8 +1352,10 @@
           players: firebase.firestore.FieldValue.arrayUnion({
             ...oldPlayer,
             name: playerName,
-            score: 0
-          })
+            score: score,
+            lastAnswerTime: 0
+          }),
+          lastUpdate: Date.now()
         });
         
       } catch (error) {
@@ -1446,14 +1386,20 @@
             waitingSection.classList.remove('hidden');
             roomInfoSection.classList.add('hidden');
             
-            // Si le jeu est actif, s'abonner aux mises à jour
-            subscribeToGameState(roomCode);
+            // Si le jeu est actif, s'abonner aux mises à jour de l'état du jeu
+            if (!gameStateListenerActive) {
+              subscribeToGameState(roomCode);
+            }
             
             // Mettre à jour les manches
             updateRoundsDisplay(roomData.gameState.currentRound, roomData.gameState.totalRounds);
+          } else {
+            multiplayerGameActive = false;
+            gameActive = false;
+            stopChrono();
           }
         }, (error) => {
-          console.error("Erreur d'écoute:", error);
+          console.error("Erreur d'écoute de la salle:", error);
         });
     }
 
@@ -1461,12 +1407,28 @@
     function subscribeToGameState(roomCode) {
       if (gameStateUnsubscribe) gameStateUnsubscribe();
       
+      gameStateListenerActive = true;
+      let lastGameState = null;
+      
       gameStateUnsubscribe = db.collection('multiplayer_rooms').doc(roomCode)
         .onSnapshot((doc) => {
           if (!doc.exists) return;
           
           const roomData = doc.data();
           const gameState = roomData.gameState;
+          const now = Date.now();
+          
+          // Éviter les mises à jour trop fréquentes
+          if (lastGameState && 
+              lastGameState.currentPrefix === gameState.currentPrefix &&
+              lastGameState.currentIndex === gameState.currentIndex &&
+              lastGameState.currentRound === gameState.currentRound &&
+              now - lastSyncTime < SYNC_INTERVAL) {
+            return;
+          }
+          
+          lastGameState = { ...gameState };
+          lastSyncTime = now;
           
           if (gameState.active) {
             // Synchroniser l'état du jeu
@@ -1478,13 +1440,16 @@
             // Mettre à jour l'affichage
             renderCard();
             
-            // Si c'est un nouveau mot, annoncer
-            if (gameActive === false && gameState.currentPrefix) {
-              announce();
-              answeredInRound = false;
+            // Si c'est un nouveau mot, réinitialiser le statut de réponse
+            if (answeredThisQuestion) {
+              answeredThisQuestion = false;
             }
             
-            gameActive = true;
+            // Si le jeu vient de commencer ou qu'on passe à une nouvelle question
+            if (gameActive === false && gameState.currentPrefix) {
+              gameActive = true;
+              startChronoFromTime(gameState.questionStartTime);
+            }
             
             // Mettre à jour l'affichage des manches
             updateRoundsDisplay(currentRound, totalRounds);
@@ -1492,12 +1457,63 @@
             // Afficher le message multijoueur
             multiplayerMessage.classList.remove('hidden');
             multiplayerMessage.innerHTML = `
-              <i class="fas fa-gamepad"></i> Partie multijoueur en cours - 
+              <i class="fas fa-gamepad"></i> Partie multijoueur - 
               Manche ${currentRound}/${totalRounds} - 
               Question ${currentIndex + 1}/10
             `;
           }
+        }, (error) => {
+          console.error("Erreur d'écoute de l'état du jeu:", error);
+          gameStateListenerActive = false;
         });
+    }
+
+    // Démarrer le chronomètre à partir d'un temps donné
+    function startChronoFromTime(startTime) {
+      if (!startTime) {
+        startChrono();
+        return;
+      }
+      
+      const elapsed = Date.now() - startTime;
+      const timeElapsed = Math.floor(elapsed / 1000);
+      timeLeft = Math.max(0, 20 - timeElapsed);
+      
+      if (chronoTimer) clearInterval(chronoTimer);
+      
+      if (timeLeft <= 0) {
+        chronoDisplay.textContent = "0";
+        chronoDisplay.className = "danger";
+        if (isRoomCreator) {
+          setTimeout(() => updateGameStateForNextWord(), 1000);
+        }
+        return;
+      }
+      
+      chronoDisplay.textContent = timeLeft;
+      updateChronoStyle();
+      
+      chronoTimer = setInterval(() => {
+        timeLeft--;
+        chronoDisplay.textContent = timeLeft;
+        updateChronoStyle();
+        
+        if (timeLeft <= 0) {
+          clearInterval(chronoTimer);
+          timeUp();
+        }
+      }, 1000);
+    }
+
+    // Mettre à jour le style du chrono
+    function updateChronoStyle() {
+      if (timeLeft <= 5) {
+        chronoDisplay.className = "danger";
+      } else if (timeLeft <= 10) {
+        chronoDisplay.className = "warning";
+      } else {
+        chronoDisplay.className = "";
+      }
     }
 
     // Mettre à jour l'affichage des manches
@@ -1572,13 +1588,18 @@
         // Trouver et mettre à jour le joueur
         const updatedPlayers = roomData.players.map(p => {
           if (p.id === playerId) {
-            return { ...p, score: newScore };
+            return { 
+              ...p, 
+              score: newScore,
+              lastAnswerTime: Date.now()
+            };
           }
           return p;
         });
         
         await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-          players: updatedPlayers
+          players: updatedPlayers,
+          lastUpdate: Date.now()
         });
         
       } catch (error) {
@@ -1601,9 +1622,10 @@
         'gameState.currentIndex': 0,
         'gameState.currentRound': 1,
         'gameState.totalRounds': 3,
-        'gameState.roundScores': {},
         'gameState.startedAt': firebase.firestore.FieldValue.serverTimestamp(),
-        'gameState.questionStartTime': Date.now()
+        'gameState.questionStartTime': Date.now(),
+        'gameState.syncTime': Date.now(),
+        lastUpdate: Date.now()
       });
       
       // Réinitialiser les scores
@@ -1612,11 +1634,13 @@
       
       const resetPlayers = roomData.players.map(p => ({
         ...p,
-        score: 0
+        score: 0,
+        lastAnswerTime: 0
       }));
       
       await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-        players: resetPlayers
+        players: resetPlayers,
+        lastUpdate: Date.now()
       });
       
       // Afficher un message
@@ -1657,7 +1681,8 @@
           
           if (player) {
             await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-              players: firebase.firestore.FieldValue.arrayRemove(player)
+              players: firebase.firestore.FieldValue.arrayRemove(player),
+              lastUpdate: Date.now()
             });
             
             // Si la salle est vide, la supprimer
@@ -1691,10 +1716,11 @@
       currentRoomId = null;
       isRoomCreator = false;
       multiplayerGameActive = false;
+      gameStateListenerActive = false;
       players = [];
       currentRound = 1;
-      roundScores = [];
-      answeredInRound = false;
+      answeredThisQuestion = false;
+      lastSyncTime = 0;
       
       // Masquer les éléments multijoueur
       multiplayerModal.classList.add('hidden');
@@ -1745,7 +1771,6 @@
       const item = FIELDS[currentPrefix][currentIndex];
       message.textContent = `⏰ Temps écoulé ! La réponse était : ${item.mot}`;
       message.style.color = "#ff5252";
-      speak(`Temps écoulé ! La réponse était : ${item.mot}`);
       
       // Sauvegarder le résultat (temps écoulé)
       saveGameResult(false, 0);
@@ -1776,11 +1801,10 @@
         // Passer au mot suivant
         await db.collection('multiplayer_rooms').doc(currentRoomId).update({
           'gameState.currentIndex': nextIndex,
-          'gameState.questionStartTime': Date.now()
+          'gameState.questionStartTime': Date.now(),
+          'gameState.syncTime': Date.now(),
+          lastUpdate: Date.now()
         });
-        
-        // Réinitialiser le statut de réponse
-        answeredInRound = false;
       }
     }
 
@@ -1802,7 +1826,9 @@
           'gameState.currentRound': nextRound,
           'gameState.currentPrefix': randomPrefix,
           'gameState.currentIndex': 0,
-          'gameState.questionStartTime': Date.now()
+          'gameState.questionStartTime': Date.now(),
+          'gameState.syncTime': Date.now(),
+          lastUpdate: Date.now()
         });
         
         // Afficher un message
@@ -1810,9 +1836,6 @@
           <i class="fas fa-flag"></i> Manche ${currentRound} terminée ! 
           Début de la manche ${nextRound} - Champ lexical: <strong>${randomPrefix}</strong>
         `;
-        
-        // Réinitialiser le statut de réponse
-        answeredInRound = false;
       }
     }
 
@@ -1844,7 +1867,8 @@
       
       // Désactiver le jeu
       await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-        'gameState.active': false
+        'gameState.active': false,
+        lastUpdate: Date.now()
       });
       
       gameActive = false;
@@ -1860,8 +1884,8 @@
 
     function updatePills(){
       const total = currentPrefix ? FIELDS[currentPrefix].length : 0;
-      progressPill.innerHTML = `<i class="fas fa-list-ol"></i> ${currentIndex+1} / ${total}`;
-      scorePill.innerHTML = `<i class="fas fa-star"></i> Score: ${score}`;
+      questionCounter.textContent = `${currentIndex+1}/${total}`;
+      scoreValue.textContent = score;
     }
 
     function ttsCancel(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); }
@@ -1880,7 +1904,9 @@
       const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
       const def  = item.def;
       speak(`${intro} Définition : ${def}`);
-      startChrono();
+      if (!multiplayerGameActive) {
+        startChrono();
+      }
       gameActive = true;
     }
 
@@ -1897,7 +1923,7 @@
       const item = FIELDS[currentPrefix][currentIndex];
       prefixDisplay.textContent = currentPrefix;
       definitionDisplay.textContent = item.def;
-      message.textContent = `Joueur: ${playerName.toUpperCase()} - Temps restant: 20s - Mot doit commencer par ${currentPrefix}`;
+      message.textContent = `Joueur: ${playerName.toUpperCase()} - Temps restant: ${timeLeft}s - Mot doit commencer par ${currentPrefix}`;
       message.style.color = "#fff";
       answerInput.value = "";
       answerInput.placeholder = `Écris un mot qui commence par « ${currentPrefix} »…`;
@@ -1965,7 +1991,7 @@
     }
 
     async function check(){
-      if(!currentPrefix || !gameActive || answeredInRound) return;
+      if(!currentPrefix || !gameActive || answeredThisQuestion) return;
       
       const item = FIELDS[currentPrefix][currentIndex];
       const user = normalize(answerInput.value);
@@ -1978,11 +2004,10 @@
         score++;
         message.innerHTML = `✅ <strong>Correct !</strong> Temps: ${timeUsed}s - Score: ${score}`;
         message.style.color = "#00e676";
-        speak("Correct !");
         
         // Mettre à jour le score en multijoueur
         if (multiplayerGameActive) {
-          answeredInRound = true;
+          answeredThisQuestion = true;
           await updatePlayerScore(score);
           
           // Si c'est le créateur, passer au mot suivant après un délai
@@ -2002,14 +2027,13 @@
       }else{
         message.innerHTML = `❌ <strong>Incorrect.</strong> La réponse était : ${item.mot}`;
         message.style.color = "#ff5252";
-        speak(`Incorrect. La réponse était : ${item.mot}`);
         
         // Sauvegarder le résultat
         await saveGameResult(false, timeUsed);
         
         // En mode multijoueur
         if (multiplayerGameActive) {
-          answeredInRound = true;
+          answeredThisQuestion = true;
           
           // Si c'est le créateur, passer au mot suivant après un délai
           if (isRoomCreator) {
@@ -2035,11 +2059,11 @@
           timeUsed: timeUsed,
           score: score,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          date: new Date().toISOString()
+          date: new Date().toISOString(),
+          roomId: currentRoomId || 'solo'
         };
         
         await db.collection('jeu_champs_lexicaux').add(gameData);
-        console.log(`Résultat sauvegardé pour ${playerName}`);
         
       } catch (error) {
         console.error("Erreur lors de la sauvegarde:", error);
@@ -2084,189 +2108,8 @@
     btnBack.addEventListener("click", back);
 
     answerInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" && gameActive && !answeredInRound) check();
+      if(e.key === "Enter" && gameActive && !answeredThisQuestion) check();
     });
-
-    // Gestion du panel admin (inchangé)
-    const adminModal = document.getElementById('adminModal');
-    const adminButton = document.getElementById('adminButton');
-    const closeAdminModal = document.getElementById('closeAdminModal');
-    const loginButton = document.getElementById('loginButton');
-    const exportButton = document.getElementById('exportButton');
-
-    // Ouvrir modal admin
-    adminButton.addEventListener('click', () => {
-      adminModal.style.display = 'block';
-      document.getElementById('passwordSection').classList.remove('hidden');
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminPassword').value = '';
-      document.body.style.overflow = 'hidden';
-    });
-
-    // Fermer modal admin
-    closeAdminModal.addEventListener('click', () => {
-      adminModal.style.display = 'none';
-      document.body.style.overflow = 'auto';
-    });
-
-    // Fermer modal en cliquant à l'extérieur
-    adminModal.addEventListener('click', (e) => {
-      if (e.target === adminModal) {
-        adminModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-      }
-    });
-
-    // Login admin
-    loginButton.addEventListener('click', () => {
-      const password = document.getElementById('adminPassword').value;
-      if (password === ADMIN_PASSWORD) {
-        document.getElementById('passwordSection').classList.add('hidden');
-        document.getElementById('adminPanel').classList.remove('hidden');
-        loadGamesData();
-      } else {
-        alert("Mot de passe incorrect. Le mot de passe est : legende360@");
-      }
-    });
-
-    // Charger les données des jeux
-    async function loadGamesData() {
-      try {
-        const snapshot = await db.collection('jeu_champs_lexicaux')
-          .orderBy('timestamp', 'desc')
-          .limit(100)
-          .get();
-        
-        allGames = [];
-        let totalScore = 0;
-        let bestScore = 0;
-        const today = new Date().toDateString();
-        let todayCount = 0;
-        let correctCount = 0;
-        
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          allGames.push({
-            ...data,
-            id: doc.id
-          });
-          
-          if (data.isCorrect) correctCount++;
-          if (data.score > bestScore) {
-            bestScore = data.score;
-          }
-          
-          // Compter les jeux d'aujourd'hui
-          if (data.timestamp) {
-            const gameDate = data.timestamp.toDate ? 
-              data.timestamp.toDate().toDateString() : 
-              new Date(data.date).toDateString();
-            if (gameDate === today) {
-              todayCount++;
-            }
-          }
-        });
-        
-        // Update statistics
-        document.getElementById('totalGames').textContent = allGames.length;
-        document.getElementById('averageScore').textContent = allGames.length > 0 ? 
-          Math.round((correctCount / allGames.length) * 100) + '%' : '0%';
-        document.getElementById('bestScore').textContent = bestScore;
-        document.getElementById('todayGames').textContent = todayCount;
-        
-        // Display results table
-        displayGamesTable();
-        
-      } catch (error) {
-        console.error("Erreur lors du chargement des jeux:", error);
-        const listElement = document.getElementById('gamesList');
-        listElement.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align: center; padding: 30px; color: #ff6b6b;">
-              Erreur de connexion à la base de données.
-            </td>
-          </tr>
-        `;
-      }
-    }
-
-    function displayGamesTable() {
-      const tableBody = document.getElementById('gamesList');
-      tableBody.innerHTML = '';
-      
-      if (allGames.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align: center; padding: 30px;">
-              Aucun résultat trouvé.
-            </td>
-          </tr>
-        `;
-        return;
-      }
-      
-      allGames.forEach((game) => {
-        const row = document.createElement('tr');
-        const date = game.timestamp ? 
-          new Date(game.timestamp.toDate()).toLocaleString('fr-FR') : 
-          new Date(game.date).toLocaleString('fr-FR');
-        
-        // Créer une couleur pour le résultat
-        let resultColor = game.isCorrect ? '#4CAF50' : '#ff6b6b';
-        let resultIcon = game.isCorrect ? '✅' : '❌';
-        let playerDisplay = game.player.charAt(0).toUpperCase() + game.player.slice(1);
-        
-        row.innerHTML = `
-          <td style="font-weight: bold; color: #f7ef8a;">
-            ${playerDisplay}
-          </td>
-          <td style="color: ${resultColor}; font-weight: bold;">
-            ${resultIcon} ${game.score}
-          </td>
-          <td style="color: #a0c8ff;">
-            ${game.timeUsed}s
-          </td>
-          <td style="color: #cccccc; font-size: 0.9rem;">
-            ${date}
-          </td>
-          <td style="color: #cccccc;">
-            ${game.prefix}
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    // Export des données
-    exportButton.addEventListener('click', exportGamesData);
-
-    function exportGamesData() {
-      if (allGames.length === 0) {
-        alert("Aucune donnée à exporter");
-        return;
-      }
-      
-      let csv = "Joueur,Résultat,Mot,Champ Lexical,Temps utilisé,Score,Date\n";
-      
-      allGames.forEach(game => {
-        const date = game.timestamp ? 
-          new Date(game.timestamp.toDate()).toLocaleString('fr-FR') : 
-          new Date(game.date).toLocaleString('fr-FR');
-        
-        const result = game.isCorrect ? 'Correct' : 'Incorrect';
-        
-        csv += `"${game.player}","${result}","${game.word}","${game.prefix}","${game.timeUsed}s","${game.score}","${date}"\n`;
-      });
-      
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `resultats_champs_lexicaux_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
 
     // Initialisation
     window.addEventListener("load", ()=>{
@@ -2275,9 +2118,6 @@
       if(!('speechSynthesis' in window)){
         message.innerHTML = "⚠️ La synthèse vocale n'est pas disponible sur ce navigateur.";
       }
-      
-      // Charger les données admin au démarrage
-      loadGamesData();
     });
 
     // Nettoyage lors de la fermeture de la page
