@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Champs Lexicaux - Jeu Chronométré MULTIJOUEUR</title>
+  <title>Champs Lexicaux - Jeu MULTIJOUEUR</title>
   <style>
     :root{
       --bg1:#6a11cb; --bg2:#2575fc;
@@ -546,53 +546,6 @@
       justify-content: center;
     }
     
-    /* Chronomètre */
-    .chrono-section {
-      background: rgba(0,0,0,0.2);
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    
-    .chrono-label {
-      font-size: 1.2rem;
-      margin-bottom: 15px;
-      color: #fff;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    #chrono {
-      font-size: 4rem;
-      font-weight: bold;
-      color: #fff;
-      background: rgba(0,0,0,0.3);
-      border-radius: 15px;
-      padding: 20px 40px;
-      display: inline-block;
-      min-width: 200px;
-      transition: all 0.3s ease;
-      font-family: 'Courier New', monospace;
-      margin: 10px 0;
-    }
-    #chrono.warning {
-      color: #ff9800;
-      animation: pulse 1s infinite;
-    }
-    #chrono.danger {
-      color: #ff5252;
-      animation: pulse 0.5s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.05); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    
     /* Zone de réponse */
     .answer-section {
       margin: 20px 0;
@@ -728,12 +681,6 @@
       
       h1 {
         font-size: 1.8rem;
-      }
-      
-      #chrono {
-        font-size: 3rem;
-        padding: 15px 30px;
-        min-width: 150px;
       }
       
       .multiplayer-status {
@@ -1320,16 +1267,8 @@
       <div id="prefixDisplay">– –</div>
       <div id="definitionDisplay">
         Sélectionne un champ lexical ci-dessous et clique sur "Jouer".<br>
-        Tu as <strong>20 secondes</strong> pour trouver le mot correspondant !
+        <strong>Chaque joueur répond à son rythme</strong> - On attend tout le monde !
       </div>
-    </div>
-
-    <!-- Chronomètre -->
-    <div class="chrono-section">
-      <div class="chrono-label">
-        <i class="fas fa-clock"></i> TEMPS RESTANT
-      </div>
-      <div id="chrono">20</div>
     </div>
 
     <!-- Zone de réponse -->
@@ -1479,7 +1418,6 @@
     const initialBank = document.getElementById("initialBank");
     const progressPill = document.getElementById("progressPill");
     const scorePill = document.getElementById("scorePill");
-    const chronoDisplay = document.getElementById("chrono");
     const roundsDisplay = document.getElementById("roundsDisplay");
     const questionCounter = document.getElementById("questionCounter");
     const scoreValue = document.getElementById("scoreValue");
@@ -1535,8 +1473,6 @@
     let currentIndex = 0;
     let speechRate = 1;
     let score = 0;
-    let chronoTimer = null;
-    let timeLeft = 20;
     let gameActive = false;
     let playerName = "Joueur";
 
@@ -1636,7 +1572,7 @@
         definitionDisplay.innerHTML = `
           ${multiplayerGameActive ? 
             'En attente du créateur pour démarrer...' : 
-            'Sélectionne un champ lexical ci-dessous et clique sur "Jouer".<br>Tu as <strong>20 secondes</strong> pour trouver le mot correspondant !'}
+            'Sélectionne un champ lexical ci-dessous et clique sur "Jouer".<br><strong>Chaque joueur répond à son rythme</strong> - On attend tout le monde !'}
         `;
         updatePills();
         return;
@@ -1655,7 +1591,7 @@
         message.textContent = `Manche ${currentRound}/${totalRounds} - Question ${currentIndex + 1}/10 - Mot doit commencer par ${currentPrefix}`;
         message.style.color = "#fff";
       } else {
-        message.textContent = `Temps restant: ${timeLeft}s - Mot doit commencer par ${currentPrefix}`;
+        message.textContent = `Prenez votre temps - Mot doit commencer par ${currentPrefix}`;
         message.style.color = "#fff";
       }
       
@@ -1717,11 +1653,6 @@
             if (gameActive === false && gameState.currentPrefix) {
               gameActive = true;
               multiplayerGameActive = true;
-              if (gameState.questionStartTime) {
-                startChronoFromTime(gameState.questionStartTime);
-              } else {
-                startChrono();
-              }
               
               // Démarrer la vérification périodique des réponses
               startCheckingAllAnswers();
@@ -1738,7 +1669,6 @@
           } else {
             gameActive = false;
             multiplayerGameActive = false;
-            stopChrono();
             stopCheckingAllAnswers();
             updatePlayerControls();
             multiplayerMessage.innerHTML = `<i class="fas fa-gamepad"></i> Partie en pause...`;
@@ -1785,44 +1715,7 @@
       }
     }
 
-    // Démarrer le chrono depuis un temps donné
-    function startChronoFromTime(startTime) {
-      if (!startTime) {
-        startChrono();
-        return;
-      }
-      
-      const elapsed = Date.now() - startTime;
-      const timeElapsed = Math.floor(elapsed / 1000);
-      timeLeft = Math.max(0, 20 - timeElapsed);
-      
-      if (chronoTimer) clearInterval(chronoTimer);
-      
-      if (timeLeft <= 0) {
-        chronoDisplay.textContent = "0";
-        chronoDisplay.className = "danger";
-        // Quand le temps est écoulé, forcer la réponse pour les joueurs qui n'ont pas répondu
-        setTimeout(() => forceAnswerForNonResponders(), 1000);
-        return;
-      }
-      
-      chronoDisplay.textContent = timeLeft;
-      updateChronoStyle();
-      
-      chronoTimer = setInterval(() => {
-        timeLeft--;
-        chronoDisplay.textContent = timeLeft;
-        updateChronoStyle();
-        
-        if (timeLeft <= 0) {
-          clearInterval(chronoTimer);
-          // Quand le temps est écoulé, forcer la réponse pour les joueurs qui n'ont pas répondu
-          setTimeout(() => forceAnswerForNonResponders(), 1000);
-        }
-      }, 1000);
-    }
-
-    // 🔥 NOUVEAU : Forcer une réponse pour les joueurs qui n'ont pas répondu
+    // 🔥 NOUVEAU : Forcer une réponse pour les joueurs qui n'ont pas répondu (après un délai raisonnable)
     async function forceAnswerForNonResponders() {
       if (!currentRoomId || !isRoomCreator) return;
       
@@ -1857,19 +1750,6 @@
       } catch (error) {
         console.error("Erreur lors du forçage des réponses:", error);
       }
-    }
-
-    // Gestion du temps écoulé
-    async function timeUp() {
-      if (!gameActive) return;
-      
-      const item = FIELDS[currentPrefix][currentIndex];
-      message.innerHTML = `⏰ <strong>Temps écoulé !</strong> La réponse était : ${item.mot}`;
-      message.style.color = "#ff5252";
-      message.classList.add('shake');
-      
-      // Forcer les réponses manquantes et passer à la question suivante
-      await forceAnswerForNonResponders();
     }
 
     // 🔥 NOUVEAU : Fonction pour avancer à la question suivante
@@ -1948,7 +1828,6 @@
       
       gameActive = false;
       multiplayerGameActive = false;
-      stopChrono();
       stopCheckingAllAnswers();
       updatePlayerControls();
     }
@@ -2243,7 +2122,6 @@
           } else {
             multiplayerGameActive = false;
             gameActive = false;
-            stopChrono();
             stopCheckingAllAnswers();
             updatePlayerControls();
           }
@@ -2335,69 +2213,11 @@
       multiplayerMessage.classList.remove('hidden');
       multiplayerMessage.innerHTML = `
         <i class="fas fa-gamepad"></i> La partie a commencé ! Manche 1/3 - Champ lexical: <strong>${randomPrefix}</strong>
-        <br><small>Chaque joueur a 1 seule tentative par question - On attend tous les joueurs</small>
+        <br><small>Chaque joueur répond à son rythme - On attend tous les joueurs</small>
       `;
       
       updatePlayerControls();
     });
-
-    // 🔥 FONCTIONS DE BASE DU JEU
-    function startChrono() {
-      if (chronoTimer) clearInterval(chronoTimer);
-      timeLeft = 20;
-      chronoDisplay.textContent = timeLeft;
-      chronoDisplay.className = "";
-      
-      chronoTimer = setInterval(() => {
-        timeLeft--;
-        chronoDisplay.textContent = timeLeft;
-        updateChronoStyle();
-        
-        if (timeLeft <= 0) {
-          clearInterval(chronoTimer);
-          timeUp();
-        }
-      }, 1000);
-    }
-
-    function stopChrono() {
-      if (chronoTimer) {
-        clearInterval(chronoTimer);
-        chronoTimer = null;
-      }
-    }
-
-    function updateChronoStyle() {
-      if (timeLeft <= 5) {
-        chronoDisplay.className = "danger";
-      } else if (timeLeft <= 10) {
-        chronoDisplay.className = "warning";
-      } else {
-        chronoDisplay.className = "";
-      }
-    }
-
-    function updateRoundsDisplay(currentRound, totalRounds) {
-      roundsDisplay.classList.remove('hidden');
-      roundsDisplay.innerHTML = '';
-      
-      for (let i = 1; i <= totalRounds; i++) {
-        const roundBubble = document.createElement('div');
-        roundBubble.className = 'round-bubble';
-        
-        if (i < currentRound) {
-          roundBubble.classList.add('completed');
-          roundBubble.innerHTML = `<i class="fas fa-check"></i>`;
-        } else if (i === currentRound) {
-          roundBubble.classList.add('active');
-          roundBubble.textContent = i;
-        } else {
-          roundBubble.textContent = i;
-        }
-        
-        roundsDisplay.appendChild(roundBubble);
-      }
-    }
 
     // Utilitaires
     const normalize = s => s
@@ -2428,9 +2248,6 @@
       const intro = `Toutes les bonnes réponses commencent par les lettres : ${currentPrefix}.`;
       const def  = item.def;
       speak(`${intro} Définition : ${def}`);
-      if (!multiplayerGameActive) {
-        startChrono();
-      }
       gameActive = true;
     }
 
@@ -2442,7 +2259,6 @@
       highlightBank(prefix);
       renderCard();
       gameActive = false;
-      stopChrono();
       answerInput.focus();
     }
 
@@ -2456,7 +2272,6 @@
         message.style.color = "#00e676";
         answerInput.disabled = true;
         gameActive = false;
-        stopChrono();
         speak(`Bravo ${playerName} ! Tu as terminé le champ lexical ${currentPrefix} avec un score de ${score} sur ${list.length*10}.`);
         return;
       }
@@ -2469,7 +2284,6 @@
       if(currentIndex > 0){
         currentIndex--;
         gameActive = false;
-        stopChrono();
         renderCard();
         answerInput.focus();
       }
@@ -2509,6 +2323,28 @@
       [...initialBank.children].forEach(b=>{
         b.classList.toggle('active', b.textContent === k.toUpperCase());
       });
+    }
+
+    function updateRoundsDisplay(currentRound, totalRounds) {
+      roundsDisplay.classList.remove('hidden');
+      roundsDisplay.innerHTML = '';
+      
+      for (let i = 1; i <= totalRounds; i++) {
+        const roundBubble = document.createElement('div');
+        roundBubble.className = 'round-bubble';
+        
+        if (i < currentRound) {
+          roundBubble.classList.add('completed');
+          roundBubble.innerHTML = `<i class="fas fa-check"></i>`;
+        } else if (i === currentRound) {
+          roundBubble.classList.add('active');
+          roundBubble.textContent = i;
+        } else {
+          roundBubble.textContent = i;
+        }
+        
+        roundsDisplay.appendChild(roundBubble);
+      }
     }
 
     // 🔥 FONCTIONS ADMIN
@@ -2857,7 +2693,6 @@
       waitingAnswersMessage.classList.add('hidden');
       
       gameActive = false;
-      stopChrono();
       updatePlayerControls();
       document.body.style.overflow = 'auto';
       
@@ -2921,11 +2756,11 @@
       playerName = randomName;
       
       // Indiquer les règles du jeu
-      pointsInfo.textContent = "10 points par bonne réponse - 1 seule tentative par question - On attend tous les joueurs";
+      pointsInfo.textContent = "10 points par bonne réponse - 1 seule tentative par question - Chacun répond à son rythme";
       
       // Prévenir l'utilisateur des règles
       setTimeout(() => {
-        message.innerHTML = '<i class="fas fa-info-circle"></i> Mode multijoueur : Chacun répond 1 fois, on attend tout le monde !';
+        message.innerHTML = '<i class="fas fa-info-circle"></i> Mode multijoueur : Chacun répond à son rythme, on attend tout le monde !';
         message.style.color = "#ff9800";
       }, 1000);
     });
