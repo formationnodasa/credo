@@ -328,7 +328,44 @@
       font-weight: bold;
     }
     
-    /* Nouveau : Affichage des manches */
+    /* Statut des réponses */
+    .answers-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    
+    .answer-indicator {
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .answer-indicator.correct {
+      background: rgba(0, 230, 118, 0.2);
+      color: #00e676;
+      border: 1px solid #00e676;
+    }
+    
+    .answer-indicator.incorrect {
+      background: rgba(255, 82, 82, 0.2);
+      color: #ff5252;
+      border: 1px solid #ff5252;
+    }
+    
+    .answer-indicator.waiting {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid #ffc107;
+    }
+    
+    /* Affichage des manches */
     .rounds-display {
       display: flex;
       justify-content: center;
@@ -545,6 +582,10 @@
     #answer:focus{
       box-shadow:0 0 15px var(--brand);
       caret-color:var(--brand);
+    }
+    #answer:disabled {
+      background: #e0e0e0;
+      color: #666;
     }
     
     /* Contrôles */
@@ -810,6 +851,11 @@
       <!-- Messages multijoueur -->
     </div>
     
+    <!-- Statut des réponses -->
+    <div id="answersStatus" class="answers-status hidden">
+      <!-- Indicateurs de réponses -->
+    </div>
+    
     <!-- Affichage des manches -->
     <div id="roundsDisplay" class="rounds-display hidden">
       <!-- Les bulles des manches seront ajoutées ici -->
@@ -980,6 +1026,7 @@
     const roundsDisplay = document.getElementById("roundsDisplay");
     const questionCounter = document.getElementById("questionCounter");
     const scoreValue = document.getElementById("scoreValue");
+    const answersStatus = document.getElementById("answersStatus");
 
     // Éléments Multijoueur
     const multiplayerModal = document.getElementById("multiplayerModal");
@@ -1028,7 +1075,10 @@
     let answeredThisQuestion = false;
     let gameStateListenerActive = false;
     let lastSyncTime = 0;
-    const SYNC_INTERVAL = 100; // 100ms pour synchronisation ultra-rapide
+    const SYNC_INTERVAL = 100;
+    
+    // 🔥 NOUVEAU : Suivi des réponses
+    let playerAnswers = {}; // {playerId: {correct: boolean, time: number}}
 
     // Générer un ID de joueur unique
     function generatePlayerId() {
@@ -1045,15 +1095,53 @@
       return code;
     }
 
+    // 🔥 NOUVEAU : Afficher le statut des réponses
+    function updateAnswersStatus() {
+      answersStatus.classList.remove('hidden');
+      answersStatus.innerHTML = '';
+      
+      const allPlayersAnswered = Object.keys(playerAnswers).length === players.length;
+      
+      players.forEach(player => {
+        const answerStatus = document.createElement('div');
+        answerStatus.className = 'answer-indicator';
+        
+        if (playerAnswers[player.id]) {
+          answerStatus.classList.add(playerAnswers[player.id].correct ? 'correct' : 'incorrect');
+          answerStatus.innerHTML = `
+            <i class="fas fa-${playerAnswers[player.id].correct ? 'check' : 'times'}"></i>
+            ${player.name}: ${playerAnswers[player.id].correct ? 'Correct' : 'Incorrect'} (${playerAnswers[player.id].time}s)
+          `;
+        } else {
+          answerStatus.classList.add('waiting');
+          answerStatus.innerHTML = `
+            <i class="fas fa-clock"></i>
+            ${player.name}: En attente...
+          `;
+        }
+        
+        answersStatus.appendChild(answerStatus);
+      });
+      
+      // 🔥 NOUVEAU LOGIQUE : Vérifier si tout le monde a répondu
+      if (allPlayersAnswered && isRoomCreator) {
+        // Attendre 2 secondes puis passer à la question suivante
+        setTimeout(() => {
+          updateGameStateForNextWord();
+        }, 2000);
+      }
+    }
+
     // 🔥 FONCTION CRITIQUE : Mettre à jour les contrôles selon le rôle
     function updatePlayerControls() {
       const canControl = isRoomCreator && multiplayerGameActive && gameActive;
       
-      btnPlay.disabled = !canControl;
+      // Seul le créateur peut passer/retourner
       btnSkip.disabled = !canControl;
       btnBack.disabled = !canControl;
+      btnPlay.disabled = !canControl;
       
-      // Les boutons de vitesse et répétition sont toujours actifs
+      // Tout le monde peut contrôler la vitesse et répéter
       btnSlow.disabled = !multiplayerGameActive || !gameActive;
       btnFast.disabled = !multiplayerGameActive || !gameActive;
       btnRepeat.disabled = !multiplayerGameActive || !gameActive;
@@ -1063,12 +1151,10 @@
         btn.disabled = multiplayerGameActive;
       });
       
-      answerInput.disabled = !multiplayerGameActive || !gameActive;
-      
-      console.log(`Contrôles mis à jour: créateur=${isRoomCreator}, jeu=${gameActive}, multijoueur=${multiplayerGameActive}`);
+      answerInput.disabled = !multiplayerGameActive || !gameActive || answeredThisQuestion;
     }
 
-    // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE (source de vérité unique)
+    // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE
     function renderCard(){
       if(!currentPrefix){
         prefixDisplay.textContent = "– –";
@@ -1100,7 +1186,7 @@
       
       answerInput.value = "";
       answerInput.placeholder = `Écris un mot qui commence par « ${currentPrefix} »…`;
-      answerInput.disabled = !gameActive;
+      answerInput.disabled = !gameActive || answeredThisQuestion;
       updatePills();
       answerInput.focus();
     }
@@ -1138,12 +1224,17 @@
             currentRound = gameState.currentRound || 1;
             totalRounds = gameState.totalRounds || 3;
             
+            // 🔥 NOUVEAU : Réinitialiser les réponses quand nouvelle question
+            if (lastGameState && (
+                lastGameState.currentPrefix !== currentPrefix ||
+                lastGameState.currentIndex !== currentIndex)) {
+              playerAnswers = {};
+              answeredThisQuestion = false;
+            }
+            
             // Mettre à jour l'affichage
             renderCard();
             updatePlayerControls();
-            
-            // Si c'est un nouveau mot, réinitialiser le statut de réponse
-            answeredThisQuestion = false;
             
             // Gérer le chrono
             if (gameActive === false && gameState.currentPrefix) {
@@ -1196,6 +1287,12 @@
       if (timeLeft <= 0) {
         chronoDisplay.textContent = "0";
         chronoDisplay.className = "danger";
+        if (isRoomCreator) {
+          // 🔥 NOUVEAU : Quand le temps est écoulé, on passe à la question suivante
+          setTimeout(() => {
+            updateGameStateForNextWord();
+          }, 1000);
+        }
         return;
       }
       
@@ -1230,6 +1327,29 @@
       }
     }
 
+    // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
+    function checkAllPlayersAnswered() {
+      if (!multiplayerGameActive || !isRoomCreator) return;
+      
+      const roomDoc = db.collection('multiplayer_rooms').doc(currentRoomId);
+      roomDoc.get().then(doc => {
+        if (!doc.exists) return;
+        
+        const roomData = doc.data();
+        const allPlayers = roomData.players;
+        const allAnswered = allPlayers.every(player => 
+          playerAnswers[player.id] !== undefined
+        );
+        
+        if (allAnswered) {
+          // Attendre 2 secondes pour voir les résultats
+          setTimeout(() => {
+            updateGameStateForNextWord();
+          }, 2000);
+        }
+      });
+    }
+
     // Mettre à jour l'état du jeu pour le mot suivant
     async function updateGameStateForNextWord() {
       if (!currentRoomId || !isRoomCreator) return;
@@ -1250,108 +1370,6 @@
       }
     }
 
-    // Terminer une manche
-    async function endRound() {
-      if (!currentRoomId || !isRoomCreator) return;
-      
-      const nextRound = currentRound + 1;
-      
-      if (nextRound > totalRounds) {
-        // Fin de la partie
-        await endGame();
-      } else {
-        // Passer à la manche suivante
-        const prefixes = Object.keys(FIELDS);
-        const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-        
-        await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-          'gameState.currentRound': nextRound,
-          'gameState.currentPrefix': randomPrefix,
-          'gameState.currentIndex': 0,
-          'gameState.questionStartTime': Date.now(),
-          lastUpdate: Date.now()
-        });
-        
-        // Afficher un message
-        multiplayerMessage.innerHTML = `
-          <i class="fas fa-flag"></i> Manche ${currentRound} terminée ! 
-          Début de la manche ${nextRound} - Champ lexical: <strong>${randomPrefix}</strong>
-        `;
-      }
-    }
-
-    // Terminer la partie
-    async function endGame() {
-      if (!currentRoomId || !isRoomCreator) return;
-      
-      // Calculer le gagnant
-      const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
-      const roomData = roomDoc.data();
-      const players = roomData.players;
-      
-      let winner = players[0];
-      let maxScore = winner.score;
-      
-      for (let player of players) {
-        if (player.score > maxScore) {
-          maxScore = player.score;
-          winner = player;
-        }
-      }
-      
-      // Afficher le message final
-      multiplayerMessage.innerHTML = `
-        <i class="fas fa-flag-checkered"></i> PARTIE TERMINÉE ! 
-        <br>🎉 GAGNANT: ${winner.name} avec ${winner.score} points !
-        <br>Merci d'avoir joué !
-      `;
-      
-      // Désactiver le jeu
-      await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-        'gameState.active': false,
-        lastUpdate: Date.now()
-      });
-      
-      gameActive = false;
-      multiplayerGameActive = false;
-      stopChrono();
-      updatePlayerControls();
-    }
-
-    // Mettre à jour le score du joueur
-    async function updatePlayerScore(newScore) {
-      if (!currentRoomId) return;
-      
-      try {
-        const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
-        const roomData = roomDoc.data();
-        
-        // Trouver et mettre à jour le joueur
-        const updatedPlayers = roomData.players.map(p => {
-          if (p.id === playerId) {
-            return { 
-              ...p, 
-              score: newScore,
-              lastAnswerTime: Date.now()
-            };
-          }
-          return p;
-        });
-        
-        await db.collection('multiplayer_rooms').doc(currentRoomId).update({
-          players: updatedPlayers,
-          lastUpdate: Date.now()
-        });
-        
-        // Mettre à jour le score local
-        score = newScore;
-        updatePills();
-        
-      } catch (error) {
-        console.error("Erreur lors de la mise à jour du score:", error);
-      }
-    }
-
     // Vérifier la réponse
     async function check(){
       if(!currentPrefix || !gameActive || answeredThisQuestion) return;
@@ -1360,10 +1378,10 @@
       const user = normalize(answerInput.value);
       const target = normalize(item.mot);
       const timeUsed = 20 - timeLeft;
+      const isCorrect = user && user.startsWith(normalize(currentPrefix)) && user === target;
 
-      // Vérifier la réponse
-      if(user && user.startsWith(normalize(currentPrefix)) && user === target){
-        stopChrono();
+      // 🔥 TOUT LE MONDE PEUT RÉPONDRE
+      if(isCorrect){
         const newScore = score + 1;
         message.innerHTML = `✅ <strong>Correct !</strong> Temps: ${timeUsed}s - Score: ${newScore}`;
         message.style.color = "#00e676";
@@ -1371,14 +1389,13 @@
         // Mettre à jour le score en multijoueur
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
-          await updatePlayerScore(newScore);
+          playerAnswers[playerId] = { correct: true, time: timeUsed };
           
-          // Si c'est le créateur, passer au mot suivant après un délai
-          if (isRoomCreator) {
-            setTimeout(() => {
-              updateGameStateForNextWord();
-            }, 1500);
-          }
+          await updatePlayerScore(newScore);
+          updateAnswersStatus();
+          
+          // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
+          checkAllPlayersAnswered();
         } else {
           score = newScore;
           setTimeout(next, 1500);
@@ -1390,13 +1407,12 @@
         // En mode multijoueur
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
+          playerAnswers[playerId] = { correct: false, time: timeUsed };
           
-          // Si c'est le créateur, passer au mot suivant après un délai
-          if (isRoomCreator) {
-            setTimeout(() => {
-              updateGameStateForNextWord();
-            }, 2000);
-          }
+          updateAnswersStatus();
+          
+          // 🔥 NOUVEAU : Vérifier si tout le monde a répondu
+          checkAllPlayersAnswered();
         } else {
           setTimeout(next, 2000);
         }
@@ -1423,7 +1439,7 @@
       
       const roomCode = generateRoomCode();
       playerId = generatePlayerId();
-      playerName = document.getElementById('roomNameInput').value || "Créateur";
+      playerName = roomName.substring(0, 15) || "Créateur";
       
       const roomData = {
         code: roomCode,
@@ -1531,19 +1547,6 @@
       }
     }
 
-    // Afficher les informations de la salle
-    function showRoomInfo(roomCode) {
-      showMainMenu();
-      roomInfoSection.classList.remove('hidden');
-      roomIdDisplay.textContent = `SALLE: ${roomCode}`;
-      
-      if (isRoomCreator) {
-        startGameBtn.classList.remove('hidden');
-      } else {
-        startGameBtn.classList.add('hidden');
-      }
-    }
-
     // S'abonner aux mises à jour de la salle
     function subscribeToRoomUpdates(roomCode) {
       if (roomUnsubscribe) roomUnsubscribe();
@@ -1555,6 +1558,9 @@
           const roomData = doc.data();
           updatePlayersList(roomData.players);
           updatePlayersInGame(roomData.players);
+          
+          // Mettre à jour les joueurs
+          players = roomData.players;
           
           // Mettre à jour l'affichage
           document.getElementById('playerCount').textContent = roomData.players.length;
@@ -1626,7 +1632,7 @@
       updatePlayerControls();
     });
 
-    // 🔥 FONCTIONS DE BASE DU JEU (maintenant synchronisées avec Firestore)
+    // 🔥 FONCTIONS RESTANTES (inchangées sauf ajustements)
     function startChrono() {
       if (chronoTimer) clearInterval(chronoTimer);
       timeLeft = 20;
@@ -1718,6 +1724,40 @@
         
         playersInRoom.appendChild(bubble);
       });
+    }
+
+    // Mettre à jour le score du joueur
+    async function updatePlayerScore(newScore) {
+      if (!currentRoomId) return;
+      
+      try {
+        const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
+        const roomData = roomDoc.data();
+        
+        // Trouver et mettre à jour le joueur
+        const updatedPlayers = roomData.players.map(p => {
+          if (p.id === playerId) {
+            return { 
+              ...p, 
+              score: newScore,
+              lastAnswerTime: Date.now()
+            };
+          }
+          return p;
+        });
+        
+        await db.collection('multiplayer_rooms').doc(currentRoomId).update({
+          players: updatedPlayers,
+          lastUpdate: Date.now()
+        });
+        
+        // Mettre à jour le score local
+        score = newScore;
+        updatePills();
+        
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du score:", error);
+      }
     }
 
     // Utilitaires
@@ -1966,12 +2006,14 @@
       currentRound = 1;
       answeredThisQuestion = false;
       lastSyncTime = 0;
+      playerAnswers = {};
       
       // Masquer les éléments multijoueur
       multiplayerModal.classList.add('hidden');
       multiplayerStatus.classList.add('hidden');
       multiplayerMessage.classList.add('hidden');
       roundsDisplay.classList.add('hidden');
+      answersStatus.classList.add('hidden');
       
       // Réinitialiser le jeu
       gameActive = false;
