@@ -24,7 +24,6 @@
       min-height: 100vh;
       padding: 12px;
       overflow-x: hidden;
-      overflow-y: auto;
     }
     @keyframes gradientAnimation{
       0%{background-position:0% 50%}
@@ -78,6 +77,11 @@
       align-items: center;
       justify-content: center;
       z-index: 10;
+      transition: background-color 0.3s;
+    }
+    
+    .close-multiplayer:hover {
+      background: rgba(255, 107, 107, 0.1);
     }
     
     .multiplayer-title {
@@ -89,7 +93,7 @@
     
     .multiplayer-buttons {
       display: flex;
-        flex-direction: column;
+      flex-direction: column;
       gap: 15px;
       margin-bottom: 25px;
     }
@@ -111,16 +115,21 @@
       width: 100%;
     }
     
-    .multiplayer-btn:hover {
+    .multiplayer-btn:hover:not(:disabled) {
       transform: translateY(-3px);
       box-shadow: 0 8px 25px rgba(156, 39, 176, 0.5);
+    }
+    
+    .multiplayer-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
     
     .multiplayer-btn.join {
       background: linear-gradient(90deg, var(--player-color), #2e7d32);
     }
     
-    .multiplayer-btn.join:hover {
+    .multiplayer-btn.join:hover:not(:disabled) {
       box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
     }
     
@@ -139,6 +148,12 @@
       color: white;
       font-size: 1.1rem;
       margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+    
+    .room-input:focus {
+      outline: none;
+      border-color: var(--room-color);
     }
     
     .room-input::placeholder {
@@ -161,9 +176,10 @@
       font-size: 1.3rem;
       position: sticky;
       top: 0;
-      background: rgba(26, 26, 46, 0.9);
-      padding: 5px;
-      z-index: 1;
+      background: rgba(26, 26, 46, 0.95);
+      padding: 10px 5px;
+      margin: -10px -5px 15px;
+      backdrop-filter: blur(5px);
     }
     
     .players-list {
@@ -172,13 +188,18 @@
     }
     
     .players-list li {
-      padding: 10px 15px;
+      padding: 12px 15px;
       margin-bottom: 8px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       display: flex;
       align-items: center;
       gap: 12px;
+      transition: background-color 0.3s;
+    }
+    
+    .players-list li:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
     
     .players-list li .player-badge {
@@ -215,20 +236,22 @@
       background: rgba(255, 255, 255, 0.15);
       border: none;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border-radius: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
       margin: 10px auto 0;
-      transition: background 0.3s;
+      transition: all 0.3s;
       width: 100%;
       justify-content: center;
+      font-weight: 600;
     }
     
     .copy-btn:hover {
       background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
     }
     
     /* Interface multijoueur dans le jeu */
@@ -259,7 +282,7 @@
     
     .players-in-room {
       display: flex;
-      gap: 10px;
+      gap: 15px;
       align-items: center;
       flex-wrap: wrap;
       justify-content: center;
@@ -278,6 +301,11 @@
       position: relative;
       border: 3px solid white;
       flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+    
+    .player-bubble:hover {
+      transform: scale(1.1);
     }
     
     .player-bubble.you {
@@ -293,16 +321,17 @@
       text-align: center;
       font-size: 0.9rem;
       color: white;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.8);
       padding: 2px 6px;
       border-radius: 10px;
+      min-width: 30px;
     }
     
     .leave-room-btn {
       background: #ff6b6b;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
@@ -326,9 +355,10 @@
       border-left: 4px solid var(--room-color);
       text-align: center;
       font-weight: bold;
+      animation: fadeIn 0.5s ease;
     }
     
-    /* Nouveau : Affichage des manches */
+    /* Affichage des manches */
     .rounds-display {
       display: flex;
       justify-content: center;
@@ -349,12 +379,14 @@
       font-size: 1.2rem;
       border: 2px solid rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
+      transition: all 0.3s;
     }
     
     .round-bubble.active {
       background: var(--room-color);
       border-color: #fff;
       box-shadow: 0 0 15px var(--room-color);
+      transform: scale(1.1);
     }
     
     .round-bubble.completed {
@@ -392,6 +424,9 @@
       font-size: clamp(26px, 3.4vw, 40px);
       text-shadow: 0 3px 8px rgba(0,0,0,.3);
       letter-spacing:.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     .multiplayer-btn-header {
@@ -468,6 +503,10 @@
       letter-spacing:.18em;
       text-align:center;
       text-shadow: 0 3px 8px rgba(0,0,0,.28);
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #definitionDisplay{
       font-size: clamp(18px, 2.2vw, 22px);
@@ -496,6 +535,10 @@
       margin-bottom: 15px;
       color: #fff;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
     
     #chrono {
@@ -520,9 +563,9 @@
       animation: pulse 0.5s infinite;
     }
     @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.7; }
-      100% { opacity: 1; }
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
     }
     
     /* Zone de réponse */
@@ -546,6 +589,11 @@
       box-shadow:0 0 15px var(--brand);
       caret-color:var(--brand);
     }
+    #answer:disabled {
+      background: #f0f0f0;
+      color: #888;
+      cursor: not-allowed;
+    }
     
     /* Contrôles */
     .controls-section {
@@ -568,22 +616,23 @@
       color: var(--brand);
       transition: .25s;
       box-shadow: 0 4px 10px rgba(0,0,0,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    button:hover{
+    button:hover:not(:disabled){
       background: var(--brand);
       color: #fff;
       box-shadow: 0 0 12px #ffffff99, 0 0 18px #2575fcaa;
+      transform: translateY(-2px);
     }
     button:disabled{
       opacity: .55;
       cursor: not-allowed;
       background: #666;
       color: #999;
-    }
-    button:disabled:hover{
-      background: #666;
-      color: #999;
-      box-shadow: none;
+      transform: none;
     }
     
     /* Message */
@@ -596,6 +645,10 @@
       padding: 10px;
       border-radius: 10px;
       background: rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
     
     /* Banque d'initiales */
@@ -617,8 +670,10 @@
       border: 2px solid rgba(255,255,255,.18);
       min-width: 60px;
       padding: 15px 0;
+      flex: 1 0 auto;
+      max-width: 100px;
     }
-    .bank button:hover{
+    .bank button:hover:not(:disabled){
       background: rgba(255,255,255,.2);
       color: var(--brand);
     }
@@ -642,6 +697,7 @@
       .bank button {
         min-width: 50px;
         padding: 12px 0;
+        font-size: 1rem;
       }
       
       h1 {
@@ -651,6 +707,7 @@
       #chrono {
         font-size: 3rem;
         padding: 15px 30px;
+        min-width: 150px;
       }
       
       .multiplayer-status {
@@ -658,9 +715,18 @@
         gap: 15px;
       }
       
+      .room-indicator {
+        min-width: 100%;
+      }
+      
       .players-in-room {
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
+        gap: 10px;
+      }
+      
+      .player-bubble {
+        width: 45px;
+        height: 45px;
       }
     }
     
@@ -671,21 +737,67 @@
       
       .status {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
       
       header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 15px;
       }
       
       .admin-btn, .multiplayer-btn-header {
-        align-self: flex-start;
+        align-self: stretch;
+        justify-content: center;
+      }
+      
+      .pill {
+        justify-content: center;
+      }
+      
+      .multiplayer-content {
+        padding: 20px 15px;
       }
     }
     
     .hidden {
       display: none !important;
+    }
+    
+    /* Scrollbar personnalisée */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--room-color);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7b1fa2;
+    }
+    
+    /* Animations supplémentaires */
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .shake {
+      animation: shake 0.5s ease;
     }
   </style>
   <!-- Firebase SDK -->
@@ -698,11 +810,16 @@
   <!-- Modal Multijoueur -->
   <div class="multiplayer-modal hidden" id="multiplayerModal">
     <div class="multiplayer-content">
-      <button class="close-multiplayer" id="closeMultiplayerModal">&times;</button>
+      <button class="close-multiplayer" id="closeMultiplayerModal" aria-label="Fermer">&times;</button>
       
       <h2 class="multiplayer-title">
         <i class="fas fa-users"></i> MODE MULTIJOUEUR
       </h2>
+      
+      <div class="room-section">
+        <input type="text" id="playerNameInput" class="room-input" 
+               placeholder="Ton nom (ex: Miriam, Moïse, Aubaine…)" maxlength="20" value="">
+      </div>
       
       <div class="multiplayer-buttons">
         <button class="multiplayer-btn" id="createRoomBtn">
@@ -1004,6 +1121,7 @@
     const roomCreator = document.getElementById("roomCreator");
     const leaveRoomBtnInGame = document.getElementById("leaveRoomBtnInGame");
     const multiplayerMessage = document.getElementById("multiplayerMessage");
+    const playerNameInput = document.getElementById("playerNameInput");
 
     // État du jeu
     let currentPrefix = null;
@@ -1028,7 +1146,7 @@
     let answeredThisQuestion = false;
     let gameStateListenerActive = false;
     let lastSyncTime = 0;
-    const SYNC_INTERVAL = 100; // 100ms pour synchronisation ultra-rapide
+    const SYNC_INTERVAL = 100;
 
     // Générer un ID de joueur unique
     function generatePlayerId() {
@@ -1044,13 +1162,6 @@
       }
       return code;
     }
-    <input
-  type="text"
-  id="playerNameInput"
-  class="room-input"
-  placeholder="Ton nom (ex: Miriam, Moïse, Aubaine…)"
-  maxlength="20"
-/>
 
     // 🔥 FONCTION CRITIQUE : Mettre à jour les contrôles selon le rôle
     function updatePlayerControls() {
@@ -1071,11 +1182,9 @@
       });
       
       answerInput.disabled = !multiplayerGameActive || !gameActive;
-      
-      console.log(`Contrôles mis à jour: créateur=${isRoomCreator}, jeu=${gameActive}, multijoueur=${multiplayerGameActive}`);
     }
 
-    // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE (source de vérité unique)
+    // 🔥 RENDRE LA CARTE DEPUIS FIRESTORE
     function renderCard(){
       if(!currentPrefix){
         prefixDisplay.textContent = "– –";
@@ -1139,20 +1248,16 @@
           lastSyncTime = now;
           
           if (gameState.active) {
-            // 🔥 TOUTE LA LOGIQUE VIENT DE FIRESTORE
             currentPrefix = gameState.currentPrefix;
             currentIndex = gameState.currentIndex;
             currentRound = gameState.currentRound || 1;
             totalRounds = gameState.totalRounds || 3;
             
-            // Mettre à jour l'affichage
             renderCard();
             updatePlayerControls();
             
-            // Si c'est un nouveau mot, réinitialiser le statut de réponse
             answeredThisQuestion = false;
             
-            // Gérer le chrono
             if (gameActive === false && gameState.currentPrefix) {
               gameActive = true;
               multiplayerGameActive = true;
@@ -1163,10 +1268,8 @@
               }
             }
             
-            // Mettre à jour l'affichage des manches
             updateRoundsDisplay(currentRound, totalRounds);
             
-            // Afficher le message multijoueur
             multiplayerMessage.classList.remove('hidden');
             multiplayerMessage.innerHTML = `
               <i class="fas fa-gamepad"></i> Partie multijoueur - 
@@ -1174,7 +1277,6 @@
               Question ${currentIndex + 1}/10 - Champ lexical: <strong>${currentPrefix}</strong>
             `;
           } else {
-            // Jeu inactif
             gameActive = false;
             multiplayerGameActive = false;
             stopChrono();
@@ -1229,7 +1331,6 @@
       message.textContent = `⏰ Temps écoulé ! La réponse était : ${item.mot}`;
       message.style.color = "#ff5252";
       
-      // En mode multijoueur, seul le créateur passe au mot suivant
       if (multiplayerGameActive && isRoomCreator) {
         setTimeout(() => {
           updateGameStateForNextWord();
@@ -1245,10 +1346,8 @@
       const nextIndex = currentIndex + 1;
       
       if (nextIndex >= list.length) {
-        // Fin de la manche
         await endRound();
       } else {
-        // Passer au mot suivant
         await db.collection('multiplayer_rooms').doc(currentRoomId).update({
           'gameState.currentIndex': nextIndex,
           'gameState.questionStartTime': Date.now(),
@@ -1264,10 +1363,8 @@
       const nextRound = currentRound + 1;
       
       if (nextRound > totalRounds) {
-        // Fin de la partie
         await endGame();
       } else {
-        // Passer à la manche suivante
         const prefixes = Object.keys(FIELDS);
         const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
         
@@ -1279,7 +1376,6 @@
           lastUpdate: Date.now()
         });
         
-        // Afficher un message
         multiplayerMessage.innerHTML = `
           <i class="fas fa-flag"></i> Manche ${currentRound} terminée ! 
           Début de la manche ${nextRound} - Champ lexical: <strong>${randomPrefix}</strong>
@@ -1291,7 +1387,6 @@
     async function endGame() {
       if (!currentRoomId || !isRoomCreator) return;
       
-      // Calculer le gagnant
       const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
       const roomData = roomDoc.data();
       const players = roomData.players;
@@ -1306,14 +1401,12 @@
         }
       }
       
-      // Afficher le message final
       multiplayerMessage.innerHTML = `
         <i class="fas fa-flag-checkered"></i> PARTIE TERMINÉE ! 
         <br>🎉 GAGNANT: ${winner.name} avec ${winner.score} points !
         <br>Merci d'avoir joué !
       `;
       
-      // Désactiver le jeu
       await db.collection('multiplayer_rooms').doc(currentRoomId).update({
         'gameState.active': false,
         lastUpdate: Date.now()
@@ -1333,7 +1426,6 @@
         const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
         const roomData = roomDoc.data();
         
-        // Trouver et mettre à jour le joueur
         const updatedPlayers = roomData.players.map(p => {
           if (p.id === playerId) {
             return { 
@@ -1350,7 +1442,6 @@
           lastUpdate: Date.now()
         });
         
-        // Mettre à jour le score local
         score = newScore;
         updatePills();
         
@@ -1368,19 +1459,16 @@
       const target = normalize(item.mot);
       const timeUsed = 20 - timeLeft;
 
-      // Vérifier la réponse
       if(user && user.startsWith(normalize(currentPrefix)) && user === target){
         stopChrono();
         const newScore = score + 1;
         message.innerHTML = `✅ <strong>Correct !</strong> Temps: ${timeUsed}s - Score: ${newScore}`;
         message.style.color = "#00e676";
         
-        // Mettre à jour le score en multijoueur
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
           await updatePlayerScore(newScore);
           
-          // Si c'est le créateur, passer au mot suivant après un délai
           if (isRoomCreator) {
             setTimeout(() => {
               updateGameStateForNextWord();
@@ -1394,11 +1482,9 @@
         message.innerHTML = `❌ <strong>Incorrect.</strong> La réponse était : ${item.mot}`;
         message.style.color = "#ff5252";
         
-        // En mode multijoueur
         if (multiplayerGameActive) {
           answeredThisQuestion = true;
           
-          // Si c'est le créateur, passer au mot suivant après un délai
           if (isRoomCreator) {
             setTimeout(() => {
               updateGameStateForNextWord();
@@ -1422,6 +1508,12 @@
     createRoomConfirm.addEventListener('click', async () => {
       const roomName = document.getElementById('roomNameInput').value || "Salle de Jeu";
       const maxPlayers = parseInt(document.getElementById('maxPlayersInput').value) || 4;
+      playerName = playerNameInput.value.trim() || "Créateur";
+      
+      if (!playerName) {
+        alert("Veuillez entrer un nom de joueur");
+        return;
+      }
       
       if (maxPlayers < 2 || maxPlayers > 8) {
         alert("Le nombre de joueurs doit être entre 2 et 8");
@@ -1430,8 +1522,6 @@
       
       const roomCode = generateRoomCode();
       playerId = generatePlayerId();
-playerName =
-  document.getElementById('playerNameInput').value.trim() || "Créateur";
       
       const roomData = {
         code: roomCode,
@@ -1474,6 +1564,12 @@ playerName =
     // Rejoindre une salle
     joinRoomConfirm.addEventListener('click', async () => {
       const roomCode = document.getElementById('roomCodeInput').value.toUpperCase();
+      playerName = playerNameInput.value.trim() || "Joueur";
+      
+      if (!playerName) {
+        alert("Veuillez entrer un nom de joueur");
+        return;
+      }
       
       if (!roomCode || roomCode.length !== 4) {
         alert("Veuillez entrer un code de salle valide (4 caractères)");
@@ -1496,8 +1592,6 @@ playerName =
         }
         
         playerId = generatePlayerId();
-playerName =
-  document.getElementById('playerNameInput').value.trim() || "Joueur";
         currentRoomId = roomCode;
         isRoomCreator = false;
         joinRoom(roomCode);
@@ -1510,7 +1604,6 @@ playerName =
     // Rejoindre une salle
     async function joinRoom(roomCode) {
       try {
-        // Ajouter le joueur à la salle
         await db.collection('multiplayer_rooms').doc(roomCode).update({
           players: firebase.firestore.FieldValue.arrayUnion({
             id: playerId,
@@ -1523,13 +1616,9 @@ playerName =
           lastUpdate: Date.now()
         });
         
-        // Afficher les infos de la salle
         showRoomInfo(roomCode);
-        
-        // S'abonner aux mises à jour de la salle
         subscribeToRoomUpdates(roomCode);
         
-        // Mettre à jour l'interface
         multiplayerStatus.classList.remove('hidden');
         currentRoomCode.textContent = roomCode;
         updatePlayerControls();
@@ -1565,18 +1654,15 @@ playerName =
           updatePlayersList(roomData.players);
           updatePlayersInGame(roomData.players);
           
-          // Mettre à jour l'affichage
           document.getElementById('playerCount').textContent = roomData.players.length;
           document.getElementById('maxPlayers').textContent = roomData.maxPlayers;
           roomCreator.textContent = roomData.creatorName;
           
-          // Gérer l'état du jeu
           if (roomData.gameState.active) {
             multiplayerGameActive = true;
             waitingSection.classList.remove('hidden');
             roomInfoSection.classList.add('hidden');
             
-            // Si le jeu est actif, s'abonner aux mises à jour de l'état du jeu
             if (!gameStateListenerActive) {
               subscribeToGameState(roomCode);
             }
@@ -1595,11 +1681,9 @@ playerName =
     startGameBtn.addEventListener('click', async () => {
       if (!currentRoomId || !isRoomCreator) return;
       
-      // Choisir un champ lexical aléatoire pour la première manche
       const prefixes = Object.keys(FIELDS);
       const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
       
-      // Mettre à jour l'état du jeu
       await db.collection('multiplayer_rooms').doc(currentRoomId).update({
         'gameState.active': true,
         'gameState.currentPrefix': randomPrefix,
@@ -1611,7 +1695,6 @@ playerName =
         lastUpdate: Date.now()
       });
       
-      // Réinitialiser les scores
       const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
       const roomData = roomDoc.data();
       
@@ -1626,7 +1709,6 @@ playerName =
         lastUpdate: Date.now()
       });
       
-      // Afficher un message
       multiplayerMessage.classList.remove('hidden');
       multiplayerMessage.innerHTML = `
         <i class="fas fa-gamepad"></i> La partie a commencé ! Manche 1/3 - Champ lexical: <strong>${randomPrefix}</strong>
@@ -1635,7 +1717,7 @@ playerName =
       updatePlayerControls();
     });
 
-    // 🔥 FONCTIONS DE BASE DU JEU (maintenant synchronisées avec Firestore)
+    // 🔥 FONCTIONS DE BASE DU JEU
     function startChrono() {
       if (chronoTimer) clearInterval(chronoTimer);
       timeLeft = 20;
@@ -1845,6 +1927,8 @@ playerName =
     btnPlay.addEventListener("click", ()=>{
       if (multiplayerGameActive && !isRoomCreator) {
         message.textContent = "❌ Seul le créateur peut démarrer le jeu en mode multijoueur";
+        message.classList.add('shake');
+        setTimeout(() => message.classList.remove('shake'), 500);
         return;
       }
       
@@ -1864,6 +1948,8 @@ playerName =
     btnSkip.addEventListener("click", () => {
       if (multiplayerGameActive && !isRoomCreator) {
         message.textContent = "❌ Seul le créateur peut passer à la question suivante";
+        message.classList.add('shake');
+        setTimeout(() => message.classList.remove('shake'), 500);
         return;
       }
       next();
@@ -1872,6 +1958,8 @@ playerName =
     btnBack.addEventListener("click", () => {
       if (multiplayerGameActive && !isRoomCreator) {
         message.textContent = "❌ Seul le créateur peut revenir à la question précédente";
+        message.classList.add('shake');
+        setTimeout(() => message.classList.remove('shake'), 500);
         return;
       }
       back();
@@ -1916,8 +2004,10 @@ playerName =
         .then(() => {
           const originalText = copyRoomCodeBtn.innerHTML;
           copyRoomCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+          copyRoomCodeBtn.style.background = 'rgba(76, 175, 80, 0.3)';
           setTimeout(() => {
             copyRoomCodeBtn.innerHTML = originalText;
+            copyRoomCodeBtn.style.background = '';
           }, 2000);
         })
         .catch(err => {
@@ -1932,8 +2022,11 @@ playerName =
     async function leaveRoom() {
       if (!currentRoomId) return;
       
+      if (!confirm("Voulez-vous vraiment quitter la salle ?")) {
+        return;
+      }
+      
       try {
-        // Retirer le joueur de la salle
         const roomDoc = await db.collection('multiplayer_rooms').doc(currentRoomId).get();
         if (roomDoc.exists) {
           const roomData = roomDoc.data();
@@ -1945,9 +2038,13 @@ playerName =
               lastUpdate: Date.now()
             });
           }
+          
+          if (isRoomCreator) {
+            // Si le créateur quitte, supprimer la salle
+            await db.collection('multiplayer_rooms').doc(currentRoomId).delete();
+          }
         }
         
-        // Réinitialiser l'état multijoueur
         resetMultiplayerState();
         
       } catch (error) {
@@ -1976,17 +2073,18 @@ playerName =
       answeredThisQuestion = false;
       lastSyncTime = 0;
       
-      // Masquer les éléments multijoueur
       multiplayerModal.classList.add('hidden');
       multiplayerStatus.classList.add('hidden');
       multiplayerMessage.classList.add('hidden');
       roundsDisplay.classList.add('hidden');
       
-      // Réinitialiser le jeu
       gameActive = false;
       stopChrono();
       updatePlayerControls();
       document.body.style.overflow = 'auto';
+      
+      // Réinitialiser le jeu solo
+      setPrefix(Object.keys(FIELDS)[0]);
     }
 
     // Initialisation
@@ -1996,6 +2094,12 @@ playerName =
       if(!('speechSynthesis' in window)){
         message.innerHTML = "⚠️ La synthèse vocale n'est pas disponible sur ce navigateur.";
       }
+      
+      // Générer un nom par défaut
+      const defaultNames = ["Alex", "Sam", "Morgan", "Jordan", "Taylor", "Casey", "Riley", "Quinn"];
+      const randomName = defaultNames[Math.floor(Math.random() * defaultNames.length)];
+      playerNameInput.value = randomName;
+      playerName = randomName;
     });
 
     // Nettoyage
