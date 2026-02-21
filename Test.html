@@ -1,940 +1,207 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Codes Aléatoires</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>Bienvenue Majestueuse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-y: auto; /* Permet le scroll */
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000;
+    }
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 500px;
-        }
+    .back-btn:hover {
+      background-color: #218838;
+    }
 
-        h1 {
-            color: #333;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 24px;
-        }
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 70px;
+      margin-top: 80px;
+      animation: defilement 6s infinite alternate;
+      background: linear-gradient(to right, #ffffff, #ffcc70);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
 
-        .code-display {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
+    @keyframes defilement {
+      0% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-15px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 0.8; }
+    }
 
-        .code-display:hover {
-            border-color: #667eea;
-            background: #f0f2ff;
-        }
+    .annee-toggle {
+      margin: 30px 0;
+      text-align: center;
+    }
 
-        #generatedCode {
-            font-family: 'Courier New', monospace;
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-            word-break: break-all;
-            letter-spacing: 2px;
-        }
+    .annee-btn {
+      background: #ff8c00;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
 
-        .options {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+    .annee-btn:hover {
+      background: #e67300;
+    }
 
-        .options label {
-            display: block;
-            margin-bottom: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
+    .liste-annees {
+      display: none;
+      margin-top: 15px;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .options input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.2);
-        }
+    .liste-annees a {
+      text-decoration: none;
+    }
 
-        .length-selector {
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .liste-annees button {
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-        #codeLength {
-            width: 70px;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+    .liste-annees button:hover {
+      background: #444;
+    }
 
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #777;
+      font-size: 14px;
+    }
 
-        button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .content {
+      max-width: 800px;
+      padding: 20px;
+      line-height: 1.6;
+      text-align: justify;
+    }
 
-        #generateBtn {
-            background: #667eea;
-            color: white;
-        }
-
-        #generateBtn:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        #copyBtn {
-            background: #48bb78;
-            color: white;
-        }
-
-        #copyBtn:hover {
-            background: #38a169;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .history {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .history h3 {
-            margin-bottom: 15px;
-            color: #555;
-            font-size: 18px;
-        }
-
-        #historyList {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospac
-            e;
-            border-left: 4px solid #667eea;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .history-item:hover {
-            background: #f0f2ff;
-            transform: translateX(5px);
-        }
-
-        .history-item .time {
-            font-size: 12px;
-            color: #888;
-            font-family: Arial, sans-serif;
-        }
-
-        .counter {
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .buttons {
-                flex-direction: column;
-            }
-            
-            #generatedCode {
-                font-size: 18px;
-            }
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #48bb78;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transform: translateX(200%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-    </style>
+    img {
+      display: block;
+      margin: 40px auto;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔐 Générateur de Codes Aléatoires</h1>
-        
-        <div class="code-display" id="codeDisplay">
-            <span id="generatedCode">Cliquez sur "Générer"</span>
-        </div>
-        
-        <div class="options">
-            <label>
-                <input type="checkbox" id="includeNumbers" checked> 🔢 Chiffres (0-9)
-            </label>
-            <label>
-                <input type="checkbox" id="includeLetters" checked> 🔤 Lettres (A-Z)
-            </label>
-            <label>
-                <input type="checkbox" id="includeSpecial"> ⭐ Caractères spéciaux (!@#$%^&*)
-            </label>
-            
-            <div class="length-selector">
-                <label for="codeLength">📏 Longueur :</label>
-                <input type="number" id="codeLength" min="4" max="100" value="12">
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <button id="generateBtn">
-                <span>⚡ Générer</span>
-            </button>
-            <button id="copyBtn">
-                <span>📋 Copier</span>
-            </button>
-        </div>
-        
-        <div class="counter">
-            Codes générés : <span id="counter">0</span>
-        </div>
-        
-        <div class="history">
-            <h3>📜 Historique</h3>
-            <div id="historyList"></div>
-        </div>
-    </div>
 
-    <div class="notification" id="notification">
-        Code copié dans le presse-papier !
-    </div>
+  <button class="back-btn" onclick="window.location.href='info.html'">← Retour</button>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Éléments DOM
-            const generatedCode = document.getElementById('generatedCode');
-            const generateBtn = document.getElementById('generateBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const includeNumbers = document.getElementById('includeNumbers');
-            const includeLetters = document.getElementById('includeLetters');
-            const includeSpecial = document.getElementById('includeSpecial');
-            const codeLength = document.getElementById('codeLength');
-            const historyList = document.getElementById('historyList');
-            const counterElement = document.getElementById('counter');
-            const notification = document.getElementById('notification');
-            const codeDisplay = document.getElementById('codeDisplay');
-            
-            // Variables
-            let history = [];
-            let counter = 0;
-            
-            // Caractères disponibles
-            const numbers = '0123456789';
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-            const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-            
-            // Générer un code aléatoire
-            function generateRandomCode() {
-                let characters = '';
-                
-                if (includeNumbers.checked) characters += numbers;
-                if (includeLetters.checked) characters += letters;
-                if (includeSpecial.checked) characters += special;
-                
-                // Si aucun caractère n'est sélectionné
-                if (characters === '') {
-                    showNotification('Sélectionnez au moins un type de caractère !', 'error');
-                    return 'Sélectionnez un type';
-                }
-                
-                const length = parseInt(codeLength.value);
-                let result = '';
-                
-                // Générer le code caractère par caractère
-                for (let i = 0; i < length; i++) {
-                    const randomIndex = Math.floor(Math.random() * characters.length);
-                    result += characters[randomIndex];
-                }
-                
-                return result;
-            }
-            
-            // Mettre à jour l'affichage du code
-            function updateCodeDisplay(code) {
-                generatedCode.textContent = code;
-                
-                // Animation
-                codeDisplay.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    codeDisplay.style.transform = 'scale(1)';
-                }, 200);
-                
-                // Ajouter à l'historique
-                addToHistory(code);
-                
-                // Mettre à jour le compteur
-                counter++;
-                counterElement.textContent = counter;
-            }
-            
-            // Ajouter à l'historique
-            function addToHistory(code) {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                history.unshift({ code, time: timeString });
-                
-                // Garder seulement les 10 derniers
-                if (history.length > 10) {
-                    history.pop();
-                }
-                
-                // Mettre à jour l'affichage de l'historique
-                updateHistoryDisplay();
-            }
-            
-            // Mettre à jour l'affichage de l'historique
-            function updateHistoryDisplay() {
-                historyList.innerHTML = '';
-                
-                history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = 
-                        <span class="code">${item.code}</span>
-                        <span class="time">${item.time}</span>
-                    ;
-                    
-                    // Ajouter un clic pour recopier
-                    historyItem.addEventListener('click', function() {
-                        copyToClipboard(item.code);
-                        showNotification('Code copié !');
-                    });
-                    
-                    historyList.appendChild(historyItem);
-                });
-            }
-            
-            // Copier dans le presse-papier
-            function copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showNotification('Code copié dans le presse-papier !');
-                }).catch(err => {
-                    // Fallback pour anciens navigateurs
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showNotification ('Code copié !');
-                });
-            }
-            
-            // Afficher une notification
-            function showNotification(message, type = 'success') {
-                notification.textContent = message;
-                notification.style.background = type === 'error' ? '#f56565' : '#48bb78';
-                
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Événements
-            generateBtn.addEventListener('click', function() {
-                const code = generateRandomCode();
-                updateCodeDisplay(code);
-                
-                // Animation du bouton
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 100);
-            });
-            
-            copyBtn.addEventListener('click', function() {
-                const code = generatedCode.textContent;
-                if (code && code !== 'Cliquez sur "Générer"') {
-                    copyToClipboard(code);
-                    
-                    // Animation du bouton
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = 'scale(1)';
-                    }, 100);
-                } else {
-                    showNotification('Générez un code d\'abord !', 'error');
-                }
-            });
-            
-            // Générer un code avec la barre d'espace
-            document.addEventListener('keydown', function(event) {
-                if (event.code === 'Space' || event.code === 'Enter') {
-                    event.preventDefault();
-                    generateBtn.click();
-                }
-                
-                // Copier avec Ctrl+C
-                if (event.ctrlKey && event.code === 'KeyC') {
-                    event.preventDefault();
-                    copyBtn.click();
-                }
-            });
-            
-            // Double-clic sur le code pour copier
-            codeDisplay.addEventListener('dblclick', function() {
-                const code = generatedCode.textContent;
-                if (code && code !== 'Cliquez sur "Générer"') {
-                    copyToClipboard(code);
-                }
-            });
-            
-            // Générer un code au chargement
-            const initialCode = generateRandomCode();
-            updateCodeDisplay(initialCode);
-            
-            // Afficher un message d'accueil
-            setTimeout(() => {
-                showNotification('Appuyez sur Espace pour générer un nouveau code !');
-            }, 1000);
-        });
-    </script>
+  <h1>Bienvenue</h1>
+
+  <div class="annee-toggle">
+    <button class="annee-btn" onclick="toggleAnnees()">Année</button>
+    <div class="liste-annees" id="listeAnnees">
+      <a href="Guest.html"><button>2024</button></a>
+      <a href="2025.html"><button>2025</button></a>
+      <a href="2026.html"><button>2026</button></a>
+      <a href="2027.html"><button>2027</button></a>
+      <a href="2028.html"><button>2028</button></a>
+      <a href="2029.html"><button>2029</button></a>
+      <a href="2030.html"><button>2030</button></a>
+    </div>
+  </div>
+
+  <div class="content">
+    <h3>N’hésitez pas à nous contacter sur la page :</h3>
+    <h2 style="color: blue;">Exprimez-Vous</h2>
+    <p>Si vous voulez envoyer le résumé de votre parcours au challenge Dictée et Épellation durant
+    l’année, y compris les noms de tous ceux qui y ont participé (comme le veut la tradition).  
+    Nous vous répondrons quelques heures après que vous aurez envoyé votre message.</p>
+    <p>Si, après 24 heures, vous ne recevez toujours aucune réponse, merci de renvoyer votre message. 📬</p>
+    <p>👉 Pour lire nos réponses ou suivre les prochaines étapes, rendez-vous ci-dessous à l’option Instructions 📄👇</p>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="Instruction.html">
+      <img src="Instructions.png" alt="Description" style="max-width: 350px;" />
+    </a>
+  </div>
+
+  <img src="GOLO.PNG" width="900" alt="GOLO" />
+
+  <footer>
+    Tous droits réservés ©️ 2025
+  </footer>
+
+  <script>
+    function toggleAnnees() {
+      const liste = document.getElementById("listeAnnees");
+      liste.style.display = (liste.style.display === "flex") ? "none" : "flex";
+      if (liste.style.display === "flex") {
+        liste.style.flexDirection = "column";
+        liste.style.alignItems = "center";
+      }
+    }
+  </script>
+
 </body>
-</html><!DOCTYPE html>
+</html>
+
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Codes Aléatoires</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 500px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 24px;
-        }
-
-        .code-display {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .code-display:hover {
-            border-color: #667eea;
-            background: #f0f2ff;
-        }
-
-        #generatedCode {
-            font-family: 'Courier New', monospace;
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-            word-break: break-all;
-            letter-spacing: 2px;
-        }
-
-        .options {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .options label {
-            display: block;
-            margin-bottom: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .options input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.2);
-        }
-
-        .length-selector {
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #codeLength {
-            width: 70px;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        #generateBtn {
-            background: #667eea;
-            color: white;
-        }
-
-        #generateBtn:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        #copyBtn {
-            background: #48bb78;
-            color: white;
-        }
-
-        #copyBtn:hover {
-            background: #38a169;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .history {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .history h3 {
-            margin-bottom: 15px;
-            color: #555;
-            font-size: 18px;
-        }
-
-        #historyList {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            border-left: 4px solid #667eea;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .history-item:hover {
-            background: #f0f2ff;
-            transform: translateX(5px);
-        }
-
-        .history-item .time {
-            font-size: 12px;
-            color: #888;
-            font-family: Arial, sans-serif;
-        }
-
-        .counter {
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .buttons {
-                flex-direction: column;
-            }
-            
-            #generatedCode {
-                font-size: 18px;
-            }
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #48bb78;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transform: translateX(200%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Page avec image cliquable</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .image-lien {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .image-lien img {
+      width: 80px; /* Taille réduite */
+      height: auto;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔐 Générateur de Codes Aléatoires</h1>
-        
-        <div class="code-display" id="codeDisplay">
-            <span id="generatedCode">Cliquez sur "Générer"</span>
-        </div>
-        
-        <div class="options">
-            <label>
-                <input type="checkbox" id="includeNumbers" checked> 🔢 Chiffres (0-9)
-            </label>
-            <label>
-                <input type="checkbox" id="includeLetters" checked> 🔤 Lettres (A-Z)
-            </label>
-            <label>
-                <input type="checkbox" id="includeSpecial"> ⭐ Caractères spéciaux (!@#$%^&*)
-            </label>
-            
-            <div class="length-selector">
-                <label for="codeLength">📏 Longueur :</label>
-                <input type="number" id="codeLength" min="4" max="100" value="12">
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <button id="generateBtn">
-                <span>⚡ Générer</span>
-            </button>
-            <button id="copyBtn">
-                <span>📋 Copier</span>
-            </button>
-        </div>
-        
-        <div class="counter">
-            Codes générés : <span id="counter">0</span>
-        </div>
-        
-        <div class="history">
-            <h3>📜 Historique</h3>
-            <div id="historyList"></div>
-        </div>
-    </div>
 
-    <div class="notification" id="notification">
-        Code copié dans le presse-papier !
-    </div>
+  <a href="entrainement.html" class="image-lien">
+    <img src="img.png" alt="Aller à l'entraînement">
+  </a>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Éléments DOM
-            const generatedCode = document.getElementById('generatedCode');
-            const generateBtn = document.getElementById('generateBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const includeNumbers = document.getElementById('includeNumbers');
-            const includeLetters = document.getElementById('includeLetters');
-            const includeSpecial = document.getElementById('includeSpecial');
-            const codeLength = document.getElementById('codeLength');
-            const historyList = document.getElementById('historyList');
-            const counterElement = document.getElementById('counter');
-            const notification = document.getElementById('notification');
-            const codeDisplay = document.getElementById('codeDisplay');
-            
-            // Variables
-            let history = [];
-            let counter = 0;
-            
-            // Caractères disponibles
-            const numbers = '0123456789';
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-            const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-            
-            // Générer un code aléatoire
-            function generateRandomCode() {
-                let characters = '';
-                
-                if (includeNumbers.checked) characters += numbers;
-                if (includeLetters.checked) characters += letters;
-                if (includeSpecial.checked) characters += special;
-                
-                // Si aucun caractère n'est sélectionné
-                if (characters === '') {
-                    showNotification('Sélectionnez au moins un type de caractère !', 'error');
-                    return 'Sélectionnez un type';
-                }
-                
-                const length = parseInt(codeLength.value);
-                let result = '';
-                
-                // Générer le code caractère par caractère
-                for (let i = 0; i < length; i++) {
-                    const randomIndex = Math.floor(Math.random() * characters.length);
-                    result += characters[randomIndex];
-                }
-                
-                return result;
-            }
-            
-            // Mettre à jour l'affichage du code
-            function updateCodeDisplay(code) { generatedCode.textContent = code;
-                
-                // Animation
-                codeDisplay.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    codeDisplay.style.transform = 'scale(1)';
-                }, 200);
-                
-                // Ajouter à l'historique
-                addToHistory(code);
-                
-                // Mettre à jour le compteur
-                counter++;
-                counterElement.textContent = counter;
-            }
-            
-            // Ajouter à l'historique
-            function addToHistory(code) {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                history.unshift({ code, time: timeString });
-                
-                // Garder seulement les 10 derniers
-                if (history.length > 10) {
-                    history.pop();
-                }
-                
-                // Mettre à jour l'affichage de l'historique
-                updateHistoryDisplay();
-            }
-            
-            // Mettre à jour l'affichage de l'historique
-            function updateHistoryDisplay() {
-                historyList.innerHTML = '';
-                
-                history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = 
-                        <span class="code">${item.code}</span>
-                        <span class="time">${item.time}</span>
-                    ;
-                    
-                    // Ajouter un clic pour recopier
-                    historyItem.addEventListener('click', function() {
-                        copyToClipboard(item.code);
-                        showNotification('Code copié !');
-                    });
-                    
-                    historyList.appendChild(historyItem);
-                });
-            }
-            
-            // Copier dans le presse-papier
-            function copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showNotification('Code copié dans le presse-papier !');
-                }).catch(err => {
-                    // Fallback pour anciens navigateurs
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showNotification('Code copié !');
-                });
-            }
-            
-            // Afficher une notification
-            function showNotification(message, type = 'success') {
-                notification.textContent = message;
-                notification.style.background = type === 'error' ? '#f56565' : '#48bb78';
-                
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Événements
-            generateBtn.addEventListener('click', function() {
-                const code = generateRandomCode();
-                updateCodeDisplay(code);
-                
-                // Animation du bouton
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 100);
-            });
-            
-            copyBtn.addEventListener('click', function() {
-                const code = generatedCode.textContent;
-                if (code && code !== 'Cliquez sur "Générer"') {
-                    copyToClipboard(code); // Animation du bouton
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = 'scale(1)';
-                    }, 100);
-                } else {
-                    showNotification('Générez un code d\'abord !', 'error');
-                }
-            });
-            
-            // Générer un code avec la barre d'espace
-            document.addEventListener('keydown', function(event) {
-                if (event.code === 'Space' || event.code === 'Enter') {
-                    event.preventDefault();
-                    generateBtn.click();
-                }
-                
-                // Copier avec Ctrl+C
-                if (event.ctrlKey && event.code === 'KeyC') {
-                    event.preventDefault();
-                    copyBtn.click();
-                }
-            });
-            
-            // Double-clic sur le code pour copier
-            codeDisplay.addEventListener('dblclick', function() {
-                const code = generatedCode.textContent;
-                if (code && code !== 'Cliquez sur "Générer"') {
-                    copyToClipboard(code);
-                }
-            });
-            
-            // Générer un code au chargement
-            const initialCode = generateRandomCode();
-            updateCodeDisplay(initialCode);
-            
-            // Afficher un message d'accueil
-            setTimeout(() => {
-                showNotification('Appuyez sur Espace pour générer un nouveau code !');
-            }, 1000);
-        });
-    </script>
 </body>
 </html>
