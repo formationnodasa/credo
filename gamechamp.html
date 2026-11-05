@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>champ lexical – Quiz Multijoueur</title>
+<title>Josef – Quiz Multijoueur</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -105,6 +105,7 @@
   }
   .status { text-align: center; margin: 12px 0; font-weight: 600; }
   
+  /* Style du tableau des scores en jeu */
   .scoreboard {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px; margin: 20px 0;
@@ -117,7 +118,6 @@
   .player-card.me { border-color: var(--dore); background: var(--carte); }
   .player-card.winner { border-color: var(--dore); background: var(--carte); box-shadow: 0 4px 12px rgba(205, 164, 52, 0.2); }
   
-  /* Couleurs synchronisées en temps réel */
   .player-card.good { background-color: var(--carte-verte) !important; border-color: var(--msg-vert) !important; transform: scale(1.02); }
   .player-card.bad { background-color: var(--carte-rouge) !important; border-color: var(--msg-rouge) !important; }
 
@@ -160,13 +160,62 @@
   .recap-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gris); font-size: 0.95rem; }
   .recap-item:last-child { border-bottom: none; }
   .recap-good { color: var(--msg-vert); font-weight: 800; }
+
+  /* --- TABLEAU DE CLASSEMENT FINAL PROFESSIONNEL --- */
+  .pro-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: var(--carte);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid var(--gris);
+  }
+  .pro-table th {
+    background: var(--dore);
+    color: #111;
+    padding: 16px;
+    text-align: left;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+  .pro-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--gris);
+    font-weight: 600;
+    color: var(--texte);
+  }
+  .pro-table tr:last-child td { border-bottom: none; }
+  .pro-table tr.winner-row {
+    background: rgba(205, 164, 52, 0.1);
+  }
+  .pro-table tr.winner-row td {
+    color: var(--dore);
+    font-weight: 900;
+  }
+  .rank-badge {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    text-align: center;
+    border-radius: 50%;
+    background: var(--gris);
+    color: var(--texte);
+    font-weight: 800;
+  }
+  .rank-badge.gold { background: #fbbf24; color: #111; }
+  .rank-badge.silver { background: #9ca3af; color: #111; }
+  .rank-badge.bronze { background: #d97706; color: #fff; }
 </style>
 </head>
 <body>
 <div class="container">
   <button id="themeToggle" title="Changer de thème">🌙</button>
 
-  <h1>👑 Champ Lexical – Quiz Multijoueur</h1>
+  <h1>👑 Josef – Quiz Multijoueur</h1>
 
   <!-- ACCUEIL -->
   <div id="screenHome">
@@ -233,9 +282,23 @@
   <!-- FIN -->
   <div id="screenEnd" class="hidden">
     <div class="status" style="font-size:clamp(24px, 5vw, 36px); font-weight:900; color:var(--dore); margin:20px 0;" id="endTitle">Partie terminée</div>
-    <div class="scoreboard" id="finalScoreboard"></div>
     
-    <h3 style="text-align:center; margin-top:24px; color:var(--texte);">Récapitulatif des réponses</h3>
+    <!-- Le tableau professionnel remplace l'ancien scoreboard -->
+    <table class="pro-table" id="finalScoreboard">
+      <thead>
+        <tr>
+          <th>Rang</th>
+          <th>Joueur</th>
+          <th>Score</th>
+          <th>Stats (✅/❌)</th>
+        </tr>
+      </thead>
+      <tbody id="finalScoreboardBody">
+        <!-- Rempli par JS -->
+      </tbody>
+    </table>
+    
+    <h3 style="text-align:center; margin-top:32px; color:var(--texte);">Récapitulatif des réponses</h3>
     <div class="recap-list" id="recapList"></div>
 
     <div class="row" style="margin-top:24px;">
@@ -756,7 +819,6 @@ async function submitAnswer(){
       
       if (allWrong) {
         setMsg('msg3', `❌ Tout le monde a raté !`, 'var(--dore)');
-        // Modification : plus de vocale ici
         
         setTimeout(async () => {
           const updates = {};
@@ -795,7 +857,7 @@ $('btnLobbyLeaveGuest').addEventListener('click', leaveRoom);
 $('btnGameLeave').addEventListener('click', leaveRoom);
 
 /* ============================================================
-   FIN DE PARTIE
+   FIN DE PARTIE (TABLEAU PRO)
    ============================================================ */
 function renderEnd(game){
   if (timerInterval) clearInterval(timerInterval);
@@ -807,12 +869,26 @@ function renderEnd(game){
   const winnerScore = winnerName ? entries[0][1].score : 0;
   const tied = entries.length > 1 && entries[1][1].score === winnerScore;
 
-  $('finalScoreboard').innerHTML = entries.map(([name,p],i) => `
-    <div class="player-card ${name===winnerName && !tied ? 'winner' : ''}">
-      <span class="player-name">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${escapeHtml(name)}</span>
-      <span class="player-score">${p.score||0} pts (✅ ${p.correctAnswers||0} | ❌ ${p.wrongAnswers||0})</span>
-    </div>
-  `).join('');
+  const tbody = $('finalScoreboardBody');
+  tbody.innerHTML = entries.map(([name,p],i) => {
+    let rankIcon = '';
+    let rankClass = '';
+    if (i === 0) { rankIcon = '🥇'; rankClass = 'gold'; }
+    else if (i === 1) { rankIcon = '🥈'; rankClass = 'silver'; }
+    else if (i === 2) { rankIcon = '🥉'; rankClass = 'bronze'; }
+    else { rankIcon = i + 1; }
+
+    const isWinner = name === winnerName && !tied;
+
+    return `
+      <tr class="${isWinner ? 'winner-row' : ''}">
+        <td><span class="rank-badge ${rankClass}">${rankIcon}</span></td>
+        <td>${escapeHtml(name)} ${isWinner ? '👑' : ''}</td>
+        <td style="color:var(--dore); font-size:1.2rem;">${p.score||0} pts</td>
+        <td>✅ ${p.correctAnswers||0} | ❌ ${p.wrongAnswers||0}</td>
+      </tr>
+    `;
+  }).join('');
   
   if (tied) {
     $('endTitle').textContent = `🤝 Égalité entre les joueurs à ${winnerScore} pts !`;
